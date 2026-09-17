@@ -92,7 +92,9 @@ describe("complete business components", () => {
     fireEvent.click(screen.getByRole("button", { name: "下线" }));
     expect(onStatusChange).toHaveBeenCalledWith(false);
     expect(screen.getByText("已下线")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "V1" }));
+    fireEvent.click(screen.getByRole("button", {
+      name: "查看部署版本 V1",
+    }));
     expect(screen.getByRole("dialog", { name: "版本列表" })).toBeInTheDocument();
   });
 });

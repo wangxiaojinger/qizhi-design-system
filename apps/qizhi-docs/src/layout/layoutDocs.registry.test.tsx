@@ -4,6 +4,11 @@ describe("Layout legacy registry", () => {
   it("preserves the exact old-site order, titles and descriptions", () => {
     expect(layoutDemos.map(({ id, title, description }) => ({ id, title, description }))).toEqual([
       {
+        id: "layout-locale-provider",
+        title: "全局语言",
+        description: "通过 LocaleProvider 和 useLocale 让整棵应用共享中文与英文状态。",
+      },
+      {
         id: "layout-basic",
         title: "基础用法",
         description: "典型的页面布局。上方展示 Header、Content、Footer 纵向结构，下方展示带 Sider 的复合结构。",

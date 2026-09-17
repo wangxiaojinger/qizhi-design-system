@@ -154,7 +154,7 @@ describe("Business objects", () => {
     );
 
     const actions = screen.getAllByRole("button");
-    expect(actions.map((button) => button.textContent)).toEqual([
+    expect(actions.map((button) => button.textContent?.trim())).toEqual([
       "查看详情",
       "快速体验",
       "在线推理",

@@ -9,9 +9,9 @@ describe("Business guidance docs", () => {
       .toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "基础用法" }))
       .toBeInTheDocument();
-    expect(screen.getAllByRole("heading", { level: 3 }).map((node) => (
-      node.textContent
-    ))).toEqual([
+    expect(Array.from(
+      container.querySelectorAll(".qizhi-business-guide__steps h3"),
+    ).map((node) => node.textContent)).toEqual([
       "申请/加入项目",
       "模型训练与资产沉淀",
       "模型服务化部署",

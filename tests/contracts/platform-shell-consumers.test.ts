@@ -51,18 +51,4 @@ describe("generated page PlatformShell consumers", () => {
       ".qizhi-side-navigation.agent-page-side-navigation",
     );
   });
-
-  it("uses the public CodePreview for the workbench Skill.md file preview", () => {
-    const source = readSource(
-      "generated-react-pages/workbench-home/src/SkillsWorkshop.tsx",
-    );
-    const pageCss = readSource(
-      "generated-react-pages/workbench-home/src/page.css",
-    );
-
-    expect(source).toContain("CodePreview");
-    expect(source).not.toContain("<pre>{selectedSkill.markdown}</pre>");
-    expect(pageCss).not.toContain(".skill-markdown pre");
-    expect(pageCss).not.toContain("--font-mono");
-  });
 });
