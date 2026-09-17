@@ -1,0 +1,83 @@
+.qizhi-tooltip {
+  --qizhi-tooltip-bg: var(--color-neutral-10, #1d2129);
+  position: fixed;
+  z-index: 1200;
+  box-sizing: border-box;
+  max-width: min(420px, calc(100vw - 16px));
+  min-height: 32px;
+  padding: 6px 12px;
+  border-radius: var(--border-radius-medium, 4px);
+  background: var(--qizhi-tooltip-bg);
+  color: #fff;
+  font-size: 14px;
+  line-height: 20px;
+  text-align: left;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.18);
+  overflow-wrap: anywhere;
+}
+
+.qizhi-tooltip-mini {
+  min-height: 34px;
+  padding: 6px 14px;
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.qizhi-tooltip__arrow {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: var(--qizhi-tooltip-bg);
+  transform: rotate(45deg);
+}
+
+.qizhi-tooltip[data-tooltip-position^="top"] .qizhi-tooltip__arrow {
+  bottom: -4px;
+  left: calc(50% - 4px);
+}
+
+.qizhi-tooltip[data-tooltip-position^="bottom"] .qizhi-tooltip__arrow {
+  top: -4px;
+  left: calc(50% - 4px);
+}
+
+.qizhi-tooltip[data-tooltip-position^="left"] .qizhi-tooltip__arrow {
+  top: calc(50% - 4px);
+  right: -4px;
+}
+
+.qizhi-tooltip[data-tooltip-position^="right"] .qizhi-tooltip__arrow {
+  top: calc(50% - 4px);
+  left: -4px;
+}
+
+.qizhi-tooltip[data-tooltip-position$="Left"] .qizhi-tooltip__arrow {
+  right: auto;
+  left: 18px;
+}
+
+.qizhi-tooltip[data-tooltip-position$="Right"] .qizhi-tooltip__arrow {
+  right: 18px;
+  left: auto;
+}
+
+.qizhi-tooltip[data-tooltip-position$="Top"] .qizhi-tooltip__arrow {
+  top: 8px;
+  bottom: auto;
+}
+
+.qizhi-tooltip[data-tooltip-position$="Bottom"] .qizhi-tooltip__arrow {
+  top: auto;
+  bottom: 8px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .qizhi-tooltip {
+    animation: qizhi-tooltip-enter 0.16s ease-out;
+  }
+}
+
+@keyframes qizhi-tooltip-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

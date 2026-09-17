@@ -1,0 +1,164 @@
+#component-drawer .component-examples,
+#component-drawer .component-examples > *,
+#component-drawer .codebox-wrapper,
+#component-drawer .qizhi-api-section,
+#component-drawer .qizhi-api-table-scroll {
+  min-width: 0;
+  max-width: 100%;
+}
+
+#component-drawer .codebox-wrapper {
+  overflow: visible;
+}
+
+.drawer-demo-copy p {
+  margin: 0 0 16px;
+}
+
+.drawer-demo-copy p:last-child {
+  margin-bottom: 0;
+}
+
+.drawer-form-shell {
+  min-height: calc(100% + 48px);
+  margin: -24px;
+  padding: 16px 24px 24px;
+  background: var(--color-fill-1);
+}
+
+.drawer-form-demo-form {
+  gap: 16px;
+  width: 100%;
+  max-width: none;
+}
+
+.drawer-form-section {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+  padding: 24px;
+  background: var(--color-bg-2);
+}
+
+.drawer-form-section h3 {
+  margin: 0;
+  color: var(--color-text-1);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+}
+
+.drawer-form-control {
+  width: min(100%, 558px);
+  max-width: 558px;
+}
+
+.drawer-form-control-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: min(100%, 590px);
+  min-width: 0;
+}
+
+.drawer-form-control-row .drawer-form-control {
+  flex: 0 1 558px;
+}
+
+.drawer-form-refresh {
+  flex: 0 0 auto;
+  width: 24px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0;
+  color: var(--color-text-3);
+}
+
+.drawer-form-refresh:hover {
+  color: var(--color-text-2);
+}
+
+.drawer-form-refresh.is-refreshing svg {
+  animation: drawer-form-refresh 450ms ease;
+}
+
+@keyframes drawer-form-refresh {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes drawer-form-refresh-reduced {
+  from, to { transform: none; }
+}
+
+.drawer-form-resource-button.qizhi-btn {
+  justify-self: start;
+  width: max-content;
+}
+
+.drawer-form-choice-stack {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  width: min(100%, 558px);
+  min-width: 0;
+}
+
+.drawer-form-section .qizhi-radio-group.radio-demo-row {
+  gap: 16px 32px;
+}
+
+.drawer-form-section .qizhi-form-item-label svg {
+  width: 14px;
+  height: 14px;
+  color: var(--color-text-4);
+  vertical-align: -2px;
+}
+
+.drawer-form-advanced {
+  justify-content: flex-start;
+  width: max-content;
+  min-width: 0;
+  min-height: 24px;
+  height: 24px;
+  padding: 0;
+  color: var(--color-text-3);
+}
+
+@media (max-width: 640px) {
+  .drawer-form-shell {
+    min-height: calc(100% + 40px);
+    margin: -20px;
+    padding: 16px 20px 20px;
+  }
+
+  .drawer-form-section {
+    padding: 20px;
+  }
+
+  .drawer-form-control-row {
+    align-items: flex-end;
+  }
+
+  .drawer-form-choice-stack,
+  .drawer-form-control,
+  .drawer-form-control-row {
+    width: 100%;
+  }
+
+  .drawer-form-choice-stack .radio-button-demo {
+    display: grid;
+    width: 100%;
+  }
+
+  .drawer-form-choice-stack .qizhi-radio-button {
+    width: 100%;
+    margin: 0 0 -1px;
+    border-radius: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer-form-refresh.is-refreshing svg {
+    animation: drawer-form-refresh-reduced 1ms linear;
+  }
+}

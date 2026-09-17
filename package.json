@@ -1,0 +1,36 @@
+{
+  "name": "qizhi-design-system",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.19.0",
+  "scripts": {
+    "api:build": "node scripts/build-component-api.mjs",
+    "api:validate": "node scripts/build-component-api.mjs --check",
+    "dev": "vite --host 127.0.0.1",
+    "build": "pnpm api:build && pnpm --filter @wangxiaojinger/qizhi-tokens build && vite build && pnpm --filter @wangxiaojinger/qizhi-react build && pnpm --filter @wangxiaojinger/qizhi-react-smoke build",
+    "typecheck": "tsc -p tsconfig.json --noEmit && pnpm --filter @wangxiaojinger/qizhi-react typecheck",
+    "test": "pnpm --filter @wangxiaojinger/qizhi-tokens test && vitest run",
+    "e2e": "playwright test",
+    "verify": "pnpm api:validate && pnpm --filter @wangxiaojinger/qizhi-tokens validate && pnpm typecheck && pnpm test && pnpm build"
+  },
+  "dependencies": {
+    "prismjs": "^1.30.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.62.1",
+    "@testing-library/jest-dom": "7.0.1",
+    "@testing-library/react": "16.3.2",
+    "@testing-library/user-event": "14.6.4",
+    "@types/prismjs": "^1.26.6",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "@vitejs/plugin-react": "6.0.5",
+    "jsdom": "30.0.1",
+    "typescript": "7.0.2",
+    "vite": "8.2.1",
+    "vitest": "4.1.10"
+  }
+}

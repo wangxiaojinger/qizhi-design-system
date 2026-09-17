@@ -1,0 +1,93 @@
+.qizhi-link {
+  --qizhi-link-color: var(--color-link);
+  --qizhi-link-color-hover: var(--color-link-hover);
+  --qizhi-link-color-active: rgb(var(--link-7));
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 2px 6px;
+  border: 0;
+  border-radius: var(--border-radius-medium);
+  background: transparent;
+  color: var(--qizhi-link-color);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  font-weight: 400;
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.18s ease, background-color 0.18s ease;
+}
+
+.qizhi-link:hover {
+  color: var(--qizhi-link-color-hover);
+  background: var(--color-fill-2);
+}
+
+.qizhi-link:active {
+  color: var(--qizhi-link-color-active);
+  background: var(--color-fill-3);
+}
+
+.qizhi-link:focus-visible {
+  outline: 2px solid rgba(var(--primary-6), 0.35);
+  outline-offset: 2px;
+}
+
+.qizhi-link--error {
+  --qizhi-link-color: var(--color-danger);
+  --qizhi-link-color-hover: rgb(var(--danger-5));
+  --qizhi-link-color-active: rgb(var(--danger-7));
+}
+
+.qizhi-link--success {
+  --qizhi-link-color: var(--color-success);
+  --qizhi-link-color-hover: rgb(var(--success-5));
+  --qizhi-link-color-active: rgb(var(--success-7));
+}
+
+.qizhi-link--warning {
+  --qizhi-link-color: var(--color-warning);
+  --qizhi-link-color-hover: rgb(var(--warning-5));
+  --qizhi-link-color-active: rgb(var(--warning-7));
+}
+
+.qizhi-link__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+}
+
+.qizhi-link__icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.qizhi-link--hoverless:hover {
+  background: transparent;
+}
+
+.qizhi-link:disabled,
+.qizhi-link--disabled,
+.qizhi-link[aria-disabled="true"] {
+  color: var(--color-text-4);
+  background: transparent;
+  cursor: not-allowed;
+}
+
+.qizhi-link:disabled:hover,
+.qizhi-link--disabled:hover,
+.qizhi-link[aria-disabled="true"]:hover {
+  color: var(--color-text-4);
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qizhi-link {
+    transition: none;
+  }
+}

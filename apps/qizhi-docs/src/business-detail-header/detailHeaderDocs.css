@@ -1,0 +1,6 @@
+#business-detail-header .component-examples,#business-detail-header .component-examples > *,#business-detail-header .codebox-wrapper,#business-detail-header .qz-description,#business-detail-header .qz-description-children,#business-detail-header .code-preview,#business-detail-header .codebox-wrapper > .demo { box-sizing:border-box; width:100%; min-width:0; }
+#business-detail-header .component-example-actions { padding-right:0; }
+#business-detail-header .codebox-wrapper > .demo { margin-bottom:12px; }
+.detail-header-preview { container-type:inline-size; overflow:visible; background:var(--color-fill-1); }
+.detail-header-guidance .demo ul { margin:0; }
+@media (max-width:600px) { #business-detail-header .detail-header-preview { padding:16px; } }

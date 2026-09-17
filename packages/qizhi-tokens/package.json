@@ -1,0 +1,37 @@
+{
+  "name": "@wangxiaojinger/qizhi-tokens",
+  "version": "0.1.0",
+  "description": "QIZHI Design System design tokens.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./style.css": "./dist/style.css",
+    "./tokens.json": "./dist/tokens.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wangxiaojinger/qizhi-design-system.git",
+    "directory": "packages/qizhi-tokens"
+  },
+  "homepage": "https://github.com/wangxiaojinger/qizhi-design-system#readme",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/tokens.node.mjs",
+    "validate": "node scripts/validate.mjs"
+  }
+}

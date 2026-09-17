@@ -1,0 +1,37 @@
+#component-popover .qizhi-components-wrapper { grid-template-columns: minmax(0, 1fr); width: 100%; min-width: 0; }
+#component-popover .codebox-wrapper, #component-popover .demo { box-sizing: border-box; width: 100%; max-width: 100%; min-width: 0; }
+#component-popover .codebox-wrapper > .demo { display: flex; align-items: center; justify-content: center; min-height: 180px; margin-bottom: 12px; overflow: visible; }
+#component-popover .component-example-actions { padding-right: 0; }
+#component-popover .qizhi-api-section { margin-top: 64px; }
+#component-popover .qizhi-api-section h3 { margin: 48px 0 24px; font-size: 24px; font-weight: 500; }
+#component-popover .qizhi-api-section__note { color: var(--color-text-2); font-size: 14px; }
+#component-popover .qizhi-api-table-scroll { overflow-x: auto; }
+#component-popover .qizhi-copy-status:empty { display: none; }
+#component-popover .qizhi-code-wrapper { min-width: 0; max-width: 100%; overflow: hidden; }
+#component-popover .qizhi-code-wrapper pre { box-sizing: border-box; width: 100%; margin: 0; padding: 24px; overflow: auto; background: var(--color-fill-1); }
+#component-popover .popover-placement-demo { display: grid; grid-template-columns: repeat(5, 104px); grid-template-rows: repeat(5, 40px); gap: 20px 16px; width: min(100%, 584px); height: auto; min-height: 280px; align-content: center; justify-content: center; }
+#component-popover .popover-placement-demo__item { display: flex; align-items: center; justify-content: center; }
+#component-popover .popover-placement-demo__item .qizhi-btn { width: 104px; }
+#component-popover .popover-closable-demo__copy { margin: 0 0 12px; }
+#component-popover .popover-closable-demo__actions { display: flex; justify-content: flex-end; }
+
+@media (min-width: 701px) {
+  #component-popover .popover-placement-demo__item:nth-child(1) { grid-column: 2; grid-row: 1; }
+  #component-popover .popover-placement-demo__item:nth-child(2) { grid-column: 3; grid-row: 1; }
+  #component-popover .popover-placement-demo__item:nth-child(3) { grid-column: 4; grid-row: 1; }
+  #component-popover .popover-placement-demo__item:nth-child(4) { grid-column: 1; grid-row: 2; }
+  #component-popover .popover-placement-demo__item:nth-child(5) { grid-column: 5; grid-row: 2; }
+  #component-popover .popover-placement-demo__item:nth-child(6) { grid-column: 1; grid-row: 3; }
+  #component-popover .popover-placement-demo__item:nth-child(7) { grid-column: 5; grid-row: 3; }
+  #component-popover .popover-placement-demo__item:nth-child(8) { grid-column: 1; grid-row: 4; }
+  #component-popover .popover-placement-demo__item:nth-child(9) { grid-column: 5; grid-row: 4; }
+  #component-popover .popover-placement-demo__item:nth-child(10) { grid-column: 2; grid-row: 5; }
+  #component-popover .popover-placement-demo__item:nth-child(11) { grid-column: 3; grid-row: 5; }
+  #component-popover .popover-placement-demo__item:nth-child(12) { grid-column: 4; grid-row: 5; }
+}
+
+@media (max-width: 700px) {
+  #component-popover .component-example-actions { flex-wrap: wrap; padding-inline: 0; }
+  #component-popover .popover-placement-demo { grid-template: none; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px 8px; width: 100%; min-height: 0; }
+  #component-popover .popover-placement-demo__item .qizhi-btn { width: 100%; min-width: 0; padding-inline: 8px; }
+}

@@ -1,0 +1,4 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs><linearGradient id="loading-white" x1="2" y1="12" x2="14" y2="4" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFFFF" stop-opacity="0.0001"/><stop offset="1" stop-color="#FFFFFF"/></linearGradient></defs>
+<path d="M8 1.5A6.5 6.5 0 1 1 1.5 8" fill="none" stroke="url(#loading-white)" stroke-width="2" stroke-linecap="round"/>
+</svg>

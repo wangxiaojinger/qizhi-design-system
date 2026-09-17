@@ -1,0 +1,15 @@
+.qizhi-layout {
+  box-sizing: border-box;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.qizhi-layout--has-sider { flex-direction: row; }
+.qizhi-layout__header,
+.qizhi-layout__footer,
+.qizhi-layout__content,
+.qizhi-layout__sider { box-sizing: border-box; min-width: 0; }
+.qizhi-layout__content { flex: 1 1 auto; }
+.qizhi-layout__sider { flex: 0 0 auto; }

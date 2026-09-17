@@ -1,0 +1,2 @@
+import { ApiTable } from "../api/ApiTable";
+export function MarkdownViewerApiTable() { return <section id="markdown-viewer-API" className="qizhi-api-section"><h2 className="qz-demo-title"><a tabIndex={-1} href="#markdown-viewer-API">API</a></h2><h3>MarkdownViewer</h3><p className="qizhi-api-section__note">首版不解析 Markdown 内嵌 HTML。</p><ApiTable api="markdownViewerApi" label="MarkdownViewer API" /></section>; }

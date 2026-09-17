@@ -1,0 +1,125 @@
+.qizhi-markdown-viewer {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+  color: var(--color-text-1);
+}
+
+.qizhi-markdown-viewer:has(.qizhi-markdown-viewer__outline) {
+  grid-template-columns: 200px minmax(0, 1fr);
+}
+
+.qizhi-markdown-viewer__outline {
+  display: flex;
+  align-self: start;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border-right: 1px solid var(--color-border-1);
+}
+
+.qizhi-markdown-viewer__outline-link {
+  overflow: hidden;
+  color: var(--color-text-2);
+  font-size: 13px;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.qizhi-markdown-viewer__outline-link--level-3 {
+  padding-left: 16px;
+}
+
+.qizhi-markdown-viewer__outline-link:hover,
+.qizhi-markdown-viewer__outline-link:focus-visible {
+  color: rgb(var(--primary-6));
+}
+
+.qizhi-markdown-viewer__content {
+  min-width: 0;
+  max-height: var(--qizhi-markdown-viewer-max-height);
+  overflow: auto;
+  font-size: 14px;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+
+.qizhi-markdown-viewer__content > :first-child {
+  margin-top: 0;
+}
+
+.qizhi-markdown-viewer__content > :last-child {
+  margin-bottom: 0;
+}
+
+.qizhi-markdown-viewer h1,
+.qizhi-markdown-viewer h2,
+.qizhi-markdown-viewer h3,
+.qizhi-markdown-viewer h4 {
+  margin: 24px 0 12px;
+  color: var(--color-text-1);
+  line-height: 1.4;
+}
+
+.qizhi-markdown-viewer p,
+.qizhi-markdown-viewer ul,
+.qizhi-markdown-viewer ol,
+.qizhi-markdown-viewer blockquote,
+.qizhi-markdown-viewer table,
+.qizhi-markdown-viewer .qizhi-code-preview {
+  margin: 0 0 16px;
+}
+
+.qizhi-markdown-viewer blockquote {
+  padding: 8px 16px;
+  border-left: 3px solid rgb(var(--primary-6));
+  background: var(--color-fill-1);
+  color: var(--color-text-2);
+}
+
+.qizhi-markdown-viewer table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.qizhi-markdown-viewer th,
+.qizhi-markdown-viewer td {
+  padding: 8px 12px;
+  border: 1px solid var(--color-border-1);
+  text-align: left;
+}
+
+.qizhi-markdown-viewer th {
+  background: var(--color-fill-1);
+  font-weight: var(--font-weight-600);
+}
+
+.qizhi-markdown-viewer :not(pre) > code {
+  padding: 2px 6px;
+  border-radius: var(--border-radius-small);
+  background: var(--color-fill-2);
+  color: var(--color-text-2);
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.qizhi-markdown-viewer__state {
+  display: grid;
+  min-height: 160px;
+  place-items: center;
+}
+
+@media (max-width: 767.98px) {
+  .qizhi-markdown-viewer:has(.qizhi-markdown-viewer__outline) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .qizhi-markdown-viewer__outline {
+    border-right: 0;
+    border-bottom: 1px solid var(--color-border-1);
+  }
+}

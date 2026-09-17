@@ -1,0 +1,48 @@
+#business-overview-metrics .qizhi-components-wrapper {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+#business-overview-metrics .codebox-wrapper > .demo {
+  margin-bottom: 12px;
+  overflow: visible;
+}
+
+#business-overview-metrics .component-example-actions {
+  padding-right: 0;
+}
+
+#business-overview-metrics .qizhi-overview-demo {
+  display: flex;
+  align-items: flex-start;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+#business-overview-metrics .business-overview-demo__row {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 600px) {
+  #business-overview-metrics .qizhi-overview-demo {
+    gap: 16px;
+  }
+
+  #business-overview-metrics .business-overview-demo__row {
+    width: 100%;
+    gap: 16px;
+  }
+
+  #business-overview-metrics .qizhi-metric-card,
+  #business-overview-metrics .qizhi-resource-card,
+  #business-overview-metrics .qizhi-object-metrics {
+    width: 100%;
+    max-width: none;
+  }
+
+  #business-overview-metrics .qizhi-object-metrics__items {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+}

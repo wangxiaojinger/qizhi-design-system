@@ -1,0 +1,10 @@
+#component-auto-complete .qizhi-components-wrapper { grid-template-columns: minmax(0, 1fr); width: 100%; min-width: 0; }
+#component-auto-complete .codebox-wrapper, #component-auto-complete .demo { box-sizing: border-box; width: 100%; max-width: 100%; min-width: 0; overflow: visible; }
+#component-auto-complete .codebox-wrapper > .demo { margin-bottom: 12px; }
+#component-auto-complete .component-example-actions { padding-right: 0; }
+#component-auto-complete .auto-complete-docs-wide { width: 320px; max-width: 100%; }
+#component-auto-complete .auto-complete-docs-textarea { height: 80px; }
+#component-auto-complete .auto-complete-docs-textarea .qizhi-textarea__field { height: 80px; min-height: 80px; }
+#component-auto-complete .auto-complete-docs-with-meta small { flex: 0 0 auto; color: var(--color-text-3); font-size: 12px; }
+#component-auto-complete .qizhi-api-section { margin-top: 64px; }
+@media (max-width: 767.98px) { #component-auto-complete .auto-complete-docs-wide { width: 100%; } }

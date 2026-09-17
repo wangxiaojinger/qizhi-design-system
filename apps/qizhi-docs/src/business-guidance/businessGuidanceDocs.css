@@ -1,0 +1,9 @@
+#business-guidance-flow .qizhi-components-wrapper {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+#business-guidance-flow .demo { overflow: visible; }
+#business-guidance-flow .codebox-wrapper > .demo { margin-bottom: 12px; }
+#business-guidance-flow .component-example-actions { padding-right: 0; }
+
+.business-guide-preview { padding: 24px; }

@@ -1,0 +1,52 @@
+.qizhi-code-wrapper {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.qizhi-code-wrapper pre {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: 24px;
+  overflow: auto;
+  background: var(--color-fill-1);
+}
+
+.qizhi-code-highlight {
+  color: var(--color-text-2);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 13px;
+  white-space: pre;
+}
+
+.qizhi-code-token--keyword,
+.qizhi-code-token--component,
+.qizhi-code-token--tag,
+.qizhi-code-token--attribute-value,
+.qizhi-code-token--boolean {
+  color: #00b42a;
+}
+
+.qizhi-code-token--string,
+.qizhi-code-token--property,
+.qizhi-code-token--attribute-punctuation {
+  color: #b37feb;
+}
+
+.qizhi-code-token--function {
+  color: #722ed1;
+}
+
+.qizhi-code-token--operator {
+  color: #ff7d00;
+}
+
+.qizhi-code-token--punctuation {
+  color: #165dff;
+}
+
+.qizhi-code-token--comment {
+  color: var(--color-text-3);
+  font-style: italic;
+}

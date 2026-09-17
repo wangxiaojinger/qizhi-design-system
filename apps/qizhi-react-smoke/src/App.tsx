@@ -1,0 +1,3 @@
+import { Button, Dropdown, Input } from "@wangxiaojinger/qizhi-react";
+const menu = <Dropdown.Menu><Dropdown.Item itemKey="beijing">北京</Dropdown.Item><Dropdown.Item itemKey="shanghai">上海</Dropdown.Item></Dropdown.Menu>;
+export default function App() { return <main><h1>QIZHI React 正式包消费验证</h1><Dropdown trigger="click" droplist={menu}><Button>打开菜单</Button></Dropdown><Input aria-label="服务名称" placeholder="请输入服务名称" /><Input.Search aria-label="搜索模型" searchButton="搜索" placeholder="搜索模型" /><Input.TextArea aria-label="服务描述" maxLength={50} showWordLimit placeholder="请输入服务描述" /><Input.Password aria-label="访问密码" placeholder="请输入访问密码" /></main>; }

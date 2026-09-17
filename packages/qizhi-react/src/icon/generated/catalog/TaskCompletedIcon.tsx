@@ -1,0 +1,9 @@
+// 由 scripts/build-catalog-icons.mjs 生成，禁止手改。
+// Source: ../../../../assets/icons/figma-combination/qz-icon-72-382.svg
+import { createQizhiMarkupIcon } from "../../createQizhiMarkupIcon";
+
+export const TaskCompletedIcon = createQizhiMarkupIcon(
+  "TaskCompletedIcon",
+  "0 0 16 16",
+  "<g id=\"__QIZHI_ICON_ID__-&#229;&#174;&#140;&#230;&#136;&#144;=on\">\n<path id=\"__QIZHI_ICON_ID__-Vector\" d=\"M6.76719 10.2766C6.96563 10.5531 7.37656 10.5531 7.575 10.2766L10.8656 5.71406C10.925 5.63125 10.8656 5.51562 10.7641 5.51562H10.0312C9.87187 5.51562 9.72031 5.59219 9.62656 5.72344L7.17188 9.12969L6.05937 7.58594C5.96562 7.45625 5.81562 7.37813 5.65469 7.37813H4.92188C4.82031 7.37813 4.76094 7.49375 4.82031 7.57656L6.76719 10.2766Z\" fill=\"currentColor\" fill-opacity=\"0.45\"/>\n<path id=\"__QIZHI_ICON_ID__-Vector_2\" d=\"M13.75 1.75H2.25C1.97344 1.75 1.75 1.97344 1.75 2.25V13.75C1.75 14.0266 1.97344 14.25 2.25 14.25H13.75C14.0266 14.25 14.25 14.0266 14.25 13.75V2.25C14.25 1.97344 14.0266 1.75 13.75 1.75ZM13.125 13.125H2.875V2.875H13.125V13.125Z\" fill=\"currentColor\" fill-opacity=\"0.45\"/>\n</g>",
+);

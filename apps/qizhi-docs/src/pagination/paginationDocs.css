@@ -1,0 +1,13 @@
+#component-pagination .qizhi-components-wrapper { grid-template-columns: minmax(0, 1fr); width: 100%; min-width: 0; }
+#component-pagination .codebox-wrapper, #component-pagination .demo { box-sizing: border-box; width: 100%; max-width: 100%; min-width: 0; }
+#component-pagination .codebox-wrapper > .demo { display: flex; align-items: center; justify-content: center; min-height: 180px; margin-bottom: 12px; overflow: visible; }
+#component-pagination .qizhi-api-section { margin-top: 64px; }
+#component-pagination .qizhi-api-section h3 { margin: 48px 0 24px; font-size: 24px; font-weight: 500; }
+#component-pagination .qizhi-api-section__note { color: var(--color-text-2); font-size: 14px; }
+#component-pagination .qizhi-api-table-scroll { overflow-x: auto; }
+#component-pagination .qizhi-code-wrapper { min-width: 0; max-width: 100%; overflow: hidden; }
+#component-pagination .qizhi-code-wrapper pre { box-sizing: border-box; width: 100%; margin: 0; padding: 24px; overflow: auto; background: var(--color-fill-1); }
+#component-pagination .pagination-size-demo { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+#component-pagination .pagination-demo-stack { display: flex; flex-direction: column; align-items: flex-start; gap: 24px; }
+@media (max-width: 1199px) { #component-pagination .codebox-wrapper > .demo { justify-content: flex-start; } #component-pagination .qizhi-pagination, #component-pagination .pagination-size-demo, #component-pagination .pagination-demo-stack { width: 100%; min-width: 0; } }
+@media (max-width: 767px) { #component-pagination .codebox-wrapper > .demo { padding-inline: 12px; } #component-pagination .pagination-size-demo { align-items: flex-start; } }

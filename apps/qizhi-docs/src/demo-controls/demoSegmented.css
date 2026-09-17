@@ -1,0 +1,73 @@
+.qizhi-segmented {
+  position: relative;
+  z-index: 0;
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  min-height: 32px;
+  padding: 1.5px;
+  border: 0;
+  border-radius: var(--border-radius-medium);
+  background: var(--color-fill-2);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.qizhi-segmented::-webkit-scrollbar { display: none; }
+
+.qizhi-segmented > .qizhi-segmented-item {
+  position: relative;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  height: 26px;
+  margin: 1.5px;
+  padding: 0 12px;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-2);
+  font: inherit;
+  font-size: 14px;
+  line-height: 26px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.qizhi-segmented > .qizhi-segmented-item[hidden] { display: none; }
+.qizhi-segmented.qizhi-segmented-sm { min-height: 28px; }
+.qizhi-segmented.qizhi-segmented-sm > .qizhi-segmented-item { height: 22px; line-height: 22px; }
+.qizhi-segmented.qizhi-segmented-lg { min-height: 36px; }
+.qizhi-segmented.qizhi-segmented-lg > .qizhi-segmented-item { height: 30px; line-height: 30px; }
+
+.qizhi-segmented > .is-active {
+  z-index: 1;
+  border-radius: var(--border-radius-small);
+  background: var(--color-white);
+  color: rgb(var(--primary-6));
+  font-weight: 400;
+  box-shadow: 0 1px 2px rgba(29, 33, 41, 0.08);
+}
+
+.qizhi-segmented > .qizhi-segmented-item:not(.is-active):hover:not(:disabled, [aria-disabled="true"]) {
+  border-radius: var(--border-radius-small);
+  background: var(--color-white);
+  color: var(--color-text-1);
+}
+
+.qizhi-segmented > .qizhi-segmented-item:focus-visible {
+  outline: 2px solid rgba(var(--primary-6), 0.2);
+  outline-offset: 0;
+  border-radius: var(--border-radius-small);
+}
+
+.qizhi-segmented > .qizhi-segmented-item:is(:disabled, [aria-disabled="true"]) {
+  color: var(--color-text-4);
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qizhi-segmented > .qizhi-segmented-item { scroll-behavior: auto; }
+}

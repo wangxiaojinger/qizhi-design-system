@@ -1,0 +1,143 @@
+.qizhi-popconfirm {
+  position: fixed;
+  z-index: 1200;
+  box-sizing: border-box;
+  width: 240px;
+  max-width: calc(100vw - 48px);
+  padding: 16px;
+  color: var(--color-text-1, #1d2129);
+  background: var(--color-bg-5, #fff);
+  border: 1px solid var(--color-border-1, #f2f3f5);
+  border-radius: 4px;
+  box-shadow: 0 8px 24px var(--color-shadow-border-strong, rgba(0, 0, 0, 0.12));
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.qizhi-popconfirm__main {
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.qizhi-popconfirm__main--no-icon {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.qizhi-popconfirm__icon {
+  display: inline-flex;
+  align-items: flex-start;
+  justify-content: center;
+  color: rgb(var(--warning-6, 255, 125, 0));
+  font-size: 18px;
+  line-height: 22px;
+}
+
+.qizhi-popconfirm__icon > svg {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+}
+
+.qizhi-popconfirm__default-icon path {
+  fill-opacity: 1;
+}
+
+.qizhi-popconfirm__title {
+  color: var(--color-text-1, #1d2129);
+  font-weight: 500;
+}
+
+.qizhi-popconfirm__content {
+  margin-top: 4px;
+  color: var(--color-text-2, #4e5969);
+}
+
+.qizhi-popconfirm__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.qizhi-popconfirm__actions .qizhi-btn {
+  min-width: 56px;
+}
+
+.qizhi-popconfirm__arrow {
+  position: absolute;
+  width: 12px;
+  height: 7px;
+  background: var(--color-bg-5, #fff);
+}
+
+.qizhi-popconfirm[data-popconfirm-position^="top"] .qizhi-popconfirm__arrow {
+  bottom: -7px;
+  left: calc(50% - 6px);
+  clip-path: polygon(0 0, 100% 0, 50% 100%);
+}
+
+.qizhi-popconfirm[data-popconfirm-position="topLeft"] .qizhi-popconfirm__arrow,
+.qizhi-popconfirm[data-popconfirm-position="bottomLeft"] .qizhi-popconfirm__arrow {
+  right: auto;
+  left: 18px;
+}
+
+.qizhi-popconfirm[data-popconfirm-position="topRight"] .qizhi-popconfirm__arrow,
+.qizhi-popconfirm[data-popconfirm-position="bottomRight"] .qizhi-popconfirm__arrow {
+  right: 18px;
+  left: auto;
+}
+
+.qizhi-popconfirm[data-popconfirm-position^="bottom"] .qizhi-popconfirm__arrow {
+  top: -7px;
+  left: calc(50% - 6px);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.qizhi-popconfirm[data-popconfirm-position^="left"] .qizhi-popconfirm__arrow,
+.qizhi-popconfirm[data-popconfirm-position^="right"] .qizhi-popconfirm__arrow {
+  top: calc(50% - 6px);
+  width: 7px;
+  height: 12px;
+}
+
+.qizhi-popconfirm[data-popconfirm-position="leftTop"] .qizhi-popconfirm__arrow,
+.qizhi-popconfirm[data-popconfirm-position="rightTop"] .qizhi-popconfirm__arrow {
+  top: 12px;
+  bottom: auto;
+}
+
+.qizhi-popconfirm[data-popconfirm-position="leftBottom"] .qizhi-popconfirm__arrow,
+.qizhi-popconfirm[data-popconfirm-position="rightBottom"] .qizhi-popconfirm__arrow {
+  top: auto;
+  bottom: 12px;
+}
+
+.qizhi-popconfirm[data-popconfirm-position^="left"] .qizhi-popconfirm__arrow {
+  right: -7px;
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+
+.qizhi-popconfirm[data-popconfirm-position^="right"] .qizhi-popconfirm__arrow {
+  left: -7px;
+  clip-path: polygon(100% 0, 0 50%, 100% 100%);
+}
+
+@media (max-width: 767.98px) {
+  .qizhi-popconfirm {
+    width: 148px;
+    padding: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .qizhi-popconfirm {
+    animation: qizhi-popconfirm-enter 0.16s ease-out;
+  }
+}
+
+@keyframes qizhi-popconfirm-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

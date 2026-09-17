@@ -1,0 +1,59 @@
+{
+  "name": "@wangxiaojinger/qizhi-react",
+  "version": "0.1.0",
+  "description": "QIZHI Design System React components.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./icon": {
+      "types": "./dist/icon/index.d.ts",
+      "import": "./dist/icon/index.js"
+    },
+    "./style.css": "./dist/qizhi-react.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wangxiaojinger/qizhi-design-system.git",
+    "directory": "packages/qizhi-react"
+  },
+  "homepage": "https://github.com/wangxiaojinger/qizhi-design-system#readme",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  },
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "dependencies": {
+    "@antv/g2": "5.4.8",
+    "@wangxiaojinger/qizhi-tokens": "workspace:*",
+    "prism-react-renderer": "^2.4.1",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1"
+  },
+  "scripts": {
+    "build": "pnpm icons:build && vite build && tsc -p tsconfig.build.json",
+    "icons:build": "node --experimental-strip-types scripts/build-direction-icons.mjs && node --experimental-strip-types scripts/build-prompt-icons.mjs && node --experimental-strip-types scripts/build-catalog-icons.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "peerDependencies": {
+    "react": ">=19",
+    "react-dom": ">=19"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "@vitejs/plugin-react": "6.0.5",
+    "typescript": "7.0.2",
+    "vite": "8.2.1"
+  }
+}

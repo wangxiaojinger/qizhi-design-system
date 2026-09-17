@@ -1,0 +1,51 @@
+#component-statistic .qizhi-components-wrapper {
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  min-width: 0;
+}
+
+#component-statistic .codebox-wrapper,
+#component-statistic .demo {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+#component-statistic .codebox-wrapper > .demo {
+  margin-bottom: 12px;
+}
+
+#component-statistic .component-example-actions {
+  padding-right: 0;
+}
+
+#component-statistic .statistic-docs-row {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 32px 60px;
+  width: 100%;
+}
+
+#component-statistic .statistic-loading-demo__control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+  color: var(--color-text-2);
+  font-size: 14px;
+  line-height: 22px;
+}
+
+#component-statistic .qizhi-api-section {
+  margin-top: 64px;
+}
+
+@media (max-width: 767.98px) {
+  #component-statistic .statistic-docs-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+}

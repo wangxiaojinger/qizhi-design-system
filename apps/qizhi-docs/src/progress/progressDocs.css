@@ -1,0 +1,14 @@
+#component-progress .qizhi-components-wrapper { grid-template-columns: minmax(0, 1fr); width: 100%; min-width: 0; }
+#component-progress .codebox-wrapper, #component-progress .demo { box-sizing: border-box; width: 100%; max-width: 100%; min-width: 0; }
+#component-progress .codebox-wrapper > .demo { margin-bottom: 12px; }
+#component-progress .component-example-actions { padding-right: 0; }
+#component-progress .progress-demo-stack { display: grid; gap: 20px; width: min(100%, 400px); }
+#component-progress .progress-demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 32px; }
+#component-progress .progress-demo-mini-groups { display: grid; gap: 28px; }
+#component-progress .progress-demo-mini-row { display: flex; align-items: center; gap: 72px; }
+#component-progress .progress-demo-size { display: grid; justify-items: start; gap: 32px; }
+#component-progress .progress-demo-size-preview { display: flex; flex-wrap: wrap; align-items: center; gap: 48px; width: min(100%, 560px); }
+#component-progress .progress-demo-size-preview .qizhi-progress--line { flex: 1 1 320px; }
+#component-progress .progress-demo-gradient { display: flex; flex-wrap: wrap; align-items: center; gap: 48px; }
+#component-progress .qizhi-api-section { margin-top: 64px; }
+@media (max-width: 767.98px) { #component-progress .progress-demo-mini-row { gap: 32px; } #component-progress .progress-demo-size-preview { gap: 32px; } }

@@ -1,0 +1,38 @@
+.qizhi-choice-card-group {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+.qizhi-choice-card-group--columns-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.qizhi-choice-card {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  min-height: 84px;
+  padding: 8px 12px;
+  gap: 8px;
+  border: 1px solid var(--color-border-2);
+  border-radius: var(--border-radius-medium);
+  background: var(--color-bg-white);
+  cursor: pointer;
+  transition: border-color 0.16s ease, background-color 0.16s ease;
+}
+.qizhi-choice-card:hover { border-color: rgb(var(--primary-5)); }
+.qizhi-choice-card.is-selected { border-color: rgb(var(--primary-6)); background: var(--color-fill-1); }
+.qizhi-choice-card:has(input:focus-visible) { border-color: rgb(var(--primary-6)); }
+.qizhi-choice-card.is-disabled { border-color: var(--color-border-1); color: var(--color-text-4); cursor: not-allowed; }
+.qizhi-choice-card > input { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+.qizhi-choice-card__content { display:grid; gap:8px; min-width:0; }
+.qizhi-choice-card__title { color:var(--color-text-1); font-size:14px; line-height:22px; font-weight:500; }
+.qizhi-choice-card__description { color:var(--color-text-3); font-size:12px; line-height:20px; }
+.qizhi-choice-card.is-disabled :is(.qizhi-choice-card__title, .qizhi-choice-card__description) { color:var(--color-text-4); }
+.qizhi-choice-card-group--small .qizhi-choice-card { min-height:64px; }
+.qizhi-choice-card--icon { display:grid; grid-template-columns:40px minmax(0, 1fr); min-height:114px; padding:12px 16px; gap:12px; }
+.qizhi-choice-card__icon { display:inline-flex; align-items:center; justify-content:center; width:40px; height:40px; border:1px solid rgba(var(--primary-6), .6); border-radius:10px; }
+.qizhi-choice-card__icon svg { width:24px; height:24px; }
+@media (max-width:720px) { .qizhi-choice-card-group { grid-template-columns:minmax(0, 1fr); } }
+@media (prefers-reduced-motion:reduce) { .qizhi-choice-card { transition:none; } }

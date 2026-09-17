@@ -1,0 +1,18 @@
+#component-dropdown .demo { overflow: visible; }
+#component-dropdown .qizhi-dropdown__popup { text-align: left; }
+#component-dropdown .codebox-wrapper > .demo { margin-bottom: 12px; }
+#component-dropdown .component-example-actions { padding-right: 0; }
+#component-dropdown .qizhi-copy-status { align-self: center; min-width: 64px; color: var(--color-text-3); font-size: 14px; }
+#component-dropdown .qizhi-copy-status:empty { display: none; }
+#component-dropdown .qizhi-code-wrapper { min-width: 0; max-width: 100%; overflow: hidden; }
+#component-dropdown .qizhi-code-wrapper pre { box-sizing: border-box; width: 100%; margin: 0; padding: 24px; overflow: auto; background: var(--color-fill-1); }
+#component-dropdown .qizhi-dropdown-api { margin-top: 64px; }
+#component-dropdown .qizhi-dropdown-api h3 { margin: 48px 0 24px; font-size: 24px; font-weight: 500; }
+#component-dropdown .qizhi-api-table-scroll { overflow-x: auto; }
+#component-dropdown .qizhi-dropdown-api table { width: 100%; min-width: 760px; border-collapse: collapse; text-align: left; }
+#component-dropdown .qizhi-dropdown-api th { background: var(--color-fill-1); }
+#component-dropdown .qizhi-dropdown-api th, #component-dropdown .qizhi-dropdown-api td { padding: 14px 16px; border: 1px solid var(--color-border-1); }
+#component-dropdown .qizhi-dropdown-api td { font-family: Inter, -apple-system, BlinkMacSystemFont, "system-ui", sans-serif; font-size: 14px; }
+#component-dropdown .qizhi-dropdown-api td:not(:nth-child(2)) code { padding: 0; border-radius: 0; background: transparent; font-family: Inter, -apple-system, BlinkMacSystemFont, "system-ui", sans-serif; font-size: 14px; }
+#component-dropdown .qizhi-dropdown-api .qizhi-api-english { color: rgb(var(--magenta-6)); }
+@media (max-width: 600px) { #component-dropdown .component-example-actions { justify-content: flex-end; flex-wrap: wrap; padding-right: 0; padding-left: 0; } }

@@ -1,0 +1,9 @@
+// 由 scripts/build-catalog-icons.mjs 生成，禁止手改。
+// Source: ../../../../assets/icons/figma-combination/qz-icon-710-474.svg
+import { createQizhiMarkupIcon } from "../../createQizhiMarkupIcon";
+
+export const ComputerIcon = createQizhiMarkupIcon(
+  "ComputerIcon",
+  "0 0 16 16",
+  "<g id=\"__QIZHI_ICON_ID__-fill=off\">\n<path id=\"__QIZHI_ICON_ID__-Vector\" d=\"M9.33333 12V13.3333L10.6667 14V14.6667H5.33333L5.33092 14.0024L6.66666 13.3333V12H1.99453C1.62936 12 1.33333 11.7007 1.33333 11.3283V2.67165C1.33333 2.30071 1.63687 2 1.99453 2H14.0055C14.3707 2 14.6667 2.29928 14.6667 2.67165V11.3283C14.6667 11.6993 14.3631 12 14.0055 12H9.33333ZM2.66666 3.33333V9.33333H13.3333V3.33333H2.66666Z\" fill=\"currentColor\" fill-opacity=\"0.45\"/>\n</g>",
+);

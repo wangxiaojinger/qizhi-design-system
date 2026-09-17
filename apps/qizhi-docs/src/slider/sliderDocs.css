@@ -1,0 +1,6 @@
+#component-slider .qizhi-components-wrapper {
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  min-width: 0;
+}
+

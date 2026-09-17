@@ -1,0 +1,154 @@
+.qizhi-tree {
+  --qizhi-tree-node-height: 32px;
+  --qizhi-tree-title-height: 28px;
+  color: var(--color-text-1);
+  font-size: 14px;
+  line-height: 22px;
+  outline: none;
+}
+.qizhi-tree-size-mini {
+  --qizhi-tree-node-height: 24px;
+  --qizhi-tree-title-height: 22px;
+  font-size: 12px;
+}
+.qizhi-tree-size-small {
+  --qizhi-tree-node-height: 28px;
+  --qizhi-tree-title-height: 24px;
+  font-size: 13px;
+}
+.qizhi-tree-size-large {
+  --qizhi-tree-node-height: 36px;
+  --qizhi-tree-title-height: 32px;
+}
+.qizhi-tree__node {
+  display: grid;
+  grid-template-columns: auto 24px minmax(0, 1fr);
+  align-items: center;
+  min-height: var(--qizhi-tree-node-height);
+  outline: none;
+}
+.qizhi-tree-checkable .qizhi-tree__node {
+  grid-template-columns: auto 24px 24px minmax(0, 1fr);
+}
+.qizhi-tree__indent {
+  display: inline-flex;
+  grid-column: 1;
+  height: var(--qizhi-tree-node-height);
+}
+.qizhi-tree__indent-block {
+  position: relative;
+  width: 24px;
+  height: var(--qizhi-tree-node-height);
+}
+.qizhi-tree__indent-block::before {
+  position: absolute;
+  inset: 0 auto 0 11px;
+  width: 1px;
+  background: var(--color-border-1);
+  content: "";
+}
+.qizhi-tree__indent-block--lineless::before {
+  display: none;
+}
+.qizhi-tree__switcher {
+  display: inline-flex;
+  grid-column: 2;
+  align-items: center;
+  justify-content: center;
+  justify-self: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--color-text-1);
+}
+button.qizhi-tree__switcher {
+  cursor: pointer;
+}
+button.qizhi-tree__switcher:hover {
+  background: var(--color-fill-2);
+  color: var(--color-text-1);
+}
+.qizhi-tree__switcher svg {
+  width: 12px;
+  height: 12px;
+}
+.qizhi-tree__switcher-icon path {
+  fill-opacity: 1;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.qizhi-tree__switcher-icon--expanded path {
+  transform: scale(1.225, 1.6067);
+}
+.qizhi-tree__switcher-icon--collapsed path {
+  transform: scale(1.6067, 1.225);
+}
+.qizhi-tree__checkbox {
+  grid-column: 3;
+  justify-self: center;
+}
+.qizhi-tree__title {
+  display: inline-flex;
+  grid-column: 3;
+  align-items: center;
+  justify-content: flex-start;
+  justify-self: start;
+  width: fit-content;
+  max-width: 100%;
+  height: var(--qizhi-tree-title-height);
+  padding: 0 8px;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.qizhi-tree-block-node .qizhi-tree__title {
+  flex: 1;
+  justify-content: flex-start;
+}
+.qizhi-tree-checkable .qizhi-tree__title {
+  grid-column: 4;
+}
+.qizhi-tree__title:hover {
+  background: var(--color-fill-2);
+}
+.qizhi-tree__node.is-selected > .qizhi-tree__title {
+  color: rgb(var(--primary-6));
+}
+.qizhi-tree__node.is-disabled {
+  color: var(--color-text-4);
+}
+.qizhi-tree__node.is-disabled > .qizhi-tree__title {
+  cursor: not-allowed;
+}
+.qizhi-tree__node.is-disabled > .qizhi-tree__title:hover {
+  background: transparent;
+}
+.qizhi-tree__node:focus-visible > .qizhi-tree__title {
+  box-shadow: 0 0 0 2px var(--color-primary-light-1);
+}
+.qizhi-tree__title-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.qizhi-tree__icon {
+  display: inline-flex;
+  margin-right: 6px;
+}
+.qizhi-tree__icon svg {
+  width: 16px;
+  height: 16px;
+}
+.qizhi-tree__node.is-draggable > .qizhi-tree__title {
+  cursor: grab;
+}
+.qizhi-tree__node.is-draggable:active > .qizhi-tree__title {
+  cursor: grabbing;
+}

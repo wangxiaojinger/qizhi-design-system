@@ -1,0 +1,13 @@
+#component-checkbox .qizhi-components-wrapper { grid-template-columns: minmax(0, 1fr); width: 100%; min-width: 0; }
+#component-checkbox .codebox-wrapper, #component-checkbox .demo { box-sizing: border-box; width: 100%; max-width: 100%; min-width: 0; }
+#component-checkbox .codebox-wrapper > .demo { margin-bottom: 12px; }
+#component-checkbox .component-example-actions { padding-right: 0; }
+#component-checkbox .checkbox-docs-row { display: flex; flex-wrap: wrap; align-items: center; gap: 16px 40px; }
+#component-checkbox .checkbox-docs-controlled { display: grid; justify-items: start; gap: 30px; }
+#component-checkbox .checkbox-docs-group-stack { display: grid; justify-items: start; gap: 20px; }
+#component-checkbox .checkbox-docs-check-all { display: grid; justify-items: start; gap: 16px; }
+#component-checkbox .qizhi-api-section { margin-top: 64px; }
+#component-checkbox .qizhi-api-section > h3:not(:first-of-type) { margin-top: 32px; }
+#component-checkbox .checkbox-type-definitions { display: grid; gap: 12px; }
+#component-checkbox .checkbox-type-definitions pre { margin: 0; padding: 16px; overflow-x: auto; border-radius: 2px; background: var(--color-fill-1); }
+#component-checkbox .checkbox-type-definitions code { font-family: Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: 14px; line-height: 22px; }

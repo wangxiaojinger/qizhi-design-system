@@ -1,0 +1,16 @@
+.qizhi-control-container {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 2px;
+  background: var(--color-bg-2, #fff);
+}
+
+.qizhi-control-container :is(input, textarea) {
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+}

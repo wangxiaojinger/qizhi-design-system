@@ -1,0 +1,26 @@
+#component-slider .slider-demo-row { display: flex; flex-wrap: wrap; align-items: center; gap: 24px 60px; }
+#component-slider .slider-demo-stack { display: grid; justify-items: start; gap: 16px; min-width: 0; }
+#component-slider .slider-demo-value { display: inline-flex; padding: 2px 6px; border-radius: var(--border-radius-small); background: var(--color-fill-1); color: var(--color-text-2); font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 13px; line-height: 20px; }
+#component-slider .slider-demo-input-grid { display: grid; gap: 20px 60px; grid-template-columns: repeat(2, minmax(0, max-content)); align-items: center; }
+#component-slider .slider-demo-input-item { display: flex; align-items: center; gap: 16px; min-width: 0; }
+#component-slider .slider-demo-input-slider { width: 280px; }
+#component-slider .slider-demo-input-item > .qizhi-input-number { width: 64px; }
+#component-slider .slider-demo-input-item > .slider-demo-number--with-step { width: 80px; }
+#component-slider .slider-demo-number-group { display: inline-flex; align-items: center; gap: 8px; }
+#component-slider .slider-demo-number-group .qizhi-input-number { width: 64px; }
+#component-slider .slider-demo-number-group .slider-demo-number--with-step { width: 80px; }
+#component-slider .slider-demo-number-separator { display: inline-flex; flex: 0 0 auto; width: 12px; height: 1px; background: var(--color-border-3); }
+#component-slider .slider-demo-row--tooltip { align-items: flex-end; padding-top: 34px; }
+#component-slider .slider-demo-tooltip-offset { margin-right: 40px; }
+#component-slider .slider-demo-vertical-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 24px 100px; min-height: 184px; }
+#component-slider .slider-demo-vertical-volume { display: inline-grid; justify-items: center; gap: 8px; width: 22px; }
+#component-slider .slider-demo-sound { color: var(--color-text-1); font-size: 16px; }
+
+@media (max-width: 1200px) {
+  #component-slider .slider-demo-input-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 760px) {
+  #component-slider .slider-demo-input-item { flex-wrap: wrap; }
+  #component-slider .slider-demo-vertical-row { gap: 24px 72px; }
+}

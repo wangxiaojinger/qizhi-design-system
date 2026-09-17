@@ -1,0 +1,29 @@
+#component-select .qizhi-components-wrapper { grid-template-columns: minmax(0, 1fr); width: 100%; min-width: 0; }
+#component-select .codebox-wrapper, #component-select .demo { box-sizing: border-box; width: 100%; max-width: 100%; min-width: 0; overflow: visible; }
+#component-select .codebox-wrapper > .demo { margin-bottom: 12px; }
+#component-select .component-example-actions { padding-right: 0; }
+#component-select .qizhi-select { width: 345px; }
+#component-select .select-docs-narrow { width: 154px; }
+#component-select .select-docs-medium { width: 240px; }
+#component-select .select-docs-wide { width: 345px; }
+.select-docs-grid { display: grid; grid-template-columns: repeat(2, 154px); gap: 24px; width: fit-content; max-width: 100%; }
+.select-docs-row { display: flex; flex-wrap: wrap; gap: 24px; }
+.select-docs-stack { display: grid; justify-items: start; gap: 24px; }
+.select-docs-stack > .qizhi-select, .select-docs-wide-row > .qizhi-select { width: 345px; }
+.select-docs-avatar { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin-right: 12px; border-radius: 50%; background: var(--color-fill-3); color: var(--color-text-2); font-size: 12px; }
+.select-docs-size { display: grid; justify-items: start; gap: 18px; }
+.select-docs-size label { display: inline-flex; align-items: center; gap: 16px; color: var(--color-text-2); }
+.select-docs-size input[type="range"] { width: 180px; accent-color: rgb(var(--primary-6)); }
+.select-docs-trigger { display: inline-flex; align-items: center; width: 300px; min-height: 32px; padding: 0 12px; border: 0; border-radius: 2px; background: transparent; color: var(--color-text-1); cursor: pointer; }
+.select-docs-trigger:hover { background: var(--color-fill-2); }
+.select-docs-extra { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-top: 1px solid var(--color-border-1); }
+.select-docs-extra .qizhi-input { flex: 1 1 auto; min-width: 0; }
+.select-docs-auto { display: grid; justify-items: start; gap: 18px; width: min(100%, 560px); }
+.select-docs-auto .qizhi-divider, .select-docs-max .qizhi-divider { width: 100%; }
+.select-docs-max { display: grid; justify-items: start; gap: 24px; }
+.select-docs-max .qizhi-select { width: 350px; }
+.select-docs-card-section { display: grid; gap: 4px; }
+.select-docs-card-section > p { margin: 0; }
+#component-select .select-docs-card-select, #component-select .select-docs-card-selection { width: 558px; max-width: 100%; }
+.select-docs-card-selection { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; }
+@media (max-width: 767.98px) { #component-select .select-docs-grid { grid-template-columns: minmax(0, 1fr); width: 100%; } #component-select .select-docs-grid .qizhi-select, #component-select .select-docs-stack, #component-select .select-docs-stack > .qizhi-select, #component-select .select-docs-row > .qizhi-select, #component-select .select-docs-size > .qizhi-select, #component-select .select-docs-auto, #component-select .select-docs-auto > .qizhi-select, #component-select .select-docs-max, #component-select .select-docs-max .qizhi-select, #component-select .select-docs-trigger { width: 100%; max-width: 100%; min-width: 0; } #component-select .select-docs-auto { grid-template-columns: minmax(0, 1fr); } #component-select .select-docs-size, #component-select .select-docs-size label { width: 100%; min-width: 0; } #component-select .select-docs-size label { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; } #component-select .select-docs-size input[type="range"] { box-sizing: border-box; width: 100%; max-width: 100%; } #component-select :is(.select-docs-auto, .select-docs-max) .qizhi-divider { justify-self: stretch; width: auto; max-width: 100%; } #component-select :is(.select-docs-auto, .select-docs-max) .qizhi-divider--with-text::before, #component-select :is(.select-docs-auto, .select-docs-max) .qizhi-divider--with-text::after { flex: 0 0 8px; } #component-select :is(.select-docs-auto, .select-docs-max) .qizhi-divider__text { box-sizing: border-box; flex: 0 0 calc(100% - 16px); width: calc(100% - 16px); min-width: 0; max-width: calc(100% - 16px); padding: 0 8px; white-space: normal; overflow-wrap: anywhere; text-align: center; } }

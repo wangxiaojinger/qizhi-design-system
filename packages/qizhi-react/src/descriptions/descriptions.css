@@ -1,0 +1,84 @@
+.qizhi-descriptions {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 720px;
+  color: var(--color-text-1);
+}
+
+.qizhi-descriptions__title {
+  margin-bottom: 18px;
+  color: var(--color-text-1);
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 500;
+}
+
+.qizhi-descriptions__body {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px 28px;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.qizhi-descriptions__item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 8px;
+  min-width: 0;
+}
+
+.qizhi-descriptions__label,
+.qizhi-descriptions__value {
+  min-width: 0;
+  margin: 0;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.qizhi-descriptions__label {
+  color: var(--color-text-3);
+  white-space: nowrap;
+}
+
+.qizhi-descriptions__label::after {
+  content: ":";
+}
+
+.qizhi-descriptions__value {
+  color: var(--color-text-1);
+  word-break: break-word;
+}
+
+.qizhi-descriptions-layout-horizontal.qizhi-descriptions-label-align-right .qizhi-descriptions__item {
+  grid-template-columns: 72px minmax(0, 1fr);
+}
+
+.qizhi-descriptions-layout-horizontal.qizhi-descriptions-label-align-right .qizhi-descriptions__label {
+  text-align: right;
+}
+
+.qizhi-descriptions-layout-vertical .qizhi-descriptions__body {
+  gap: 16px 32px;
+}
+
+.qizhi-descriptions-layout-vertical .qizhi-descriptions__item {
+  grid-template-columns: 1fr;
+  gap: 6px;
+}
+
+.qizhi-descriptions-layout-vertical .qizhi-descriptions__label {
+  text-align: left;
+}
+
+.qizhi-descriptions-layout-vertical .qizhi-descriptions__label::after {
+  content: "";
+}
+
+@media (max-width: 767.98px) {
+  .qizhi-descriptions__body {
+    grid-template-columns: 1fr;
+  }
+}

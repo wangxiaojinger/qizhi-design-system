@@ -1,0 +1,145 @@
+.qizhi-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  column-gap: 8px;
+  min-width: 0;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: var(--border-radius-medium);
+  background: transparent;
+  color: var(--color-text-2);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 400;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.qizhi-btn-primary {
+  border-color: rgb(var(--primary-6));
+  background: rgb(var(--primary-6));
+  color: var(--color-white);
+}
+
+.qizhi-btn-primary:hover { border-color: rgb(var(--primary-5)); background: rgb(var(--primary-5)); }
+.qizhi-btn-primary:active { border-color: rgb(var(--primary-7)); background: rgb(var(--primary-7)); transform: scale(0.98); }
+
+.qizhi-btn-secondary {
+  border-color: var(--color-border-2);
+  background: transparent;
+  color: var(--color-text-2);
+}
+
+.qizhi-btn-secondary:hover { border-color: var(--color-border-3); background: var(--color-fill-1); color: var(--color-text-1); }
+.qizhi-btn-secondary:active { border-color: var(--color-border-4); background: var(--color-fill-2); color: var(--color-text-1); transform: scale(0.98); }
+
+.qizhi-btn-dashed {
+  border-color: var(--color-border-2);
+  border-style: dashed;
+  background: var(--color-bg-white);
+  color: var(--color-text-2);
+}
+
+.qizhi-btn-dashed:hover { color: var(--color-text-1); }
+.qizhi-btn-dashed:active { border-color: var(--color-border-4); background: var(--color-fill-2); transform: scale(0.98); }
+
+.qizhi-btn-text {
+  color: rgb(var(--primary-6));
+}
+
+.qizhi-btn-text:hover { color: rgb(var(--primary-5)); }
+.qizhi-btn-text:active { color: rgb(var(--primary-7)); transform: scale(0.98); }
+
+.qizhi-btn-size-mini {
+  height: 24px;
+  padding: 0 11px;
+}
+
+.qizhi-btn-size-small {
+  height: 28px;
+  padding: 0 13px;
+}
+
+.qizhi-btn-size-large {
+  height: 36px;
+  padding: 0 15px;
+}
+
+.qizhi-btn-icon-only {
+  width: 32px;
+  padding: 0;
+}
+
+.qizhi-btn-size-mini.qizhi-btn-icon-only { width: 24px; }
+.qizhi-btn-size-small.qizhi-btn-icon-only { width: 28px; }
+.qizhi-btn-size-large.qizhi-btn-icon-only { width: 36px; }
+
+.qizhi-btn__icon,
+.qizhi-btn__label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.qizhi-btn__icon {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+}
+
+.qizhi-btn__icon svg { width: 16px; height: 16px; }
+.qizhi-btn-long { width: 100%; }
+
+.qizhi-btn-loading-fixed-width.is-loading:not(.qizhi-btn-has-icon):not(.qizhi-btn-icon-only) { padding-inline: 0; }
+.qizhi-btn-size-mini.qizhi-btn-loading-fixed-width.is-loading:not(.qizhi-btn-has-icon):not(.qizhi-btn-icon-only) { padding-inline: 1px; }
+.qizhi-btn-size-small.qizhi-btn-loading-fixed-width.is-loading:not(.qizhi-btn-has-icon):not(.qizhi-btn-icon-only),
+.qizhi-btn-size-large.qizhi-btn-loading-fixed-width.is-loading:not(.qizhi-btn-has-icon):not(.qizhi-btn-icon-only) { padding-inline: 2px; }
+
+.qizhi-btn-status-warning { --qizhi-status-1: var(--warning-1); --qizhi-status-2: var(--warning-2); --qizhi-status-3: var(--warning-3); --qizhi-status-4: var(--warning-4); --qizhi-status-5: var(--warning-5); --qizhi-status-6: var(--warning-6); --qizhi-status-7: var(--warning-7); }
+.qizhi-btn-status-danger { --qizhi-status-1: var(--danger-1); --qizhi-status-2: var(--danger-2); --qizhi-status-3: var(--danger-3); --qizhi-status-4: var(--danger-4); --qizhi-status-5: var(--danger-5); --qizhi-status-6: var(--danger-6); --qizhi-status-7: var(--danger-7); }
+.qizhi-btn-status-success { --qizhi-status-1: var(--success-1); --qizhi-status-2: var(--success-2); --qizhi-status-3: var(--success-3); --qizhi-status-4: var(--success-4); --qizhi-status-5: var(--success-5); --qizhi-status-6: var(--success-6); --qizhi-status-7: var(--success-7); }
+
+.qizhi-btn-primary[class*="qizhi-btn-status-"] { background: rgb(var(--qizhi-status-6)); border-color: rgb(var(--qizhi-status-6)); color: var(--color-white); }
+.qizhi-btn-primary[class*="qizhi-btn-status-"]:hover { background: rgb(var(--qizhi-status-5)); border-color: rgb(var(--qizhi-status-5)); }
+.qizhi-btn-primary[class*="qizhi-btn-status-"]:active { background: rgb(var(--qizhi-status-7)); border-color: rgb(var(--qizhi-status-7)); }
+.qizhi-btn-secondary[class*="qizhi-btn-status-"],
+.qizhi-btn-dashed[class*="qizhi-btn-status-"] { background: var(--color-bg-white); border-color: rgb(var(--qizhi-status-6)); color: rgb(var(--qizhi-status-6)); }
+.qizhi-btn-text[class*="qizhi-btn-status-"] { color: rgb(var(--qizhi-status-6)); }
+
+.qizhi-btn:disabled,
+.qizhi-btn.is-disabled {
+  border-color: var(--color-border-1);
+  background: var(--color-fill-2);
+  color: var(--color-text-4);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.qizhi-btn-secondary:disabled,
+.qizhi-btn-secondary.is-disabled { border-color: var(--color-border-2); background: transparent; color: var(--color-text-4); }
+.qizhi-btn-dashed:disabled,
+.qizhi-btn-dashed.is-disabled { border-color: var(--color-border-2); background: transparent; color: var(--color-text-4); }
+.qizhi-btn-text:disabled,
+.qizhi-btn-text.is-disabled { border-color: transparent; background: transparent; color: var(--color-text-4); }
+.qizhi-btn-primary:disabled,
+.qizhi-btn-primary.is-disabled { border-color: rgb(var(--primary-3)); background: rgb(var(--primary-3)); color: var(--color-white); }
+.qizhi-btn[class*="qizhi-btn-status-"]:disabled,
+.qizhi-btn[class*="qizhi-btn-status-"].is-disabled { border-color: rgb(var(--qizhi-status-3)); background: rgb(var(--qizhi-status-3)); color: var(--color-white); }
+.qizhi-btn.is-loading { pointer-events: none; }
+.qizhi-btn__loading-icon { animation: qizhi-button-loading-spin 0.9s linear infinite; }
+
+@keyframes qizhi-button-loading-spin { to { transform: rotate(360deg); } }
+
+.qizhi-btn:focus-visible {
+  outline: 2px solid rgb(var(--primary-6));
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .qizhi-btn { transition: none; }
+  .qizhi-btn__loading-icon { animation-duration: 1.8s; }
+}

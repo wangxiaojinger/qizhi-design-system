@@ -1,0 +1,92 @@
+.qizhi-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  width: 44px;
+  min-width: 44px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: var(--color-fill-3);
+  box-shadow: inset 0 0 0 1px rgba(29, 33, 41, 0.04);
+  cursor: pointer;
+  outline: none;
+  overflow: hidden;
+  vertical-align: middle;
+  transition: background-color 0.2s cubic-bezier(0.34, 0.69, 0.1, 1), opacity 0.2s cubic-bezier(0.34, 0.69, 0.1, 1);
+}
+
+.qizhi-switch::after {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(29, 33, 41, 0.16), 0 1px 4px rgba(29, 33, 41, 0.12);
+  content: "";
+  transform: translateX(0);
+  transition: transform 0.2s cubic-bezier(0.34, 0.69, 0.1, 1), box-shadow 0.2s cubic-bezier(0.34, 0.69, 0.1, 1);
+  z-index: 1;
+}
+
+.qizhi-switch-small { width: 32px; min-width: 32px; height: 16px; border-radius: 8px; }
+.qizhi-switch-small::after { width: 12px; height: 12px; }
+.qizhi-switch-checked { background: rgb(var(--primary-6)); }
+.qizhi-switch-checked::after { transform: translateX(20px); }
+.qizhi-switch-small.qizhi-switch-checked::after { transform: translateX(16px); }
+.qizhi-switch:disabled { cursor: not-allowed; opacity: 0.42; }
+.qizhi-switch:disabled:not(.qizhi-switch-checked) {
+  background: var(--color-fill-2);
+  opacity: 1;
+}
+.qizhi-switch-checked:disabled { background: rgb(var(--primary-6)); }
+.qizhi-switch:focus-visible { outline: 2px solid rgb(var(--primary-6)); outline-offset: 2px; }
+
+.qizhi-switch-dot {
+  position: absolute;
+  top: 50%;
+  left: 2px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: rgb(var(--primary-6));
+  transform: translate(0, -50%);
+  transition: transform 0.2s cubic-bezier(0.34, 0.69, 0.1, 1);
+  z-index: 2;
+}
+
+.qizhi-switch-loading .qizhi-switch-dot { display: inline-flex; }
+.qizhi-switch-checked .qizhi-switch-dot { transform: translate(20px, -50%); }
+.qizhi-switch-small .qizhi-switch-dot { width: 12px; height: 12px; }
+.qizhi-switch-small.qizhi-switch-checked .qizhi-switch-dot { transform: translate(16px, -50%); }
+.qizhi-switch-dot-icon { display: inline-flex; font-size: 14px; animation: qizhi-switch-loading-spin 0.9s linear infinite; }
+.qizhi-switch-small .qizhi-switch-dot-icon { font-size: 10px; }
+.qizhi-switch-loading { cursor: not-allowed; }
+
+.qizhi-switch-with-text { width: 56px; min-width: 56px; }
+.qizhi-switch-with-text.qizhi-switch-checked::after { transform: translateX(32px); }
+.qizhi-switch-text {
+  position: absolute;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  color: #fff;
+  font-size: 12px;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+}
+.qizhi-switch-checked .qizhi-switch-text { right: auto; left: 8px; }
+
+@keyframes qizhi-switch-loading-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .qizhi-switch, .qizhi-switch::after, .qizhi-switch-dot { transition: none; }
+  .qizhi-switch-dot-icon { animation-duration: 1.8s; }
+}

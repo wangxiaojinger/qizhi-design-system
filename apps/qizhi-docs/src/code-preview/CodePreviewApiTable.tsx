@@ -1,0 +1,2 @@
+import { ApiTable } from "../api/ApiTable";
+export function CodePreviewApiTable() { return <section id="code-preview-API" className="qizhi-api-section"><h2 className="qz-demo-title"><a tabIndex={-1} href="#code-preview-API">API</a></h2><h3>CodePreview</h3><p className="qizhi-api-section__note">只列出 QIZHI CodePreview v1 已实现的只读能力。</p><ApiTable api="codePreviewApi" label="CodePreview API" /></section>; }

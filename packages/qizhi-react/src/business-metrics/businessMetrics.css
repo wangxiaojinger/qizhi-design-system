@@ -1,0 +1,36 @@
+.qizhi-metric-card { box-sizing: border-box; display: block; width: 230px; min-height: 84px; padding: 12px; border: 1px solid #e4e9f2; border-radius: 8px; background: var(--color-bg-white); color: inherit; font: inherit; text-align: left; transition: background .15s ease; }
+button.qizhi-metric-card:not(:disabled) { cursor: pointer; }
+button.qizhi-metric-card:not(:disabled):hover, button.qizhi-metric-card:not(:disabled):active, button.qizhi-metric-card:not(:disabled):focus-visible, .qizhi-metric-card.is-selected { border-color: var(--primary); }
+button.qizhi-metric-card:focus-visible { outline: 2px solid rgba(var(--primary-6), .2); outline-offset: 2px; }
+.qizhi-metric-card.is-selected-primary { position: relative; background: linear-gradient(0deg, rgba(255,255,255,0) 33.333%, rgba(44,78,244,.06) 100%), var(--color-bg-white); }
+.qizhi-metric-card.is-selected-primary::after { position:absolute; top:3px; right:3.5px; width:8px; height:8px; background:url("./assets/qizhi-task-overview-selected-corner.svg") center / contain no-repeat; content:""; }
+.qizhi-metric-card__head, .qizhi-object-metrics__head { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.qizhi-metric-card__head { color: var(--color-text-2); font-size: 14px; line-height: 22px; }
+.qizhi-metric-card__title { display: inline-flex; align-items: center; gap: 4px; }
+.qizhi-metric-info, .qizhi-metric-info:hover, .qizhi-metric-info:active, .qizhi-metric-info:focus-visible { display: inline-flex; align-items: center; justify-content: center; color: var(--color-text-3); cursor: pointer; }
+.qizhi-metric-info:focus-visible { border-radius: 2px; outline: 2px solid rgba(var(--primary-6), .2); outline-offset: 1px; }
+.qizhi-metric-info svg { width: 16px; height: 16px; }
+.qizhi-metric-card__total { color: var(--color-text-3); white-space: nowrap; }
+.qizhi-metric-card__total strong { color: var(--color-text-2); font-weight: 400; }
+.qizhi-metric-card__primary { display: flex; align-items: baseline; gap: 8px; margin-top: 4px; color: var(--color-text-3); font-size: 14px; line-height: 22px; }
+.qizhi-metric-card__primary strong { color: var(--color-text-1); font-size: 24px; line-height: 30px; font-weight: 600; }
+.qizhi-metric-card.is-disabled { background: rgba(0,0,0,.02); color: var(--color-text-4); cursor: not-allowed; }
+.qizhi-metric-card.is-disabled :is(span,strong) { color: var(--color-text-4); }
+.qizhi-resource-card { box-sizing: border-box; width: 365px; padding: 16px 24px; border-radius: 8px; background: linear-gradient(180deg,#f7f9fc 0%,rgba(255,255,255,0) 100%); }
+.qizhi-resource-card h3, .qizhi-object-metrics h3 { margin: 0; color: var(--color-text-1); font-size: 14px; line-height: 22px; font-weight: 400; }
+.qizhi-resource-card__body { display: flex; align-items: center; gap: 12px; margin-top: 8px; }
+.qizhi-resource-card__body > strong { flex: 0 0 auto; color: var(--color-text-1); font-size: 24px; line-height: 30px; font-weight: 500; white-space: nowrap; }
+.qizhi-resource-card__divider { width: 1px; height: 16px; background: var(--color-border-2); }
+.qizhi-resource-card__body > div { flex: 1; min-width: 0; }
+.qizhi-resource-card__body p { margin: 4px 0 0; color: var(--color-text-2); font-size: 12px; line-height: 18px; }
+.qizhi-resource-meter { position: relative; height: 10px; overflow: hidden; background: repeating-linear-gradient(90deg,rgba(82,196,26,.25) 0 4px,transparent 4px 6px); }
+.qizhi-resource-meter::before { position: absolute; inset: 0; background: repeating-linear-gradient(90deg,#52c41a 0 4px,transparent 4px 6px); content: ""; }
+.qizhi-resource-meter span { position: absolute; top: 0; right: 0; z-index: 1; height: 100%; background: rgba(255,255,255,.75); }
+.qizhi-metric-item { box-sizing: border-box; display: flex; flex-direction: column; gap: 4px; min-width: 103px; padding: 8px 12px; border-radius: 8px; background: linear-gradient(180deg,#f7f9fc 0%,rgba(255,255,255,0) 100%); color: var(--color-text-2); font-size: 13px; line-height: 18px; }
+.qizhi-metric-item strong { color: var(--color-text-1); font-size: 14px; line-height: 20px; font-weight: 500; }
+.qizhi-metric-item__value { display: flex; align-items: center; gap: 4px; }
+.qizhi-object-metrics { box-sizing: border-box; width: 365px; padding: 12px 16px; border: 1px solid var(--color-border-1); border-radius: 8px; background: var(--color-bg-white); }
+.qizhi-object-metrics h3 { font-size: 16px; font-weight: 500; }
+.qizhi-object-metrics__head p { margin: 0; color: var(--color-text-2); font-size: 14px; line-height: 22px; }
+.qizhi-object-metrics__head p strong { color: var(--color-text-1); font-size: 16px; font-weight: 600; }
+.qizhi-object-metrics__items { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin-top: 12px; }

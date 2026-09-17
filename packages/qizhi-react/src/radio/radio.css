@@ -1,0 +1,120 @@
+.qizhi-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-text-1);
+  font-size: 14px;
+  line-height: 22px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.qizhi-radio input,
+.qizhi-radio-button input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.qizhi-radio-mask-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+}
+
+.qizhi-radio-mask {
+  position: relative;
+  display: inline-flex;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--color-border-3);
+  border-radius: 50%;
+  background: var(--color-bg-2);
+  transition: border-color 0.16s ease, background-color 0.16s ease;
+}
+
+.qizhi-radio:hover .qizhi-radio-mask,
+.qizhi-radio:has(input:focus-visible) .qizhi-radio-mask,
+.qizhi-radio-checked .qizhi-radio-mask {
+  border-color: rgb(var(--primary-6));
+}
+
+.qizhi-radio:has(input:focus-visible) .qizhi-radio-mask {
+  box-shadow: 0 0 0 2px rgba(var(--primary-6), 0.15);
+}
+
+.qizhi-radio-checked .qizhi-radio-mask::after {
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: rgb(var(--primary-6));
+  content: "";
+}
+
+.qizhi-radio-disabled {
+  color: var(--color-text-4);
+  cursor: not-allowed;
+}
+
+.qizhi-radio-disabled .qizhi-radio-mask {
+  border-color: var(--color-border-2);
+  background: var(--color-fill-2);
+  box-shadow: none;
+}
+
+.qizhi-radio-disabled.qizhi-radio-checked .qizhi-radio-mask::after {
+  background: var(--color-text-4);
+}
+
+.qizhi-radio-group.radio-demo-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 40px;
+}
+
+.radio-button-demo {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.radio-button-demo .qizhi-radio-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  height: 32px;
+  margin-left: -1px;
+  padding: 0 16px;
+  border: 1px solid var(--color-border-2);
+  background: var(--color-bg-2);
+  color: var(--color-text-2);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.radio-button-demo .qizhi-radio-button:first-child { margin-left: 0; border-radius: 2px 0 0 2px; }
+.radio-button-demo .qizhi-radio-button:last-child { border-radius: 0 2px 2px 0; }
+.radio-button-demo .qizhi-radio-button:hover { color: rgb(var(--primary-6)); }
+.radio-button-demo .qizhi-radio-button:has(input:focus-visible) { z-index: 2; box-shadow: 0 0 0 2px rgba(var(--primary-6), 0.15); }
+.radio-button-demo .qizhi-radio-checked { z-index: 1; border-color: rgb(var(--primary-6)); color: rgb(var(--primary-6)); }
+.radio-button-demo .qizhi-radio-disabled { color: var(--color-text-4); background: var(--color-fill-1); cursor: not-allowed; }
+.radio-button-demo.qizhi-radio-size-small .qizhi-radio-button,
+.qizhi-radio-button.qizhi-radio-size-small { height: 28px; }
+.radio-button-demo.qizhi-radio-size-large .qizhi-radio-button,
+.qizhi-radio-button.qizhi-radio-size-large { height: 36px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .qizhi-radio-mask { transition: none; }
+}

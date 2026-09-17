@@ -1,0 +1,94 @@
+.qizhi-avatar {
+  position: relative;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  overflow: hidden;
+  border: 1px solid transparent;
+  background: rgb(var(--primary-6));
+  color: var(--color-white);
+  line-height: 1;
+  font-weight: 500;
+  vertical-align: middle;
+}
+
+.qizhi-avatar-size-large { width: 64px; height: 64px; font-size: 32px; }
+.qizhi-avatar-size-default { width: 40px; height: 40px; font-size: 20px; }
+.qizhi-avatar-size-small { width: 32px; height: 32px; font-size: 16px; }
+.qizhi-avatar-size-mini { width: 24px; height: 24px; font-size: 12px; }
+
+.qizhi-avatar-shape-circle { border-radius: 50%; }
+.qizhi-avatar-shape-square { border-radius: var(--border-radius-medium, 4px); }
+
+.qizhi-avatar__content {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 100%;
+  white-space: nowrap;
+  transform: scale(var(--qizhi-avatar-content-scale, 1));
+  transform-origin: center;
+}
+
+.qizhi-avatar__content > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.qizhi-avatar:has(.qizhi-avatar__content > img) .qizhi-avatar__content {
+  width: 100%;
+  height: 100%;
+}
+
+.qizhi-avatar-has-trigger:has(.qizhi-avatar-trigger-button) { overflow: visible; }
+
+.qizhi-avatar .qizhi-avatar-trigger-mask {
+  position: absolute;
+  inset: -1px;
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: rgba(29, 33, 41, 0.55);
+  color: var(--color-white);
+}
+
+.qizhi-avatar .qizhi-avatar-trigger-mask:hover,
+.qizhi-avatar .qizhi-avatar-trigger-mask:active {
+  border: 0;
+  background: rgba(29, 33, 41, 0.55);
+}
+
+.qizhi-avatar .qizhi-avatar-trigger-button {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  border: 1px solid var(--color-white);
+  border-radius: 50%;
+  box-shadow: 0 2px 6px rgba(29, 33, 41, 0.16);
+}
+
+.qizhi-avatar-group {
+  display: inline-flex;
+  align-items: center;
+}
+
+.qizhi-avatar-group > .qizhi-avatar {
+  border: 1px solid var(--color-white);
+  box-shadow: 0 4px 12px rgba(29, 33, 41, 0.08);
+}
+
+.qizhi-avatar-group-size-large > .qizhi-avatar + .qizhi-avatar,
+.qizhi-avatar-group-size-default > .qizhi-avatar + .qizhi-avatar { margin-left: -10px; }
+
+.qizhi-avatar-group-size-small > .qizhi-avatar + .qizhi-avatar,
+.qizhi-avatar-group-size-mini > .qizhi-avatar + .qizhi-avatar { margin-left: -8px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .qizhi-avatar__content { transition: none; }
+}

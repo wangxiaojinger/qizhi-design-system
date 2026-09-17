@@ -1,0 +1,202 @@
+#component-form .qizhi-components-wrapper {
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  min-width: 0;
+}
+
+#component-form .codebox-wrapper,
+#component-form .demo {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+#component-form .codebox-wrapper > .demo {
+  margin-bottom: 12px;
+}
+
+#component-form .component-example-actions {
+  padding-right: 0;
+}
+
+#component-form .qizhi-form {
+  --form-control-width: 558px;
+}
+
+#component-form .qizhi-form-item-control > .qizhi-input,
+#component-form .qizhi-form-item-control > .qizhi-select,
+#component-form .form-docs-image-control > .qizhi-select {
+  width: min(100%, var(--form-control-width));
+}
+
+#component-form .form-docs-inline-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: min(100%, 590px);
+  min-width: 0;
+}
+
+#component-form .form-docs-inline-control .qizhi-select {
+  flex: 0 1 558px;
+  min-width: 0;
+}
+
+#component-form .form-docs-refresh.qizhi-btn {
+  flex: 0 0 24px;
+  width: 24px;
+  min-width: 24px;
+  height: 24px;
+  padding: 0;
+  color: var(--color-text-3);
+}
+
+#component-form .form-docs-refresh.qizhi-btn:hover {
+  color: var(--color-text-2);
+}
+
+#component-form .form-docs-refresh.is-refreshing svg {
+  animation: form-docs-refresh 450ms ease;
+}
+
+@keyframes form-docs-refresh {
+  to { transform: rotate(360deg); }
+}
+
+#component-form .form-docs-layout-demo {
+  display: grid;
+  gap: 32px;
+  width: 100%;
+}
+
+#component-form .form-docs-layout-control {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: max-content;
+  max-width: 100%;
+  color: var(--color-text-2);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 32px;
+}
+
+#component-form .form-docs-image-control {
+  display: grid;
+  justify-items: start;
+  gap: 8px;
+  min-width: 0;
+}
+
+#component-form .form-docs-model-button.qizhi-btn {
+  justify-self: start;
+  width: max-content;
+}
+
+#component-form .form-docs-command-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  width: min(100%, 558px);
+}
+
+#component-form .form-docs-command-control,
+#component-form .form-docs-port-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+#component-form .form-docs-command-control {
+  flex: 1 1 auto;
+}
+
+#component-form .form-docs-command-control .qizhi-input {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+}
+
+#component-form .form-docs-port-control .qizhi-input {
+  width: 108px;
+}
+
+#component-form .form-docs-command-control .qizhi-btn,
+#component-form .form-docs-port-control .qizhi-btn {
+  flex: 0 0 16px;
+  width: 16px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0;
+}
+
+#component-form .form-docs-info-button.qizhi-btn {
+  color: var(--color-text-3);
+}
+
+#component-form .form-docs-info-button.qizhi-btn:hover {
+  color: var(--color-text-2);
+}
+
+#component-form .qizhi-form-item:last-child .qizhi-textarea {
+  width: min(100%, 558px);
+  min-height: 64px;
+}
+
+#component-form .qizhi-api-section {
+  margin-top: 64px;
+}
+
+#component-form .qizhi-api-section > h3:not(:first-of-type) {
+  margin-top: 32px;
+}
+
+@media (max-width: 720px) {
+  #component-form .codebox-wrapper > .demo {
+    padding: 24px 16px;
+  }
+
+  #component-form .form-docs-layout-control {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  #component-form .form-docs-command-row {
+    grid-template-columns: 1fr;
+  }
+
+  #component-form .form-docs-port-control,
+  #component-form .form-docs-port-control .qizhi-input {
+    width: 100%;
+  }
+
+  #component-form .form-docs-image-control .radio-button-demo {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  #component-form .form-docs-image-control .qizhi-radio-button {
+    width: 100%;
+    margin: 0 0 -1px;
+    border-radius: 0;
+  }
+
+  #component-form .form-docs-image-control .qizhi-radio-button:first-child {
+    border-radius: 2px 2px 0 0;
+  }
+
+  #component-form .form-docs-image-control .qizhi-radio-button:last-child {
+    margin-bottom: 0;
+    border-radius: 0 0 2px 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #component-form .form-docs-refresh.is-refreshing svg {
+    animation: none;
+  }
+}

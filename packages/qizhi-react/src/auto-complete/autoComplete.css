@@ -1,0 +1,54 @@
+.qizhi-auto-complete {
+  position: relative;
+  display: inline-block;
+  width: 154px;
+  max-width: 100%;
+  vertical-align: top;
+}
+
+.qizhi-auto-complete > .qizhi-input,
+.qizhi-auto-complete > .qizhi-textarea {
+  width: 100%;
+}
+
+.qizhi-auto-complete--open { z-index: 30; }
+
+.qizhi-auto-complete > .qizhi-auto-complete__popup {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 40;
+  box-sizing: border-box;
+  width: 100%;
+  max-height: 240px;
+  margin: 0;
+  padding: 4px;
+  overflow-y: auto;
+  border: 1px solid var(--color-border-2);
+  border-radius: 2px;
+  background: var(--color-bg-2);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+  list-style: none;
+}
+
+.qizhi-auto-complete__entry { margin: 0; padding: 0; }
+.qizhi-auto-complete__group { padding: 6px 8px 4px; color: var(--color-text-3); font-size: 12px; line-height: 18px; }
+.qizhi-auto-complete__option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 32px;
+  padding: 5px 8px;
+  border-radius: 2px;
+  color: var(--color-text-1);
+  font-size: 14px;
+  line-height: 22px;
+  cursor: pointer;
+}
+.qizhi-auto-complete__option:hover,
+.qizhi-auto-complete__option--active { background: var(--color-fill-2); }
+.qizhi-auto-complete__option--disabled { color: var(--color-text-4); cursor: not-allowed; }
+
+@media (max-width: 767.98px) {
+  .qizhi-auto-complete { max-width: 100%; }
+}

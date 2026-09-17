@@ -1,0 +1,25 @@
+#component-message .qizhi-components-wrapper {
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  min-width: 0;
+}
+#component-message .codebox-wrapper,
+#component-message .demo,
+#component-message .qz-description,
+#component-message .qz-description-children,
+#component-message .code-preview {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+#component-message .codebox-wrapper,
+#component-message .demo { overflow: visible; }
+#component-message .qz-description p { overflow-wrap: anywhere; }
+#component-message .qizhi-space { row-gap: 16px; }
+.qizhi-message-context-demo { display: grid; gap: 24px; }
+.qizhi-message-context-holder { box-sizing: border-box; display: flex; align-items: flex-start; justify-content: center; min-height: 76px; padding: 16px; border: 1px dashed var(--color-border-2); border-radius: var(--border-radius-medium); background: var(--color-fill-1); }
+.qizhi-message-context-placeholder { align-self: center; color: var(--color-text-3); font-size: 13px; line-height: 20px; }
+.qizhi-message-context-holder:has(.qizhi-message) .qizhi-message-context-placeholder { display: none; }
+.qizhi-message-api-methods { margin-top: 12px; }
+#component-message .qizhi-api-section > h3 { margin: 32px 0 12px; }

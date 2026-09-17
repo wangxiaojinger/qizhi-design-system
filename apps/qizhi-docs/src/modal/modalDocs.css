@@ -1,0 +1,20 @@
+#component-modal .qizhi-components-wrapper { grid-template-columns: minmax(0, 1fr); width: 100%; min-width: 0; }
+#component-modal .codebox-wrapper, #component-modal .demo, #component-modal .qz-description, #component-modal .qz-description-children, #component-modal .code-preview { box-sizing: border-box; width: 100%; max-width: 100%; min-width: 0; }
+#component-modal .codebox-wrapper, #component-modal .demo { overflow: visible; }
+#component-modal .qz-description p { overflow-wrap: anywhere; }
+#component-modal .qizhi-space { row-gap: 16px; }
+.qizhi-modal-form { display: grid; gap: 18px; }
+.qizhi-modal-form__item { display: grid; gap: 8px; }
+.qizhi-modal-form__label { color: var(--color-text-2); }
+.qizhi-modal-form__label.is-required::before { margin-right: 4px; color: rgb(var(--danger-6)); content: "*"; }
+.qizhi-modal-confirm { display: grid; grid-template-columns: 24px minmax(0, 1fr); gap: 12px; }
+.qizhi-modal-confirm__icon { color: rgb(var(--warning-6)); font-size: 22px; }
+.qizhi-modal-confirm__title { margin-bottom: 8px; color: var(--color-text-1); font-weight: 500; }
+.qizhi-modal-status { display: flex; align-items: flex-start; gap: 12px; }
+.qizhi-modal-status > svg { flex: 0 0 auto; color: rgb(var(--warning-6)); font-size: 22px; }
+.qizhi-modal-status.is-success > svg { color: rgb(var(--success-6)); }
+.qizhi-modal-alert { display: flex; align-items: flex-start; gap: 8px; margin: -16px -24px 20px; padding: 10px 16px; background: rgb(var(--primary-1)); }
+.qizhi-modal-alert > svg { flex: 0 0 auto; color: rgb(var(--primary-6)); font-size: 17px; }
+#component-modal .qizhi-modal .qizhi-steps {
+  margin: -8px 0 24px;
+}

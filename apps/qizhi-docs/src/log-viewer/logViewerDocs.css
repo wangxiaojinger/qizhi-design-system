@@ -1,0 +1,5 @@
+#component-log-viewer .qizhi-components-wrapper { grid-template-columns: minmax(0, 1fr); width: 100%; min-width: 0; }
+#component-log-viewer .codebox-wrapper, #component-log-viewer .demo { box-sizing: border-box; width: 100%; max-width: 100%; min-width: 0; }
+#component-log-viewer .codebox-wrapper > .demo { min-height: 240px; margin-bottom: 12px; }
+#component-log-viewer .component-example-actions { padding-right: 0; }
+#component-log-viewer .qizhi-api-section { margin-top: 64px; }

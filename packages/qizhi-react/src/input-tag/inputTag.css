@@ -1,0 +1,22 @@
+.qizhi-input-tag { --qizhi-input-tag-height: 32px; box-sizing: border-box; position: relative; display: inline-flex; align-items: center; width: min(100%, 350px); height: var(--qizhi-input-tag-height); min-height: var(--qizhi-input-tag-height); padding: 0 4px; overflow: hidden; border-color: var(--color-border-2, #e5e6eb); background: var(--color-bg-2, #fff); color: var(--color-text-1, #1d2129); transition: border-color .16s ease, box-shadow .16s ease; }
+.qizhi-input-tag:hover { border-color: var(--color-border-3, #c9cdd4); }
+.qizhi-input-tag:focus-within { border-color: rgb(var(--primary-6, 51, 102, 255)); box-shadow: 0 0 0 2px var(--color-primary-light-1, #e8f0ff); }
+.qizhi-input-tag--small { --qizhi-input-tag-height: 28px; }
+.qizhi-input-tag--large { --qizhi-input-tag-height: 36px; }
+.qizhi-input-tag--error { border-color: var(--color-danger, #f53f3f); }
+.qizhi-input-tag--error:focus-within { border-color: var(--color-danger, #f53f3f); box-shadow: 0 0 0 2px var(--color-danger-light-1, #ffece8); }
+.qizhi-input-tag__inner { display: flex; flex: 1 1 auto; align-items: center; min-width: 0; height: 100%; gap: 4px; overflow: hidden; }
+.qizhi-input-tag__tag, .qizhi-input-tag__more { flex: 0 0 auto; max-width: 120px; }
+.qizhi-input-tag--small .qizhi-input-tag__tag, .qizhi-input-tag--small .qizhi-input-tag__more { height: 20px; font-size: 12px; line-height: 18px; }
+.qizhi-input-tag--large .qizhi-input-tag__tag, .qizhi-input-tag--large .qizhi-input-tag__more { height: 28px; font-size: 14px; line-height: 26px; }
+.qizhi-input-tag__input { flex: 1 1 90px; min-width: 90px; height: 100%; padding: 0 4px; border: 0; outline: 0; background: transparent; color: var(--color-text-1, #1d2129); font: inherit; font-size: 14px; }
+.qizhi-input-tag__input::placeholder { color: var(--color-text-4, #c9cdd4); }
+.qizhi-input-tag__input--collapsed { flex: 0 0 2px; min-width: 2px; width: 2px; padding: 0; }
+.qizhi-input-tag--responsive .qizhi-input-tag__input { flex-basis: 0; min-width: 0; width: 0; padding: 0; opacity: 0; pointer-events: none; }
+.qizhi-input-tag__clear { display: inline-flex; flex: 0 0 20px; align-items: center; justify-content: center; width: 20px; height: 20px; margin-left: 6px; padding: 0; border: 0; background: transparent; color: var(--color-text-3, #86909c); cursor: pointer; }
+.qizhi-input-tag__clear svg { width: 16px; height: 16px; }
+.qizhi-input-tag:not(:hover):not(:focus-within) .qizhi-input-tag__clear { visibility: hidden; }
+.qizhi-input-tag__clear:hover { color: var(--color-text-3, #86909c); }
+.qizhi-input-tag__clear:active { color: var(--color-text-2, #4e5969); }
+.qizhi-input-tag__measure { position: absolute; visibility: hidden; white-space: nowrap; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .qizhi-input-tag { transition: none; } }

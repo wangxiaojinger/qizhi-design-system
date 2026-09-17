@@ -1,0 +1,21 @@
+.qizhi-pagination { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; color: var(--color-text-2); font-size: 14px; }
+.qizhi-pagination__pages { display: flex; gap: inherit; }
+.qizhi-pagination__item { display: inline-flex; align-items: center; justify-content: center; box-sizing: border-box; width: 32px; height: 32px; padding: 0; border: 1px solid transparent; border-radius: 2px; color: var(--color-text-2); background: transparent; font: inherit; cursor: pointer; }
+.qizhi-pagination__item:hover:not(:disabled) { color: rgb(var(--primary-6, 51, 102, 255)); background: var(--color-fill-2); }
+.qizhi-pagination__item:focus-visible { outline: 2px solid rgba(var(--primary-6, 51, 102, 255), .2); outline-offset: 1px; }
+.qizhi-pagination__item.is-active { border-color: rgb(var(--primary-6, 51, 102, 255)); color: rgb(var(--primary-6, 51, 102, 255)); }
+.qizhi-pagination__item:disabled { color: var(--color-text-4); cursor: not-allowed; }
+.qizhi-pagination__item svg { width: 16px; height: 16px; }
+.qizhi-pagination__total { margin-right: 4px; white-space: nowrap; }
+.qizhi-pagination__jumper, .qizhi-pagination__simple-pager { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
+.qizhi-pagination__jumper .qizhi-input, .qizhi-pagination__simple-pager .qizhi-input { width: 56px; }
+.qizhi-pagination__jumper .qizhi-input__field, .qizhi-pagination__simple-pager .qizhi-input__field { width: 100%; height: 100%; padding: 0 8px; border: 0; border-radius: 0; outline: 0; background: transparent; text-align: center; }
+.qizhi-pagination__jumper .qizhi-input__field:focus-visible, .qizhi-pagination__simple-pager .qizhi-input__field:focus-visible { border: 0; outline: 0; }
+.qizhi-pagination--large { gap: 8px; }
+.qizhi-pagination--large .qizhi-pagination__item { width: 36px; height: 36px; }
+.qizhi-pagination--small { gap: 6px; font-size: 13px; }
+.qizhi-pagination--small .qizhi-pagination__item { width: 28px; height: 28px; }
+.qizhi-pagination--mini { gap: 4px; font-size: 12px; }
+.qizhi-pagination--mini .qizhi-pagination__item { width: 24px; height: 24px; }
+.qizhi-pagination--simple .qizhi-pagination__simple-pager .qizhi-input { width: 48px; }
+.qizhi-pagination.is-disabled .qizhi-pagination__total, .qizhi-pagination.is-disabled .qizhi-pagination__jumper, .qizhi-pagination.is-disabled .qizhi-pagination__simple-pager { color: var(--color-text-4); }

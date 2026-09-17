@@ -1,0 +1,29 @@
+[
+  {
+    "width": 1440,
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "bodyScrollWidth": 1440,
+    "guideHidden": true,
+    "emptyVisible": true,
+    "errors": []
+  },
+  {
+    "width": 1024,
+    "scrollWidth": 1024,
+    "clientWidth": 1024,
+    "bodyScrollWidth": 1024,
+    "guideHidden": true,
+    "emptyVisible": true,
+    "errors": []
+  },
+  {
+    "width": 375,
+    "scrollWidth": 375,
+    "clientWidth": 375,
+    "bodyScrollWidth": 375,
+    "guideHidden": true,
+    "emptyVisible": true,
+    "errors": []
+  }
+]

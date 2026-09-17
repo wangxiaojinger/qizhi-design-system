@@ -1,0 +1,6 @@
+#component-switch .qizhi-components-wrapper { grid-template-columns: minmax(0, 1fr); width: 100%; min-width: 0; }
+#component-switch .codebox-wrapper, #component-switch .demo { box-sizing: border-box; width: 100%; max-width: 100%; min-width: 0; }
+#component-switch .codebox-wrapper > .demo { margin-bottom: 12px; }
+#component-switch .component-example-actions { padding-right: 0; }
+#component-switch .switch-docs-row { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 24px; }
+#component-switch .qizhi-api-section { margin-top: 64px; }

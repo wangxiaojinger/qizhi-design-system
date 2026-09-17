@@ -1,0 +1,192 @@
+#component-tooltip .qizhi-components-wrapper {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+#component-tooltip .codebox-wrapper,
+#component-tooltip .demo {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+
+#component-tooltip .codebox-wrapper > .demo {
+  margin-bottom: 12px;
+  overflow: visible;
+}
+
+#component-tooltip .component-example-actions {
+  padding-right: 0;
+}
+
+#文字气泡-基础用法 .demo {
+  min-height: 194px;
+}
+
+#文字气泡-迷你尺寸 .demo,
+#文字气泡-不同颜色 .demo {
+  min-height: 130px;
+}
+
+#文字气泡-位置 .demo {
+  min-height: 378px;
+}
+
+#文字气泡-受控模式 .demo {
+  min-height: 224px;
+}
+
+.tooltip-docs-basic {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 72px 40px;
+  min-height: 96px;
+}
+
+.tooltip-docs-basic .qizhi-typography-text {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  white-space: nowrap;
+}
+
+.qizhi-tooltip:has(.tooltip-docs-wide-content) {
+  width: 350px;
+  white-space: normal;
+}
+
+.tooltip-docs-wide-content {
+  display: inline;
+}
+
+.tooltip-docs-placement {
+  position: relative;
+  width: 440px;
+  height: 280px;
+  margin: 0 auto;
+}
+
+.tooltip-docs-placement > div {
+  position: absolute;
+  width: 80px;
+}
+
+.tooltip-docs-placement .qizhi-btn {
+  width: 80px;
+  height: 32px;
+  padding-inline: 16px;
+}
+
+.tooltip-docs-placement__item-topLeft { top: 0; left: 70px; }
+.tooltip-docs-placement__item-top { top: 0; left: 180px; }
+.tooltip-docs-placement__item-topRight { top: 0; left: 290px; }
+.tooltip-docs-placement__item-leftTop { top: 60px; left: 10px; }
+.tooltip-docs-placement__item-rightTop { top: 60px; left: 350px; }
+.tooltip-docs-placement__item-left { top: 120px; left: 10px; }
+.tooltip-docs-placement__item-right { top: 120px; left: 350px; }
+.tooltip-docs-placement__item-leftBottom { top: 180px; left: 10px; }
+.tooltip-docs-placement__item-rightBottom { top: 180px; left: 350px; }
+.tooltip-docs-placement__item-bottomLeft { top: 240px; left: 70px; }
+.tooltip-docs-placement__item-bottom { top: 240px; left: 180px; }
+.tooltip-docs-placement__item-bottomRight { top: 240px; left: 290px; }
+
+.tooltip-docs-controlled {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 72px 32px;
+  min-height: 126px;
+}
+
+.tooltip-docs-controlled__switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--color-text-2);
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.tooltip-docs-colors {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(72px, 1fr));
+  align-items: start;
+  justify-items: start;
+  gap: 18px;
+  width: min(100%, 620px);
+}
+
+.tooltip-docs-color-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  min-height: 32px;
+  padding-inline: 10px;
+  border-radius: var(--border-radius-medium);
+  background: var(--color-fill-1);
+}
+
+#component-tooltip .qizhi-api-section {
+  margin-top: 64px;
+}
+
+@media (max-width: 720px) {
+  #文字气泡-基础用法 .demo {
+    min-height: 234px;
+  }
+
+  #文字气泡-位置 .demo {
+    min-height: 370px;
+  }
+
+  #文字气泡-不同颜色 .demo {
+    min-height: 322px;
+  }
+
+  .tooltip-docs-basic {
+    align-items: flex-start;
+    gap: 64px 24px;
+  }
+
+  .tooltip-docs-basic .qizhi-typography-text {
+    white-space: normal;
+    text-align: center;
+  }
+
+  .tooltip-docs-placement {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+    width: 100%;
+    height: auto;
+  }
+
+  .tooltip-docs-placement > div {
+    position: relative;
+    inset: auto;
+    width: 100%;
+  }
+
+  .tooltip-docs-placement .qizhi-btn {
+    width: 100%;
+  }
+
+  .tooltip-docs-placement__item-topLeft { grid-area: 1 / 1; }
+  .tooltip-docs-placement__item-top { grid-area: 1 / 2; }
+  .tooltip-docs-placement__item-topRight { grid-area: 5 / 1; }
+  .tooltip-docs-placement__item-leftTop { grid-area: 2 / 2; }
+  .tooltip-docs-placement__item-left { grid-area: 3 / 2; }
+  .tooltip-docs-placement__item-leftBottom { grid-area: 4 / 2; }
+  .tooltip-docs-placement__item-rightTop { grid-area: 2 / 1; }
+  .tooltip-docs-placement__item-right { grid-area: 3 / 1; }
+  .tooltip-docs-placement__item-rightBottom { grid-area: 4 / 1; }
+  .tooltip-docs-placement__item-bottomLeft { grid-area: 5 / 2; }
+  .tooltip-docs-placement__item-bottom { grid-area: 6 / 1; }
+  .tooltip-docs-placement__item-bottomRight { grid-area: 6 / 2; }
+
+  .tooltip-docs-colors {
+    grid-template-columns: repeat(2, minmax(96px, 1fr));
+    gap: 64px 16px;
+  }
+}

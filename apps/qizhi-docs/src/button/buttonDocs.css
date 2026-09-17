@@ -1,0 +1,32 @@
+#components-button .button-demo-row { gap: 24px; }
+#components-button .qizhi-components-wrapper { grid-template-columns: minmax(0, 1fr); width: 100%; min-width: 0; }
+#components-button .codebox-wrapper,
+#components-button .codebox-wrapper > .demo { box-sizing: border-box; width: 100%; max-width: 100%; min-width: 0; }
+#components-button .codebox-wrapper > .demo { margin-bottom: 12px; }
+#components-button .qz-description,
+#components-button .qz-description-children,
+#components-button .code-preview { box-sizing: border-box; width: 100%; max-width: 100%; min-width: 0; }
+#components-button .qz-description p { overflow-wrap: anywhere; }
+#components-button .button-status-demo { display: grid; gap: 24px; }
+#components-button .button-loading-grid { display: grid; grid-template-columns: repeat(3, max-content); justify-content: start; gap: 24px; padding-left: 0; }
+#components-button .button-loading-actions { display: flex; gap: 24px; margin: 24px 0; }
+#components-button .button-long-demo__inner { display: grid; gap: 24px; width: min(100%, 360px); }
+#components-button .component-example-actions { padding-right: 0; }
+#components-button .qizhi-copy-status { align-self: center; min-width: 64px; color: var(--color-text-3); font-size: 14px; }
+#components-button .qizhi-copy-status:empty { display: none; }
+#components-button .qizhi-code-wrapper { min-width: 0; max-width: 100%; overflow: hidden; }
+#components-button .qizhi-code-wrapper pre { box-sizing: border-box; width: 100%; margin: 0; padding: 24px; overflow: auto; background: var(--color-fill-1); }
+#components-button .qizhi-button-api { margin-top: 64px; }
+#components-button .qizhi-button-api h3 { margin: 48px 0 24px; font-size: 24px; font-weight: 500; }
+#components-button .qizhi-button-api h3:first-of-type { margin-top: 32px; }
+#components-button .qizhi-button-api > p { margin: -12px 0 24px; color: var(--color-text-3); }
+#components-button .qizhi-api-table-scroll { overflow-x: auto; }
+#components-button .qizhi-button-api table { width: 100%; min-width: 760px; border-collapse: collapse; text-align: left; }
+#components-button .qizhi-button-api th { background: var(--color-fill-1); }
+#components-button .qizhi-button-api th, #components-button .qizhi-button-api td { padding: 14px 16px; border: 1px solid var(--color-border-1); }
+#components-button .qizhi-button-api td { font-family: Inter, -apple-system, BlinkMacSystemFont, "system-ui", sans-serif; font-size: 14px; }
+#components-button .qizhi-button-api td:not(:nth-child(2)) code { padding: 0; border-radius: 0; background: transparent; font-family: Inter, -apple-system, BlinkMacSystemFont, "system-ui", sans-serif; }
+#components-button .qizhi-button-api td:first-child code { font-size: 14px; }
+#components-button .qizhi-button-api td:nth-child(2) code { display: inline-block; padding: 1px 6px; border-radius: 2px; background: var(--color-fill-2); color: var(--color-text-2); font-family: Menlo, Monaco, Consolas, "Liberation Mono", monospace; font-size: 12px; line-height: 1.5; }
+#components-button .qizhi-button-api .qizhi-api-english { color: rgb(var(--magenta-6)); font-family: Inter, -apple-system, BlinkMacSystemFont, "system-ui", sans-serif; font-size: 14px; }
+@media (max-width: 600px) { #components-button .button-demo-row { gap: 12px; } #components-button .button-demo-row > .qizhi-btn { min-width: 0; } #components-button .component-example-actions { justify-content: flex-end; flex-wrap: wrap; padding-right: 0; padding-left: 0; } #components-button .button-loading-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

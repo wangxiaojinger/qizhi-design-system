@@ -1,0 +1,9 @@
+// 由 scripts/build-catalog-icons.mjs 生成，禁止手改。
+// Source: ../../../../assets/icons/figma-combination/qz-icon-0-5360.svg
+import { createQizhiMarkupIcon } from "../../createQizhiMarkupIcon";
+
+export const CirclePlusFilledIcon = createQizhiMarkupIcon(
+  "CirclePlusFilledIcon",
+  "0 0 16 16",
+  "<g id=\"__QIZHI_ICON_ID__-icon=&#229;&#138;&#160;&#229;&#143;&#183;, &#233;&#163;&#142;&#230;&#160;&#188;=on\">\n<path id=\"__QIZHI_ICON_ID__-Vector\" d=\"M8 1C4.13438 1 1 4.13438 1 8C1 11.8656 4.13438 15 8 15C11.8656 15 15 11.8656 15 8C15 4.13438 11.8656 1 8 1ZM11 8.375C11 8.44375 10.9438 8.5 10.875 8.5H8.5V10.875C8.5 10.9438 8.44375 11 8.375 11H7.625C7.55625 11 7.5 10.9438 7.5 10.875V8.5H5.125C5.05625 8.5 5 8.44375 5 8.375V7.625C5 7.55625 5.05625 7.5 5.125 7.5H7.5V5.125C7.5 5.05625 7.55625 5 7.625 5H8.375C8.44375 5 8.5 5.05625 8.5 5.125V7.5H10.875C10.9438 7.5 11 7.55625 11 7.625V8.375Z\" fill=\"currentColor\" fill-opacity=\"0.45\"/>\n</g>",
+);

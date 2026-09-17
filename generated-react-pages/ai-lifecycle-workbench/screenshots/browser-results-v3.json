@@ -1,0 +1,41 @@
+[
+  {
+    "width": 1440,
+    "hasSider": false,
+    "regionDropdown": true,
+    "languageDropdown": true,
+    "resourceHelp": true,
+    "menubar": true,
+    "scrollWidth": 1440,
+    "clientWidth": 1440,
+    "regionMenuVisible": true,
+    "languageMenuVisible": true,
+    "errors": []
+  },
+  {
+    "width": 1024,
+    "hasSider": false,
+    "regionDropdown": true,
+    "languageDropdown": true,
+    "resourceHelp": true,
+    "menubar": true,
+    "scrollWidth": 1024,
+    "clientWidth": 1024,
+    "regionMenuVisible": true,
+    "languageMenuVisible": true,
+    "errors": []
+  },
+  {
+    "width": 375,
+    "hasSider": false,
+    "regionDropdown": true,
+    "languageDropdown": true,
+    "resourceHelp": true,
+    "menubar": true,
+    "scrollWidth": 375,
+    "clientWidth": 375,
+    "regionMenuVisible": true,
+    "languageMenuVisible": true,
+    "errors": []
+  }
+]

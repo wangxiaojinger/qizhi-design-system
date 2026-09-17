@@ -1,0 +1,20 @@
+.qizhi-space {
+  --qizhi-space-column-gap: 8px;
+  --qizhi-space-row-gap: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--qizhi-space-row-gap) var(--qizhi-space-column-gap);
+  min-width: 0;
+}
+
+.qizhi-space--horizontal { flex-direction: row; }
+.qizhi-space--vertical { flex-direction: column; }
+.qizhi-space--wrap { flex-wrap: wrap; }
+.qizhi-space--align-start { align-items: flex-start; }
+.qizhi-space--align-center { align-items: center; }
+.qizhi-space--align-end { align-items: flex-end; }
+.qizhi-space--align-baseline { align-items: baseline; }
+.qizhi-space-size-mini { --qizhi-space-column-gap: 4px; --qizhi-space-row-gap: 4px; }
+.qizhi-space-size-small { --qizhi-space-column-gap: 8px; --qizhi-space-row-gap: 8px; }
+.qizhi-space-size-medium { --qizhi-space-column-gap: 16px; --qizhi-space-row-gap: 16px; }
+.qizhi-space-size-large { --qizhi-space-column-gap: 24px; --qizhi-space-row-gap: 24px; }

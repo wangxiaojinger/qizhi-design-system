@@ -1,0 +1,4 @@
+interface:
+  display_name: "QIZHI 页面搭建"
+  short_description: "根据产品需求生成一致、可验收且有来源证据的 QIZHI 页面"
+  default_prompt: "使用 $qizhi-page-builder 根据这份需求文档生成 QIZHI 页面，并列出假设、组件来源和能力缺口。"

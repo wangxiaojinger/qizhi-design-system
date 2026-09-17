@@ -1,0 +1,8 @@
+#component-code-preview .qizhi-components-wrapper { grid-template-columns: minmax(0, 1fr); width: 100%; min-width: 0; }
+#component-code-preview .codebox-wrapper, #component-code-preview .demo { box-sizing: border-box; width: 100%; max-width: 100%; min-width: 0; }
+#component-code-preview .codebox-wrapper > .demo { min-height: 200px; margin-bottom: 12px; }
+#component-code-preview .component-example-actions { padding-right: 0; }
+#component-code-preview .qizhi-api-section { margin-top: 64px; }
+.content-viewer-demo-stack { display: grid; min-width: 0; gap: 16px; }
+.content-viewer-demo-grid { display: grid; min-width: 0; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 767.98px) { .content-viewer-demo-grid { grid-template-columns: minmax(0, 1fr); } }
