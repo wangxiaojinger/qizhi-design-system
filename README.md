@@ -53,7 +53,7 @@ export function Example() {
 ## 发布
 
 1. 更新 `packages/qizhi-tokens` 与 `packages/qizhi-react` 的版本号。
-2. 运行 `corepack pnpm verify`。
+2. 运行 `corepack pnpm release:check`。
 3. 在 GitHub 创建并发布 Release。
 4. `Publish GitHub Packages` 工作流会依次发布 Tokens 和 React 包。
 

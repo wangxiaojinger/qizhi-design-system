@@ -19,8 +19,4 @@ jobs:
           node-version: 24
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
-      - run: pnpm api:validate
-      - run: pnpm --filter @wangxiaojinger/qizhi-tokens validate
-      - run: pnpm --filter @wangxiaojinger/qizhi-tokens test
-      - run: pnpm typecheck
-      - run: pnpm build
+      - run: pnpm release:check
