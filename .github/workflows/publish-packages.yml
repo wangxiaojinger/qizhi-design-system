@@ -21,7 +21,11 @@ jobs:
           scope: "@wangxiaojinger"
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
-      - run: pnpm verify
+      - run: pnpm api:validate
+      - run: pnpm --filter @wangxiaojinger/qizhi-tokens validate
+      - run: pnpm --filter @wangxiaojinger/qizhi-tokens test
+      - run: pnpm typecheck
+      - run: pnpm build
       - name: Publish design tokens
         run: pnpm --filter @wangxiaojinger/qizhi-tokens publish --no-git-checks
         env:
