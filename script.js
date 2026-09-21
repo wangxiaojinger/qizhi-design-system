@@ -10433,12 +10433,17 @@ const createTokenTable = (tokens, rgbVariables) => {
   return scroll;
 };
 
+const tokenManifestUrl = new URL(
+  "./packages/qizhi-tokens/dist/tokens.json",
+  import.meta.url,
+);
+
 const initTokenDocs = async () => {
   const container = document.querySelector("[data-token-docs]");
   if (!container) return;
 
   try {
-    const response = await fetch("./packages/qizhi-tokens/dist/tokens.json");
+    const response = await fetch(tokenManifestUrl);
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const manifest = await response.json();
     const tokens = Object.values(manifest.tokens ?? {});

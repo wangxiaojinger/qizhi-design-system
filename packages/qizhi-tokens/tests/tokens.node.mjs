@@ -112,7 +112,11 @@ test("design token docs are rendered from generated token data", async () => {
 
   assert.match(section, /data-token-docs/);
   assert.doesNotMatch(section, /<table class="token-table">/);
-  assert.match(script, /packages\/qizhi-tokens\/dist\/tokens\.json/);
+  assert.match(
+    script,
+    /new URL\(\s*"\.\/packages\/qizhi-tokens\/dist\/tokens\.json",\s*import\.meta\.url,\s*\)/,
+  );
+  assert.match(script, /fetch\(tokenManifestUrl\)/);
   assert.match(script, /token\.name/);
   assert.match(script, /token\.category/);
   assert.match(script, /token\.cssVariable/);
