@@ -2,6 +2,7 @@ import { createContext, forwardRef, useContext, useLayoutEffect, useRef, useStat
 import type { CSSProperties } from "react";
 import { Button } from "../button/Button";
 import type { AvatarComponent, AvatarGroupProps, AvatarProps, AvatarSize } from "./Avatar.types";
+import "./avatar.css";
 
 type AvatarStyle = CSSProperties & { "--qizhi-avatar-content-scale"?: number };
 const AvatarGroupSizeContext = createContext<AvatarSize | null>(null);
