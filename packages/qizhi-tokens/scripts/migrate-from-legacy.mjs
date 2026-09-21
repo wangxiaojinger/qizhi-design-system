@@ -49,7 +49,7 @@ const tokens = Object.fromEntries(entries.map(([cssVariable, value]) => {
 await mkdir(fileURLToPath(new URL("src/", packageRoot)), { recursive: true });
 await writeFile(target, `${JSON.stringify({
   name: "QIZHI Design Tokens",
-  version: "0.1.0",
+  version: "0.1.1",
   tokens,
 }, null, 2)}\n`, "utf8");
 

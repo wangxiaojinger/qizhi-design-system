@@ -12,7 +12,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit && pnpm --filter @wangxiaojinger/qizhi-react typecheck",
     "test": "pnpm --filter @wangxiaojinger/qizhi-tokens test && vitest run",
     "e2e": "playwright test",
-    "verify": "pnpm api:validate && pnpm --filter @wangxiaojinger/qizhi-tokens validate && pnpm typecheck && pnpm test && pnpm build"
+    "verify": "pnpm api:validate && pnpm --filter @wangxiaojinger/qizhi-tokens build && pnpm --filter @wangxiaojinger/qizhi-tokens validate && pnpm typecheck && pnpm test && pnpm build"
   },
   "dependencies": {
     "prismjs": "^1.30.0",

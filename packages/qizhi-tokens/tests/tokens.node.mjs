@@ -128,5 +128,9 @@ test("QIZHI React and root verification consume the token package", async () => 
   assert.match(reactEntry, /^import "@wangxiaojinger\/qizhi-tokens\/style\.css";/);
   assert.match(rootPackage.scripts.build, /@wangxiaojinger\/qizhi-tokens build/);
   assert.match(rootPackage.scripts.test, /@wangxiaojinger\/qizhi-tokens test/);
-  assert.match(rootPackage.scripts.verify, /@wangxiaojinger\/qizhi-tokens validate/);
+  const tokenBuildIndex = rootPackage.scripts.verify.indexOf("@wangxiaojinger/qizhi-tokens build");
+  const tokenValidateIndex = rootPackage.scripts.verify.indexOf("@wangxiaojinger/qizhi-tokens validate");
+
+  assert.ok(tokenBuildIndex >= 0);
+  assert.ok(tokenValidateIndex > tokenBuildIndex);
 });
