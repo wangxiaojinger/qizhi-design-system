@@ -62,6 +62,13 @@ it("consumes PageHeader from the public package boundary", () => {
     .toHaveClass("qizhi-page-header");
 });
 
+it("resolves the public icon subpath from source in a clean workspace", () => {
+  const tsconfig = JSON.parse(readFileSync("tsconfig.base.json", "utf8"));
+
+  expect(tsconfig.compilerOptions.paths["@wangxiaojinger/qizhi-react/icon"])
+    .toEqual(["./packages/qizhi-react/src/icon/index.ts"]);
+});
+
 it("consumes Steps from the public package boundary", () => {
   render(
     <Steps

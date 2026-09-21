@@ -12,7 +12,8 @@
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "paths": {
-      "@wangxiaojinger/qizhi-react": ["./packages/qizhi-react/src/index.ts"]
+      "@wangxiaojinger/qizhi-react": ["./packages/qizhi-react/src/index.ts"],
+      "@wangxiaojinger/qizhi-react/icon": ["./packages/qizhi-react/src/icon/index.ts"]
     },
     "resolveJsonModule": true,
     "isolatedModules": true,
