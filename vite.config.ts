@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react";
 import { fileURLToPath } from "node:url";
 
 export default defineConfig(({ command }) => ({
-  base: command === "build" ? "/qizhi-design-system/" : "/",
+  base: command === "build" ? "/qizhi-design-system-docs/" : "/",
   plugins: [react()],
   resolve: {
     alias: [

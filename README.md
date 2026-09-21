@@ -13,11 +13,11 @@ corepack pnpm dev
 
 ## 在线文档
 
-`main` 分支更新后会通过 GitHub Actions 自动构建并部署到 GitHub Pages：
+文档站的生产构建产物发布在独立的公开仓库 `qizhi-design-system-docs`：
 
-<https://wangxiaojinger.github.io/qizhi-design-system/>
+<https://wangxiaojinger.github.io/qizhi-design-system-docs/>
 
-仓库虽然是私有的，但 GitHub Pages 站点默认公开访问。私有仓库启用 Pages 需要仓库所有者的 GitHub 套餐支持。
+组件源码继续保存在当前私有仓库，公开仓库只存放 `dist` 页面产物。
 
 ## 工作区
 
