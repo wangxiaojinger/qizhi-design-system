@@ -11,6 +11,14 @@ corepack pnpm dev
 
 文档站默认运行在 `http://127.0.0.1:5173/`。
 
+## 在线文档
+
+`main` 分支更新后会通过 GitHub Actions 自动构建并部署到 GitHub Pages：
+
+<https://wangxiaojinger.github.io/qizhi-design-system/>
+
+仓库虽然是私有的，但 GitHub Pages 站点默认公开访问。私有仓库启用 Pages 需要仓库所有者的 GitHub 套餐支持。
+
 ## 工作区
 
 - `packages/qizhi-tokens`：设计变量包。

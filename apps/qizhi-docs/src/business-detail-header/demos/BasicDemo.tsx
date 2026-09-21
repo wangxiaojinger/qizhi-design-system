@@ -1,4 +1,5 @@
 import { ServiceDetailHeader } from "@wangxiaojinger/qizhi-react";
+import serviceIconUrl from "../../../../../assets/qizhi-detail-service.svg";
 
 const versions = [
   {
@@ -33,7 +34,7 @@ export default function BasicDemo() {
   return (
     <ServiceDetailHeader
       key="initial-version-v3"
-      icon={<img src="/assets/qizhi-detail-service.svg" alt="" />}
+      icon={<img src={serviceIconUrl} alt="" />}
       title="自定义-医疗服务详情"
       serviceId="dlc1bgehaev9iiaz"
       framework="自定义"

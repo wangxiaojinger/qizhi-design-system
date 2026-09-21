@@ -2,7 +2,8 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { fileURLToPath } from "node:url";
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+  base: command === "build" ? "/qizhi-design-system/" : "/",
   plugins: [react()],
   resolve: {
     alias: [
@@ -10,4 +11,4 @@ export default defineConfig({
       { find: "@wangxiaojinger/qizhi-react", replacement: fileURLToPath(new URL("./packages/qizhi-react/src/index.ts", import.meta.url)) },
     ],
   },
-});
+}));
