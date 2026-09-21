@@ -1,6 +1,7 @@
 import { forwardRef, useEffect } from "react";
 import { LoadingIcon } from "../icon";
 import type { ButtonClassName, ButtonHandle, ButtonProps } from "./Button.types";
+import "./button.css";
 
 const joinClassName = (className?: ButtonClassName) =>
   Array.isArray(className) ? className.filter(Boolean).join(" ") : className;
