@@ -2,6 +2,7 @@ import { forwardRef, useState } from "react";
 import type { MouseEvent } from "react";
 import { LoadingIcon } from "../icon/LoadingIcon";
 import type { SwitchProps } from "./Switch.types";
+import "./switch.css";
 
 const joinClassNames = (...names: Array<string | false | undefined>) => names.filter(Boolean).join(" ");
 

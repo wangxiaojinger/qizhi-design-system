@@ -16,6 +16,7 @@ import {
 } from "./treeModel";
 import type { NormalizedTreeNode } from "./treeModel";
 import type { TreeKey, TreeNodeData, TreeProps } from "./Tree.types";
+import "./tree.css";
 
 const join = (...names: Array<string | false | undefined>) =>
   names.filter(Boolean).join(" ");

@@ -16,6 +16,7 @@ import {
   getFloatingCoordinates,
 } from "../overlay/floatingPosition";
 import type { TooltipProps, TooltipTrigger } from "./Tooltip.types";
+import "./tooltip.css";
 
 const DEFAULT_TRIGGERS: TooltipTrigger[] = ["hover", "focus", "click"];
 const CLOSE_DELAY = 80;

@@ -1,5 +1,6 @@
 import { forwardRef, useId } from "react";
 import type { DetailHeaderProps } from "./DetailHeader.types";
+import "./detailHeader.css";
 
 export const DetailHeader = forwardRef<HTMLElement, DetailHeaderProps>(function DetailHeader(
   { icon, title, status, action, properties = [], audit, tabs, className, ...rest },

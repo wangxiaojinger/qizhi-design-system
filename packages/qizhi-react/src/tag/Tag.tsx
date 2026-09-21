@@ -2,6 +2,7 @@ import { forwardRef, useState } from "react";
 import type { CSSProperties, KeyboardEvent, MouseEvent } from "react";
 import { CloseIcon } from "../icon";
 import type { TagPresetColor, TagProps } from "./Tag.types";
+import "./tag.css";
 
 const presetColors = new Set<TagPresetColor>([
   "red", "orangered", "orange", "gold", "lime", "green", "cyan",

@@ -1,5 +1,6 @@
 import { forwardRef, useId } from "react";
 import type { FormComponent, FormItemProps, FormProps } from "./Form.types";
+import "./form.css";
 
 const joinClassNames = (...names: Array<string | undefined>) => names.filter(Boolean).join(" ");
 
@@ -43,4 +44,3 @@ function FormItem({ label, required = false, extra, children, className, style }
 }
 
 export const Form = Object.assign(FormRoot, { Item: FormItem }) as FormComponent;
-

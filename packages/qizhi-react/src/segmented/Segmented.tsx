@@ -1,5 +1,6 @@
 import { useId, useState } from "react";
 import type { SegmentedProps, SegmentedValue } from "./Segmented.types";
+import "./segmented.css";
 
 export function Segmented({
   options,

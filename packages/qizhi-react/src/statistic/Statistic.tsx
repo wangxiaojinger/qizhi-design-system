@@ -1,6 +1,7 @@
 import { forwardRef } from "react";
 import { Skeleton } from "../skeleton/Skeleton";
 import type { StatisticFormat, StatisticProps } from "./Statistic.types";
+import "./statistic.css";
 
 const joinClassNames = (...names: Array<string | false | undefined>) =>
   names.filter(Boolean).join(" ");

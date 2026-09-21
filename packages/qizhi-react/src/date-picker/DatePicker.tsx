@@ -7,6 +7,7 @@ import { controlContainerClassName } from "../control-container/controlContainer
 import { ArrowLeftIcon, ArrowRightIcon } from "../icon/generated";
 import type { DatePickerComponent, DatePickerMode, DatePickerProps, DateRangePickerProps, DisabledTimeConfig } from "./DatePicker.types";
 import { TimePanel } from "../time-picker/TimePanel";
+import "./datePicker.css";
 
 const pad = (value: number) => String(value).padStart(2, "0");
 const dateValue = (date: Date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;

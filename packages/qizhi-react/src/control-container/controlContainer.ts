@@ -1,3 +1,5 @@
+import "./controlContainer.css";
+
 export const CONTROL_CONTAINER_CLASS_NAME = "qizhi-control-container";
 
 export const controlContainerClassName = (

@@ -9,6 +9,7 @@ import type {
   RadioType,
   RadioValue,
 } from "./Radio.types";
+import "./radio.css";
 
 interface RadioGroupContextValue {
   value: RadioValue | undefined;

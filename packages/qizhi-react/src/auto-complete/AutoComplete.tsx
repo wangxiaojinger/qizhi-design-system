@@ -2,6 +2,7 @@ import { Children, cloneElement, forwardRef, isValidElement, useEffect, useId, u
 import type { ChangeEvent, FocusEvent, KeyboardEvent, ReactElement } from "react";
 import { Input } from "../input/Input";
 import type { AutoCompleteComponent, AutoCompleteOption, AutoCompleteOptionProps, AutoCompleteProps } from "./AutoComplete.types";
+import "./autoComplete.css";
 
 type TriggerElement = HTMLInputElement | HTMLTextAreaElement;
 type TriggerProps = {

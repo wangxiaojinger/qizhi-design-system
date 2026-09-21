@@ -6,6 +6,7 @@ import type {
   ObjectMetricsProps,
   ResourceUsageCardProps,
 } from "./BusinessMetrics.types";
+import "./businessMetrics.css";
 
 const classes = (...values: Array<string | false | undefined>) => (
   values.filter(Boolean).join(" ")

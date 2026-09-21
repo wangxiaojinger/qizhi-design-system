@@ -3,6 +3,7 @@ import type { FocusEvent, KeyboardEvent, MouseEvent, ReactElement } from "react"
 import { Button } from "../button/Button";
 import { ChevronDownIcon, ChevronRightIcon, LoadingIcon } from "../icon";
 import type { DropdownButtonProps, DropdownComponent, DropdownItemProps, DropdownMenuProps, DropdownProps, DropdownSubMenuProps } from "./Dropdown.types";
+import "./dropdown.css";
 
 const joinClassName = (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(" ");
 const DropdownContext = createContext<{ close: (restore?: boolean) => void } | null>(null);

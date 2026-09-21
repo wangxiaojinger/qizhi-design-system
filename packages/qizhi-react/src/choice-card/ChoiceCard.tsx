@@ -11,6 +11,7 @@ import type {
   ChoiceCardSize,
   ChoiceCardValue,
 } from "./ChoiceCard.types";
+import "./choiceCard.css";
 
 interface ChoiceCardContextValue {
   value: ChoiceCardValue | undefined;

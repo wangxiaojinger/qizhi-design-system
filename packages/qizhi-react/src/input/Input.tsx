@@ -16,6 +16,7 @@ import {
   MultiplyIcon,
   SearchIcon,
 } from "../icon";
+import "./input.css";
 import { controlContainerClassName } from "../control-container/controlContainer";
 
 const joinClassName = (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(" ");

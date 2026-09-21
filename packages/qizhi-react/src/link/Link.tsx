@@ -1,6 +1,7 @@
 import { forwardRef } from "react";
 import { LinkIcon } from "../icon";
 import type { LinkClassName, LinkHandle, LinkProps } from "./Link.types";
+import "./link.css";
 
 const joinClassName = (className?: LinkClassName) =>
   Array.isArray(className) ? className.filter(Boolean).join(" ") : className;

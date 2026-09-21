@@ -15,6 +15,7 @@ import type {
   InputTagProps,
   InputTagValue,
 } from "./InputTag.types";
+import "./inputTag.css";
 
 const join = (...classes: Array<string | false | null | undefined>) =>
   classes.filter(Boolean).join(" ");

@@ -16,6 +16,7 @@ import {
 } from "../icon";
 import { Tag } from "../tag/Tag";
 import { TreeSelectPopup } from "./TreeSelectPopup";
+import "./treeSelect.css";
 import type {
   TreeSelectMultipleProps,
   TreeSelectOption,

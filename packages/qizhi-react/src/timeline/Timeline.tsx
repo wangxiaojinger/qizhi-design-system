@@ -12,6 +12,7 @@ import type {
   TimelineProps,
   TimelineStyle,
 } from "./Timeline.types";
+import "./timeline.css";
 
 const classes = (...values: Array<string | false | null | undefined>) =>
   values.filter(Boolean).join(" ");

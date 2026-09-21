@@ -8,6 +8,7 @@ import type {
   TypographyTextProps,
   TypographyTitleProps,
 } from "./Typography.types";
+import "./typography.css";
 
 const joinClassName = (className?: TypographyClassName) =>
   Array.isArray(className) ? className.filter(Boolean).join(" ") : className;

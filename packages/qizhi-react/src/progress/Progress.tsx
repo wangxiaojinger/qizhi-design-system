@@ -3,6 +3,7 @@ import { CheckCircleIcon, CheckIcon, CloseIcon } from "../icon";
 import { CircleCloseFilledIcon } from "../icon/generated/catalog/CircleCloseFilledIcon";
 import { WarningFilledIcon } from "../icon/generated/prompt/WarningFilledIcon";
 import type { ProgressGradient, ProgressProps } from "./Progress.types";
+import "./progress.css";
 
 type ProgressStyle = CSSProperties & Record<`--qizhi-progress-${string}`, string>;
 

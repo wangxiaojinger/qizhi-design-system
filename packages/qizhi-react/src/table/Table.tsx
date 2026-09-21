@@ -9,6 +9,7 @@ import { MinusIcon } from "../icon/generated/catalog/MinusIcon";
 import { Pagination } from "../pagination/Pagination";
 import { Radio } from "../radio/Radio";
 import type { TableColumn, TableProps, TableRowKey, TableSortOrder } from "./Table.types";
+import "./table.css";
 
 const cx = (...parts: Array<string | false | undefined>) => parts.filter(Boolean).join(" ");
 

@@ -5,6 +5,7 @@ import type { SideNavigationVariant } from "../side-navigation/SideNavigation.ty
 import { TopNavigation } from "../top-navigation/TopNavigation";
 import { useLocale } from "../locale/LocaleProvider";
 import type { PlatformShellProps } from "./PlatformShell.types";
+import "./platformShell.css";
 
 const sideVariants = new Set([
   "custom-model",

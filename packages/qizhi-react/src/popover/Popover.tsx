@@ -6,6 +6,7 @@ import {
   constrainFloatingCoordinates,
   getFloatingCoordinates,
 } from "../overlay/floatingPosition";
+import "./popover.css";
 
 const mergeRef = (element: ReactElement, node: HTMLElement | null) => {
   const ref = (element.props as { ref?: unknown }).ref;

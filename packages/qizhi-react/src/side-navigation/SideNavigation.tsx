@@ -33,6 +33,7 @@ import type {
   SideNavigationProps,
   SideNavigationVariant,
 } from "./SideNavigation.types";
+import "./sideNavigation.css";
 
 const defaultWorkspaces = [
   "AI4S_DEV_public_workspace",

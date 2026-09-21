@@ -1,6 +1,7 @@
 import { forwardRef } from "react";
 import emptyImageUrl from "./qizhi-empty.svg";
 import type { EmptyProps } from "./Empty.types";
+import "./empty.css";
 
 export const Empty = forwardRef<HTMLDivElement, EmptyProps>(function Empty(
   { description = "暂无数据", className, role = "status", ...rest },

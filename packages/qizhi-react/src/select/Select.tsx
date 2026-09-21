@@ -8,6 +8,7 @@ import { ArrowDownIcon, CloseIcon } from "../icon";
 import { Tag } from "../tag/Tag";
 import { CONTROL_CONTAINER_CLASS_NAME } from "../control-container/controlContainer";
 import type { SelectHandle, SelectMultipleProps, SelectOption, SelectProps, SelectRawValue, SelectSingleProps } from "./Select.types";
+import "./select.css";
 
 const join = (...values: Array<string | false | null | undefined>) => values.filter(Boolean).join(" ");
 const textOf = (value: ReactNode) => typeof value === "string" || typeof value === "number" ? String(value) : "";

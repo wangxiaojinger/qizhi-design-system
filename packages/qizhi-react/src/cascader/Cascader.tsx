@@ -21,6 +21,7 @@ import type {
   CascaderProps,
   CascaderSingleProps,
 } from "./Cascader.types";
+import "./cascader.css";
 import {
   filterPaths,
   findPathByValue,

@@ -16,6 +16,7 @@ import type {
   MenuMode,
   MenuProps,
 } from "./Menu.types";
+import "./menu.css";
 
 interface MenuContextValue {
   mode: MenuMode;

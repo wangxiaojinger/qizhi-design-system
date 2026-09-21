@@ -8,6 +8,7 @@ import type {
   CheckboxValue,
 } from "./Checkbox.types";
 import { CheckboxIndicator } from "./CheckboxIndicator";
+import "./checkbox.css";
 
 interface CheckboxGroupContextValue {
   values: readonly CheckboxValue[];

@@ -8,6 +8,7 @@ import type {
   LayoutProps,
   LayoutSiderProps,
 } from "./Layout.types";
+import "./layout.css";
 
 const classes = (...values: Array<string | false | undefined>) => values.filter(Boolean).join(" ");
 

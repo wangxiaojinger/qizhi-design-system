@@ -1,5 +1,6 @@
 import { Children, Fragment, forwardRef } from "react";
 import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
+import "./space.css";
 
 export type SpaceSize = "mini" | "small" | "medium" | "large" | number;
 export type SpaceSizeValue = SpaceSize | readonly [number, number];

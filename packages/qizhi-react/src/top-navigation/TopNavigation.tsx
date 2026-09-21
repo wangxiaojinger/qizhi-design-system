@@ -16,6 +16,7 @@ import { useLocale } from "../locale/LocaleProvider";
 import type { QizhiLocale } from "../locale/LocaleProvider.types";
 import exploreIcon from "./assets/explore.svg";
 import helpIcon from "./assets/help.svg";
+import "./topNavigation.css";
 import internetIcon from "./assets/internet.svg";
 import locationIcon from "./assets/location.svg";
 import operationsIcon from "./assets/operations-center.svg";

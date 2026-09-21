@@ -14,6 +14,7 @@ import type {
   ObjectSelectorProps,
   ObjectSelectorValue,
 } from "./ObjectSelector.types";
+import "./objectSelector.css";
 
 const names = (...values: Array<string | false | undefined>) => (
   values.filter(Boolean).join(" ")

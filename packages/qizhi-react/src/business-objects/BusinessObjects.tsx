@@ -26,6 +26,7 @@ import type {
   ResourceSpecificationCardProps,
   TaskCardProps,
 } from "./BusinessObjects.types";
+import "./businessObjects.css";
 
 const names = (...values: Array<string | false | undefined>) => (
   values.filter(Boolean).join(" ")

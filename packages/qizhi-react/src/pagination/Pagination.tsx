@@ -7,6 +7,7 @@ import { ArrowRightIcon } from "../icon/generated/ArrowRightIcon";
 import { MoreIcon } from "../icon/MoreIcon";
 import { clampPage, getPaginationTokens } from "./paginationModel";
 import type { PaginationProps } from "./Pagination.types";
+import "./pagination.css";
 
 const joinClassName = (...values: Array<string | false | undefined>) => values.filter(Boolean).join(" ");
 const positive = (value: number, fallback: number) => Number.isFinite(value) && value > 0 ? Math.trunc(value) : fallback;

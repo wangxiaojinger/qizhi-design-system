@@ -13,6 +13,7 @@ import { ArrowLeftIcon } from "../icon/generated/ArrowLeftIcon";
 import { ArrowRightIcon } from "../icon/generated/ArrowRightIcon";
 import { ArrowUpIcon } from "../icon/generated/ArrowUpIcon";
 import type { TabsKey, TabsProps } from "./Tabs.types";
+import "./tabs.css";
 
 const joinClassNames = (...names: Array<string | false | undefined>) =>
   names.filter(Boolean).join(" ");

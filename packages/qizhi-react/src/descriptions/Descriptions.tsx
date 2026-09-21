@@ -1,5 +1,6 @@
 import { forwardRef } from "react";
 import type { DescriptionsComponent, DescriptionsItemProps, DescriptionsProps } from "./Descriptions.types";
+import "./descriptions.css";
 
 const DescriptionsItem = forwardRef<HTMLDivElement, DescriptionsItemProps>(function DescriptionsItem(
   { children, label, className, ...rest },
