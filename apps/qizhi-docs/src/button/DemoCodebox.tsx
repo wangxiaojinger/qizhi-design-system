@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Button, CodeIcon, CopyIcon } from "@wangxiaojinger/qizhi-react";
+import { Button } from "@wangxiaojinger/qizhi-react";
 import { CodeHighlight } from "../code/CodeHighlight";
 import type { ButtonDemoDefinition } from "./buttonDocs.registry";
 import { useCopyFeedback } from "./useCopyFeedback";
@@ -14,8 +14,8 @@ export function DemoCodebox({ demo }: { demo: ButtonDemoDefinition }) {
     <div className="demo"><Demo /></div>
     <div className="component-example-actions">
       <span className="qizhi-copy-status" role="status">{message}</span>
-      <Button type="secondary" icon={<CodeIcon />} className="qizhi-code-action" aria-expanded={expanded} aria-controls={codeId} onClick={() => setExpanded((value) => !value)}>{expanded ? "收起代码" : "查看代码"}</Button>
-      <Button type="secondary" icon={<CopyIcon />} className="qizhi-code-action" onClick={copy}>复制代码</Button>
+      <Button type="secondary" icon={<i className="ri-code-s-slash-line" aria-hidden="true" />} className="qizhi-code-action" aria-expanded={expanded} aria-controls={codeId} onClick={() => setExpanded((value) => !value)}>{expanded ? "收起代码" : "查看代码"}</Button>
+      <Button type="secondary" icon={<i className="ri-file-copy-line" aria-hidden="true" />} className="qizhi-code-action" onClick={copy}>复制代码</Button>
     </div>
     {expanded ? <div id={codeId} className="qizhi-code-wrapper"><pre><CodeHighlight source={demo.source} /></pre></div> : null}
   </article>;

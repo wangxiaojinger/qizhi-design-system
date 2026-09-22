@@ -74,7 +74,8 @@ describe("Button", () => {
     const button = screen.getByRole("button");
     expect(button).not.toBeDisabled();
     expect(button).toHaveAttribute("aria-busy", "true");
-    expect(button.querySelector(".qizhi-btn__loading-icon")).not.toBeNull();
+    expect(button.querySelector(".qizhi-btn__loading-icon .ri-loader-4-line")).not.toBeNull();
+    expect(button.querySelector(".qizhi-btn__loading-icon svg")).toBeNull();
     await user.click(button);
     expect(onClick).not.toHaveBeenCalled();
   });

@@ -1,5 +1,4 @@
 import { forwardRef, useEffect } from "react";
-import { LoadingIcon } from "../icon";
 import type { ButtonClassName, ButtonHandle, ButtonProps } from "./Button.types";
 import "./button.css";
 
@@ -69,7 +68,7 @@ const ButtonBase = forwardRef<ButtonHandle, ButtonProps>(function Button(
       className="qizhi-btn__icon qizhi-btn__loading-icon"
       aria-hidden="true"
     >
-      <LoadingIcon />
+      <i className="ri-loader-4-line" aria-hidden="true" />
     </span>
   ) : icon ? (
     <span className="qizhi-btn__icon" aria-hidden="true">{icon}</span>

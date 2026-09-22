@@ -15,7 +15,7 @@ describe("Button docs registry", () => {
       expect(demo.source.split("\n").length).toBeGreaterThan(5);
     }
     expect(buttonDemos[0].source).toContain("Button, Space");
-    expect(buttonDemos[0].source).toContain('<Space size="large">');
+    expect(buttonDemos[0].source).toContain('<Space size="large" wrap>');
     expect(buttonDemos.find((demo) => demo.id === "按钮形状")?.source).not.toMatch(/shape="(?:round|circle)"/);
     expect(buttonDemos.some((demo) => demo.source.includes("<Button.Group"))).toBe(false);
   });
@@ -27,6 +27,30 @@ describe("Button docs registry", () => {
       expect(screen.getAllByRole("button").length).toBeGreaterThan(0);
       unmount();
     }
+  });
+
+  it("uses Remix Icon assets in the icon button demo", () => {
+    const iconDemo = buttonDemos.find((demo) => demo.id === "图标按钮");
+    expect(iconDemo).toBeDefined();
+    expect(iconDemo?.source).toContain('className="ri-add-line"');
+    expect(iconDemo?.source).toContain('className="ri-delete-bin-line"');
+    expect(iconDemo?.source).not.toMatch(/AddIcon|DeleteIcon/);
+
+    const Demo = iconDemo?.component;
+    if (!Demo) return;
+    const { container } = render(<Demo />);
+    expect(container.querySelectorAll(".ri-add-line")).toHaveLength(4);
+    expect(container.querySelector(".ri-delete-bin-line")).toBeInTheDocument();
+  });
+
+  it("uses Remix Icon assets in every Button demo icon", () => {
+    const demoSources = buttonDemos.map((demo) => demo.source).join("\n");
+    const shapeDemo = buttonDemos.find((demo) => demo.id === "按钮形状");
+    const loadingDemo = buttonDemos.find((demo) => demo.id === "加载中按钮");
+
+    expect(demoSources).not.toMatch(/\b(?:Add|Delete|Code|Copy|Loading)Icon\b/);
+    expect(shapeDemo?.source).toContain('className="ri-add-line"');
+    expect(loadingDemo?.source).toContain('className="ri-add-line"');
   });
 
   it("documents the complete QIZHI Button API with independent descriptions", () => {

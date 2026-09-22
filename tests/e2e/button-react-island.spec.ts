@@ -1,5 +1,28 @@
 import { expect, test } from "@playwright/test";
 
+test("Button static fallback keeps component styles when scripts are unavailable", async ({ page }) => {
+  await page.route("**/*", async (route) => {
+    if (route.request().resourceType() === "script") {
+      await route.abort();
+      return;
+    }
+    await route.continue();
+  });
+  await page.goto("/#components-button");
+  const primaryButton = page.locator("#components-button .qizhi-btn-primary").first();
+  await expect(primaryButton).toBeVisible();
+  await expect(primaryButton).toHaveCSS("display", "inline-flex");
+  await expect(primaryButton).toHaveCSS("height", "32px");
+  await expect(primaryButton).toHaveCSS("background-color", "rgb(51, 102, 255)");
+  await expect(primaryButton).toHaveCSS("color", "rgb(255, 255, 255)");
+  await expect(page.locator('[id="图标按钮"] .ri-add-line')).toHaveCount(4);
+  await expect(page.locator('[id="图标按钮"] .ri-delete-bin-line')).toHaveCount(1);
+  await expect(page.locator('[id="图标按钮"] svg')).toHaveCount(0);
+  await expect(page.locator('[id="加载中按钮"] .ri-loader-4-line')).toHaveCount(9);
+  await expect(page.locator('[id="加载中按钮"] .ri-add-line')).toHaveCount(1);
+  await expect(page.locator('[id="加载中按钮"] svg')).toHaveCount(0);
+});
+
 test("Button React Island keeps the legacy shell and exposes callable docs", async ({ page }, testInfo) => {
   const errors: string[] = [];
   page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
@@ -49,14 +72,26 @@ test("Button React Island keeps the legacy shell and exposes callable docs", asy
   await expect(iconLabel.locator("..")).toHaveCSS("column-gap", "8px");
   const squareIconButton = page.locator('[id="按钮形状"]').getByRole("button", { name: "添加" });
   await expect(squareIconButton).toHaveCSS("border-radius", "4px");
+  await expect(squareIconButton.locator(".ri-add-line")).toHaveCount(1);
   await expect.poll(async () => {
     const box = await squareIconButton.boundingBox();
     return box ? Math.round(box.width) === Math.round(box.height) : false;
   }).toBe(true);
+  await expect(page.getByRole("button", { name: "查看代码" }).first().locator(".ri-code-s-slash-line")).toHaveCount(1);
+  await expect(page.getByRole("button", { name: "复制代码" }).first().locator(".ri-file-copy-line")).toHaveCount(1);
+  await expect(page.locator("#components-button .qizhi-btn svg")).toHaveCount(0);
+  const loadingIcon = page.locator('[id="加载中按钮"] .qizhi-btn__loading-icon').first();
+  await expect(loadingIcon.locator(".ri-loader-4-line")).toBeVisible();
+  await expect(loadingIcon).toHaveCSS("animation-name", "qizhi-button-loading-spin");
+  const loadingTrigger = page.locator('[id="加载中按钮"] .button-loading-actions').getByRole("button", { name: "点击加载" }).first();
+  await loadingTrigger.click();
+  await expect(loadingTrigger).toHaveAttribute("aria-busy", "true");
+  await expect(loadingTrigger.locator(".ri-loader-4-line")).toBeVisible();
+  await expect(loadingTrigger.locator(".qizhi-btn__loading-icon")).toHaveCSS("animation-name", "qizhi-button-loading-spin");
   await page.getByRole("button", { name: "查看代码" }).first().click();
   await expect(page.locator("#button-code-基本用法 code")).toContainText('import { Button, Space } from "@wangxiaojinger/qizhi-react";');
   await expect(page.locator("#button-code-基本用法 .qizhi-code-token--keyword").first()).toBeVisible();
-  await expect(page.locator("#button-code-基本用法 code")).toHaveCSS("font-size", "14px");
+  await expect(page.locator("#button-code-基本用法 code")).toHaveCSS("font-size", "13px");
   await expect(page.locator("#button-code-基本用法 code")).toHaveCSS("color", "rgb(78, 89, 105)");
   const apiDescription = page.getByRole("row", { name: /^disabled 是否禁用 boolean false$/ }).locator("td").nth(1);
   await expect(apiDescription).toHaveCSS("font-size", "14px");

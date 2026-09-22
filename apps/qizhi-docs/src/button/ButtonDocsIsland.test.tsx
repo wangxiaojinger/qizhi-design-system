@@ -19,8 +19,8 @@ it("renders the preserved Button contract and API", () => {
   const copyCodeButton = screen.getAllByRole("button", { name: "复制代码" })[0];
   expect(viewCodeButton).toHaveClass("qizhi-btn", "qizhi-btn-secondary", "qizhi-btn-has-icon");
   expect(copyCodeButton).toHaveClass("qizhi-btn", "qizhi-btn-secondary", "qizhi-btn-has-icon");
-  expect(viewCodeButton.querySelector('[data-icon="icon-代码-样式2"]')).not.toBeNull();
-  expect(copyCodeButton.querySelector('[data-icon="icon-复制"]')).not.toBeNull();
+  expect(viewCodeButton.querySelector(".ri-code-s-slash-line")).not.toBeNull();
+  expect(copyCodeButton.querySelector(".ri-file-copy-line")).not.toBeNull();
   fireEvent.click(screen.getAllByRole("button", { name: "查看代码" })[0]);
   expect(document.querySelector(".qizhi-code-token--keyword")).not.toBeNull();
   expect(document.querySelector(".qizhi-code-token--string")).not.toBeNull();

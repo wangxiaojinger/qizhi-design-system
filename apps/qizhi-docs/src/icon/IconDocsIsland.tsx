@@ -133,6 +133,26 @@ export function IconDocsIsland() {
       </div>
 
       <div className="qizhi-icon-docs">
+        <section className="qizhi-icon-docs__source-guide" aria-labelledby="icon-source-guide-title">
+          <h2 id="icon-source-guide-title">图标来源与使用规则</h2>
+          <ol>
+            <li>
+              <strong>默认使用 Remix Icon：</strong>
+              标准界面图标优先从
+              <a href="https://remixicon.com/" target="_blank" rel="noreferrer"> Remix Icon </a>
+              中选择语义匹配的 `ri-*` 资产。
+            </li>
+            <li>
+              <strong>特殊缺失时使用启智图标：</strong>
+              Remix Icon 中没有语义匹配的图标，或场景明确需要启智专属业务、多色、品牌图形时，再从 @wangxiaojinger/qizhi-react/icon 中选择正式图标组件。
+            </li>
+            <li>
+              <strong>禁止临时造图标：</strong>
+              业务代码不得使用字符、Unicode 符号、Emoji、CSS 绘制、硬编码 SVG path 或 data URL 代替正式图标。两个图标库均无法满足时，应补充经过审核的 SVG 资产或 React 图标组件。
+            </li>
+          </ol>
+        </section>
+
         <div className="qizhi-icon-docs__toolbar">
           <div className="qizhi-segmented qizhi-segmented-lg" role="radiogroup" aria-label="筛选图标类型">
             {styleFilters.map((filter) => (

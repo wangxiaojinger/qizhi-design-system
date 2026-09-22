@@ -68,11 +68,29 @@ export function Example() {
 }
 ```
 
-图标使用独立入口：
+标准界面图标默认优先使用公开的 [Remix Icon](https://remixicon.com/)。先安装依赖：
+
+```bash
+pnpm add remixicon
+```
+
+在应用入口全局引入一次样式，再使用官网提供的 `ri-*` 类名：
+
+```tsx
+import "remixicon/fonts/remixicon.css";
+
+export function SearchIconExample() {
+  return <i className="ri-search-line" aria-hidden="true" />;
+}
+```
+
+Remix Icon 中没有语义匹配的图标，或场景明确需要启智专属业务、多色、品牌图形时，再从组件包的独立入口导入启智图标资产：
 
 ```tsx
 import { ArrowDownIcon } from "@wangxiaojinger/qizhi-react/icon";
 ```
+
+仅图标交互控件必须提供中文 `aria-label`。业务代码不得使用字符、Unicode 符号、Emoji、CSS 绘制、硬编码 SVG path 或 data URL 临时创造图标；Remix Icon 和启智图标均无法满足时，应补充经过审核的 SVG 资产或 React 图标组件。
 
 ### 3. 仅使用设计变量或 CSS
 

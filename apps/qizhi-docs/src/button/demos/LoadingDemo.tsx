@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { AddIcon, Button, Space } from "@wangxiaojinger/qizhi-react";
+import { Button, Space } from "@wangxiaojinger/qizhi-react";
 
 const App = () => {
   const [loading, setLoading] = useState(false);
@@ -18,7 +18,7 @@ const App = () => {
       </Space>
       <Space size="large" className="button-loading-actions">
         <Button type="primary" loading={loading} onClick={start}>点击加载</Button>
-        <Button type="primary" icon={<AddIcon />} loading={loading} onClick={start}>点击加载</Button>
+        <Button type="primary" icon={<i className="ri-add-line" aria-hidden="true" />} loading={loading} onClick={start}>点击加载</Button>
       </Space>
       <Button type="primary" loading={loading} onClick={start}>搜索</Button>
     </div>

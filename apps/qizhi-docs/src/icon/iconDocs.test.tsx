@@ -206,7 +206,7 @@ describe("Icon docs", () => {
     expect(screen.getByRole("cell", { name: "size" })).toBeInTheDocument();
     expect(screen.getByRole("cell", { name: "color" })).toBeInTheDocument();
     expect(screen.getByText(/currentColor/)).toBeInTheDocument();
-    expect(screen.getByText(/统一从 @wangxiaojinger\/qizhi-react\/icon 导入/)).toBeInTheDocument();
+    expect(screen.getByText(/当 Remix Icon 无法覆盖、需要启智图标资产时，统一从 @wangxiaojinger\/qizhi-react\/icon 导入/)).toBeInTheDocument();
     expect(screen.getByText(/默认作为装饰图标隐藏/)).toBeInTheDocument();
     expect(screen.getByText(/fixedPalette/)).toBeInTheDocument();
     expect(screen.getByRole("table", { name: "图标目录与检索 API" })).toBeInTheDocument();
@@ -217,9 +217,14 @@ describe("Icon docs", () => {
   it("documents the boundary between standard icons and custom SVG resources", () => {
     render(<IconDocsIsland />);
 
-    expect(screen.getByRole("heading", { name: "自定义 SVG 边界" })).toBeInTheDocument();
-    expect(screen.getByText(/标准界面图标必须从 @wangxiaojinger\/qizhi-react\/icon 导入/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "图标来源与使用规则" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Remix Icon" })).toHaveAttribute("href", "https://remixicon.com/");
+    expect(screen.getByText(/标准界面图标优先从/)).toBeInTheDocument();
+    expect(screen.getByText(/Remix Icon 中没有语义匹配的图标.*再从 @wangxiaojinger\/qizhi-react\/icon 中选择/)).toBeInTheDocument();
+    expect(screen.getByText(/业务代码不得使用字符、Unicode 符号、Emoji、CSS 绘制、硬编码 SVG path 或 data URL/)).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "图标来源边界" })).toBeInTheDocument();
+    expect(screen.getByText(/标准界面图标默认优先使用 Remix Icon/)).toBeInTheDocument();
     expect(screen.getByText(/不会自动获得 QizhiIconProps/)).toBeInTheDocument();
-    expect(screen.getByText(/禁止使用未经审核的远程 Iconfont 脚本/)).toBeInTheDocument();
+    expect(screen.getByText(/业务代码禁止使用字符、Unicode 符号、Emoji、CSS 绘制、硬编码 SVG path 或 data URL/)).toBeInTheDocument();
   });
 });

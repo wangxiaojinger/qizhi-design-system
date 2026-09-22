@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.7.0/fonts/remixicon.min.css" />
     <link rel="stylesheet" href="./packages/qizhi-tokens/dist/style.css?v=20260921-token-manifest-001" />
     <link rel="stylesheet" href="./styles.css?v=20260921-token-manifest-001" />
+    <link rel="stylesheet" href="./packages/qizhi-react/src/button/button.css" />
     <noscript><style>.route-pending .doc-content > [id] { display: block; }</style></noscript>
   </head>
   <body>
@@ -109,7 +110,6 @@
                         <div tabindex="0" role="menuitem" class="qz-menu-item qz-menu-item-indented"><span><span class="qz-menu-indent"></span></span><span class="qz-menu-item-inner" style="display: block;"><a href="#component-slider" tabindex="-1" class="menu-link nav-link nav-link-sub"><span>滑动输入条 Slider</span></a></span></div>
                         <div tabindex="0" role="menuitem" class="qz-menu-item qz-menu-item-indented"><span><span class="qz-menu-indent"></span></span><span class="qz-menu-item-inner" style="display: block;"><a href="#component-switch" tabindex="-1" class="menu-link nav-link nav-link-sub"><span>开关 Switch</span></a></span></div>
                         <div tabindex="0" role="menuitem" class="qz-menu-item qz-menu-item-indented"><span><span class="qz-menu-indent"></span></span><span class="qz-menu-item-inner" style="display: block;"><a href="#component-time-picker" tabindex="-1" class="menu-link nav-link nav-link-sub"><span>时间选择器 TimePicker</span></a></span></div>
-                        <div tabindex="0" role="menuitem" class="qz-menu-item qz-menu-item-indented"><span><span class="qz-menu-indent"></span></span><span class="qz-menu-item-inner" style="display: block;"><a href="#component-transfer" tabindex="-1" class="menu-link nav-link nav-link-sub"><span>数据穿梭框 Transfer</span></a></span></div>
                         <div tabindex="0" role="menuitem" class="qz-menu-item qz-menu-item-indented"><span><span class="qz-menu-indent"></span></span><span class="qz-menu-item-inner" style="display: block;"><a href="#component-tree-select" tabindex="-1" class="menu-link nav-link nav-link-sub"><span>树选择 TreeSelect</span></a></span></div>
                         <div tabindex="0" role="menuitem" class="qz-menu-item qz-menu-item-indented"><span><span class="qz-menu-indent"></span></span><span class="qz-menu-item-inner" style="display: block;"><a href="#component-upload" tabindex="-1" class="menu-link nav-link nav-link-sub"><span>上传 Upload</span></a></span></div>
                       </div>
@@ -582,30 +582,30 @@
                   <div class="qizhi-space qizhi-space--horizontal qizhi-space--align-center button-demo-row button-icon-demo-row">
                     <div class="qizhi-space-item" style="margin-right: 24px;">
                       <button class="qizhi-btn qizhi-btn-primary qizhi-btn-size-default qizhi-btn-shape-square qizhi-btn-icon-only" type="button" aria-label="添加">
-                        <svg class="qizhi-btn__library-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M7.33334 7.33333V3.33333H8.66668V7.33333H12.6667V8.66666H8.66668V12.6667H7.33334V8.66666H3.33334V7.33333H7.33334Z" fill="currentColor"></path></svg>
+                        <i class="ri-add-line" aria-hidden="true"></i>
                       </button>
                     </div>
                     <div class="qizhi-space-item" style="margin-right: 24px;">
                       <button class="qizhi-btn qizhi-btn-primary qizhi-btn-size-default qizhi-btn-shape-square" type="button">
-                        <svg class="qizhi-btn__library-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M10.375 4V2.875H10.5C10.4312 2.875 10.375 2.81875 10.375 2.75V2.875H5.625V2.75C5.625 2.81875 5.56875 2.875 5.5 2.875H5.625V4H10.375ZM4.19531 5.125L4.57324 13.125H11.4268L11.8047 5.125H4.19531ZM13.5 4C13.7766 4 14 4.22344 14 4.5V5C14 5.06875 13.9438 5.125 13.875 5.125H12.9316L12.5449 13.2969C12.5199 13.8312 12.0812 14.25 11.5469 14.25H4.45312C3.92032 14.25 3.48009 13.8297 3.45508 13.2969L3.06836 5.125H2.125C2.05625 5.125 2 5.06875 2 5V4.5C2 4.22344 2.22344 4 2.5 4H4.5V2.75C4.5 2.19844 4.94844 1.75 5.5 1.75H10.5C11.0516 1.75 11.5 2.19844 11.5 2.75V4H13.5Z" fill="currentColor"></path></svg>
+                        <i class="ri-delete-bin-line" aria-hidden="true"></i>
                         <span>删除</span>
                       </button>
                     </div>
                     <div class="qizhi-space-item" style="margin-right: 24px;">
                       <button class="qizhi-btn qizhi-btn-outline qizhi-btn-outline-neutral qizhi-btn-size-default qizhi-btn-shape-square" type="button">
-                        <svg class="qizhi-btn__library-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M7.33334 7.33333V3.33333H8.66668V7.33333H12.6667V8.66666H8.66668V12.6667H7.33334V8.66666H3.33334V7.33333H7.33334Z" fill="currentColor"></path></svg>
+                        <i class="ri-add-line" aria-hidden="true"></i>
                         <span>添加</span>
                       </button>
                     </div>
                     <div class="qizhi-space-item" style="margin-right: 24px;">
                       <button class="qizhi-btn qizhi-btn-dashed qizhi-btn-size-default qizhi-btn-shape-square" type="button">
-                        <svg class="qizhi-btn__library-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M7.33334 7.33333V3.33333H8.66668V7.33333H12.6667V8.66666H8.66668V12.6667H7.33334V8.66666H3.33334V7.33333H7.33334Z" fill="currentColor"></path></svg>
+                        <i class="ri-add-line" aria-hidden="true"></i>
                         <span>添加</span>
                       </button>
                     </div>
                     <div class="qizhi-space-item">
                       <button class="qizhi-btn qizhi-btn-text qizhi-btn-size-default qizhi-btn-shape-square" type="button">
-                        <svg class="qizhi-btn__library-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M7.33334 7.33333V3.33333H8.66668V7.33333H12.6667V8.66666H8.66668V12.6667H7.33334V8.66666H3.33334V7.33333H7.33334Z" fill="currentColor"></path></svg>
+                        <i class="ri-add-line" aria-hidden="true"></i>
                         <span>添加</span>
                       </button>
                     </div>
@@ -720,7 +720,7 @@
                     </div>
                     <div class="button-loading-actions button-demo-row">
                       <button class="qizhi-btn qizhi-btn-primary qizhi-btn-size-default qizhi-btn-shape-square btn-loading-demo btn-loading-demo--primary" type="button" data-loading-demo><i class="ri-loader-4-line btn-loading-icon" aria-hidden="true"></i><span>点击加载</span></button>
-                      <button class="qizhi-btn qizhi-btn-primary qizhi-btn-size-default qizhi-btn-shape-square btn-loading-demo btn-loading-demo--primary" type="button" data-loading-demo><i class="ri-loader-4-line btn-loading-icon" aria-hidden="true"></i><svg class="qizhi-btn__library-icon btn-loading-idle-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M7.33334 7.33333V3.33333H8.66668V7.33333H12.6667V8.66666H8.66668V12.6667H7.33334V8.66666H3.33334V7.33333H7.33334Z" fill="currentColor"></path></svg><span>点击加载</span></button>
+                      <button class="qizhi-btn qizhi-btn-primary qizhi-btn-size-default qizhi-btn-shape-square btn-loading-demo btn-loading-demo--primary" type="button" data-loading-demo><i class="ri-loader-4-line btn-loading-icon" aria-hidden="true"></i><i class="ri-add-line btn-loading-idle-icon" aria-hidden="true"></i><span>点击加载</span></button>
                     </div>
                     <div class="qizhi-divider qizhi-divider-horizontal qizhi-divider-with-text qizhi-divider-with-text-center button-loading-divider" role="separator"><span class="qizhi-divider-text">加载时固定宽度</span></div>
                     <div class="button-demo-row">
@@ -961,8 +961,8 @@
             </div>
 
             <div class="icon-source-note">
-              <strong>接入原则：</strong>
-              <span>页面直接引用逐个导出的本地 SVG；分组名、变体名和节点 ID 均与 Figma 保持对应，避免同名或状态变体互相覆盖。</span>
+              <strong>图标来源：</strong>
+              <span>默认优先从 <a class="qizhi-link" href="https://remixicon.com/" target="_blank" rel="noreferrer">Remix Icon</a> 公开库选用；未找到语义匹配的图标，或场景明确需要启智专属业务、多色、品牌图形时，再使用启智图标资产。业务代码禁止使用字符、Unicode 符号、Emoji、CSS 绘制、硬编码 SVG path 或 data URL 自制图标；如两者均无法满足，应补充经过审核的正式图标资产。</span>
             </div>
 
             <div class="iconlist-bar">
@@ -7310,7 +7310,7 @@ export default function App() {
               <article class="component-catalog-card" id="component-slider-card"><div class="component-catalog-card__head"><h4>滑动输入条 Slider</h4><span class="component-catalog-chip">输入</span></div><p>用于连续区间调节，适合音量、权重、阈值和视觉化参数控制。</p></article>
               <article class="component-catalog-card" id="component-switch-card"><div class="component-catalog-card__head"><h4>开关 Switch</h4><span class="component-catalog-chip">输入</span></div><p>用于即时启停状态切换，适合功能开关、策略启用和偏好设置。</p></article>
               <article class="component-catalog-card" id="component-time-picker-card"><div class="component-catalog-card__head"><h4>时间选择器 TimePicker</h4><span class="component-catalog-chip">输入</span></div><p>用于时间点和时间范围输入，适合排班、提醒、营业时段和策略配置。</p></article>
-              <article class="component-catalog-card" id="component-transfer"><div class="component-catalog-card__head"><h4>数据穿梭框 Transfer</h4><span class="component-catalog-chip">输入</span></div><p>用于双栏数据选择与移动，适合角色分配、资源授权和成员编组。</p></article>
+              <article class="component-catalog-card" id="component-transfer-card"><div class="component-catalog-card__head"><h4>数据穿梭框 Transfer</h4><span class="component-catalog-chip">输入</span></div><p>用于双栏数据选择与移动，适合角色分配、资源授权和成员编组。</p></article>
               <article class="component-catalog-card" id="component-tree-select-card"><div class="component-catalog-card__head"><h4>树选择 TreeSelect</h4><span class="component-catalog-chip">输入</span></div><p>用于树形结构下的选择录入，适合目录、组织、权限和分类树筛选。</p></article>
               <article class="component-catalog-card" id="component-upload-card"><div class="component-catalog-card__head"><h4>上传 Upload</h4><span class="component-catalog-chip">输入</span></div><p>用于文件上传与附件管理，适合图片素材、导入文件、证件信息和批量处理。</p></article>
             </div>

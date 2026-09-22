@@ -92,6 +92,11 @@
 }
 
 .qizhi-btn__icon svg { width: 16px; height: 16px; }
+.qizhi-btn__loading-icon > .ri-loader-4-line {
+  display: inline-flex;
+  font-size: 16px;
+  line-height: 1;
+}
 .qizhi-btn-long { width: 100%; }
 
 .qizhi-btn-loading-fixed-width.is-loading:not(.qizhi-btn-has-icon):not(.qizhi-btn-icon-only) { padding-inline: 0; }
