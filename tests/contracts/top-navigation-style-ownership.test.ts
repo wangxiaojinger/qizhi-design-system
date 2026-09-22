@@ -29,6 +29,9 @@ it("publishes TopNavigation without a docs-source dependency", () => {
   expect(componentCss).toMatch(
     /\.qizhi-top-navigation__region-wrap\s*{[^}]*margin-right:\s*20px;/s,
   );
+  expect(componentCss).toMatch(
+    /\.qizhi-top-navigation\s*{[^}]*background-color:\s*inherit;/s,
+  );
 });
 
 it("publishes the exact generated TopNavigation API", () => {

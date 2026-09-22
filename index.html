@@ -6,8 +6,8 @@
     <title>QIZHI Design System</title>
     <link rel="icon" type="image/svg+xml" href="./assets/qizhi-logo.svg" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.7.0/fonts/remixicon.min.css" />
-    <link rel="stylesheet" href="./packages/qizhi-tokens/dist/style.css?v=20260921-token-manifest-001" />
-    <link rel="stylesheet" href="./styles.css?v=20260921-token-manifest-001" />
+    <link rel="stylesheet" href="./packages/qizhi-tokens/dist/style.css?v=20260922-menu-background-004" />
+    <link rel="stylesheet" href="./styles.css?v=20260922-menu-background-004" />
     <link rel="stylesheet" href="./packages/qizhi-react/src/button/button.css" />
     <noscript><style>.route-pending .doc-content > [id] { display: block; }</style></noscript>
   </head>
@@ -41,6 +41,7 @@
                       <div tabindex="0" role="menuitem" class="qz-menu-item qz-menu-item-indented"><span><span class="qz-menu-indent"></span></span><span class="qz-menu-item-inner" style="display: block;"><a href="#source" tabindex="-1" class="menu-link nav-link"><span>样式来源分析</span></a></span></div>
                       <div tabindex="0" role="menuitem" class="qz-menu-item qz-menu-item-indented"><span><span class="qz-menu-indent"></span></span><span class="qz-menu-item-inner" style="display: block;"><a href="#colors" tabindex="-1" class="menu-link nav-link"><span>颜色</span></a></span></div>
                       <div tabindex="0" role="menuitem" class="qz-menu-item qz-menu-item-indented"><span><span class="qz-menu-indent"></span></span><span class="qz-menu-item-inner" style="display: block;"><a href="#design-tokens" tabindex="-1" class="menu-link nav-link"><span>设计变量</span></a></span></div>
+                      <div tabindex="0" role="menuitem" class="qz-menu-item qz-menu-item-indented"><span><span class="qz-menu-indent"></span></span><span class="qz-menu-item-inner" style="display: block;"><a href="#changelog" tabindex="-1" class="menu-link nav-link"><span>更新日志</span></a></span></div>
                     </div>
                   </div>
 
@@ -499,6 +500,208 @@
 
             <div class="token-docs" data-token-docs aria-live="polite">
               <p class="token-docs__status">正在加载设计变量…</p>
+            </div>
+          </section>
+
+          <section class="doc-section qizhi-changelog" id="changelog">
+            <header class="doc-header">
+              <p class="doc-kicker">开发指南</p>
+              <h2>更新日志</h2>
+              <p class="doc-lead">按日期分组、按提交时间倒序记录 QIZHI Design System 的功能、视觉、文档与工程变更，方便快速了解每天的更新数量与影响范围。</p>
+            </header>
+
+            <div class="qizhi-changelog__note" role="note" aria-label="更新日志记录规则">
+              <i class="ri-information-line" aria-hidden="true"></i>
+              <div>
+                <strong>记录规则</strong>
+                <p>每次提交前在对应日期分组顶部补充一条简短说明，并同步当日更新数量；仅更新日志自身的文字修正不重复记录。</p>
+              </div>
+            </div>
+
+            <div class="qizhi-changelog__list">
+              <section class="qizhi-changelog__day" id="changelog-2026-09-22" data-toc-label="2026-09-22">
+                <header class="qizhi-changelog__day-head">
+                  <h2><time datetime="2026-09-22">2026-09-22</time></h2>
+                  <span class="qizhi-changelog__count">2 次更新</span>
+                </header>
+
+              <article class="qizhi-changelog__entry">
+                <header class="qizhi-changelog__entry-head">
+                  <div>
+                    <h3>新增更新日志模块</h3>
+                    <div class="qizhi-changelog__meta">
+                      <span class="qizhi-changelog__commit">本次提交</span>
+                    </div>
+                  </div>
+                </header>
+                <ul>
+                  <li>在开发指南的设计变量下方增加更新日志入口和独立页面。</li>
+                  <li>按提交时间倒序展示日期、提交号与简短变更，并接入右侧目录。</li>
+                  <li>顶部导航和左侧导航默认继承父容器背景，保留选中与悬停反馈。</li>
+                </ul>
+              </article>
+
+              <article class="qizhi-changelog__entry">
+                <header class="qizhi-changelog__entry-head">
+                  <div>
+                    <h3>完善按钮文档与图标优先级</h3>
+                    <div class="qizhi-changelog__meta">
+                      <code class="qizhi-changelog__commit">c290d94</code>
+                    </div>
+                  </div>
+                </header>
+                <ul>
+                  <li>恢复按钮组件文档样式，并将组件库默认图标调整为优先使用 Remix Icon。</li>
+                  <li>加载中按钮改用 Remix Icon，保留原有旋转动效与无障碍状态。</li>
+                </ul>
+              </article>
+              </section>
+
+              <section class="qizhi-changelog__day" id="changelog-2026-09-21" data-toc-label="2026-09-21">
+                <header class="qizhi-changelog__day-head">
+                  <h2><time datetime="2026-09-21">2026-09-21</time></h2>
+                  <span class="qizhi-changelog__count">10 次更新</span>
+                </header>
+
+              <article class="qizhi-changelog__entry">
+                <header class="qizhi-changelog__entry-head">
+                  <div>
+                    <h3>补充组件安装与升级说明</h3>
+                    <div class="qizhi-changelog__meta">
+                      <code class="qizhi-changelog__commit">43a67bf</code>
+                    </div>
+                  </div>
+                </header>
+                <ul><li>完善组件包安装、版本更新与使用流程的文档说明。</li></ul>
+              </article>
+
+              <article class="qizhi-changelog__entry">
+                <header class="qizhi-changelog__entry-head">
+                  <div>
+                    <h3>调整平台外壳背景</h3>
+                    <div class="qizhi-changelog__meta">
+                      <code class="qizhi-changelog__commit">f8d00a2</code>
+                    </div>
+                  </div>
+                </header>
+                <ul><li>统一文档站外壳背景表现，保持页面层级与品牌视觉一致。</li></ul>
+              </article>
+
+              <article class="qizhi-changelog__entry">
+                <header class="qizhi-changelog__entry-head">
+                  <div>
+                    <h3>修复组件文档生产样式</h3>
+                    <div class="qizhi-changelog__meta">
+                      <code class="qizhi-changelog__commit">89de24e</code>
+                    </div>
+                  </div>
+                </header>
+                <ul><li>修复生产环境中组件文档样式遗漏加载的问题。</li></ul>
+              </article>
+
+              <article class="qizhi-changelog__entry">
+                <header class="qizhi-changelog__entry-head">
+                  <div>
+                    <h3>修复头像组件生产样式</h3>
+                    <div class="qizhi-changelog__meta">
+                      <code class="qizhi-changelog__commit">900299d</code>
+                    </div>
+                  </div>
+                </header>
+                <ul><li>补齐 Avatar 文档在生产构建中的组件样式。</li></ul>
+              </article>
+
+              <article class="qizhi-changelog__entry">
+                <header class="qizhi-changelog__entry-head">
+                  <div>
+                    <h3>修复设计变量发布数据</h3>
+                    <div class="qizhi-changelog__meta">
+                      <code class="qizhi-changelog__commit">767de72</code>
+                    </div>
+                  </div>
+                </header>
+                <ul><li>修正设计变量清单在发布环境中的加载与展示。</li></ul>
+              </article>
+
+              <article class="qizhi-changelog__entry">
+                <header class="qizhi-changelog__entry-head">
+                  <div>
+                    <h3>修复按钮组件生产样式</h3>
+                    <div class="qizhi-changelog__meta">
+                      <code class="qizhi-changelog__commit">fa5dc52</code>
+                    </div>
+                  </div>
+                </header>
+                <ul><li>补齐 Button 文档在生产构建中的组件样式。</li></ul>
+              </article>
+
+              <article class="qizhi-changelog__entry">
+                <header class="qizhi-changelog__entry-head">
+                  <div>
+                    <h3>修复图标子路径解析</h3>
+                    <div class="qizhi-changelog__meta">
+                      <code class="qizhi-changelog__commit">d1d8494</code>
+                    </div>
+                  </div>
+                </header>
+                <ul><li>修复干净工作区中组件图标子路径无法正确解析的问题。</li></ul>
+              </article>
+
+              <article class="qizhi-changelog__entry">
+                <header class="qizhi-changelog__entry-head">
+                  <div>
+                    <h3>修复干净环境发布验证</h3>
+                    <div class="qizhi-changelog__meta">
+                      <code class="qizhi-changelog__commit">382c284</code>
+                    </div>
+                  </div>
+                </header>
+                <ul><li>修复从全新环境执行组件包发布验证时的失败问题。</li></ul>
+              </article>
+
+              <article class="qizhi-changelog__entry">
+                <header class="qizhi-changelog__entry-head">
+                  <div>
+                    <h3>从公共仓库发布文档</h3>
+                    <div class="qizhi-changelog__meta">
+                      <code class="qizhi-changelog__commit">b3d65e3</code>
+                    </div>
+                  </div>
+                </header>
+                <ul><li>调整文档发布流程，支持从公共仓库完成站点发布。</li></ul>
+              </article>
+
+              <article class="qizhi-changelog__entry">
+                <header class="qizhi-changelog__entry-head">
+                  <div>
+                    <h3>配置 GitHub Pages 部署</h3>
+                    <div class="qizhi-changelog__meta">
+                      <code class="qizhi-changelog__commit">cac62c1</code>
+                    </div>
+                  </div>
+                </header>
+                <ul><li>新增 GitHub Pages 的文档站构建与部署配置。</li></ul>
+              </article>
+              </section>
+
+              <section class="qizhi-changelog__day" id="changelog-2026-09-17" data-toc-label="2026-09-17">
+                <header class="qizhi-changelog__day-head">
+                  <h2><time datetime="2026-09-17">2026-09-17</time></h2>
+                  <span class="qizhi-changelog__count">1 次更新</span>
+                </header>
+
+              <article class="qizhi-changelog__entry">
+                <header class="qizhi-changelog__entry-head">
+                  <div>
+                    <h3>清理过期测试契约</h3>
+                    <div class="qizhi-changelog__meta">
+                      <code class="qizhi-changelog__commit">f652d8a</code>
+                    </div>
+                  </div>
+                </header>
+                <ul><li>移除已失效的测试契约，保持验收范围与当前实现一致。</li></ul>
+              </article>
+              </section>
             </div>
           </section>
 
@@ -15076,6 +15279,6 @@ export default function App() {
     <script type="module" src="/apps/qizhi-docs/src/business-object-selection/main.tsx"></script>
     <script type="module" src="/apps/qizhi-docs/src/business-detail-header/main.tsx"></script>
     <script type="module" src="/apps/qizhi-docs/src/lazy-icon-main.ts"></script>
-    <script type="module" src="./script.js?v=20260921-token-manifest-001"></script>
+    <script type="module" src="./script.js?v=20260922-menu-background-004"></script>
   </body>
   </html>

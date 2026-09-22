@@ -150,10 +150,10 @@ test("Menu React Island preserves behavior, geometry, and source", async ({
   await expect(modelService).toHaveAttribute("aria-current", "page");
   const topNavigation = topArticle.locator(".qizhi-top-navigation");
   await expect(topNavigation).toHaveCSS("height", "56px");
-  await expect(topNavigation).toHaveCSS(
-    "background-color",
-    "rgb(220, 232, 255)",
-  );
+  await expect.poll(() => topNavigation.evaluate((node) => (
+    window.getComputedStyle(node).backgroundColor
+      === window.getComputedStyle(node.parentElement!).backgroundColor
+  ))).toBe(true);
   await expect(topArticle.locator(".qizhi-top-navigation__product"))
     .toHaveCSS("height", "32px");
   await expect(topArticle.locator(".qizhi-top-navigation__product"))
@@ -351,6 +351,10 @@ test("Menu React Island preserves behavior, geometry, and source", async ({
   const sideArticle = section.locator("#左侧菜单");
   const sideViewport = sideArticle.locator(".qizhi-side-navigation");
   const sideContent = sideArticle.locator(".qizhi-side-navigation__content");
+  await expect.poll(() => sideViewport.evaluate((node) => (
+    window.getComputedStyle(node).backgroundColor
+      === window.getComputedStyle(node.parentElement!).backgroundColor
+  ))).toBe(true);
   const demoContentWidth = await sideArticle.locator(":scope > .demo")
     .evaluate((node) => {
       const style = window.getComputedStyle(node);

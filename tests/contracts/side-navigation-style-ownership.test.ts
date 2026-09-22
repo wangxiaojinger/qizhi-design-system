@@ -37,6 +37,9 @@ it("publishes SideNavigation without a docs-source dependency", () => {
   expect(componentCss).toMatch(
     /\.qizhi-side-navigation\s*{[^}]*height:\s*100%;[^}]*min-height:\s*calc\(100dvh - 56px\);/s,
   );
+  expect(componentCss).toMatch(
+    /\.qizhi-side-navigation\s*{[^}]*background-color:\s*inherit;/s,
+  );
   expect(componentCss).not.toMatch(/height:\s*800px/);
   expect(componentCss).toMatch(
     /@media \(max-width:\s*991\.98px\)[\s\S]*\.qizhi-side-navigation\s*{[^}]*height:\s*auto;[^}]*min-height:\s*0;/,

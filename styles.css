@@ -1390,7 +1390,7 @@ button.qizhi-metric-card.is-disabled {
   overflow-y: auto;
   overflow-x: hidden;
   border: 0;
-  background: #dce8ff;
+  background-color: inherit;
   box-sizing: border-box;
   scrollbar-width: thin;
 }
@@ -1619,7 +1619,7 @@ button.qizhi-metric-card.is-disabled {
   min-width: 0;
   min-height: 56px;
   padding: 0 24px;
-  background: #dce8ff;
+  background-color: inherit;
   color: var(--color-text-2);
   font-size: 14px;
   line-height: 22px;
@@ -18108,6 +18108,154 @@ body.has-open-qizhi-modal {
 
 #design-tokens .token-table tbody tr:hover td {
   background: var(--color-fill-2);
+}
+
+.qizhi-changelog__note {
+  display: flex;
+  gap: 12px;
+  margin: 32px 0 8px;
+  padding: 16px 20px;
+  border: 1px solid var(--color-border-1);
+  border-radius: var(--border-radius-medium);
+  background: var(--color-fill-1);
+  color: var(--color-text-2);
+}
+
+.qizhi-changelog__note > i {
+  flex: 0 0 auto;
+  color: var(--color-primary-6);
+  font-size: 20px;
+  line-height: 1.5;
+}
+
+.qizhi-changelog__note strong {
+  color: var(--color-text-1);
+  font-weight: var(--font-weight-500);
+}
+
+.qizhi-changelog__note p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.qizhi-changelog__list {
+  margin-top: 8px;
+}
+
+.qizhi-changelog__day {
+  padding-top: 40px;
+}
+
+.qizhi-changelog__day + .qizhi-changelog__day {
+  margin-top: 8px;
+}
+
+.qizhi-changelog__day-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border-2);
+}
+
+.qizhi-changelog .qizhi-changelog__day-head h2 {
+  margin: 0;
+  color: var(--color-text-1);
+  font-size: 28px;
+  font-weight: var(--font-weight-500);
+  line-height: 1.4;
+}
+
+.qizhi-changelog__count {
+  flex: 0 0 auto;
+  padding: 3px 10px;
+  border-radius: var(--border-radius-medium);
+  background: var(--color-primary-light-1);
+  color: var(--color-primary-6);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.qizhi-changelog__entry {
+  padding: 24px 0;
+  border-bottom: 1px solid var(--color-border-1);
+}
+
+.qizhi-changelog__entry:last-child {
+  border-bottom: 0;
+}
+
+.qizhi-changelog__entry-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.qizhi-changelog .qizhi-changelog__entry h3 {
+  margin: 0;
+  color: var(--color-text-1);
+  font-size: 15px;
+  font-weight: var(--font-weight-500);
+  line-height: var(--line-height-regular);
+}
+
+.qizhi-changelog__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  color: var(--color-text-3);
+  font-size: 13px;
+}
+
+.qizhi-changelog__commit {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 2px 8px;
+  border-radius: var(--border-radius-medium);
+  background: var(--color-fill-2);
+  color: var(--color-text-2);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.qizhi-changelog__entry ul {
+  margin: 12px 0 0;
+  padding-left: 20px;
+  color: var(--color-text-2);
+  font-size: 15px;
+  font-weight: var(--font-weight-400);
+  line-height: var(--line-height-regular);
+}
+
+.qizhi-changelog__entry li + li {
+  margin-top: 4px;
+}
+
+@media (max-width: 767.98px) {
+  .qizhi-changelog__note {
+    margin-top: 24px;
+    padding: 14px 16px;
+  }
+
+  .qizhi-changelog__entry {
+    padding: 20px 0;
+  }
+
+  .qizhi-changelog__day {
+    padding-top: 32px;
+  }
+
+  .qizhi-changelog .qizhi-changelog__day-head h2 {
+    font-size: 24px;
+  }
+
 }
 
 #design-tokens .token-cell {
