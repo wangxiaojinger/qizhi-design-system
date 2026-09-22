@@ -8,7 +8,7 @@
   ],
   "apis": {
     "alertApi": {
-      "source": "apps/qizhi-docs/src/alert/alertApi.ts",
+      "source": "apps\\qizhi-docs\\src\\alert\\alertApi.ts",
       "items": [
         {
           "name": "content",
@@ -85,7 +85,7 @@
       ]
     },
     "autoCompleteApi": {
-      "source": "apps/qizhi-docs/src/auto-complete/autoCompleteApi.ts",
+      "source": "apps\\qizhi-docs\\src\\auto-complete\\autoCompleteApi.ts",
       "items": [
         {
           "name": "data",
@@ -168,7 +168,7 @@
       ]
     },
     "avatarApi": {
-      "source": "apps/qizhi-docs/src/avatar/avatarApi.ts",
+      "source": "apps\\qizhi-docs\\src\\avatar\\avatarApi.ts",
       "items": [
         {
           "name": "children",
@@ -227,7 +227,7 @@
       ]
     },
     "avatarGroupApi": {
-      "source": "apps/qizhi-docs/src/avatar/avatarApi.ts",
+      "source": "apps\\qizhi-docs\\src\\avatar\\avatarApi.ts",
       "items": [
         {
           "name": "children",
@@ -256,7 +256,7 @@
       ]
     },
     "breadcrumbApi": {
-      "source": "apps/qizhi-docs/src/breadcrumb/breadcrumbApi.ts",
+      "source": "apps\\qizhi-docs\\src\\breadcrumb\\breadcrumbApi.ts",
       "items": [
         {
           "name": "size",
@@ -297,7 +297,7 @@
       ]
     },
     "breadcrumbItemApi": {
-      "source": "apps/qizhi-docs/src/breadcrumb/breadcrumbApi.ts",
+      "source": "apps\\qizhi-docs\\src\\breadcrumb\\breadcrumbApi.ts",
       "items": [
         {
           "name": "href",
@@ -344,7 +344,7 @@
       ]
     },
     "detailHeaderApi": {
-      "source": "apps/qizhi-docs/src/business-detail-header/detailHeaderApi.ts",
+      "source": "apps\\qizhi-docs\\src\\business-detail-header\\detailHeaderApi.ts",
       "items": [
         {
           "name": "icon",
@@ -397,7 +397,7 @@
       ]
     },
     "serviceDetailHeaderApi": {
-      "source": "apps/qizhi-docs/src/business-detail-header/detailHeaderApi.ts",
+      "source": "apps\\qizhi-docs\\src\\business-detail-header\\detailHeaderApi.ts",
       "items": [
         {
           "name": "icon",
@@ -522,7 +522,7 @@
       ]
     },
     "businessGuideApi": {
-      "source": "apps/qizhi-docs/src/business-guidance/businessGuidanceApi.ts",
+      "source": "apps\\qizhi-docs\\src\\business-guidance\\businessGuidanceApi.ts",
       "items": [
         {
           "name": "title",
@@ -575,7 +575,7 @@
       ]
     },
     "billingBudgetCardApi": {
-      "source": "apps/qizhi-docs/src/business-object-display/businessObjectApi.ts",
+      "source": "apps\\qizhi-docs\\src\\business-object-display\\businessObjectApi.ts",
       "items": [
         {
           "name": "model",
@@ -634,7 +634,7 @@
       ]
     },
     "financialModelCardApi": {
-      "source": "apps/qizhi-docs/src/business-object-display/businessObjectApi.ts",
+      "source": "apps\\qizhi-docs\\src\\business-object-display\\businessObjectApi.ts",
       "items": [
         {
           "name": "name",
@@ -681,7 +681,7 @@
       ]
     },
     "marketplaceModelCardApi": {
-      "source": "apps/qizhi-docs/src/business-object-display/businessObjectApi.ts",
+      "source": "apps\\qizhi-docs\\src\\business-object-display\\businessObjectApi.ts",
       "items": [
         {
           "name": "name",
@@ -734,7 +734,7 @@
       ]
     },
     "projectCardApi": {
-      "source": "apps/qizhi-docs/src/business-object-display/businessObjectApi.ts",
+      "source": "apps\\qizhi-docs\\src\\business-object-display\\businessObjectApi.ts",
       "items": [
         {
           "name": "name",
@@ -805,7 +805,7 @@
       ]
     },
     "resourceSpecificationCardApi": {
-      "source": "apps/qizhi-docs/src/business-object-display/businessObjectApi.ts",
+      "source": "apps\\qizhi-docs\\src\\business-object-display\\businessObjectApi.ts",
       "items": [
         {
           "name": "resourceModel",
@@ -840,7 +840,7 @@
       ]
     },
     "skillServiceCardApi": {
-      "source": "apps/qizhi-docs/src/business-object-display/businessObjectApi.ts",
+      "source": "apps\\qizhi-docs\\src\\business-object-display\\businessObjectApi.ts",
       "items": [
         {
           "name": "name",
@@ -881,7 +881,7 @@
       ]
     },
     "taskCardApi": {
-      "source": "apps/qizhi-docs/src/business-object-display/businessObjectApi.ts",
+      "source": "apps\\qizhi-docs\\src\\business-object-display\\businessObjectApi.ts",
       "items": [
         {
           "name": "name",
@@ -928,7 +928,7 @@
       ]
     },
     "basicChoiceCardsApi": {
-      "source": "apps/qizhi-docs/src/business-object-selection/businessObjectSelectionApi.ts",
+      "source": "apps\\qizhi-docs\\src\\business-object-selection\\businessObjectSelectionApi.ts",
       "items": [
         {
           "name": "items",
@@ -963,7 +963,7 @@
       ]
     },
     "choiceCardApi": {
-      "source": "apps/qizhi-docs/src/business-object-selection/businessObjectSelectionApi.ts",
+      "source": "apps\\qizhi-docs\\src\\business-object-selection\\businessObjectSelectionApi.ts",
       "items": [
         {
           "name": "value",
@@ -1004,7 +1004,7 @@
       ]
     },
     "choiceCardGroupApi": {
-      "source": "apps/qizhi-docs/src/business-object-selection/businessObjectSelectionApi.ts",
+      "source": "apps\\qizhi-docs\\src\\business-object-selection\\businessObjectSelectionApi.ts",
       "items": [
         {
           "name": "children",
@@ -1045,7 +1045,7 @@
       ]
     },
     "iconChoiceCardsApi": {
-      "source": "apps/qizhi-docs/src/business-object-selection/businessObjectSelectionApi.ts",
+      "source": "apps\\qizhi-docs\\src\\business-object-selection\\businessObjectSelectionApi.ts",
       "items": [
         {
           "name": "items",
@@ -1080,7 +1080,7 @@
       ]
     },
     "objectSelectorApi": {
-      "source": "apps/qizhi-docs/src/business-object-selection/businessObjectSelectionApi.ts",
+      "source": "apps\\qizhi-docs\\src\\business-object-selection\\businessObjectSelectionApi.ts",
       "items": [
         {
           "name": "label",
@@ -1139,7 +1139,7 @@
       ]
     },
     "metricCardApi": {
-      "source": "apps/qizhi-docs/src/business-overview/businessOverviewApi.ts",
+      "source": "apps\\qizhi-docs\\src\\business-overview\\businessOverviewApi.ts",
       "items": [
         {
           "name": "title",
@@ -1204,7 +1204,7 @@
       ]
     },
     "metricItemApi": {
-      "source": "apps/qizhi-docs/src/business-overview/businessOverviewApi.ts",
+      "source": "apps\\qizhi-docs\\src\\business-overview\\businessOverviewApi.ts",
       "items": [
         {
           "name": "label",
@@ -1233,7 +1233,7 @@
       ]
     },
     "objectMetricsApi": {
-      "source": "apps/qizhi-docs/src/business-overview/businessOverviewApi.ts",
+      "source": "apps\\qizhi-docs\\src\\business-overview\\businessOverviewApi.ts",
       "items": [
         {
           "name": "title",
@@ -1268,7 +1268,7 @@
       ]
     },
     "resourceUsageCardApi": {
-      "source": "apps/qizhi-docs/src/business-overview/businessOverviewApi.ts",
+      "source": "apps\\qizhi-docs\\src\\business-overview\\businessOverviewApi.ts",
       "items": [
         {
           "name": "title",
@@ -1297,7 +1297,7 @@
       ]
     },
     "taskOverviewApi": {
-      "source": "apps/qizhi-docs/src/business-overview/businessOverviewApi.ts",
+      "source": "apps\\qizhi-docs\\src\\business-overview\\businessOverviewApi.ts",
       "items": [
         {
           "name": "title",
@@ -1350,7 +1350,7 @@
       ]
     },
     "buttonApi": {
-      "source": "apps/qizhi-docs/src/button/buttonApi.ts",
+      "source": "apps\\qizhi-docs\\src\\button\\buttonApi.ts",
       "items": [
         {
           "name": "disabled",
@@ -1457,7 +1457,7 @@
       ]
     },
     "cascaderApi": {
-      "source": "apps/qizhi-docs/src/cascader/cascaderApi.ts",
+      "source": "apps\\qizhi-docs\\src\\cascader\\cascaderApi.ts",
       "items": [
         {
           "name": "options",
@@ -1636,7 +1636,7 @@
       ]
     },
     "barChartApi": {
-      "source": "apps/qizhi-docs/src/chart/chartApi.ts",
+      "source": "apps\\qizhi-docs\\src\\chart\\chartApi.ts",
       "items": [
         {
           "name": "mode",
@@ -1647,7 +1647,7 @@
       ]
     },
     "chartCommonApi": {
-      "source": "apps/qizhi-docs/src/chart/chartApi.ts",
+      "source": "apps\\qizhi-docs\\src\\chart\\chartApi.ts",
       "items": [
         {
           "name": "focusable",
@@ -1772,7 +1772,7 @@
       ]
     },
     "chartDatumApi": {
-      "source": "apps/qizhi-docs/src/chart/chartApi.ts",
+      "source": "apps\\qizhi-docs\\src\\chart\\chartApi.ts",
       "items": [
         {
           "name": "x",
@@ -1795,7 +1795,7 @@
       ]
     },
     "chartSeriesApi": {
-      "source": "apps/qizhi-docs/src/chart/chartApi.ts",
+      "source": "apps\\qizhi-docs\\src\\chart\\chartApi.ts",
       "items": [
         {
           "name": "key",
@@ -1818,7 +1818,7 @@
       ]
     },
     "focusedItemApi": {
-      "source": "apps/qizhi-docs/src/chart/chartApi.ts",
+      "source": "apps\\qizhi-docs\\src\\chart\\chartApi.ts",
       "items": [
         {
           "name": "seriesKey",
@@ -1847,7 +1847,7 @@
       ]
     },
     "checkboxApi": {
-      "source": "apps/qizhi-docs/src/checkbox/checkboxApi.ts",
+      "source": "apps\\qizhi-docs\\src\\checkbox\\checkboxApi.ts",
       "items": [
         {
           "name": "children",
@@ -1912,7 +1912,7 @@
       ]
     },
     "checkboxGroupApi": {
-      "source": "apps/qizhi-docs/src/checkbox/checkboxApi.ts",
+      "source": "apps\\qizhi-docs\\src\\checkbox\\checkboxApi.ts",
       "items": [
         {
           "name": "children",
@@ -1971,7 +1971,7 @@
       ]
     },
     "codePreviewApi": {
-      "source": "apps/qizhi-docs/src/code-preview/codePreviewApi.ts",
+      "source": "apps\\qizhi-docs\\src\\code-preview\\codePreviewApi.ts",
       "items": [
         {
           "name": "value",
@@ -2048,7 +2048,7 @@
       ]
     },
     "datePickerApi": {
-      "source": "apps/qizhi-docs/src/date-picker/datePickerApi.ts",
+      "source": "apps\\qizhi-docs\\src\\date-picker\\datePickerApi.ts",
       "items": [
         {
           "name": "mode",
@@ -2093,10 +2093,22 @@
           "defaultValue": "按模式生成"
         },
         {
+          "name": "placeholders",
+          "description": "范围选择器起止输入框各自的提示文案。",
+          "type": "readonly [string, string]",
+          "defaultValue": "开始日期、结束日期"
+        },
+        {
           "name": "allowClear",
           "description": "有值时是否允许悬停清空。",
           "type": "boolean",
           "defaultValue": "true"
+        },
+        {
+          "name": "disabled",
+          "description": "禁用输入、弹层打开和清空交互。",
+          "type": "boolean",
+          "defaultValue": "false"
         },
         {
           "name": "disabledDate",
@@ -2143,7 +2155,7 @@
       ]
     },
     "descriptionsApi": {
-      "source": "apps/qizhi-docs/src/descriptions/descriptionsApi.ts",
+      "source": "apps\\qizhi-docs\\src\\descriptions\\descriptionsApi.ts",
       "items": [
         {
           "name": "children",
@@ -2184,7 +2196,7 @@
       ]
     },
     "descriptionsItemApi": {
-      "source": "apps/qizhi-docs/src/descriptions/descriptionsApi.ts",
+      "source": "apps\\qizhi-docs\\src\\descriptions\\descriptionsApi.ts",
       "items": [
         {
           "name": "label",
@@ -2213,7 +2225,7 @@
       ]
     },
     "dividerApi": {
-      "source": "apps/qizhi-docs/src/divider/dividerApi.ts",
+      "source": "apps\\qizhi-docs\\src\\divider\\dividerApi.ts",
       "items": [
         {
           "name": "children",
@@ -2254,7 +2266,7 @@
       ]
     },
     "drawerApi": {
-      "source": "apps/qizhi-docs/src/drawer/drawerApi.ts",
+      "source": "apps\\qizhi-docs\\src\\drawer\\drawerApi.ts",
       "items": [
         {
           "name": "open",
@@ -2325,7 +2337,7 @@
       ]
     },
     "dropdownApi": {
-      "source": "apps/qizhi-docs/src/dropdown/dropdownApi.ts",
+      "source": "apps\\qizhi-docs\\src\\dropdown\\dropdownApi.ts",
       "items": [
         {
           "name": "droplist",
@@ -2384,7 +2396,7 @@
       ]
     },
     "emptyApi": {
-      "source": "apps/qizhi-docs/src/empty/emptyApi.ts",
+      "source": "apps\\qizhi-docs\\src\\empty\\emptyApi.ts",
       "items": [
         {
           "name": "description",
@@ -2407,7 +2419,7 @@
       ]
     },
     "formApi": {
-      "source": "apps/qizhi-docs/src/form/formApi.ts",
+      "source": "apps\\qizhi-docs\\src\\form\\formApi.ts",
       "items": [
         {
           "name": "layout",
@@ -2436,7 +2448,7 @@
       ]
     },
     "formItemApi": {
-      "source": "apps/qizhi-docs/src/form/formApi.ts",
+      "source": "apps\\qizhi-docs\\src\\form\\formApi.ts",
       "items": [
         {
           "name": "label",
@@ -2477,7 +2489,7 @@
       ]
     },
     "iconApi": {
-      "source": "apps/qizhi-docs/src/icon/iconApi.ts",
+      "source": "apps\\qizhi-docs\\src\\icon\\iconApi.ts",
       "items": [
         {
           "name": "size",
@@ -2530,7 +2542,7 @@
       ]
     },
     "iconCatalogApi": {
-      "source": "apps/qizhi-docs/src/icon/iconApi.ts",
+      "source": "apps\\qizhi-docs\\src\\icon\\iconApi.ts",
       "items": [
         {
           "name": "findIcons",
@@ -2577,7 +2589,7 @@
       ]
     },
     "inputNumberApi": {
-      "source": "apps/qizhi-docs/src/input-number/inputNumberApi.ts",
+      "source": "apps\\qizhi-docs\\src\\input-number\\inputNumberApi.ts",
       "items": [
         {
           "name": "value",
@@ -2708,7 +2720,7 @@
       ]
     },
     "inputTagApi": {
-      "source": "apps/qizhi-docs/src/input-tag/inputTagApi.ts",
+      "source": "apps\\qizhi-docs\\src\\input-tag\\inputTagApi.ts",
       "items": [
         {
           "name": "value",
@@ -2809,7 +2821,7 @@
       ]
     },
     "inputApi": {
-      "source": "apps/qizhi-docs/src/input/inputApi.ts",
+      "source": "apps\\qizhi-docs\\src\\input\\inputApi.ts",
       "items": [
         {
           "name": "value",
@@ -2940,7 +2952,7 @@
       ]
     },
     "inputApiSections:Input": {
-      "source": "apps/qizhi-docs/src/input/inputApi.ts",
+      "source": "apps\\qizhi-docs\\src\\input\\inputApi.ts",
       "items": [
         {
           "name": "value",
@@ -3071,7 +3083,7 @@
       ]
     },
     "inputApiSections:Input.TextArea": {
-      "source": "apps/qizhi-docs/src/input/inputApi.ts",
+      "source": "apps\\qizhi-docs\\src\\input\\inputApi.ts",
       "items": [
         {
           "name": "value",
@@ -3160,7 +3172,7 @@
       ]
     },
     "inputApiSections:Input.Group": {
-      "source": "apps/qizhi-docs/src/input/inputApi.ts",
+      "source": "apps\\qizhi-docs\\src\\input\\inputApi.ts",
       "items": [
         {
           "name": "children",
@@ -3189,7 +3201,7 @@
       ]
     },
     "inputApiSections:Input.Search": {
-      "source": "apps/qizhi-docs/src/input/inputApi.ts",
+      "source": "apps\\qizhi-docs\\src\\input\\inputApi.ts",
       "items": [
         {
           "name": "loading",
@@ -3212,7 +3224,7 @@
       ]
     },
     "inputApiSections:Input.Password": {
-      "source": "apps/qizhi-docs/src/input/inputApi.ts",
+      "source": "apps\\qizhi-docs\\src\\input\\inputApi.ts",
       "items": [
         {
           "name": "defaultVisibility",
@@ -3235,7 +3247,7 @@
       ]
     },
     "inputApiSections:Ref 方法": {
-      "source": "apps/qizhi-docs/src/input/inputApi.ts",
+      "source": "apps\\qizhi-docs\\src\\input\\inputApi.ts",
       "items": [
         {
           "name": "focus",
@@ -3252,7 +3264,7 @@
       ]
     },
     "inputGroupApi": {
-      "source": "apps/qizhi-docs/src/input/inputApi.ts",
+      "source": "apps\\qizhi-docs\\src\\input\\inputApi.ts",
       "items": [
         {
           "name": "children",
@@ -3281,7 +3293,7 @@
       ]
     },
     "inputPasswordApi": {
-      "source": "apps/qizhi-docs/src/input/inputApi.ts",
+      "source": "apps\\qizhi-docs\\src\\input\\inputApi.ts",
       "items": [
         {
           "name": "defaultVisibility",
@@ -3304,7 +3316,7 @@
       ]
     },
     "inputRefApi": {
-      "source": "apps/qizhi-docs/src/input/inputApi.ts",
+      "source": "apps\\qizhi-docs\\src\\input\\inputApi.ts",
       "items": [
         {
           "name": "focus",
@@ -3321,7 +3333,7 @@
       ]
     },
     "inputSearchApi": {
-      "source": "apps/qizhi-docs/src/input/inputApi.ts",
+      "source": "apps\\qizhi-docs\\src\\input\\inputApi.ts",
       "items": [
         {
           "name": "loading",
@@ -3344,7 +3356,7 @@
       ]
     },
     "inputTextAreaApi": {
-      "source": "apps/qizhi-docs/src/input/inputApi.ts",
+      "source": "apps\\qizhi-docs\\src\\input\\inputApi.ts",
       "items": [
         {
           "name": "value",
@@ -3433,7 +3445,7 @@
       ]
     },
     "layoutApi": {
-      "source": "apps/qizhi-docs/src/layout/layoutApi.ts",
+      "source": "apps\\qizhi-docs\\src\\layout\\layoutApi.ts",
       "items": [
         {
           "name": "children",
@@ -3456,7 +3468,7 @@
       ]
     },
     "localeProviderApi": {
-      "source": "apps/qizhi-docs/src/layout/localeProviderApi.ts",
+      "source": "apps\\qizhi-docs\\src\\layout\\localeProviderApi.ts",
       "items": [
         {
           "name": "children",
@@ -3497,7 +3509,7 @@
       ]
     },
     "platformShellApi": {
-      "source": "apps/qizhi-docs/src/layout/platformShellApi.ts",
+      "source": "apps\\qizhi-docs\\src\\layout\\platformShellApi.ts",
       "items": [
         {
           "name": "selectedKey",
@@ -3562,7 +3574,7 @@
       ]
     },
     "linkApi": {
-      "source": "apps/qizhi-docs/src/link/linkApi.ts",
+      "source": "apps\\qizhi-docs\\src\\link\\linkApi.ts",
       "items": [
         {
           "name": "children",
@@ -3645,7 +3657,7 @@
       ]
     },
     "logViewerApi": {
-      "source": "apps/qizhi-docs/src/log-viewer/logViewerApi.ts",
+      "source": "apps\\qizhi-docs\\src\\log-viewer\\logViewerApi.ts",
       "items": [
         {
           "name": "logs",
@@ -3740,7 +3752,7 @@
       ]
     },
     "markdownViewerApi": {
-      "source": "apps/qizhi-docs/src/markdown-viewer/markdownViewerApi.ts",
+      "source": "apps\\qizhi-docs\\src\\markdown-viewer\\markdownViewerApi.ts",
       "items": [
         {
           "name": "value",
@@ -3793,7 +3805,7 @@
       ]
     },
     "menuApi": {
-      "source": "apps/qizhi-docs/src/menu/menuApi.ts",
+      "source": "apps\\qizhi-docs\\src\\menu\\menuApi.ts",
       "items": [
         {
           "name": "mode",
@@ -3846,7 +3858,7 @@
       ]
     },
     "sideNavigationApi": {
-      "source": "apps/qizhi-docs/src/menu/sideNavigationApi.ts",
+      "source": "apps\\qizhi-docs\\src\\menu\\sideNavigationApi.ts",
       "items": [
         {
           "name": "variant",
@@ -3897,9 +3909,21 @@
           "defaultValue": "当前变体默认空间"
         },
         {
+          "name": "showWorkspaceSwitcher",
+          "description": "是否显示空间切换器。",
+          "type": "boolean",
+          "defaultValue": "true"
+        },
+        {
           "name": "onWorkspaceChange",
           "description": "空间变化时触发。",
           "type": "(workspace: string) => void",
+          "defaultValue": "—"
+        },
+        {
+          "name": "onWorkspacePopupScroll",
+          "description": "空间菜单滚动时触发，可用于分页加载。",
+          "type": "UIEventHandler<HTMLDivElement>",
           "defaultValue": "—"
         },
         {
@@ -3917,7 +3941,7 @@
       ]
     },
     "topNavigationApi": {
-      "source": "apps/qizhi-docs/src/menu/topNavigationApi.ts",
+      "source": "apps\\qizhi-docs\\src\\menu\\topNavigationApi.ts",
       "items": [
         {
           "name": "logo",
@@ -3962,6 +3986,18 @@
           "defaultValue": "—"
         },
         {
+          "name": "regionSelector",
+          "description": "替换默认区域控件；传入 null 时隐藏。",
+          "type": "ReactNode",
+          "defaultValue": "默认区域选择器"
+        },
+        {
+          "name": "regionHidden",
+          "description": "隐藏区域控件但保留其布局空间。",
+          "type": "boolean",
+          "defaultValue": "false"
+        },
+        {
           "name": "regions",
           "description": "区域选项。",
           "type": "readonly TopNavigationOption[]",
@@ -3983,6 +4019,12 @@
           "name": "onRegionChange",
           "description": "区域变化时触发。",
           "type": "(key: string) => void",
+          "defaultValue": "—"
+        },
+        {
+          "name": "onRegionPopupScroll",
+          "description": "区域菜单滚动时触发，可用于分页加载。",
+          "type": "UIEventHandler<HTMLDivElement>",
           "defaultValue": "—"
         },
         {
@@ -4010,6 +4052,12 @@
           "defaultValue": "—"
         },
         {
+          "name": "languageAriaLabel",
+          "description": "语言切换按钮的无障碍名称。",
+          "type": "string",
+          "defaultValue": "—"
+        },
+        {
           "name": "helpLabel",
           "description": "帮助入口文案。",
           "type": "ReactNode",
@@ -4020,6 +4068,24 @@
           "description": "点击帮助入口时触发。",
           "type": "() => void",
           "defaultValue": "—"
+        },
+        {
+          "name": "utility",
+          "description": "替换默认帮助操作；传入 null 时隐藏。",
+          "type": "ReactNode",
+          "defaultValue": "默认帮助按钮"
+        },
+        {
+          "name": "userMenu",
+          "description": "锚定在头像按钮上的用户菜单内容。",
+          "type": "ReactNode",
+          "defaultValue": "—"
+        },
+        {
+          "name": "userMenuAriaLabel",
+          "description": "用户菜单按钮的无障碍名称。",
+          "type": "string",
+          "defaultValue": "\"打开用户菜单\""
         },
         {
           "name": "onUserMenu",
@@ -4042,7 +4108,7 @@
       ]
     },
     "messageApi": {
-      "source": "apps/qizhi-docs/src/message/messageApi.ts",
+      "source": "apps\\qizhi-docs\\src\\message\\messageApi.ts",
       "items": [
         {
           "name": "content",
@@ -4113,7 +4179,7 @@
       ]
     },
     "messageConfigApi": {
-      "source": "apps/qizhi-docs/src/message/messageApi.ts",
+      "source": "apps\\qizhi-docs\\src\\message\\messageApi.ts",
       "items": [
         {
           "name": "maxCount",
@@ -4136,7 +4202,7 @@
       ]
     },
     "modalApi": {
-      "source": "apps/qizhi-docs/src/modal/modalApi.ts",
+      "source": "apps\\qizhi-docs\\src\\modal\\modalApi.ts",
       "items": [
         {
           "name": "open",
@@ -4255,7 +4321,7 @@
       ]
     },
     "modalConfirmApi": {
-      "source": "apps/qizhi-docs/src/modal/modalApi.ts",
+      "source": "apps\\qizhi-docs\\src\\modal\\modalApi.ts",
       "items": [
         {
           "name": "title",
@@ -4284,7 +4350,7 @@
       ]
     },
     "notificationApi": {
-      "source": "apps/qizhi-docs/src/notification/notificationApi.ts",
+      "source": "apps\\qizhi-docs\\src\\notification\\notificationApi.ts",
       "items": [
         {
           "name": "title",
@@ -4367,7 +4433,7 @@
       ]
     },
     "notificationConfigApi": {
-      "source": "apps/qizhi-docs/src/notification/notificationApi.ts",
+      "source": "apps\\qizhi-docs\\src\\notification\\notificationApi.ts",
       "items": [
         {
           "name": "maxCount",
@@ -4390,7 +4456,7 @@
       ]
     },
     "pageHeaderApi": {
-      "source": "apps/qizhi-docs/src/page-header/pageHeaderApi.ts",
+      "source": "apps\\qizhi-docs\\src\\page-header\\pageHeaderApi.ts",
       "items": [
         {
           "name": "children",
@@ -4419,7 +4485,7 @@
       ]
     },
     "paginationApi": {
-      "source": "apps/qizhi-docs/src/pagination/paginationApi.ts",
+      "source": "apps\\qizhi-docs\\src\\pagination\\paginationApi.ts",
       "items": [
         {
           "name": "total",
@@ -4508,7 +4574,7 @@
       ]
     },
     "popconfirmApi": {
-      "source": "apps/qizhi-docs/src/popconfirm/popconfirmApi.ts",
+      "source": "apps\\qizhi-docs\\src\\popconfirm\\popconfirmApi.ts",
       "items": [
         {
           "name": "children",
@@ -4609,7 +4675,7 @@
       ]
     },
     "popoverApi": {
-      "source": "apps/qizhi-docs/src/popover/popoverApi.ts",
+      "source": "apps\\qizhi-docs\\src\\popover\\popoverApi.ts",
       "items": [
         {
           "name": "children",
@@ -4674,7 +4740,7 @@
       ]
     },
     "progressApi": {
-      "source": "apps/qizhi-docs/src/progress/progressApi.ts",
+      "source": "apps\\qizhi-docs\\src\\progress\\progressApi.ts",
       "items": [
         {
           "name": "percent",
@@ -4757,7 +4823,7 @@
       ]
     },
     "radioApi": {
-      "source": "apps/qizhi-docs/src/radio/radioApi.ts",
+      "source": "apps\\qizhi-docs\\src\\radio\\radioApi.ts",
       "items": [
         {
           "name": "children",
@@ -4822,7 +4888,7 @@
       ]
     },
     "radioGroupApi": {
-      "source": "apps/qizhi-docs/src/radio/radioApi.ts",
+      "source": "apps\\qizhi-docs\\src\\radio\\radioApi.ts",
       "items": [
         {
           "name": "children",
@@ -4893,7 +4959,7 @@
       ]
     },
     "selectApi": {
-      "source": "apps/qizhi-docs/src/select/selectApi.ts",
+      "source": "apps\\qizhi-docs\\src\\select\\selectApi.ts",
       "items": [
         {
           "name": "options",
@@ -5074,11 +5140,17 @@
           "description": "弹层打开状态变化时触发。",
           "type": "(open: boolean) => void",
           "defaultValue": "—"
+        },
+        {
+          "name": "onPopupScroll",
+          "description": "下拉弹层滚动时触发，可用于分页加载远程选项。",
+          "type": "UIEventHandler<HTMLDivElement>",
+          "defaultValue": "—"
         }
       ]
     },
     "selectOptionCardApi": {
-      "source": "apps/qizhi-docs/src/select/selectApi.ts",
+      "source": "apps\\qizhi-docs\\src\\select\\selectApi.ts",
       "items": [
         {
           "name": "name",
@@ -5095,7 +5167,7 @@
       ]
     },
     "selectSelectionCardApi": {
-      "source": "apps/qizhi-docs/src/select/selectApi.ts",
+      "source": "apps\\qizhi-docs\\src\\select\\selectApi.ts",
       "items": [
         {
           "name": "fields",
@@ -5112,7 +5184,7 @@
       ]
     },
     "skeletonApi": {
-      "source": "apps/qizhi-docs/src/skeleton/skeletonApi.ts",
+      "source": "apps\\qizhi-docs\\src\\skeleton\\skeletonApi.ts",
       "items": [
         {
           "name": "animation",
@@ -5153,7 +5225,7 @@
       ]
     },
     "sliderApi": {
-      "source": "apps/qizhi-docs/src/slider/sliderApi.ts",
+      "source": "apps\\qizhi-docs\\src\\slider\\sliderApi.ts",
       "items": [
         {
           "name": "value",
@@ -5272,7 +5344,7 @@
       ]
     },
     "spaceApi": {
-      "source": "apps/qizhi-docs/src/space/spaceApi.ts",
+      "source": "apps\\qizhi-docs\\src\\space\\spaceApi.ts",
       "items": [
         {
           "name": "wrap",
@@ -5319,7 +5391,7 @@
       ]
     },
     "spinApi": {
-      "source": "apps/qizhi-docs/src/spin/spinApi.ts",
+      "source": "apps\\qizhi-docs\\src\\spin\\spinApi.ts",
       "items": [
         {
           "name": "loading",
@@ -5378,7 +5450,7 @@
       ]
     },
     "statisticApi": {
-      "source": "apps/qizhi-docs/src/statistic/statisticApi.ts",
+      "source": "apps\\qizhi-docs\\src\\statistic\\statisticApi.ts",
       "items": [
         {
           "name": "value",
@@ -5455,7 +5527,7 @@
       ]
     },
     "stepsApi": {
-      "source": "apps/qizhi-docs/src/steps/stepsApi.ts",
+      "source": "apps\\qizhi-docs\\src\\steps\\stepsApi.ts",
       "items": [
         {
           "name": "items",
@@ -5502,7 +5574,7 @@
       ]
     },
     "switchApi": {
-      "source": "apps/qizhi-docs/src/switch/switchApi.ts",
+      "source": "apps\\qizhi-docs\\src\\switch\\switchApi.ts",
       "items": [
         {
           "name": "checked",
@@ -5573,7 +5645,7 @@
       ]
     },
     "tableApi": {
-      "source": "apps/qizhi-docs/src/table/tableApi.ts",
+      "source": "apps\\qizhi-docs\\src\\table\\tableApi.ts",
       "items": [
         {
           "name": "columns",
@@ -5695,7 +5767,7 @@
       ]
     },
     "tabsApi": {
-      "source": "apps/qizhi-docs/src/tabs/tabsApi.ts",
+      "source": "apps\\qizhi-docs\\src\\tabs\\tabsApi.ts",
       "items": [
         {
           "name": "items",
@@ -5772,7 +5844,7 @@
       ]
     },
     "tagApi": {
-      "source": "apps/qizhi-docs/src/tag/tagApi.ts",
+      "source": "apps\\qizhi-docs\\src\\tag\\tagApi.ts",
       "items": [
         {
           "name": "children",
@@ -5873,7 +5945,7 @@
       ]
     },
     "timePickerApi": {
-      "source": "apps/qizhi-docs/src/time-picker/timePickerApi.ts",
+      "source": "apps\\qizhi-docs\\src\\time-picker\\timePickerApi.ts",
       "items": [
         {
           "name": "value",
@@ -5962,7 +6034,7 @@
       ]
     },
     "timelineApi": {
-      "source": "apps/qizhi-docs/src/timeline/timelineApi.ts",
+      "source": "apps\\qizhi-docs\\src\\timeline\\timelineApi.ts",
       "items": [
         {
           "name": "children",
@@ -6021,7 +6093,7 @@
       ]
     },
     "timelineItemApi": {
-      "source": "apps/qizhi-docs/src/timeline/timelineApi.ts",
+      "source": "apps\\qizhi-docs\\src\\timeline\\timelineApi.ts",
       "items": [
         {
           "name": "children",
@@ -6086,7 +6158,7 @@
       ]
     },
     "tooltipApi": {
-      "source": "apps/qizhi-docs/src/tooltip/tooltipApi.ts",
+      "source": "apps\\qizhi-docs\\src\\tooltip\\tooltipApi.ts",
       "items": [
         {
           "name": "children",
@@ -6151,7 +6223,7 @@
       ]
     },
     "treeSelectApi": {
-      "source": "apps/qizhi-docs/src/tree-select/treeSelectApi.ts",
+      "source": "apps\\qizhi-docs\\src\\tree-select\\treeSelectApi.ts",
       "items": [
         {
           "name": "treeData",
@@ -6294,7 +6366,7 @@
       ]
     },
     "treeApi": {
-      "source": "apps/qizhi-docs/src/tree/treeApi.ts",
+      "source": "apps\\qizhi-docs\\src\\tree\\treeApi.ts",
       "items": [
         {
           "name": "treeData",
@@ -6437,7 +6509,7 @@
       ]
     },
     "typographyApi:Typography": {
-      "source": "apps/qizhi-docs/src/typography/typographyApi.ts",
+      "source": "apps\\qizhi-docs\\src\\typography\\typographyApi.ts",
       "items": [
         {
           "name": "className",
@@ -6454,7 +6526,7 @@
       ]
     },
     "typographyApi:Typography.Title": {
-      "source": "apps/qizhi-docs/src/typography/typographyApi.ts",
+      "source": "apps\\qizhi-docs\\src\\typography\\typographyApi.ts",
       "items": [
         {
           "name": "heading",
@@ -6519,7 +6591,7 @@
       ]
     },
     "typographyApi:Typography.Text": {
-      "source": "apps/qizhi-docs/src/typography/typographyApi.ts",
+      "source": "apps\\qizhi-docs\\src\\typography\\typographyApi.ts",
       "items": [
         {
           "name": "type",
@@ -6578,7 +6650,7 @@
       ]
     },
     "typographyApi:Typography.Paragraph": {
-      "source": "apps/qizhi-docs/src/typography/typographyApi.ts",
+      "source": "apps\\qizhi-docs\\src\\typography\\typographyApi.ts",
       "items": [
         {
           "name": "spacing",
@@ -6649,7 +6721,7 @@
       ]
     },
     "typographyApi:Typography.Ellipsis": {
-      "source": "apps/qizhi-docs/src/typography/typographyApi.ts",
+      "source": "apps\\qizhi-docs\\src\\typography\\typographyApi.ts",
       "items": [
         {
           "name": "rows",
@@ -6708,7 +6780,7 @@
       ]
     },
     "uploadApi": {
-      "source": "apps/qizhi-docs/src/upload/uploadApi.ts",
+      "source": "apps\\qizhi-docs\\src\\upload\\uploadApi.ts",
       "items": [
         {
           "name": "fileList",
@@ -6852,3 +6924,4 @@
     }
   }
 }
+
