@@ -1,9 +1,32 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 import { TopNavigation } from "./TopNavigation";
 
 describe("TopNavigation", () => {
+  it("supports replacement and hidden region controls plus integration slots", async () => {
+    const onRegionPopupScroll = vi.fn();
+    const { rerender } = render(<TopNavigation
+      regionSelector={<span>当前项目</span>}
+      utility={<button>自定义帮助</button>}
+      userMenu={<span>账户操作</span>}
+      languageAriaLabel="切换界面语言"
+      userMenuAriaLabel="打开账户菜单"
+      onRegionPopupScroll={onRegionPopupScroll}
+    />);
+    expect(screen.getByText("当前项目")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "自定义帮助" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "切换界面语言" })).toBeInTheDocument();
+    await userEvent.click(screen.getByRole("button", { name: "打开账户菜单" }));
+    expect(screen.getByText("账户操作")).toBeInTheDocument();
+    rerender(<TopNavigation regionSelector={null} />);
+    expect(screen.queryByRole("button", { name: /七宝/ })).not.toBeInTheDocument();
+    rerender(<TopNavigation onRegionPopupScroll={onRegionPopupScroll} />);
+    await userEvent.click(screen.getByRole("button", { name: /七宝/ }));
+    const option = await screen.findByRole("menuitemradio", { name: "松江机房" });
+    fireEvent.scroll(option.closest("[role=menu]")!);
+    expect(onRegionPopupScroll).toHaveBeenCalledOnce();
+  });
   it("preserves the current default copy and selections", () => {
     const { container } = render(<TopNavigation />);
     expect(screen.getByText("启智")).toBeInTheDocument();

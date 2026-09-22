@@ -15,6 +15,7 @@ interface DatePickerSharedProps {
   prefix?: ReactNode;
   placeholder?: string;
   allowClear?: boolean;
+  disabled?: boolean;
   disabledDate?: (date: Date) => boolean;
   disabledTime?: (date: Date | undefined, field?: "start" | "end") => DisabledTimeConfig;
   hideDisabledTimeOptions?: boolean;
@@ -30,6 +31,7 @@ export interface DatePickerProps extends DatePickerSharedProps {
 }
 
 export interface DateRangePickerProps extends DatePickerSharedProps {
+  placeholders?: readonly [string, string];
   value?: readonly [string, string] | readonly [];
   defaultValue?: readonly [string, string] | readonly [];
   onChange?: (value: [string, string] | []) => void;

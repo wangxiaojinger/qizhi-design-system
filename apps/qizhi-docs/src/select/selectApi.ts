@@ -37,6 +37,7 @@ export const selectApi = [
   { name: "open", description: "受控弹层打开状态。", type: "boolean", defaultValue: "—" },
   { name: "defaultOpen", description: "非受控初始打开状态。", type: "boolean", defaultValue: "false" },
   { name: "onOpenChange", description: "弹层打开状态变化时触发。", type: "(open: boolean) => void", defaultValue: "—" },
+  { name: "onPopupScroll", description: "下拉弹层滚动时触发，可用于分页加载远程选项。", type: "UIEventHandler<HTMLDivElement>", defaultValue: "—" },
 ] as const satisfies readonly SelectApiItem[];
 
 export const selectOptionCardApi = [

@@ -8,6 +8,11 @@ import {
 } from "./index";
 
 describe("complete business components", () => {
+  it("renders a custom BusinessGuide header action", () => {
+    render(<BusinessGuide title="开始" highlight="AI" subtitle="说明" steps={[]}
+      headerAction={<button>打开调试台</button>} />);
+    expect(screen.getByRole("button", { name: "打开调试台" })).toBeInTheDocument();
+  });
   it("owns the BusinessGuide close and restore flow", () => {
     const onClose = vi.fn();
     const onRestore = vi.fn();

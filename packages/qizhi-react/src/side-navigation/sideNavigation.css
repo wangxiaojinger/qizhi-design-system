@@ -35,6 +35,8 @@
   box-sizing: border-box;
   width: max-content;
   max-width: calc(100vw - 48px);
+  max-height: min(360px, 60vh);
+  overflow-y: auto;
 }
 
 .qizhi-side-navigation__workspace-option {

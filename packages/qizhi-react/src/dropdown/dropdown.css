@@ -33,3 +33,5 @@
 .qizhi-dropdown--tr > .qizhi-dropdown__popup { right: 0; bottom: calc(100% + 4px); }
 @keyframes qizhi-dropdown-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .qizhi-dropdown__arrow, .qizhi-dropdown-button__loading-icon { transition: none; animation: none; } }
+.qizhi-dropdown__submenu--left > .qizhi-dropdown__submenu-popup { left: auto; right: calc(100% + 4px); }
+.qizhi-dropdown__submenu--left > .qizhi-dropdown__submenu-trigger > svg { transform: rotate(180deg); }

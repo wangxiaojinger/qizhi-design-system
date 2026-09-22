@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode, UIEvent } from "react";
 
 export type SideNavigationVariant =
   | "custom-model"
@@ -28,7 +28,9 @@ export interface SideNavigationProps {
   workspaces?: readonly string[];
   workspace?: string;
   defaultWorkspace?: string;
+  showWorkspaceSwitcher?: boolean;
   onWorkspaceChange?: (workspace: string) => void;
+  onWorkspacePopupScroll?: (event: UIEvent<HTMLDivElement>) => void;
   className?: string;
   "aria-label"?: string;
 }

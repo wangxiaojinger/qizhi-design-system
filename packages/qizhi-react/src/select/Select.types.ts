@@ -1,4 +1,4 @@
-import type { CSSProperties, FocusEventHandler, KeyboardEventHandler, MouseEventHandler, PointerEventHandler, ReactNode, RefCallback } from "react";
+import type { CSSProperties, FocusEventHandler, KeyboardEventHandler, MouseEventHandler, PointerEventHandler, ReactNode, RefCallback, UIEvent } from "react";
 
 export type SelectRawValue = string | number;
 export type SelectSize = "mini" | "small" | "default" | "large";
@@ -56,6 +56,7 @@ interface SelectCommonProps {
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
+  onPopupScroll?: (event: UIEvent<HTMLDivElement>) => void;
   className?: string;
   style?: CSSProperties;
   id?: string;

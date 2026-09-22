@@ -6,6 +6,16 @@ import { HomeIcon } from "../icon";
 import { SideNavigation } from "./SideNavigation";
 
 describe("SideNavigation", () => {
+  it("can hide the workspace switcher and forward popup scrolling", async () => {
+    const { rerender } = render(<SideNavigation showWorkspaceSwitcher={false} />);
+    expect(screen.queryByRole("button", { name: /切换空间/ })).not.toBeInTheDocument();
+    const onWorkspacePopupScroll = vi.fn();
+    rerender(<SideNavigation onWorkspacePopupScroll={onWorkspacePopupScroll} />);
+    await userEvent.click(screen.getByRole("button", { name: /切换空间/ }));
+    const option = await screen.findByRole("menuitemradio", { name: "上海人工智能实验室-模型研发空间" });
+    fireEvent.scroll(option.closest("[role=menu]")!);
+    expect(onWorkspacePopupScroll).toHaveBeenCalledOnce();
+  });
   it("preserves the current default copy, groups and selection", () => {
     render(<SideNavigation />);
 

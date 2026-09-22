@@ -89,6 +89,7 @@
 }
 
 .qizhi-top-navigation__region-label { white-space: nowrap; }
+.qizhi-top-navigation__region-menu { max-height: min(360px, 60vh); overflow-y: auto; }
 .qizhi-top-navigation__region-option {
   max-width: 180px;
   overflow: hidden;

@@ -151,7 +151,9 @@ export function SideNavigation({
   workspaces = defaultWorkspaces,
   workspace,
   defaultWorkspace,
+  showWorkspaceSwitcher = true,
   onWorkspaceChange,
+  onWorkspacePopupScroll,
   className,
   "aria-label": ariaLabel = "空间导航",
 }: SideNavigationProps) {
@@ -168,6 +170,7 @@ export function SideNavigation({
   const workspaceMenu = (
     <Dropdown.Menu
       className="qizhi-side-navigation__workspace-menu"
+      onScroll={onWorkspacePopupScroll}
       onClickMenuItem={(key) => {
         if (!controlledWorkspace) setInternalWorkspace(key);
         onWorkspaceChange?.(key);
@@ -193,7 +196,7 @@ export function SideNavigation({
       aria-label={ariaLabel}
     >
       <div className="qizhi-side-navigation__content">
-        <Dropdown
+        {showWorkspaceSwitcher && <Dropdown
           className="qizhi-side-navigation__workspace-dropdown"
           trigger="click"
           position="bl"
@@ -212,7 +215,7 @@ export function SideNavigation({
               <ExpandIcon className="qizhi-side-navigation__workspace-icon" />
             </span>
           </Button>
-        </Dropdown>
+        </Dropdown>}
         <Menu
           key={variant}
           selectedKey={selectedKey}

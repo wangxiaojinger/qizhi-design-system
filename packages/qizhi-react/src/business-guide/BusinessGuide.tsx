@@ -12,6 +12,7 @@ export function BusinessGuide({
   subtitle,
   steps,
   closedText,
+  headerAction,
   onClose,
   onRestore,
   className,
@@ -61,7 +62,7 @@ export function BusinessGuide({
           <h2 id={titleId}>{title} <strong>{highlight}</strong></h2>
           <p>{subtitle}</p>
         </div>
-        <Button
+        {headerAction !== undefined ? headerAction : <Button
           ref={closeRef}
           type="text"
           icon={<CloseIcon />}
@@ -74,7 +75,7 @@ export function BusinessGuide({
           }}
         >
           {t("common.close")}
-        </Button>
+        </Button>}
       </header>
       <ol className="qizhi-business-guide__steps">
         {steps.map((item, index) => (
