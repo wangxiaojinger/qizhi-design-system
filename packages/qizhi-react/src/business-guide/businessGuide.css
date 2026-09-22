@@ -1,4 +1,4 @@
-.qizhi-business-guide { box-sizing:border-box; display:flex; flex-direction:column; gap:12px; width:100%; padding:16px; border:1px solid rgba(255,255,255,.9); border-radius:12px; background:linear-gradient(101.22deg,rgba(34,118,244,.08) 0%,rgba(44,78,244,0) 100%),var(--color-bg-white); }
+.qizhi-business-guide { box-sizing:border-box; display:flex; flex-direction:column; gap:12px; width:100%; padding:16px; border:var(--qizhi-business-guide-border-width, 1px) solid rgba(255,255,255,.9); border-radius:12px; background:linear-gradient(101.22deg,rgba(34,118,244,.08) 0%,rgba(44,78,244,0) 100%),var(--color-bg-white); }
 .qizhi-business-guide__header,.qizhi-business-guide__heading,.qizhi-business-guide__card-head,.qizhi-business-guide__actions,.qizhi-business-guide__closed { display:flex; align-items:center; }
 .qizhi-business-guide__header { justify-content:space-between; gap:16px; }
 .qizhi-business-guide__heading { min-width:0; align-items:baseline; gap:8px; }
@@ -7,7 +7,7 @@
 .qizhi-business-guide__heading p,.qizhi-business-guide__card-head span { margin:0; color:var(--color-text-3); font-size:14px; line-height:22px; white-space:nowrap; }
 .qizhi-business-guide__close.qizhi-btn,.qizhi-business-guide__close.qizhi-btn:hover,.qizhi-business-guide__close.qizhi-btn:active { flex:0 0 auto; padding:4px; color:var(--color-text-3); }
 .qizhi-business-guide__steps { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin:0; padding:0; list-style:none; }
-.qizhi-business-guide__card { min-width:0; padding:12px 16px; border:1px solid var(--color-border-1); border-radius:var(--border-radius-large); background:var(--color-bg-white); }
+.qizhi-business-guide__card { min-width:0; padding:12px 16px; border:var(--qizhi-business-guide-border-width, 1px) solid var(--color-border-1); border-radius:var(--border-radius-large); background:var(--color-bg-white); }
 .qizhi-business-guide__card-head { gap:12px; min-height:54px; }
 .qizhi-business-guide__card-head img { display:block; flex:0 0 48px; width:48px; height:48px; object-fit:contain; }
 .qizhi-business-guide__card-head h3 { margin:8px 0 0; color:var(--color-text-1); font-size:14px; line-height:22px; font-weight:var(--font-weight-600); }
@@ -18,3 +18,14 @@
 @media (min-width:1200px) { .qizhi-business-guide__card { min-height:112px; } }
 @media (max-width:1199.98px) { .qizhi-business-guide__heading { flex-wrap:wrap; } .qizhi-business-guide__heading p { flex-basis:100%; } .qizhi-business-guide__steps { grid-template-columns:1fr; } }
 @media (max-width:600px) { .qizhi-business-guide__header { align-items:flex-start; } .qizhi-business-guide__heading h2 { white-space:normal; font-size:20px; line-height:28px; } .qizhi-business-guide__heading p,.qizhi-business-guide__card-head span { white-space:normal; } .qizhi-business-guide__actions { align-items:flex-start; flex-direction:column; } .qizhi-business-guide__closed { flex-direction:column; } }
+
+.qizhi-business-guide { container-type: inline-size; min-width: 0; }
+@container (max-width: 900px) {
+  .qizhi-business-guide__heading { flex-wrap: wrap; }
+  .qizhi-business-guide__heading p { flex-basis: 100%; white-space: normal; }
+}
+@container (max-width: 600px) {
+  .qizhi-business-guide__steps { grid-template-columns: 1fr; }
+  .qizhi-business-guide__header { flex-wrap: wrap; }
+  .qizhi-business-guide__heading h2 { white-space: normal; }
+}

@@ -79,10 +79,17 @@ export function TopNavigation({
   selectedKey: controlledSelectedKey,
   defaultSelectedKey = "model-service",
   onSelect,
+  regionSelector,
+  regionHidden = false,
+  userMenu,
+  utility,
+  languageAriaLabel,
+  userMenuAriaLabel,
   regions: providedRegions,
   region: controlledRegion,
   defaultRegion = "qibao",
   onRegionChange,
+  onRegionPopupScroll,
   languages = defaultLanguages,
   language: controlledLanguage,
   defaultLanguage,
@@ -104,6 +111,11 @@ export function TopNavigation({
   const selectedKey = controlledSelectedKey ?? internalSelectedKey;
   const region = controlledRegion ?? internalRegion;
   const language = controlledLanguage ?? internalLanguage;
+  const currentRegionLabel = optionLabel(regions, region, true);
+  const lastVisibleRegionLabel = useRef(currentRegionLabel);
+  useEffect(() => {
+    if (!regionHidden) lastVisibleRegionLabel.current = currentRegionLabel;
+  }, [regionHidden, currentRegionLabel]);
   const [hiddenKeys, setHiddenKeys] = useState<string[]>([]);
   const scrollShellRef = useRef<HTMLDivElement>(null);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
@@ -197,7 +209,7 @@ export function TopNavigation({
   }, [scheduleOverflowSync, syncOverflow]);
 
   const regionMenu = (
-    <Dropdown.Menu onClickMenuItem={selectRegion}>
+    <Dropdown.Menu className="qizhi-top-navigation__region-menu" onClickMenuItem={selectRegion} onScroll={onRegionPopupScroll}>
       {regions.map((option) => (
         <Dropdown.Item
           key={option.key}
@@ -289,8 +301,8 @@ export function TopNavigation({
         </span>
         <span className="qizhi-top-navigation__tenant">{tenantName ?? t("navigation.tenantName")}</span>
       </div>
-      <div className="qizhi-top-navigation__region-wrap">
-        <Dropdown trigger="click" position="br" droplist={regionMenu}>
+      <div className="qizhi-top-navigation__region-wrap" style={regionHidden ? { visibility: "hidden" } : undefined} inert={regionHidden || undefined} aria-hidden={regionHidden || undefined}>
+        {regionSelector !== undefined ? regionSelector : <Dropdown trigger="click" position="br" droplist={regionMenu}>
           <Button
             type="secondary"
             className="qizhi-top-navigation__region"
@@ -303,11 +315,11 @@ export function TopNavigation({
             )}
           >
             <span className="qizhi-top-navigation__region-label">
-              {optionLabel(regions, region, true)}
+              {regionHidden ? lastVisibleRegionLabel.current : currentRegionLabel}
             </span>
             <ChevronDownIcon />
           </Button>
-        </Dropdown>
+        </Dropdown>}
       </div>
       <div ref={scrollShellRef} className="qizhi-top-navigation__scroll-shell">
         <div
@@ -372,7 +384,7 @@ export function TopNavigation({
         </Dropdown>
       </div>
       <div className="qizhi-top-navigation__actions">
-        <Button
+        {utility !== undefined ? utility : <Button
           type="secondary"
           className="qizhi-top-navigation__utility qizhi-top-navigation__help"
           icon={(
@@ -387,10 +399,11 @@ export function TopNavigation({
           <span className="qizhi-top-navigation__utility-label">
             {helpLabel ?? t("navigation.help")}
           </span>
-        </Button>
+        </Button>}
         <Dropdown trigger="click" position="br" droplist={languageMenu}>
           <Button
             type="secondary"
+            aria-label={languageAriaLabel}
             className="qizhi-top-navigation__utility qizhi-top-navigation__language"
             icon={(
               <img
@@ -406,14 +419,23 @@ export function TopNavigation({
             <ChevronDownIcon />
           </Button>
         </Dropdown>
-        <Button
+        {userMenu !== undefined ? <Dropdown trigger="click" position="br" droplist={userMenu}>
+          <Button
           type="secondary"
           iconOnly
           icon={<ProfileFilledIcon />}
           className="qizhi-top-navigation__avatar"
-          aria-label="打开用户菜单"
+          aria-label={userMenuAriaLabel ?? "打开用户菜单"}
           onClick={onUserMenu}
         />
+        </Dropdown> : <Button
+          type="secondary"
+          iconOnly
+          icon={<ProfileFilledIcon />}
+          className="qizhi-top-navigation__avatar"
+          aria-label={userMenuAriaLabel ?? "打开用户菜单"}
+          onClick={onUserMenu}
+        />}
       </div>
     </div>
   );

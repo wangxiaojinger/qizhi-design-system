@@ -1,6 +1,6 @@
 {
   "name": "@wangxiaojinger/qizhi-react",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "QIZHI Design System React components.",
   "type": "module",
   "main": "./dist/index.js",
@@ -14,6 +14,18 @@
     "./icon": {
       "types": "./dist/icon/index.d.ts",
       "import": "./dist/icon/index.js"
+    },
+    "./chart": {
+      "types": "./dist/chart/index.d.ts",
+      "import": "./dist/chart/index.js"
+    },
+    "./markdown": {
+      "types": "./dist/markdown-viewer/index.d.ts",
+      "import": "./dist/markdown-viewer/index.js"
+    },
+    "./code-preview": {
+      "types": "./dist/code-preview/index.d.ts",
+      "import": "./dist/code-preview/index.js"
     },
     "./style.css": "./dist/qizhi-react.css"
   },
@@ -43,7 +55,8 @@
   "scripts": {
     "build": "pnpm icons:build && vite build && tsc -p tsconfig.build.json",
     "icons:build": "node --experimental-strip-types scripts/build-direction-icons.mjs && node --experimental-strip-types scripts/build-prompt-icons.mjs && node --experimental-strip-types scripts/build-catalog-icons.mjs",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test:exports": "node scripts/exports-contract.mjs"
   },
   "peerDependencies": {
     "react": ">=19",

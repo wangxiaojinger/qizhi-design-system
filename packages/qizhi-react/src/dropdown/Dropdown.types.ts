@@ -26,6 +26,8 @@ export interface DropdownItemProps extends Omit<ButtonHTMLAttributes<HTMLButtonE
 }
 
 export interface DropdownSubMenuProps {
+  /** 根据可用空间向左或向右展开嵌套菜单，默认向右。 */
+  placement?: "left" | "right";
   itemKey: string;
   title: ReactNode;
   children?: ReactNode;

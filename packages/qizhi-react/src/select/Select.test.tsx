@@ -65,6 +65,16 @@ describe("Select", () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
+  it("forwards popup scroll events", async () => {
+    const onPopupScroll = vi.fn();
+    render(<Select defaultOpen options={options} onPopupScroll={onPopupScroll} />);
+
+    const listbox = await screen.findByRole("listbox");
+    fireEvent.scroll(listbox.parentElement!);
+
+    expect(onPopupScroll).toHaveBeenCalledTimes(1);
+  });
+
   it("支持搜索、创建和分词", async () => {
     const user = userEvent.setup();
     render(<Select mode="multiple" options={options} showSearch allowCreate tokenSeparators={[",", "|"]} aria-label="选择城市" />);

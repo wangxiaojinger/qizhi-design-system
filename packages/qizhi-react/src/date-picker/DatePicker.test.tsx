@@ -71,6 +71,17 @@ describe("DatePicker", () => {
     ]);
   });
 
+  it("supports range placeholders and a fully disabled state", async () => {
+    const user = userEvent.setup();
+    render(<DatePicker.RangePicker showTime disabled placeholders={["开始时间", "结束时间"]} />);
+    const start = screen.getByPlaceholderText("开始时间");
+    const end = screen.getByPlaceholderText("结束时间");
+    expect(start).toBeDisabled();
+    expect(end).toBeDisabled();
+    await user.click(start);
+    expect(screen.queryByRole("dialog", { name: "选择日期时间范围" })).not.toBeInTheDocument();
+  });
+
   it("does not use focus-within to reveal the clear control", () => {
     expect(datePickerCss).not.toMatch(/has-value:focus-within[^{]*qizhi-date-picker__clear/);
     expect(datePickerCss).not.toMatch(/has-value:focus-within[^{]*qizhi-date-picker__suffix/);
@@ -109,6 +120,33 @@ describe("DatePicker", () => {
     render(<div style={{ overflow: "hidden" }}><DatePicker defaultPickerDate="2026-08-01" /></div>);
     await user.click(screen.getByRole("combobox", { name: "选择日期" }));
     expect(screen.getByRole("dialog", { name: "选择日期" }).parentElement).toBe(document.body);
+  });
+
+  it("repositions the dialog when an ancestor scrolls", async () => {
+    const user = userEvent.setup();
+    render(<DatePicker defaultPickerDate="2026-08-01" />);
+    const picker = screen.getByTestId("qizhi-date-picker");
+    let triggerTop = 120;
+    vi.spyOn(picker, "getBoundingClientRect").mockImplementation(() => ({
+      bottom: triggerTop + 32,
+      height: 32,
+      left: 40,
+      right: 240,
+      top: triggerTop,
+      width: 200,
+      x: 40,
+      y: triggerTop,
+      toJSON: () => ({}),
+    }));
+
+    await user.click(screen.getByRole("combobox", { name: "选择日期" }));
+    const dialog = screen.getByRole("dialog", { name: "选择日期" });
+    expect(dialog).toHaveStyle({ left: "40px", top: "156px" });
+
+    triggerTop = 60;
+    fireEvent.scroll(window);
+
+    expect(dialog).toHaveStyle({ left: "40px", top: "96px" });
   });
 
   it("does not close a timed range before both endpoints are selected", async () => {

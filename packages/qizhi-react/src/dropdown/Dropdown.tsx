@@ -89,10 +89,10 @@ function DropdownItem({ itemKey, icon, className, children, onClick, role = "men
   return <button {...rest} className={joinClassName("qizhi-dropdown__item", icon != null && "qizhi-dropdown__item--icon", className)} type="button" role={role} onClick={(event) => { onClick?.(event); onClickMenuItem?.(itemKey, event); dropdown?.close(true); }}>{icon}{children}</button>;
 }
 
-function DropdownSubMenu({ itemKey, title, children, className }: DropdownSubMenuProps) {
+function DropdownSubMenu({ itemKey, title, children, className, placement = "right" }: DropdownSubMenuProps) {
   const [expanded, setExpanded] = useState(false);
   const id = `qizhi-submenu-${useId().replace(/:/g, "")}`;
-  return <div className={joinClassName("qizhi-dropdown__submenu", className)} onMouseEnter={() => setExpanded(true)} onMouseLeave={() => setExpanded(false)} onFocus={() => setExpanded(true)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setExpanded(false); }}><button className="qizhi-dropdown__item qizhi-dropdown__submenu-trigger" type="button" role="menuitem" data-item-key={itemKey} aria-haspopup="menu" aria-expanded={expanded} aria-controls={id}><span>{title}</span><ChevronRightIcon /></button><div id={id} className="qizhi-dropdown__popup qizhi-dropdown__submenu-popup" role="menu">{children}</div></div>;
+  return <div className={joinClassName("qizhi-dropdown__submenu", `qizhi-dropdown__submenu--${placement}`, className)} onMouseEnter={() => setExpanded(true)} onMouseLeave={() => setExpanded(false)} onFocus={() => setExpanded(true)} onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setExpanded(false); }}><button className="qizhi-dropdown__item qizhi-dropdown__submenu-trigger" type="button" role="menuitem" data-item-key={itemKey} aria-haspopup="menu" aria-expanded={expanded} aria-controls={id}><span>{title}</span><ChevronRightIcon /></button><div id={id} className="qizhi-dropdown__popup qizhi-dropdown__submenu-popup" role="menu">{children}</div></div>;
 }
 
 function DropdownButton({ children, droplist, type = "secondary", position = "br", disabled = false, loading = false, onClick, toggleIcon, "aria-label": ariaLabel }: DropdownButtonProps) {

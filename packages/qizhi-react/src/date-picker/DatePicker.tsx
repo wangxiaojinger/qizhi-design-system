@@ -1,4 +1,4 @@
-import { useEffect, useId, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { KeyboardEvent, MouseEvent as ReactMouseEvent } from "react";
 import { Button } from "../button/Button";
@@ -82,7 +82,7 @@ function CalendarPanel({ pickerDate, mode, value, range = [], disabledDate, onNa
 
 type InternalProps = (DatePickerProps | DateRangePickerProps) & { range: boolean };
 function DatePickerInternal(props: InternalProps) {
-  const { mode = "date", showTime = false, status = "default", prefix, placeholder, allowClear = true, disabledDate, disabledTime, hideDisabledTimeOptions, defaultPickerDate, className, style, range } = props;
+  const { mode = "date", showTime = false, status = "default", prefix, placeholder, allowClear = true, disabled = false, disabledDate, disabledTime, hideDisabledTimeOptions, defaultPickerDate, className, style, range } = props;
   const controlled = props.value !== undefined;
   const [singleInner, setSingleInner] = useState(() => range ? "" : (props as DatePickerProps).defaultValue ?? "");
   const [rangeInner, setRangeInner] = useState<readonly string[]>(() => range ? (props as DateRangePickerProps).defaultValue ?? [] : []);
@@ -101,13 +101,7 @@ function DatePickerInternal(props: InternalProps) {
   const ariaLabel = labelFor(mode, showTime, range);
   const hasValue = range ? rangeValue.length > 0 : !!single;
   const panels = range && !showTime ? 2 : 1;
-  useEffect(() => {
-    if (!open) return;
-    const close = (event: globalThis.MouseEvent) => { if (!rootRef.current?.contains(event.target as Node)) setOpen(false); };
-    document.addEventListener("mousedown", close);
-    return () => document.removeEventListener("mousedown", close);
-  }, [open]);
-  useLayoutEffect(() => {
+  const updatePopupPosition = useCallback(() => {
     if (!open || !rootRef.current || !popupRef.current) return;
     const trigger = rootRef.current.getBoundingClientRect();
     const popup = popupRef.current.getBoundingClientRect();
@@ -119,7 +113,25 @@ function DatePickerInternal(props: InternalProps) {
     const below = trigger.bottom + 4;
     const top = below + popup.height <= window.innerHeight - 8 ? below : Math.max(8, trigger.top - popup.height - 4);
     setPopupPosition({ left, top, ready: true });
-  }, [open, pickerDate, range, showTime]);
+  }, [open, range, showTime]);
+  useEffect(() => {
+    if (!open) return;
+    const close = (event: globalThis.MouseEvent) => { if (!rootRef.current?.contains(event.target as Node)) setOpen(false); };
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, [open]);
+  useLayoutEffect(() => {
+    updatePopupPosition();
+  }, [pickerDate, updatePopupPosition]);
+  useEffect(() => {
+    if (!open) return;
+    window.addEventListener("resize", updatePopupPosition);
+    window.addEventListener("scroll", updatePopupPosition, true);
+    return () => {
+      window.removeEventListener("resize", updatePopupPosition);
+      window.removeEventListener("scroll", updatePopupPosition, true);
+    };
+  }, [open, updatePopupPosition]);
   const commitSingle = (next: string) => { if (!controlled) setSingleInner(next); (props as DatePickerProps).onChange?.(next); };
   const commitRange = (next: [string, string] | []) => { if (!controlled) setRangeInner(next); (props as DateRangePickerProps).onChange?.(next); };
   const select = (date: Date) => {
@@ -146,8 +158,9 @@ function DatePickerInternal(props: InternalProps) {
     setOpen(false);
   };
   const clear = (event: ReactMouseEvent) => { event.stopPropagation(); if (range) { setDraftRange([]); setActiveRangeField("start"); commitRange([]); } else commitSingle(""); setOpen(false); };
-  const openWithKeyboard = (event: KeyboardEvent<HTMLInputElement>) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setOpen(true); } if (event.key === "Escape") setOpen(false); };
+  const openWithKeyboard = (event: KeyboardEvent<HTMLInputElement>) => { if (disabled) return; if (event.key === "Enter" || event.key === " ") { event.preventDefault(); setOpen(true); } if (event.key === "Escape") setOpen(false); };
   const handleControlClick = (event: ReactMouseEvent<HTMLDivElement>) => {
+    if (disabled) return;
     const target = event.target as HTMLElement;
     if (target.closest(".qizhi-date-picker__popup")) return;
     if (target.closest(".qizhi-date-picker__clear")) return;
@@ -157,16 +170,17 @@ function DatePickerInternal(props: InternalProps) {
     if (range && rangeInput) setOpen(true);
     else setOpen((current) => !current);
   };
-  const inputCommon = { readOnly: true, role: "combobox", "aria-haspopup": "dialog", "aria-expanded": open, "aria-controls": popupId, "aria-invalid": status === "error" || undefined, onKeyDown: openWithKeyboard } as const;
+  const inputCommon = { readOnly: true, disabled, role: "combobox", "aria-haspopup": "dialog", "aria-expanded": open, "aria-controls": popupId, "aria-invalid": status === "error" || undefined, onKeyDown: openWithKeyboard } as const;
   const popup = open ? createPortal(<div ref={popupRef} id={popupId} className={join("qizhi-date-picker__popup", range && "qizhi-date-picker__popup--range", showTime && "qizhi-date-picker__popup--time")} role="dialog" aria-label={ariaLabel} style={{ left: popupPosition.left, top: popupPosition.top, visibility: popupPosition.ready ? "visible" : "hidden" }} onMouseDown={(event) => event.stopPropagation()}><div className="qizhi-date-picker__main"><div className="qizhi-date-picker__panels">{Array.from({ length: panels }, (_, index) => <CalendarPanel key={index} pickerDate={addMonths(pickerDate, index)} mode={mode} value={single} range={draftRange} disabledDate={disabledDate} side={panels === 1 ? "single" : index === 0 ? "left" : "right"} onNavigate={(next) => setPickerDate(index === 0 ? next : addMonths(next, -1))} onSelect={select} />)}</div>{showTime ? <div className="qizhi-date-picker__time"><TimePanel title="选择时间" value={time} disabled={disabledTime?.(selectedDate, range ? draftRange.length === 1 ? "start" : "end" : undefined)} hideDisabled={hideDisabledTimeOptions} onChange={setTime} /></div> : null}</div>{showTime ? <footer><Button type="text" size="small" onClick={() => { const now = new Date(); setSelectedDate(now); setPickerDate(new Date(now.getFullYear(), now.getMonth(), 1)); setTime({ hour: now.getHours(), minute: now.getMinutes(), second: now.getSeconds() }); }}>此刻</Button><Button type="primary" size="small" onClick={confirm}>确认</Button></footer> : mode === "date" || mode === "week" ? <footer><Button type="text" size="small" onClick={() => select(new Date())}>今天</Button></footer> : null}</div>, document.body) : null;
-  return <div ref={rootRef} data-testid="qizhi-date-picker" data-status={status} className={controlContainerClassName("qizhi-date-picker", range && "qizhi-date-picker--range", showTime && "qizhi-date-picker--time", status !== "default" && `qizhi-date-picker--${status}`, hasValue && "has-value", open && "is-open", className)} style={style} onClick={handleControlClick}>
+  const rangePlaceholders = range ? (props as DateRangePickerProps).placeholders : undefined;
+  return <div ref={rootRef} data-testid="qizhi-date-picker" data-status={status} aria-disabled={disabled || undefined} className={controlContainerClassName("qizhi-date-picker", range && "qizhi-date-picker--range", showTime && "qizhi-date-picker--time", status !== "default" && `qizhi-date-picker--${status}`, hasValue && "has-value", open && "is-open", disabled && "is-disabled", className)} style={style} onClick={handleControlClick}>
     {prefix != null ? <div className="qizhi-date-picker__prefix" aria-hidden="true">{prefix}</div> : null}
     {range ? <>
-      <div className={join("qizhi-date-picker__input-wrap", activeRangeField === "start" && "is-active")} data-date-picker-input-wrap="start"><input {...inputCommon} className="qizhi-date-picker__input" data-date-picker-start aria-label={ariaLabel} value={rangeValue[0] ?? ""} placeholder={placeholder ?? "开始日期"} /></div>
+      <div className={join("qizhi-date-picker__input-wrap", activeRangeField === "start" && "is-active")} data-date-picker-input-wrap="start"><input {...inputCommon} className="qizhi-date-picker__input" data-date-picker-start aria-label={ariaLabel} value={rangeValue[0] ?? ""} placeholder={rangePlaceholders?.[0] ?? placeholder ?? "开始日期"} /></div>
       <span className="qizhi-date-picker__separator" aria-hidden="true">-</span>
-      <div className={join("qizhi-date-picker__input-wrap", activeRangeField === "end" && "is-active")} data-date-picker-input-wrap="end"><input {...inputCommon} className="qizhi-date-picker__input" data-date-picker-end aria-label={`${ariaLabel}结束`} value={rangeValue[1] ?? ""} placeholder="结束日期" /></div>
+      <div className={join("qizhi-date-picker__input-wrap", activeRangeField === "end" && "is-active")} data-date-picker-input-wrap="end"><input {...inputCommon} className="qizhi-date-picker__input" data-date-picker-end aria-label={`${ariaLabel}结束`} value={rangeValue[1] ?? ""} placeholder={rangePlaceholders?.[1] ?? "结束日期"} /></div>
     </> : <div className="qizhi-date-picker__input-wrap"><input {...inputCommon} className="qizhi-date-picker__input" aria-label={ariaLabel} value={single} placeholder={placeholder ?? defaultPlaceholder(mode, showTime)} /></div>}
-    <button type="button" className="qizhi-date-picker__clear" aria-label={range ? "清空日期范围" : "清空日期"} hidden={!allowClear || !hasValue} onMouseDown={(event) => event.preventDefault()} onClick={clear}><CloseIcon /></button>
+    <button type="button" className="qizhi-date-picker__clear" aria-label={range ? "清空日期范围" : "清空日期"} disabled={disabled} hidden={!allowClear || !hasValue} onMouseDown={(event) => event.preventDefault()} onClick={clear}><CloseIcon /></button>
     <div className="qizhi-date-picker__suffix" aria-hidden="true"><CalendarIcon /></div>
     {popup}
   </div>;

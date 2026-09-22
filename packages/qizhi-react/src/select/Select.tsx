@@ -52,6 +52,7 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(prop
     open,
     defaultOpen = false,
     onOpenChange,
+    onPopupScroll,
     className,
     style,
     id,
@@ -259,6 +260,6 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(prop
       {allowClear && hasValue && !disabled ? <button type="button" className="qizhi-select__clear" aria-label="清除选择" onMouseDown={(event) => event.preventDefault()} onClick={clear}><CloseIcon /></button> : null}
       <span className="qizhi-select__arrow" aria-hidden="true"><ArrowDownIcon viewBox="1.6 1.6 12.8 12.8" /></span>
     </div>}
-    {isOpen ? createPortal(<div ref={popupRef} id={popupId} className="qizhi-select-popup" style={popupStyle} onPointerDown={(event) => event.stopPropagation()}>{dropdownRender ? dropdownRender(menu) : menu}</div>, document.body) : null}
+    {isOpen ? createPortal(<div ref={popupRef} id={popupId} className="qizhi-select-popup" style={popupStyle} onScroll={onPopupScroll} onPointerDown={(event) => event.stopPropagation()}>{dropdownRender ? dropdownRender(menu) : menu}</div>, document.body) : null}
   </div>;
 });

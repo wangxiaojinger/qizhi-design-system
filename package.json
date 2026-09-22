@@ -11,6 +11,7 @@
     "build": "pnpm api:build && pnpm --filter @wangxiaojinger/qizhi-tokens build && vite build && pnpm --filter @wangxiaojinger/qizhi-react build && pnpm --filter @wangxiaojinger/qizhi-react-smoke build",
     "typecheck": "tsc -p tsconfig.json --noEmit && pnpm --filter @wangxiaojinger/qizhi-react typecheck",
     "test": "pnpm --filter @wangxiaojinger/qizhi-tokens test && vitest run",
+    "test:exports": "pnpm --filter @wangxiaojinger/qizhi-react test:exports",
     "e2e": "playwright test",
     "verify": "pnpm api:validate && pnpm --filter @wangxiaojinger/qizhi-tokens build && pnpm --filter @wangxiaojinger/qizhi-tokens validate && pnpm typecheck && pnpm test && pnpm build"
   },

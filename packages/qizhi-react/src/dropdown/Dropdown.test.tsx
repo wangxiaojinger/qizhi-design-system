@@ -72,4 +72,9 @@ describe("Dropdown", () => {
     await user.click(screen.getByRole("button", { name: "正在加载" }));
     expect(screen.queryByRole("menu")).not.toBeInTheDocument();
   });
+
+  it("can open a submenu toward the left", () => {
+    const { container } = render(<Dropdown.Menu><Dropdown.SubMenu placement="left" itemKey="workspace" title="切换空间"><Dropdown.Item itemKey="one">空间一</Dropdown.Item></Dropdown.SubMenu></Dropdown.Menu>);
+    expect(container.querySelector(".qizhi-dropdown__submenu--left")).toBeInTheDocument();
+  });
 });

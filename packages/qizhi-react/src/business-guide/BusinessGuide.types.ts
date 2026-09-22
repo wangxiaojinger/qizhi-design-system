@@ -19,6 +19,8 @@ export interface BusinessGuideProps
   highlight: ReactNode;
   subtitle: ReactNode;
   steps: readonly BusinessGuideStep[];
+  /** 替换默认关闭操作；undefined 时保留关闭与恢复流程。 */
+  headerAction?: ReactNode;
   closedText?: ReactNode;
   onClose?: () => void;
   onRestore?: () => void;
