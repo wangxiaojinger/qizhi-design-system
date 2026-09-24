@@ -5,6 +5,10 @@ import LayoutDemo from "./demos/LayoutDemo";
 import layoutSource from "./demos/LayoutDemo.tsx?raw";
 import ControlledDemo from "./demos/ControlledDemo";
 import controlledSource from "./demos/ControlledDemo.tsx?raw";
+import ValidationLoopDemo from "./demos/ValidationLoopDemo";
+import validationLoopSource from "./demos/ValidationLoopDemo.tsx?raw";
+import ComplexFieldsDemo from "./demos/ComplexFieldsDemo";
+import complexFieldsSource from "./demos/ComplexFieldsDemo.tsx?raw";
 
 export interface FormDemoDefinition {
   id: string;
@@ -36,5 +40,18 @@ export const formDemos: readonly FormDemoDefinition[] = [
     component: ControlledDemo,
     source: controlledSource,
   },
+  {
+    id: "表单-业务校验闭环",
+    title: "业务校验闭环",
+    description: "演示前端校验、提交、后端字段错误回填以及修改后清除错误的完整链路。",
+    component: ValidationLoopDemo,
+    source: validationLoopSource,
+  },
+  {
+    id: "表单-复杂表单联动",
+    title: "复杂表单联动",
+    description: "演示嵌套字段、依赖校验、条件字段保留策略和动态成员列表。",
+    component: ComplexFieldsDemo,
+    source: complexFieldsSource,
+  },
 ];
-

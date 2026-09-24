@@ -30,6 +30,38 @@
   width: min(100%, var(--form-control-width));
 }
 
+#component-form .form-docs-submit-status {
+  color: var(--color-success);
+  font-size: 14px;
+  line-height: 22px;
+}
+
+#component-form .form-docs-complex-list {
+  display: grid;
+  gap: 16px;
+  width: min(100%, 720px);
+  margin-bottom: 20px;
+}
+
+#component-form .form-docs-complex-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 12px;
+  min-width: 0;
+}
+
+#component-form .form-docs-complex-row .qizhi-form-item {
+  margin-bottom: 0;
+}
+
+#component-form .form-docs-complex-actions,
+#component-form .form-docs-complex-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 #component-form .form-docs-inline-control {
   display: flex;
   align-items: center;
@@ -166,6 +198,10 @@
   }
 
   #component-form .form-docs-command-row {
+    grid-template-columns: 1fr;
+  }
+
+  #component-form .form-docs-complex-row {
     grid-template-columns: 1fr;
   }
 
