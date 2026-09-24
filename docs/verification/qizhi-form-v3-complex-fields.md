@@ -14,7 +14,7 @@
 
 - `node --check script.js`：通过。
 - `pnpm typecheck`：通过。
-- `pnpm test`：通过；Vitest 449 个测试文件、2161 项测试全部通过，设计变量包另有 8 项 Node 测试通过。
+- `pnpm test`：通过；Vitest 449 个测试文件、2164 项测试全部通过，设计变量包另有 8 项 Node 测试通过。
 - `pnpm build`：通过；文档站、React 组件包和冒烟包均完成构建。
 - `pnpm api:validate`：通过；110 组组件 API 清单为最新状态。
 - `git diff --check`：通过。
