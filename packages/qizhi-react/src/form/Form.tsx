@@ -1,6 +1,6 @@
 import { Children, cloneElement, createContext, forwardRef, isValidElement, useContext, useEffect, useId, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { ChangeEvent, FocusEvent, ReactElement } from "react";
-import type { FormComponent, FormErrorField, FormInstance, FormItemProps, FormListProps, FormNamePath, FormProps, FormValues } from "./Form.types";
+import type { FormComponent, FormErrorField, FormInstance, FormItemProps, FormListProps, FormNamePath, FormProps, FormValidationException, FormValues } from "./Form.types";
 import { createFormStore, getFormStore, type FormStore } from "./formStore";
 import "./form.css";
 
@@ -21,14 +21,14 @@ function useDirty(form?: FormInstance): boolean {
   return useSyncExternalStore((listener) => store.subscribeDirty(listener), () => store.instance.isFieldsDirty(), () => store.instance.isFieldsDirty());
 }
 
-const FormRoot = forwardRef<HTMLFormElement, FormProps>(function Form({ layout = "vertical", form, initialValues, onValuesChange, onFinish, onFinishFailed, scrollToFirstError = false, preserve = true, className, children, ...formProps }, ref) {
+const FormRoot = forwardRef<HTMLFormElement, FormProps>(function Form({ layout = "vertical", form, initialValues, onValuesChange, onFinish, onFinishFailed, onValidationException, scrollToFirstError = false, preserve = true, className, children, ...formProps }, ref) {
   const [internalForm] = useForm(); const activeForm = form ?? internalForm; const store = getFormStore(activeForm);
   if (!store) throw new Error("Form 收到了无效的 form 实例。");
-  store.initialize(initialValues); store.setCallbacks({ onValuesChange }); store.setDefaultPreserve(preserve);
+  store.initialize(initialValues); store.setCallbacks({ onValuesChange, onValidationException }); store.setDefaultPreserve(preserve);
   const submittingRef = useRef(false);
   return <FormContext.Provider value={store}><form {...formProps} ref={(node) => { store.setFormNode(node); if (typeof ref === "function") ref(node); else if (ref) ref.current = node; }} className={joinClassNames("qizhi-form", `qizhi-form-layout-${layout}`, className)} onSubmit={async (event) => {
     event.preventDefault(); if (submittingRef.current) return; submittingRef.current = true;
-    try { try { const values = await activeForm.validateFields(); await onFinish?.(values); } catch (error) { const result = error as { values?: FormValues; errorFields?: FormErrorField[] }; if (!result.errorFields || !result.values) throw error; onFinishFailed?.({ values: result.values, errorFields: result.errorFields }); if (scrollToFirstError && result.errorFields[0]) activeForm.scrollToField(result.errorFields[0].name); } } finally { submittingRef.current = false; }
+    try { try { const values = await activeForm.validateFields(); await onFinish?.(values); } catch (error) { const result = error as { values?: FormValues; errorFields?: FormErrorField[] }; if (!result.errorFields || !result.values) { if ((error as FormValidationException)?.type === "network") return; throw error; } onFinishFailed?.({ values: result.values, errorFields: result.errorFields }); if (scrollToFirstError && result.errorFields[0]) activeForm.scrollToField(result.errorFields[0].name); } } finally { submittingRef.current = false; }
   }}>{children}</form></FormContext.Provider>;
 });
 

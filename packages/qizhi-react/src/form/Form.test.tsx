@@ -22,6 +22,27 @@ describe("Form", () => {
     expect(form?.isFieldsDirty()).toBe(false);
     expect(screen.getByRole("status", { name: "修改状态" })).toHaveTextContent("已保存");
   });
+
+  it("网络校验异常只走表单级回调且不标记字段内容错误", async () => {
+    const user = userEvent.setup();
+    const onValidationException = vi.fn();
+    const onFinishFailed = vi.fn();
+    render(
+      <Form onValidationException={onValidationException} onFinishFailed={onFinishFailed}>
+        <Form.Item name="region" label="区域" rules={[{ validator: () => ({ type: "network", message: "区域服务不可用" }) }]}>
+          <input />
+        </Form.Item>
+        <button type="submit">提交区域</button>
+      </Form>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "提交区域" }));
+
+    expect(onValidationException).toHaveBeenCalledWith(expect.objectContaining({ name: "region", type: "network", message: "区域服务不可用" }));
+    expect(onFinishFailed).not.toHaveBeenCalled();
+    expect(screen.getByRole("textbox", { name: "区域" })).not.toHaveAttribute("aria-invalid");
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
   it("renders a vertical native form by default and forwards its ref", () => {
     const ref = createRef<HTMLFormElement>();
     render(<Form ref={ref} aria-label="创建服务"><button type="submit">提交</button></Form>);

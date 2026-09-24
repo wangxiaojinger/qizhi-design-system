@@ -2,6 +2,66 @@ import { describe, expect, it, vi } from "vitest";
 import { createFormStore } from "./formStore";
 
 describe("formStore nested values", () => {
+  it("只允许同一字段最新一次异步校验结果生效", async () => {
+    const store = createFormStore();
+    const pending = new Map<string, { resolve: () => void; reject: (error: Error) => void }>();
+    store.registerField("serviceName", {
+      validateTrigger: "onChange",
+      rules: [{ validator: (value) => new Promise<void>((resolve, reject) => pending.set(String(value), { resolve, reject })) }],
+    });
+
+    store.instance.setFieldValue("serviceName", "old");
+    const oldValidation = store.validateField("serviceName");
+    store.instance.setFieldValue("serviceName", "new");
+    const newValidation = store.validateField("serviceName");
+    pending.get("new")?.resolve();
+    await newValidation;
+    pending.get("old")?.reject(new Error("旧名称不可用"));
+    await oldValidation;
+
+    expect(store.instance.getFieldError("serviceName")).toEqual([]);
+    expect(store.isFieldValidating("serviceName")).toBe(false);
+  });
+
+  it("字段卸载或重置后忽略仍在进行的旧校验", async () => {
+    const store = createFormStore();
+    const rejects: Array<(error: Error) => void> = [];
+    const config = { validateTrigger: "onChange" as const, rules: [{ validator: () => new Promise<void>((_resolve, reject) => rejects.push(reject)) }] };
+    const unregister = store.registerField("serviceName", config);
+    const unmountedValidation = store.validateField("serviceName");
+    unregister();
+    rejects[0]?.(new Error("卸载后的旧错误"));
+    await unmountedValidation;
+    expect(store.instance.getFieldError("serviceName")).toEqual([]);
+
+    store.registerField("serviceName", config);
+    const resetValidation = store.validateField("serviceName");
+    store.instance.resetFields(["serviceName"]);
+    rejects[1]?.(new Error("重置前的旧错误"));
+    await resetValidation;
+    expect(store.instance.getFieldError("serviceName")).toEqual([]);
+    expect(store.isFieldValidating("serviceName")).toBe(false);
+  });
+
+  it("网络校验异常走表单级回调且不写入字段错误", async () => {
+    const store = createFormStore();
+    const onValidationException = vi.fn();
+    store.setCallbacks({ onValidationException });
+    store.registerField("region", {
+      validateTrigger: "onChange",
+      rules: [{ validator: () => ({ type: "network", message: "区域服务不可用" }) }],
+    });
+
+    await expect(store.validateField("region")).rejects.toEqual({
+      name: "region",
+      type: "network",
+      message: "区域服务不可用",
+      cause: undefined,
+    });
+    expect(onValidationException).toHaveBeenCalledOnce();
+    expect(store.instance.getFieldError("region")).toEqual([]);
+  });
+
   it("读写嵌套字段并保留未覆盖的兄弟值", () => {
     const store = createFormStore();
     store.initialize({ user: { name: "Iris", email: "old@qizhi.cn" } });
