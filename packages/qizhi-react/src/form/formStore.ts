@@ -12,6 +12,7 @@ export interface FormStore {
   subscribe(listener: () => void): () => void;
   subscribePath(name: FormNamePath, listener: () => void): () => void;
   registerField(name: FormNamePath, config: FieldConfig): () => void;
+  updateFieldConfig(name: FormNamePath, config: FieldConfig): void;
   setFieldValueFromControl(name: FormNamePath, value: unknown): void;
   setFormNode(node: HTMLFormElement | null): void;
   setFieldNode(name: FormNamePath, node: HTMLDivElement | null): void;
@@ -192,9 +193,13 @@ export function createFormStore(): FormStore {
       return () => {
         if (fields.get(key) === state) fields.delete(key);
         nodes.delete(key);
-        if (config.preserve ?? defaultPreserve) retained.set(key, path);
+        if (state.preserve ?? defaultPreserve) retained.set(key, path);
         else { retained.delete(key); values = unsetValueAtPath(values, path); errors.delete(key); errorPaths.delete(key); errorSources.delete(key); validating.delete(key); notify(path); }
       };
+    },
+    updateFieldConfig: (name, config) => {
+      const field = fields.get(encodeNamePath(name));
+      if (field) Object.assign(field, config);
     },
     setFieldValueFromControl: (name, value) => setValue(name, value, true),
     setFormNode: (node) => { formNode = node; },

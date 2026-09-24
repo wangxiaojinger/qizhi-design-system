@@ -1,18 +1,19 @@
 import { expect, test } from "@playwright/test";
 
-test("Form 保留三组旧站契约、正式组件和响应式几何", async ({ page }, testInfo) => {
+test("Form 保留旧站契约并覆盖复杂字段全链路与响应式几何", async ({ page }, testInfo) => {
   const errors: string[] = [];
   page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/#component-form");
 
-  await expect(page.locator("#component-form article.codebox-wrapper")).toHaveCount(3);
+  await expect(page.locator("#component-form article.codebox-wrapper")).toHaveCount(5);
   await expect(page.locator("#component-form .qz-demo-title").filter({ hasText: "基础用法" })).toHaveCount(1);
   await expect(page.locator("#component-form .qz-demo-title").filter({ hasText: "表单布局" })).toHaveCount(1);
   await expect(page.locator("#component-form .qz-demo-title").filter({ hasText: "受控表单" })).toHaveCount(1);
   await expect(page.getByRole("table", { name: "Form API" })).toBeVisible();
   await expect(page.getByRole("table", { name: "Form.Item API" })).toBeVisible();
-  await expect(page.locator("#component-form .qizhi-form")).toHaveCount(3);
+  await expect(page.getByRole("table", { name: "Form.List API" })).toBeVisible();
+  await expect(page.locator("#component-form .qizhi-form")).toHaveCount(5);
 
   const basic = page.locator("#表单-基础用法");
   const name = basic.getByRole("textbox", { name: "服务名称" });
@@ -80,6 +81,38 @@ test("Form 保留三组旧站契约、正式组件和响应式几何", async ({ 
     path: testInfo.outputPath(`form-tooltip-${testInfo.project.name}.png`),
   });
 
+  const complex = page.locator("#表单-复杂表单联动");
+  await expect(complex.getByRole("textbox", { name: /成员 \d+ 名称/ })).toHaveCount(2);
+  await complex.getByRole("button", { name: "新增成员" }).click();
+  await expect(complex.getByRole("textbox", { name: /成员 \d+ 名称/ })).toHaveCount(3);
+  await complex.getByRole("textbox", { name: "成员 3 名称" }).fill("成员丙");
+  await complex.getByRole("button", { name: "成员 3 上移" }).click();
+  await expect(complex.getByRole("textbox", { name: "成员 2 名称" })).toHaveValue("成员丙");
+  await complex.getByRole("button", { name: "删除成员 3" }).click();
+  await expect(complex.getByRole("textbox", { name: /成员 \d+ 名称/ })).toHaveCount(2);
+
+  await complex.getByRole("button", { name: "模拟成员错误" }).click();
+  await expect(complex.getByRole("alert")).toContainText("成员名称已存在");
+  await complex.getByRole("textbox", { name: "成员 1 名称" }).fill("成员甲更新");
+  await expect(complex.getByRole("alert")).toHaveCount(0);
+
+  await complex.getByRole("textbox", { name: "登录密码" }).fill("new-password");
+  await expect(complex.getByText("两次输入的密码不一致")).toBeVisible();
+  await complex.getByRole("textbox", { name: "确认密码" }).fill("new-password");
+  await expect(complex.getByText("两次输入的密码不一致")).toHaveCount(0);
+
+  await expect(complex.getByRole("textbox", { name: "服务地址" })).toBeVisible();
+  await complex.getByRole("combobox", { name: "服务类型" }).click();
+  await page.getByRole("option", { name: "本地服务" }).click();
+  await expect(complex.getByRole("textbox", { name: "服务地址" })).toHaveCount(0);
+  await complex.getByRole("button", { name: "提交复杂表单" }).click();
+  const submitted = complex.getByRole("status", { name: "复杂表单提交结果" });
+  await expect(submitted).toContainText('"serviceType":"local"');
+  await expect(submitted).not.toContainText("endpoint");
+
+  await complex.getByRole("button", { name: "新增成员" }).focus();
+  await expect(complex.getByRole("button", { name: "新增成员" })).toBeFocused();
+
   if ((page.viewportSize()?.width ?? 0) > 720) {
     await basic.getByRole("button", { name: "查看代码" }).click();
     const source = page.locator("#form-code-表单-基础用法");
@@ -102,4 +135,5 @@ test("Form 保留三组旧站契约、正式组件和响应式几何", async ({ 
   await basic.locator(".demo").screenshot({ path: testInfo.outputPath(`form-basic-${testInfo.project.name}.png`) });
   await layout.locator(".demo").screenshot({ path: testInfo.outputPath(`form-layout-${testInfo.project.name}.png`) });
   await controlled.locator(".demo").screenshot({ path: testInfo.outputPath(`form-controlled-${testInfo.project.name}.png`) });
+  await complex.locator(".demo").screenshot({ path: testInfo.outputPath(`form-complex-${testInfo.project.name}.png`) });
 });
