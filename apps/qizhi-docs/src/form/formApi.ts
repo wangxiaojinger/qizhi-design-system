@@ -13,6 +13,7 @@ export const formApi = [
   { name: "onValuesChange", description: "用户修改命名字段时返回本次变化值和全部表单值；程序化赋值不触发。", type: "(changedValues, allValues) => void", defaultValue: "—" },
   { name: "onFinish", description: "所有字段校验通过后返回表单值；返回 Promise 时会在其结束前阻止重复提交。", type: "(values) => void | Promise<void>", defaultValue: "—" },
   { name: "onFinishFailed", description: "前端校验失败时返回当前表单值和字段错误列表。", type: "(result: FormFailedResult) => void", defaultValue: "—" },
+  { name: "onValidationException", description: "异步校验发生网络异常时返回表单级异常；异常不会写成字段内容错误。", type: "(exception: FormValidationException) => void", defaultValue: "—" },
   { name: "scrollToFirstError", description: "提交校验失败后滚动并聚焦第一个错误字段。", type: "boolean", defaultValue: "false" },
   { name: "preserve", description: "字段卸载后是否保留其值；可由 Form.Item 覆盖。", type: "boolean", defaultValue: "true" },
   { name: "children", description: "表单内容，通常由 Form.Item 和操作控件组成。", type: "ReactNode", defaultValue: "—" },
@@ -51,6 +52,8 @@ export const formInstanceApi = [
   { name: "setFieldErrors", description: "回填指定字段路径的后端错误；用户修改该字段后自动清除。", type: "(name: FormNamePath, errors: string[]) => void", defaultValue: "—" },
   { name: "validateFields", description: "校验所有已注册字段；成功时返回表单值，失败时拒绝并携带字段错误。", type: "() => Promise<Record<string, unknown>>", defaultValue: "—" },
   { name: "resetFields", description: "将指定字段路径或全部已注册字段恢复为初始值，并清除错误。", type: "(names?: FormNamePath[]) => void", defaultValue: "—" },
+  { name: "isFieldsDirty", description: "判断全部或指定字段是否相对当前干净基线发生变化。", type: "(names?: FormNamePath[]) => boolean", defaultValue: "—" },
+  { name: "markFieldsClean", description: "将全部或指定字段的当前值记录为新的干净基线。", type: "(names?: FormNamePath[]) => void", defaultValue: "—" },
   { name: "scrollToField", description: "将指定字段路径滚动到视口中部，并聚焦其首个可操作控件。", type: "(name: FormNamePath) => void", defaultValue: "—" },
   { name: "submit", description: "触发与用户提交表单相同的校验和提交流程。", type: "() => void", defaultValue: "—" },
 ] as const satisfies readonly FormInstanceApiItem[];

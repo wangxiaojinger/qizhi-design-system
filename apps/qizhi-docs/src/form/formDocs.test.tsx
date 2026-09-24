@@ -1,18 +1,19 @@
-import { fireEvent, render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { FormDocsIsland } from "./FormDocsIsland";
 import { formApi, formInstanceApi, formItemApi, formListApi } from "./formApi";
 import { formDemos } from "./formDocs.registry";
 
 describe("Form docs", () => {
-  it("preserves the four existing Demos and appends the complex fields Demo", () => {
-    expect(formDemos.map((demo) => demo.title)).toEqual(["基础用法", "表单布局", "受控表单", "业务校验闭环", "复杂表单联动"]);
+  it("preserves the existing Demos and appends the remote business Demo", () => {
+    expect(formDemos.map((demo) => demo.title)).toEqual(["基础用法", "表单布局", "受控表单", "业务校验闭环", "复杂表单联动", "远程联动与未保存修改"]);
     expect(formDemos.map((demo) => demo.description)).toEqual([
       "非受控模式的基础用法，表单项采用垂直布局。",
       "Form 支持垂直和水平两种排列方式。",
       "表单统一收集和更新各表单项的值。",
       "演示前端校验、提交、后端字段错误回填以及修改后清除错误的完整链路。",
       "演示嵌套字段、依赖校验、条件字段保留策略和动态成员列表。",
+      "演示异步校验竞态、网络异常分流、远程查询四态、条件字段清理和未保存修改判断。",
     ]);
     formDemos.forEach((demo) => {
       expect(demo.source).toContain('from "@wangxiaojinger/qizhi-react"');
@@ -23,8 +24,8 @@ describe("Form docs", () => {
   it("renders the legacy field data and initial states through formal components", () => {
     render(<FormDocsIsland />);
 
-    expect(screen.getAllByRole("button", { name: "查看代码" })).toHaveLength(5);
-    expect(screen.getAllByRole("button", { name: "复制代码" })).toHaveLength(5);
+    expect(screen.getAllByRole("button", { name: "查看代码" })).toHaveLength(6);
+    expect(screen.getAllByRole("button", { name: "复制代码" })).toHaveLength(6);
     expect(screen.getAllByText("支持小写字母、数字、短横线，须以字母开头。")).toHaveLength(3);
 
     const basic = document.getElementById("表单-基础用法")!;
@@ -94,6 +95,42 @@ describe("Form docs", () => {
     expect(within(demo).queryByRole("alert")).not.toBeInTheDocument();
   });
 
+  it("demonstrates remote states, exception separation, conditional cleanup and dirty recovery", async () => {
+    render(<FormDocsIsland />);
+    const demo = document.getElementById("表单-远程联动与未保存修改")!;
+    const serviceName = within(demo).getByRole("textbox", { name: "远程服务名称" });
+    const region = within(demo).getByRole("combobox", { name: "部署区域" });
+
+    expect(within(demo).getByRole("status", { name: "未保存修改状态" })).toHaveTextContent("所有修改已保存");
+    fireEvent.change(serviceName, { target: { value: "changed-service" } });
+    expect(within(demo).getByRole("status", { name: "未保存修改状态" })).toHaveTextContent("有未保存修改");
+    fireEvent.click(within(demo).getByRole("button", { name: "保存当前修改" }));
+    expect(within(demo).getByRole("status", { name: "未保存修改状态" })).toHaveTextContent("所有修改已保存");
+
+    fireEvent.change(region, { target: { value: "loading" } });
+    expect(within(demo).getByText("正在加载")).toBeInTheDocument();
+    fireEvent.change(region, { target: { value: "empty" } });
+    expect(within(demo).getByText("暂无匹配区域")).toBeInTheDocument();
+    fireEvent.change(region, { target: { value: "error" } });
+    expect(within(demo).getByRole("alert")).toHaveTextContent("区域查询失败");
+    fireEvent.click(within(demo).getByRole("button", { name: "重试" }));
+    expect(within(demo).getByRole("option", { name: "华北" })).toBeInTheDocument();
+
+    fireEvent.change(serviceName, { target: { value: "slow-invalid" } });
+    fireEvent.change(serviceName, { target: { value: "valid-service" } });
+    await new Promise((resolve) => window.setTimeout(resolve, 150));
+    expect(within(demo).queryByText("旧请求返回的名称错误")).not.toBeInTheDocument();
+
+    fireEvent.change(serviceName, { target: { value: "network-service" } });
+    await waitFor(() => expect(within(demo).getByRole("alert")).toHaveTextContent("名称校验服务暂不可用"));
+    expect(serviceName).not.toHaveAttribute("aria-invalid", "true");
+
+    fireEvent.click(within(demo).getByRole("combobox", { name: "远程服务类型" }));
+    fireEvent.click(screen.getByRole("option", { name: "本地服务" }));
+    expect(within(demo).queryByRole("textbox", { name: "服务地址" })).not.toBeInTheDocument();
+    expect(within(demo).queryByRole("combobox", { name: "部署区域" })).not.toBeInTheDocument();
+  });
+
   it("switches only the layout Demo and keeps controlled fields controlled by the Demo", () => {
     render(<FormDocsIsland />);
     const layout = document.getElementById("表单-表单布局")!;
@@ -111,16 +148,16 @@ describe("Form docs", () => {
     expect(within(controlled).getByRole("radio", { name: "个人可见镜像" })).toBeChecked();
   });
 
-  it("keeps API metadata aligned with the Form v3 complex-fields contract", () => {
-    expect(formApi.map((item) => item.name)).toEqual(["layout", "form", "initialValues", "onValuesChange", "onFinish", "onFinishFailed", "scrollToFirstError", "preserve", "children", "className", "style"]);
+  it("keeps API metadata aligned with the Form v4 business-state contract", () => {
+    expect(formApi.map((item) => item.name)).toEqual(["layout", "form", "initialValues", "onValuesChange", "onFinish", "onFinishFailed", "onValidationException", "scrollToFirstError", "preserve", "children", "className", "style"]);
     expect(formItemApi.map((item) => item.name)).toEqual(["name", "label", "required", "extra", "rules", "validateTrigger", "validateStatus", "help", "dependencies", "preserve", "children", "className", "style"]);
     expect(formListApi.map((item) => item.name)).toEqual(["name", "initialValue", "children"]);
-    expect(formInstanceApi.map((item) => item.name)).toEqual(["getFieldsValue", "getFieldValue", "setFieldsValue", "setFieldValue", "getFieldError", "setFieldErrors", "validateFields", "resetFields", "scrollToField", "submit"]);
+    expect(formInstanceApi.map((item) => item.name)).toEqual(["getFieldsValue", "getFieldValue", "setFieldsValue", "setFieldValue", "getFieldError", "setFieldErrors", "validateFields", "resetFields", "isFieldsDirty", "markFieldsClean", "scrollToField", "submit"]);
     expect(formApi.find((item) => item.name === "layout")?.defaultValue).toBe("vertical");
     expect(formItemApi.find((item) => item.name === "required")?.defaultValue).toBe("false");
   });
 
-  it("renders the Form v3 API tables", () => {
+  it("renders the Form v4 API tables", () => {
     render(<FormDocsIsland />);
     expect(screen.getByRole("table", { name: "Form API" })).toBeInTheDocument();
     expect(screen.getByRole("table", { name: "Form.Item API" })).toBeInTheDocument();

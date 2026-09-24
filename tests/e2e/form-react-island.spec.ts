@@ -1,19 +1,19 @@
 import { expect, test } from "@playwright/test";
 
-test("Form 保留旧站契约并覆盖复杂字段全链路与响应式几何", async ({ page }, testInfo) => {
+test("Form 保留旧站契约并覆盖复杂字段、远程状态与响应式几何", async ({ page }, testInfo) => {
   const errors: string[] = [];
   page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/#component-form");
 
-  await expect(page.locator("#component-form article.codebox-wrapper")).toHaveCount(5);
+  await expect(page.locator("#component-form article.codebox-wrapper")).toHaveCount(6);
   await expect(page.locator("#component-form .qz-demo-title").filter({ hasText: "基础用法" })).toHaveCount(1);
   await expect(page.locator("#component-form .qz-demo-title").filter({ hasText: "表单布局" })).toHaveCount(1);
   await expect(page.locator("#component-form .qz-demo-title").filter({ hasText: "受控表单" })).toHaveCount(1);
   await expect(page.getByRole("table", { name: "Form API" })).toBeVisible();
   await expect(page.getByRole("table", { name: "Form.Item API" })).toBeVisible();
   await expect(page.getByRole("table", { name: "Form.List API" })).toBeVisible();
-  await expect(page.locator("#component-form .qizhi-form")).toHaveCount(5);
+  await expect(page.locator("#component-form .qizhi-form")).toHaveCount(6);
 
   const basic = page.locator("#表单-基础用法");
   const name = basic.getByRole("textbox", { name: "服务名称" });
@@ -118,6 +118,53 @@ test("Form 保留旧站契约并覆盖复杂字段全链路与响应式几何", 
   await page.keyboard.press("Enter");
   await expect(complex.getByRole("alert")).toContainText("成员名称已存在");
 
+  const remote = page.locator("#表单-远程联动与未保存修改");
+  const remoteName = remote.getByRole("textbox", { name: "远程服务名称" });
+  const dirtyStatus = remote.getByRole("status", { name: "未保存修改状态" });
+  await expect(dirtyStatus).toHaveText("所有修改已保存");
+  await remoteName.fill("changed-service");
+  await expect(dirtyStatus).toHaveText("有未保存修改");
+  await remote.getByRole("button", { name: "保存当前修改" }).click();
+  await expect(dirtyStatus).toHaveText("所有修改已保存");
+
+  const region = remote.getByRole("combobox", { name: "部署区域" });
+  await region.fill("loading");
+  await expect(remote.getByText("正在加载")).toBeVisible();
+  await region.fill("empty");
+  await expect(remote.getByText("暂无匹配区域")).toBeVisible();
+  await region.fill("error");
+  await expect(remote.getByRole("alert")).toContainText("区域查询失败");
+  await remote.getByRole("button", { name: "重试" }).click();
+  await expect(remote.getByRole("option", { name: "华北" })).toBeVisible();
+
+  await remoteName.fill("slow-invalid");
+  await remoteName.fill("valid-service");
+  await page.waitForTimeout(150);
+  await expect(remote.getByText("旧请求返回的名称错误")).toHaveCount(0);
+
+  await remoteName.fill("network-service");
+  await expect(remote.getByRole("alert")).toContainText("名称校验服务暂不可用");
+  await expect(remoteName).not.toHaveAttribute("aria-invalid", "true");
+  await remoteName.fill("valid-service");
+  await expect(remote.getByRole("alert")).toHaveCount(0);
+
+  await remote.getByRole("combobox", { name: "远程服务类型" }).click();
+  await page.getByRole("option", { name: "本地服务" }).click();
+  await expect(remote.getByRole("textbox", { name: "服务地址" })).toHaveCount(0);
+  await expect(remote.getByRole("combobox", { name: "部署区域" })).toHaveCount(0);
+  await remote.getByRole("button", { name: "提交远程表单" }).click();
+  const remoteSubmitted = remote.getByRole("status", { name: "远程表单提交结果" });
+  await expect(remoteSubmitted).toContainText('"type":"local"');
+  await expect(remoteSubmitted).not.toContainText("endpoint");
+  await expect(remoteSubmitted).not.toContainText("region");
+
+  await remote.getByRole("button", { name: "全部重置" }).click();
+  await expect(remote.getByRole("textbox", { name: "服务地址" })).toHaveValue("https://api.qizhi.cn");
+  await expect(remote.getByRole("combobox", { name: "部署区域" })).toHaveValue("华北");
+  await expect(dirtyStatus).toHaveText("有未保存修改");
+  await remote.getByRole("button", { name: "保存当前修改" }).click();
+  await expect(dirtyStatus).toHaveText("所有修改已保存");
+
   if ((page.viewportSize()?.width ?? 0) > 720) {
     await basic.getByRole("button", { name: "查看代码" }).click();
     const source = page.locator("#form-code-表单-基础用法");
@@ -141,4 +188,5 @@ test("Form 保留旧站契约并覆盖复杂字段全链路与响应式几何", 
   await layout.locator(".demo").screenshot({ path: testInfo.outputPath(`form-layout-${testInfo.project.name}.png`) });
   await controlled.locator(".demo").screenshot({ path: testInfo.outputPath(`form-controlled-${testInfo.project.name}.png`) });
   await complex.locator(".demo").screenshot({ path: testInfo.outputPath(`form-complex-${testInfo.project.name}.png`) });
+  await remote.locator(".demo").screenshot({ path: testInfo.outputPath(`form-remote-${testInfo.project.name}.png`) });
 });

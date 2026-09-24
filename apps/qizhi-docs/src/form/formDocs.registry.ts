@@ -9,6 +9,8 @@ import ValidationLoopDemo from "./demos/ValidationLoopDemo";
 import validationLoopSource from "./demos/ValidationLoopDemo.tsx?raw";
 import ComplexFieldsDemo from "./demos/ComplexFieldsDemo";
 import complexFieldsSource from "./demos/ComplexFieldsDemo.tsx?raw";
+import RemoteBusinessDemo from "./demos/RemoteBusinessDemo";
+import remoteBusinessSource from "./demos/RemoteBusinessDemo.tsx?raw";
 
 export interface FormDemoDefinition {
   id: string;
@@ -53,5 +55,12 @@ export const formDemos: readonly FormDemoDefinition[] = [
     description: "演示嵌套字段、依赖校验、条件字段保留策略和动态成员列表。",
     component: ComplexFieldsDemo,
     source: complexFieldsSource,
+  },
+  {
+    id: "表单-远程联动与未保存修改",
+    title: "远程联动与未保存修改",
+    description: "演示异步校验竞态、网络异常分流、远程查询四态、条件字段清理和未保存修改判断。",
+    component: RemoteBusinessDemo,
+    source: remoteBusinessSource,
   },
 ];

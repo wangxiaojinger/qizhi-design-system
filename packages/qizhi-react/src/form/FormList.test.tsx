@@ -116,4 +116,41 @@ describe("Form.List", () => {
     expect(screen.getByRole("textbox", { name: "移动成员 1" })).toHaveValue("B");
     expect(screen.getByRole("textbox", { name: "移动成员 2" })).toHaveValue("A");
   });
+
+  it("重置父路径时同步恢复列表条目和值", async () => {
+    let form: ReturnType<typeof Form.useForm>[0] | undefined;
+    let operations: { add(value?: unknown): void; remove(index: number | number[]): void } | undefined;
+
+    function Example() {
+      const [instance] = Form.useForm();
+      form = instance;
+      return (
+        <Form form={instance} initialValues={{ team: { members: [{ name: "A" }, { name: "B" }] } }}>
+          <Form.List name={["team", "members"]}>{(fields, nextOperations) => {
+            operations = nextOperations;
+            return fields.map((field) => (
+              <Form.Item key={field.key} name={["team", "members", field.name, "name"]}>
+                <input aria-label={`重置成员 ${field.name + 1}`} />
+              </Form.Item>
+            ));
+          }}</Form.List>
+        </Form>
+      );
+    }
+
+    render(<Example />);
+    expect(await screen.findAllByRole("textbox")).toHaveLength(2);
+    act(() => {
+      operations?.remove(0);
+      operations?.add({ name: "C" });
+      operations?.add({ name: "D" });
+    });
+    expect(screen.getAllByRole("textbox")).toHaveLength(3);
+
+    act(() => form?.resetFields([["team"]]));
+    expect(screen.getAllByRole("textbox")).toHaveLength(2);
+    expect(screen.getByRole("textbox", { name: "重置成员 1" })).toHaveValue("A");
+    expect(screen.getByRole("textbox", { name: "重置成员 2" })).toHaveValue("B");
+    expect(form?.isFieldsDirty()).toBe(false);
+  });
 });

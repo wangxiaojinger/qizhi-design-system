@@ -36,6 +36,33 @@
   line-height: 22px;
 }
 
+#component-form .form-docs-dirty-status {
+  display: block;
+  width: fit-content;
+  margin-bottom: 20px;
+  padding: 4px 10px;
+  border-radius: 2px;
+  background: var(--color-fill-2);
+  color: var(--color-text-2);
+  font-size: 13px;
+  line-height: 22px;
+}
+
+#component-form .form-docs-network-error {
+  width: min(100%, var(--form-control-width));
+  margin-bottom: 16px;
+  color: var(--color-danger);
+  font-size: 14px;
+  line-height: 22px;
+}
+
+#component-form .form-docs-remote-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
 #component-form .form-docs-complex-list {
   display: grid;
   gap: 16px;

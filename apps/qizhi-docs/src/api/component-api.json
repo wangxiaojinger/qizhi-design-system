@@ -130,6 +130,30 @@
           "defaultValue": "Input"
         },
         {
+          "name": "loading",
+          "description": "显示远程查询加载状态，并阻止选择旧候选项。",
+          "type": "boolean",
+          "defaultValue": "false"
+        },
+        {
+          "name": "emptyContent",
+          "description": "查询成功但没有候选项时显示的内容。",
+          "type": "ReactNode",
+          "defaultValue": "暂无匹配结果"
+        },
+        {
+          "name": "error",
+          "description": "远程查询失败时显示的错误内容。",
+          "type": "ReactNode",
+          "defaultValue": "—"
+        },
+        {
+          "name": "onRetry",
+          "description": "错误状态下点击重试按钮时触发。",
+          "type": "() => void",
+          "defaultValue": "—"
+        },
+        {
           "name": "onChange",
           "description": "输入值或选中值改变时触发。",
           "type": "(value: string) => void",
@@ -2458,6 +2482,12 @@
           "defaultValue": "—"
         },
         {
+          "name": "onValidationException",
+          "description": "异步校验发生网络异常时返回表单级异常；异常不会写成字段内容错误。",
+          "type": "(exception: FormValidationException) => void",
+          "defaultValue": "—"
+        },
+        {
           "name": "scrollToFirstError",
           "description": "提交校验失败后滚动并聚焦第一个错误字段。",
           "type": "boolean",
@@ -2537,6 +2567,18 @@
         {
           "name": "resetFields",
           "description": "将指定字段路径或全部已注册字段恢复为初始值，并清除错误。",
+          "type": "(names?: FormNamePath[]) => void",
+          "defaultValue": "—"
+        },
+        {
+          "name": "isFieldsDirty",
+          "description": "判断全部或指定字段是否相对当前干净基线发生变化。",
+          "type": "(names?: FormNamePath[]) => boolean",
+          "defaultValue": "—"
+        },
+        {
+          "name": "markFieldsClean",
+          "description": "将全部或指定字段的当前值记录为新的干净基线。",
           "type": "(names?: FormNamePath[]) => void",
           "defaultValue": "—"
         },

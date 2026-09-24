@@ -48,7 +48,8 @@ describe("AutoComplete docs", () => {
 
     const strict = within(document.getElementById("自动补全-区分大小写")!).getByRole("combobox");
     fireEvent.change(strict, { target: { value: "B" } });
-    expect(within(document.getElementById("自动补全-区分大小写")!).queryByRole("listbox")).not.toBeInTheDocument();
+    expect(within(document.getElementById("自动补全-区分大小写")!).getByText("暂无匹配结果")).toBeInTheDocument();
+    expect(within(document.getElementById("自动补全-区分大小写")!).queryByRole("option")).not.toBeInTheDocument();
     fireEvent.change(strict, { target: { value: "b" } });
     expect(within(document.getElementById("自动补全-区分大小写")!).getAllByRole("option")).toHaveLength(3);
 
@@ -57,9 +58,9 @@ describe("AutoComplete docs", () => {
     expect(within(document.getElementById("自动补全-查询模式-确定类目")!).getAllByRole("option")).toHaveLength(9);
   });
 
-  it("API 只列出 v1 实际能力", () => {
+  it("API 列出远程查询四态能力", () => {
     expect(autoCompleteApi.map((item) => item.name)).toEqual([
-      "data", "children", "value", "defaultValue", "strict", "filterOption", "triggerElement", "onChange", "onSearch", "onSelect", "className", "style", "ref",
+      "data", "children", "value", "defaultValue", "strict", "filterOption", "triggerElement", "loading", "emptyContent", "error", "onRetry", "onChange", "onSearch", "onSelect", "className", "style", "ref",
     ]);
   });
 });

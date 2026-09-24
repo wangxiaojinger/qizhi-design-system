@@ -44,6 +44,20 @@ describe("formStore nested values", () => {
     expect(store.instance.isFieldsDirty()).toBe(true);
   });
 
+  it("完整重置会恢复已按 preserve=false 卸载的初始字段", () => {
+    const store = createFormStore();
+    store.initialize({ service: { type: "remote", endpoint: "https://api.qizhi.cn" } });
+    store.registerField(["service", "type"], { rules: [], validateTrigger: "onChange" });
+    const unregisterEndpoint = store.registerField(["service", "endpoint"], { rules: [], validateTrigger: "onChange", preserve: false });
+
+    unregisterEndpoint();
+    expect(store.instance.getFieldValue(["service", "endpoint"])).toBeUndefined();
+
+    store.instance.resetFields();
+    expect(store.instance.getFieldValue(["service", "endpoint"])).toBe("https://api.qizhi.cn");
+    expect(store.instance.isFieldsDirty()).toBe(false);
+  });
+
   it("局部更新干净基线不会误清兄弟字段", () => {
     const store = createFormStore();
     store.initialize({ service: { name: "A", region: "华北" } });

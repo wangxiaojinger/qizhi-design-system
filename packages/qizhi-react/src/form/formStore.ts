@@ -269,6 +269,18 @@ export function createFormStore(): FormStore {
     },
     resetFields: (names) => {
       const targets = names ?? [...fields.values()].map((field) => field.path).concat([...retained.values()]);
+      if (!names) {
+        targets.forEach(invalidateValidationPath);
+        values = structuredClone(initialValues);
+        errors.clear(); errorPaths.clear(); errorSources.clear(); validating.clear();
+        listPaths.forEach((listPath, listKeyValue) => {
+          const listValue = getValueAtPath(values, listPath);
+          lists.set(listKeyValue, Array.from({ length: Array.isArray(listValue) ? listValue.length : 0 }, nextListKey));
+        });
+        targets.forEach((name) => { notify(name); validateDependents(name); });
+        notifyDirty();
+        return;
+      }
       targets.forEach((name) => {
         invalidateValidationPath(name);
         const targetPath = normalizeNamePath(name);
@@ -278,6 +290,11 @@ export function createFormStore(): FormStore {
         });
         const initial = getValueAtPath(initialValues, name);
         values = initial === undefined ? unsetValueAtPath(values, name) : setValueAtPath(values, name, initial);
+        listPaths.forEach((listPath, listKeyValue) => {
+          if (!isSameOrAncestorPath(targetPath, listPath)) return;
+          const listValue = getValueAtPath(values, listPath);
+          lists.set(listKeyValue, Array.from({ length: Array.isArray(listValue) ? listValue.length : 0 }, nextListKey));
+        });
         const key = encodeNamePath(name); errors.delete(key); errorPaths.delete(key); errorSources.delete(key); notify(name); validateDependents(name);
       });
       notifyDirty();
