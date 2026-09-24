@@ -30,7 +30,7 @@ const FormRoot = forwardRef<HTMLFormElement, FormProps>(function Form({ layout =
 function FormItem({ name, label, required = false, extra, rules = [], validateTrigger = "onChange", validateStatus, help, dependencies, preserve, children, className, style }: FormItemProps) {
   const store = useContext(FormContext); const [, setVersion] = useState(0);
   const labelId = useId(); const helpId = useId(); const nameKey = name === undefined ? "" : JSON.stringify(name); const dependencyKey = JSON.stringify(dependencies ?? []);
-  useEffect(() => name !== undefined && store ? store.subscribePath(name, () => setVersion((value) => value + 1)) : undefined, [nameKey, store]);
+  useEffect(() => name !== undefined && store ? store.subscribeField(name, () => setVersion((value) => value + 1)) : undefined, [nameKey, store]);
   useEffect(() => name !== undefined && store ? store.registerField(name, { rules, validateTrigger, dependencies, preserve }) : undefined, [nameKey, store]);
   useEffect(() => { if (name !== undefined && store) store.updateFieldConfig(name, { rules, validateTrigger, dependencies, preserve }); }, [nameKey, dependencyKey, preserve, rules, store, validateTrigger]);
   const fieldErrors = name !== undefined && store ? store.getFieldErrors(name) : [];

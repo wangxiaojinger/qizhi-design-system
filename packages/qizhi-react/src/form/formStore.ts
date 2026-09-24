@@ -11,6 +11,7 @@ export interface FormStore {
   setDefaultPreserve(value: boolean): void;
   subscribe(listener: () => void): () => void;
   subscribePath(name: FormNamePath, listener: () => void): () => void;
+  subscribeField(name: FormNamePath, listener: () => void): () => void;
   registerField(name: FormNamePath, config: FieldConfig): () => void;
   updateFieldConfig(name: FormNamePath, config: FieldConfig): void;
   setFieldValueFromControl(name: FormNamePath, value: unknown): void;
@@ -54,8 +55,43 @@ export function createFormStore(): FormStore {
   const validating = new Set<string>();
   const nodes = new Map<string, HTMLDivElement>();
   const listeners = new Set<() => void>();
-  const pathListeners = new Set<{ path: FormNameSegment[]; listener: () => void }>();
+  const pathListeners = new Set<{ path: FormNameSegment[]; value: unknown; listener: () => void }>();
+  const fieldListeners = new Set<{ path: FormNameSegment[]; listener: () => void }>();
   const lists = new Map<string, string[]>();
+  const listPaths = new Map<string, FormNameSegment[]>();
+  const dependencyIndex = new Map<string, { path: FormNameSegment[]; dependents: Set<string> }>();
+
+  const rebuildDependencyIndex = () => {
+    dependencyIndex.clear();
+    fields.forEach((field, dependentKey) => {
+      field.dependencies?.forEach((dependency) => {
+        const path = normalizeNamePath(dependency);
+        const sourceKey = encodeNamePath(path);
+        const entry = dependencyIndex.get(sourceKey) ?? { path, dependents: new Set<string>() };
+        entry.dependents.add(dependentKey);
+        dependencyIndex.set(sourceKey, entry);
+      });
+    });
+  };
+
+  const clearPathState = (name: FormNamePath) => {
+    const path = normalizeNamePath(name);
+    const fieldPaths = new Map([...fields].map(([key, field]) => [key, field.path]));
+    const knownPaths = new Map<string, FormNameSegment[]>([...retained, ...errorPaths, ...listPaths, ...fieldPaths]);
+    const statePath = (key: string) => knownPaths.get(key);
+    const isDescendant = (candidate?: FormNameSegment[]) => Boolean(candidate && isSameOrAncestorPath(path, candidate));
+    values = unsetValueAtPath(values, path);
+    [...fields].forEach(([key, field]) => { if (isDescendant(field.path)) fields.delete(key); });
+    [...retained].forEach(([key, candidate]) => { if (isDescendant(candidate)) retained.delete(key); });
+    [...errors].forEach(([key]) => { if (isDescendant(statePath(key))) errors.delete(key); });
+    [...errorPaths].forEach(([key, candidate]) => { if (isDescendant(candidate)) errorPaths.delete(key); });
+    [...errorSources].forEach(([key]) => { if (isDescendant(statePath(key))) errorSources.delete(key); });
+    [...validating].forEach((key) => { if (isDescendant(statePath(key))) validating.delete(key); });
+    [...nodes].forEach(([key]) => { if (isDescendant(statePath(key))) nodes.delete(key); });
+    [...lists].forEach(([key]) => { if (isDescendant(listPaths.get(key))) lists.delete(key); });
+    [...listPaths].forEach(([key, candidate]) => { if (isDescendant(candidate)) listPaths.delete(key); });
+    rebuildDependencyIndex();
+  };
 
   const remapListState = (name: FormNamePath, mapIndex: (index: number) => number | undefined) => {
     const listPath = normalizeNamePath(name);
@@ -78,6 +114,7 @@ export function createFormStore(): FormStore {
       nextFields.set(encodeNamePath(path), field);
     });
     fields.clear(); nextFields.forEach((field, key) => fields.set(key, field));
+    rebuildDependencyIndex();
 
     const nextRetained = new Map<string, FormNameSegment[]>();
     retained.forEach((path) => { const nextPath = remapPath(path); if (nextPath) nextRetained.set(encodeNamePath(nextPath), nextPath); });
@@ -116,14 +153,27 @@ export function createFormStore(): FormStore {
   };
   const notify = (changed?: FormNamePath) => {
     listeners.forEach((listener) => listener());
-    if (changed) pathListeners.forEach((entry) => {
-      if (isSameOrAncestorPath(entry.path, changed) || isSameOrAncestorPath(changed, entry.path)) entry.listener();
-    });
+    if (changed) {
+      fieldListeners.forEach((entry) => {
+        if (isSameOrAncestorPath(entry.path, changed) || isSameOrAncestorPath(changed, entry.path)) entry.listener();
+      });
+      pathListeners.forEach((entry) => {
+        if (!isSameOrAncestorPath(entry.path, changed) && !isSameOrAncestorPath(changed, entry.path)) return;
+        const nextValue = getValueAtPath(values, entry.path);
+        if (Object.is(entry.value, nextValue)) return;
+        entry.value = nextValue;
+        entry.listener();
+      });
+    }
   };
   const validateDependents = (changed: FormNamePath) => {
-    fields.forEach((field) => {
-      if (field.dependencies?.some((dependency) => isSameOrAncestorPath(dependency, changed) || isSameOrAncestorPath(changed, dependency))) void store.validateField(field.path);
+    const dependentKeys = new Set<string>();
+    dependencyIndex.forEach((entry) => {
+      if (isSameOrAncestorPath(entry.path, changed) || isSameOrAncestorPath(changed, entry.path)) {
+        entry.dependents.forEach((key) => dependentKeys.add(key));
+      }
     });
+    dependentKeys.forEach((key) => { const field = fields.get(key); if (field) void store.validateField(field.path); });
   };
   const setValue = (name: FormNamePath, value: unknown, user: boolean) => {
     const previous = getValueAtPath(values, name);
@@ -185,24 +235,26 @@ export function createFormStore(): FormStore {
     setCallbacks: (next) => { callbacks = next; },
     setDefaultPreserve: (value) => { defaultPreserve = value; },
     subscribe: (listener) => { listeners.add(listener); return () => listeners.delete(listener); },
-    subscribePath: (name, listener) => { const entry = { path: normalizeNamePath(name), listener }; pathListeners.add(entry); return () => pathListeners.delete(entry); },
+    subscribePath: (name, listener) => { const path = normalizeNamePath(name); const entry = { path, value: getValueAtPath(values, path), listener }; pathListeners.add(entry); return () => pathListeners.delete(entry); },
+    subscribeField: (name, listener) => { const entry = { path: normalizeNamePath(name), listener }; fieldListeners.add(entry); return () => fieldListeners.delete(entry); },
     registerField: (name, config) => {
       const path = normalizeNamePath(name); const key = encodeNamePath(path);
       const state = { ...config, path }; fields.set(key, state); retained.delete(key);
+      rebuildDependencyIndex();
       if (getValueAtPath(values, path) === undefined) values = setValueAtPath(values, path, "");
       return () => {
         const currentPath = state.path;
         const currentKey = encodeNamePath(currentPath);
         if (currentKey !== key) return;
         if (fields.get(currentKey) !== state) return;
-        fields.delete(currentKey); nodes.delete(currentKey);
+        fields.delete(currentKey); nodes.delete(currentKey); rebuildDependencyIndex();
         if (state.preserve ?? defaultPreserve) retained.set(currentKey, currentPath);
-        else { retained.delete(currentKey); values = unsetValueAtPath(values, currentPath); errors.delete(currentKey); errorPaths.delete(currentKey); errorSources.delete(currentKey); validating.delete(currentKey); notify(currentPath); }
+        else { clearPathState(currentPath); notify(currentPath); }
       };
     },
     updateFieldConfig: (name, config) => {
       const field = fields.get(encodeNamePath(name));
-      if (field) Object.assign(field, config);
+      if (field) { Object.assign(field, config); rebuildDependencyIndex(); }
     },
     setFieldValueFromControl: (name, value) => setValue(name, value, true),
     setFormNode: (node) => { formNode = node; },
@@ -235,6 +287,7 @@ export function createFormStore(): FormStore {
       const key = encodeNamePath(name); let value = getValueAtPath(values, name);
       if (value === undefined && initialValue) { values = setValueAtPath(values, name, initialValue); value = initialValue; }
       if (!lists.has(key)) lists.set(key, Array.from({ length: Array.isArray(value) ? value.length : 0 }, nextListKey));
+      listPaths.set(key, normalizeNamePath(name));
       retained.set(key, normalizeNamePath(name));
     },
     addListValue: (name, value = {}, index) => {

@@ -111,7 +111,12 @@ test("Form 保留旧站契约并覆盖复杂字段全链路与响应式几何", 
   await expect(submitted).not.toContainText("endpoint");
 
   await complex.getByRole("button", { name: "新增成员" }).focus();
-  await expect(complex.getByRole("button", { name: "新增成员" })).toBeFocused();
+  await page.keyboard.press("Tab");
+  const serverErrorButton = complex.getByRole("button", { name: "模拟成员错误" });
+  await expect(serverErrorButton).toBeFocused();
+  expect(await serverErrorButton.evaluate((node) => node.matches(":focus-visible"))).toBe(true);
+  await page.keyboard.press("Enter");
+  await expect(complex.getByRole("alert")).toContainText("成员名称已存在");
 
   if ((page.viewportSize()?.width ?? 0) > 720) {
     await basic.getByRole("button", { name: "查看代码" }).click();

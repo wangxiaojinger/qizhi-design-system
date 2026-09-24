@@ -54,4 +54,40 @@ describe("formStore nested values", () => {
     });
     expect(unrelatedValidator).not.toHaveBeenCalled();
   });
+
+  it("preserve=false 清理父路径时同步清理全部后代值与错误", () => {
+    const store = createFormStore();
+    store.initialize({ user: { email: "iris@qizhi.cn", profile: { name: "Iris" } } });
+    const unregisterParent = store.registerField(["user"], { rules: [], validateTrigger: "onChange", preserve: false });
+    const unregisterEmail = store.registerField(["user", "email"], { rules: [], validateTrigger: "onChange" });
+    const unregisterName = store.registerField(["user", "profile", "name"], { rules: [], validateTrigger: "onChange" });
+    store.instance.setFieldErrors(["user", "email"], ["邮箱已被占用"]);
+    store.instance.setFieldErrors(["user", "profile", "name"], ["名称不可用"]);
+
+    unregisterEmail();
+    unregisterName();
+    unregisterParent();
+
+    expect(store.instance.getFieldValue(["user"])).toBeUndefined();
+    expect(store.instance.getFieldError(["user", "email"])).toEqual([]);
+    expect(store.instance.getFieldError(["user", "profile", "name"])).toEqual([]);
+    expect(store.instance.getFieldsValue()).toEqual({});
+  });
+
+  it("路径订阅仅在监听值实际变化时通知", () => {
+    const store = createFormStore();
+    store.initialize({ user: { email: "iris@qizhi.cn", name: "Iris" } });
+    const emailListener = vi.fn();
+    const userListener = vi.fn();
+    store.subscribePath(["user", "email"], emailListener);
+    store.subscribePath(["user"], userListener);
+
+    store.instance.setFieldValue(["user"], { email: "iris@qizhi.cn", name: "MaoMao" });
+    expect(emailListener).not.toHaveBeenCalled();
+    expect(userListener).toHaveBeenCalledOnce();
+
+    store.instance.setFieldValue(["user", "email"], "new@qizhi.cn");
+    expect(emailListener).toHaveBeenCalledOnce();
+    expect(userListener).toHaveBeenCalledTimes(2);
+  });
 });

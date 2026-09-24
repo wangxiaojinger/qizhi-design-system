@@ -1,6 +1,6 @@
 # QIZHI Form API 契约 v3
 
-状态：待审阅  
+状态：已确认并实施（candidate_pass，独立最终验证 pending）
 负责人：林猫猫  
 证据日期：2026-09-24
 
@@ -165,9 +165,9 @@ Demo 的实际预览、展示代码和复制代码继续读取同一个 TSX 源�
 
 ## 12. 发布门槛
 
-- [ ] 契约经用户审阅确认。
-- [ ] 实施计划经用户确认执行方式。
-- [ ] 定向测试完成红灯到绿灯过程。
-- [ ] `pnpm typecheck`、`pnpm test`、`pnpm build`、`pnpm api:validate` 通过。
-- [ ] Form 文档页完成真实浏览器交互和三视口验收。
-- [ ] 执行者最多声明 `candidate_pass`；独立最终验证保持 `pending`。
+- [x] 契约经用户审阅确认。
+- [x] 实施计划经用户确认执行方式。
+- [x] 定向测试完成红灯到绿灯过程。
+- [x] `pnpm typecheck`、`pnpm test`、`pnpm build`、`pnpm api:validate` 通过。
+- [x] Form 文档页完成真实浏览器交互和三视口验收。
+- [x] 执行者最多声明 `candidate_pass`；独立最终验证保持 `pending`。
