@@ -49,7 +49,7 @@ function FormItem({ name, label, required = false, extra, rules = [], validateTr
 
 function FormList({ name, initialValue, children }: FormListProps) {
   const store = useContext(FormContext); if (!store) throw new Error("Form.List 必须在 Form 内使用。");
-  const nameKey = JSON.stringify(name); useEffect(() => store.initializeList(name, initialValue), [initialValue, nameKey, store]);
+  const nameKey = JSON.stringify(name); store.initializeList(name, initialValue);
   useSyncExternalStore((listener) => store.subscribePath(name, listener), () => store.instance.getFieldValue(name), () => store.instance.getFieldValue(name));
   const keys = store.getListKeys(name); const operations = useMemo(() => ({ add: (value?: unknown, index?: number) => store.addListValue(name, value, index), remove: (index: number | number[]) => store.removeListValue(name, index), move: (from: number, to: number) => store.moveListValue(name, from, to) }), [nameKey, store]);
   return children(keys.map((key, index) => ({ key, name: index })), operations);

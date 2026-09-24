@@ -48,12 +48,64 @@ export function createFormStore(): FormStore {
   const fields = new Map<string, FieldState>();
   const retained = new Map<string, FormNameSegment[]>();
   const errors = new Map<string, string[]>();
+  const errorPaths = new Map<string, FormNameSegment[]>();
   const errorSources = new Map<string, "client" | "server">();
   const validating = new Set<string>();
   const nodes = new Map<string, HTMLDivElement>();
   const listeners = new Set<() => void>();
   const pathListeners = new Set<{ path: FormNameSegment[]; listener: () => void }>();
   const lists = new Map<string, string[]>();
+
+  const remapListState = (name: FormNamePath, mapIndex: (index: number) => number | undefined) => {
+    const listPath = normalizeNamePath(name);
+    const originalFieldPaths = new Map([...fields].map(([key, field]) => [key, [...field.path]]));
+    const originalErrorPaths = new Map([...errorPaths].map(([key, path]) => [key, [...path]]));
+    const pathForKey = (key: string) => originalErrorPaths.get(key) ?? originalFieldPaths.get(key);
+    const remapPath = (path: FormNameSegment[]) => {
+      if (!isSameOrAncestorPath(listPath, path) || path.length <= listPath.length) return path;
+      const index = path[listPath.length];
+      if (typeof index !== "number") return path;
+      const nextIndex = mapIndex(index);
+      return nextIndex === undefined ? undefined : [...path.slice(0, listPath.length), nextIndex, ...path.slice(listPath.length + 1)];
+    };
+    const nextFields = new Map<string, FieldState>();
+    fields.forEach((field) => {
+      const path = remapPath(field.path);
+      if (!path) return;
+      field.path = path;
+      field.dependencies = field.dependencies?.map((dependency) => remapPath(normalizeNamePath(dependency))).filter((dependency): dependency is FormNameSegment[] => Boolean(dependency));
+      nextFields.set(encodeNamePath(path), field);
+    });
+    fields.clear(); nextFields.forEach((field, key) => fields.set(key, field));
+
+    const nextRetained = new Map<string, FormNameSegment[]>();
+    retained.forEach((path) => { const nextPath = remapPath(path); if (nextPath) nextRetained.set(encodeNamePath(nextPath), nextPath); });
+    retained.clear(); nextRetained.forEach((path, key) => retained.set(key, path));
+
+    const nextErrors = new Map<string, string[]>();
+    const nextErrorPaths = new Map<string, FormNameSegment[]>();
+    errors.forEach((value, key) => {
+      const sourcePath = pathForKey(key);
+      if (!sourcePath) return;
+      const path = remapPath(sourcePath);
+      if (!path) return;
+      const nextKey = encodeNamePath(path); nextErrors.set(nextKey, value); nextErrorPaths.set(nextKey, path);
+    });
+    errors.clear(); nextErrors.forEach((value, key) => errors.set(key, value));
+    errorPaths.clear(); nextErrorPaths.forEach((path, key) => errorPaths.set(key, path));
+
+    const nextSources = new Map<string, "client" | "server">();
+    errorSources.forEach((source, key) => { const sourcePath = pathForKey(key); const path = sourcePath && remapPath(sourcePath); if (path) nextSources.set(encodeNamePath(path), source); });
+    errorSources.clear(); nextSources.forEach((source, key) => errorSources.set(key, source));
+
+    const nextValidating = new Set<string>();
+    validating.forEach((key) => { const sourcePath = pathForKey(key); const path = sourcePath && remapPath(sourcePath); if (path) nextValidating.add(encodeNamePath(path)); });
+    validating.clear(); nextValidating.forEach((key) => validating.add(key));
+
+    const nextNodes = new Map<string, HTMLDivElement>();
+    nodes.forEach((node, key) => { const sourcePath = pathForKey(key); const path = sourcePath && remapPath(sourcePath); if (path) nextNodes.set(encodeNamePath(path), node); });
+    nodes.clear(); nextNodes.forEach((node, key) => nodes.set(key, node));
+  };
 
   const registeredValues = () => {
     let result: FormValues = {};
@@ -77,7 +129,7 @@ export function createFormStore(): FormStore {
     if (Object.is(previous, value)) return;
     values = setValueAtPath(values, name, value);
     const key = encodeNamePath(name);
-    if (errorSources.get(key) === "server") { errors.delete(key); errorSources.delete(key); }
+    if (errorSources.get(key) === "server") { errors.delete(key); errorPaths.delete(key); errorSources.delete(key); }
     if (user) callbacks.onValuesChange?.(buildValueAtPath(name, value), registeredValues());
     notify(name);
     if (fields.get(key)?.validateTrigger === "onChange" && user) void store.validateField(name);
@@ -89,7 +141,7 @@ export function createFormStore(): FormStore {
     setFieldsValue: (nextValues) => {
       leafEntries(nextValues).forEach(([path, value]) => {
         values = setValueAtPath(values, path, value);
-        const key = encodeNamePath(path); errors.delete(key); errorSources.delete(key);
+        const key = encodeNamePath(path); errors.delete(key); errorPaths.delete(key); errorSources.delete(key);
         notify(path); validateDependents(path);
       });
     },
@@ -97,7 +149,8 @@ export function createFormStore(): FormStore {
     getFieldError: (name) => [...(errors.get(encodeNamePath(name)) ?? [])],
     setFieldErrors: (name, nextErrors) => {
       const key = encodeNamePath(name); errors.set(key, [...nextErrors]);
-      if (nextErrors.length) errorSources.set(key, "server"); else errorSources.delete(key);
+      if (nextErrors.length) { errorSources.set(key, "server"); errorPaths.set(key, normalizeNamePath(name)); }
+      else { errorSources.delete(key); errorPaths.delete(key); }
       notify(name);
     },
     validateFields: async () => {
@@ -115,7 +168,7 @@ export function createFormStore(): FormStore {
       targets.forEach((name) => {
         const initial = getValueAtPath(initialValues, name);
         values = initial === undefined ? unsetValueAtPath(values, name) : setValueAtPath(values, name, initial);
-        const key = encodeNamePath(name); errors.delete(key); errorSources.delete(key); notify(name); validateDependents(name);
+        const key = encodeNamePath(name); errors.delete(key); errorPaths.delete(key); errorSources.delete(key); notify(name); validateDependents(name);
       });
     },
     scrollToField: (name) => {
@@ -134,12 +187,13 @@ export function createFormStore(): FormStore {
     subscribePath: (name, listener) => { const entry = { path: normalizeNamePath(name), listener }; pathListeners.add(entry); return () => pathListeners.delete(entry); },
     registerField: (name, config) => {
       const path = normalizeNamePath(name); const key = encodeNamePath(path);
-      fields.set(key, { ...config, path }); retained.delete(key);
+      const state = { ...config, path }; fields.set(key, state); retained.delete(key);
       if (getValueAtPath(values, path) === undefined) values = setValueAtPath(values, path, "");
       return () => {
-        fields.delete(key); nodes.delete(key);
+        if (fields.get(key) === state) fields.delete(key);
+        nodes.delete(key);
         if (config.preserve ?? defaultPreserve) retained.set(key, path);
-        else { retained.delete(key); values = unsetValueAtPath(values, path); errors.delete(key); errorSources.delete(key); validating.delete(key); notify(path); }
+        else { retained.delete(key); values = unsetValueAtPath(values, path); errors.delete(key); errorPaths.delete(key); errorSources.delete(key); validating.delete(key); notify(path); }
       };
     },
     setFieldValueFromControl: (name, value) => setValue(name, value, true),
@@ -161,7 +215,10 @@ export function createFormStore(): FormStore {
         } catch (error) { nextErrors.push(error instanceof Error ? error.message : rule.message ?? String(error)); break; }
         if (failed) { nextErrors.push(rule.message ?? "该字段校验失败"); break; }
       }
-      errors.set(key, nextErrors); if (nextErrors.length) errorSources.set(key, "client"); else errorSources.delete(key); notify(name); return nextErrors;
+      errors.set(key, nextErrors);
+      if (nextErrors.length) { errorSources.set(key, "client"); errorPaths.set(key, normalizeNamePath(name)); }
+      else { errorSources.delete(key); errorPaths.delete(key); }
+      notify(name); return nextErrors;
     },
     getFieldErrors: (name) => errors.get(encodeNamePath(name)) ?? [],
     isFieldValidating: (name) => validating.has(encodeNamePath(name)),
@@ -170,18 +227,27 @@ export function createFormStore(): FormStore {
       const key = encodeNamePath(name); let value = getValueAtPath(values, name);
       if (value === undefined && initialValue) { values = setValueAtPath(values, name, initialValue); value = initialValue; }
       if (!lists.has(key)) lists.set(key, Array.from({ length: Array.isArray(value) ? value.length : 0 }, nextListKey));
+      retained.set(key, normalizeNamePath(name));
     },
     addListValue: (name, value = {}, index) => {
       const current = [...((getValueAtPath(values, name) as unknown[]) ?? [])]; const at = Math.max(0, Math.min(index ?? current.length, current.length)); current.splice(at, 0, value);
-      const key = encodeNamePath(name); const keys = [...(lists.get(key) ?? [])]; keys.splice(at, 0, nextListKey()); lists.set(key, keys); setValue(name, current, true);
+      const key = encodeNamePath(name); const keys = [...(lists.get(key) ?? [])]; keys.splice(at, 0, nextListKey()); lists.set(key, keys);
+      remapListState(name, (oldIndex) => oldIndex >= at ? oldIndex + 1 : oldIndex); setValue(name, current, true);
     },
     removeListValue: (name, index) => {
       const current = [...((getValueAtPath(values, name) as unknown[]) ?? [])]; const indexes = [...new Set(Array.isArray(index) ? index : [index])].filter((item) => item >= 0 && item < current.length).sort((a, b) => b - a);
-      if (!indexes.length) return; const key = encodeNamePath(name); const keys = [...(lists.get(key) ?? [])]; indexes.forEach((item) => { current.splice(item, 1); keys.splice(item, 1); }); lists.set(key, keys); setValue(name, current, true);
+      if (!indexes.length) return; const key = encodeNamePath(name); const keys = [...(lists.get(key) ?? [])]; indexes.forEach((item) => { current.splice(item, 1); keys.splice(item, 1); }); lists.set(key, keys);
+      const removed = new Set(indexes); remapListState(name, (oldIndex) => removed.has(oldIndex) ? undefined : oldIndex - indexes.filter((item) => item < oldIndex).length); setValue(name, current, true);
     },
     moveListValue: (name, from, to) => {
       const current = [...((getValueAtPath(values, name) as unknown[]) ?? [])]; if (from < 0 || to < 0 || from >= current.length || to >= current.length || from === to) return;
-      const key = encodeNamePath(name); const keys = [...(lists.get(key) ?? [])]; const [item] = current.splice(from, 1); current.splice(to, 0, item); const [itemKey] = keys.splice(from, 1); keys.splice(to, 0, itemKey); lists.set(key, keys); setValue(name, current, true);
+      const key = encodeNamePath(name); const keys = [...(lists.get(key) ?? [])]; const [item] = current.splice(from, 1); current.splice(to, 0, item); const [itemKey] = keys.splice(from, 1); keys.splice(to, 0, itemKey); lists.set(key, keys);
+      remapListState(name, (oldIndex) => {
+        if (oldIndex === from) return to;
+        if (from < to && oldIndex > from && oldIndex <= to) return oldIndex - 1;
+        if (to < from && oldIndex >= to && oldIndex < from) return oldIndex + 1;
+        return oldIndex;
+      }); setValue(name, current, true);
     },
   };
   stores.set(instance, store);
