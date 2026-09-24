@@ -23,6 +23,30 @@ describe("Form", () => {
     expect(screen.getByRole("status", { name: "修改状态" })).toHaveTextContent("已保存");
   });
 
+  it("useDirty 只在整体脏状态翻转时重新渲染", () => {
+    const dirtyRender = vi.fn();
+    let form: FormInstance | undefined;
+
+    function DirtyState() {
+      const [instance] = Form.useForm();
+      form = instance;
+      const dirty = Form.useDirty(instance);
+      dirtyRender(dirty);
+      return <Form form={instance} initialValues={{ serviceName: "initial" }}><Form.Item name="serviceName"><input aria-label="服务名称" /></Form.Item></Form>;
+    }
+
+    render(<DirtyState />);
+    expect(dirtyRender).toHaveBeenCalledTimes(1);
+    act(() => form?.setFieldValue("serviceName", "changed"));
+    expect(dirtyRender).toHaveBeenCalledTimes(2);
+    expect(dirtyRender).toHaveBeenLastCalledWith(true);
+    act(() => form?.setFieldValue("serviceName", "changed-again"));
+    expect(dirtyRender).toHaveBeenCalledTimes(2);
+    act(() => form?.markFieldsClean());
+    expect(dirtyRender).toHaveBeenCalledTimes(3);
+    expect(dirtyRender).toHaveBeenLastCalledWith(false);
+  });
+
   it("网络校验异常只走表单级回调且不标记字段内容错误", async () => {
     const user = userEvent.setup();
     const onValidationException = vi.fn();

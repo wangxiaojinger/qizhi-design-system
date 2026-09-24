@@ -2,6 +2,43 @@ import { describe, expect, it, vi } from "vitest";
 import { createFormStore } from "./formStore";
 
 describe("formStore nested values", () => {
+  it("跟踪程序化修改、恢复原值、列表变化和条件字段删除", () => {
+    const store = createFormStore();
+    store.initialize({ service: { name: "初始服务" }, endpoint: "https://api.qizhi.cn", members: [] });
+    store.registerField(["service", "name"], { rules: [], validateTrigger: "onChange" });
+    const unregisterEndpoint = store.registerField("endpoint", { rules: [], validateTrigger: "onChange", preserve: false });
+    store.initializeList("members");
+
+    expect(store.instance.isFieldsDirty()).toBe(false);
+    store.instance.setFieldValue(["service", "name"], "新服务");
+    expect(store.instance.isFieldsDirty()).toBe(true);
+    store.instance.setFieldValue(["service", "name"], "初始服务");
+    expect(store.instance.isFieldsDirty()).toBe(false);
+
+    store.addListValue("members", { name: "成员甲" });
+    expect(store.instance.isFieldsDirty()).toBe(true);
+    store.instance.resetFields();
+    expect(store.instance.isFieldsDirty()).toBe(false);
+
+    unregisterEndpoint();
+    expect(store.instance.isFieldsDirty()).toBe(true);
+  });
+
+  it("局部更新干净基线不会误清兄弟字段", () => {
+    const store = createFormStore();
+    store.initialize({ service: { name: "A", region: "华北" } });
+    store.registerField(["service", "name"], { rules: [], validateTrigger: "onChange" });
+    store.registerField(["service", "region"], { rules: [], validateTrigger: "onChange" });
+    store.instance.setFieldValue(["service", "name"], "B");
+    store.instance.setFieldValue(["service", "region"], "华东");
+
+    store.instance.markFieldsClean([["service", "name"]]);
+
+    expect(store.instance.isFieldsDirty([["service", "name"]])).toBe(false);
+    expect(store.instance.isFieldsDirty([["service", "region"]])).toBe(true);
+    expect(store.instance.isFieldsDirty()).toBe(true);
+  });
+
   it("只允许同一字段最新一次异步校验结果生效", async () => {
     const store = createFormStore();
     const pending = new Map<string, { resolve: () => void; reject: (error: Error) => void }>();

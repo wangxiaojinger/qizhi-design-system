@@ -32,6 +32,19 @@ const stores = new WeakMap<FormInstance, FormStore>();
 let listKey = 0;
 const nextListKey = () => `qizhi-form-list-${++listKey}`;
 
+const isEqualValue = (left: unknown, right: unknown): boolean => {
+  if (Object.is(left, right)) return true;
+  if (Array.isArray(left) || Array.isArray(right)) {
+    return Array.isArray(left) && Array.isArray(right) && left.length === right.length && left.every((item, index) => isEqualValue(item, right[index]));
+  }
+  if (left && right && typeof left === "object" && typeof right === "object") {
+    const leftEntries = Object.entries(left as FormValues);
+    const rightRecord = right as FormValues;
+    return leftEntries.length === Object.keys(rightRecord).length && leftEntries.every(([key, value]) => Object.prototype.hasOwnProperty.call(rightRecord, key) && isEqualValue(value, rightRecord[key]));
+  }
+  return false;
+};
+
 const leafEntries = (value: unknown, path: FormNameSegment[] = []): Array<[FormNameSegment[], unknown]> => {
   if (Array.isArray(value)) return value.flatMap((item, index) => leafEntries(item, [...path, index]));
   if (value && typeof value === "object") {
@@ -45,6 +58,7 @@ export function createFormStore(): FormStore {
   let initialized = false;
   let initialValues: FormValues = {};
   let values: FormValues = {};
+  let cleanValues: FormValues = {};
   let callbacks: Pick<FormProps, "onValuesChange" | "onValidationException"> = {};
   let defaultPreserve = true;
   let formNode: HTMLFormElement | null = null;
@@ -57,11 +71,23 @@ export function createFormStore(): FormStore {
   const validationVersions = new Map<string, number>();
   const nodes = new Map<string, HTMLDivElement>();
   const listeners = new Set<() => void>();
+  const dirtyListeners = new Set<() => void>();
   const pathListeners = new Set<{ path: FormNameSegment[]; value: unknown; listener: () => void }>();
   const fieldListeners = new Set<{ path: FormNameSegment[]; listener: () => void }>();
   const lists = new Map<string, string[]>();
   const listPaths = new Map<string, FormNameSegment[]>();
   const dependencyIndex = new Map<string, { path: FormNameSegment[]; dependents: Set<string> }>();
+  let lastDirty = false;
+
+  const isDirty = (names?: FormNamePath[]) => names?.length
+    ? names.some((name) => !isEqualValue(getValueAtPath(values, name), getValueAtPath(cleanValues, name)))
+    : !isEqualValue(values, cleanValues);
+  const notifyDirty = () => {
+    const nextDirty = isDirty();
+    if (nextDirty === lastDirty) return;
+    lastDirty = nextDirty;
+    dirtyListeners.forEach((listener) => listener());
+  };
 
   const nextValidationVersion = (key: string) => {
     const version = (validationVersions.get(key) ?? 0) + 1;
@@ -116,6 +142,7 @@ export function createFormStore(): FormStore {
     [...lists].forEach(([key]) => { if (isDescendant(listPaths.get(key))) lists.delete(key); });
     [...listPaths].forEach(([key, candidate]) => { if (isDescendant(candidate)) listPaths.delete(key); });
     rebuildDependencyIndex();
+    notifyDirty();
   };
 
   const remapListState = (name: FormNamePath, mapIndex: (index: number) => number | undefined) => {
@@ -208,6 +235,7 @@ export function createFormStore(): FormStore {
     if (errorSources.get(key) === "server") { errors.delete(key); errorPaths.delete(key); errorSources.delete(key); }
     if (user) callbacks.onValuesChange?.(buildValueAtPath(name, value), registeredValues());
     notify(name);
+    notifyDirty();
     if (fields.get(key)?.validateTrigger === "onChange" && user) void store.validateField(name).catch(() => undefined);
     validateDependents(name);
   };
@@ -218,7 +246,7 @@ export function createFormStore(): FormStore {
       leafEntries(nextValues).forEach(([path, value]) => {
         values = setValueAtPath(values, path, value);
         const key = encodeNamePath(path); errors.delete(key); errorPaths.delete(key); errorSources.delete(key);
-        notify(path); validateDependents(path);
+        notify(path); notifyDirty(); validateDependents(path);
       });
     },
     setFieldValue: (name, value) => setValue(name, value, false),
@@ -247,9 +275,17 @@ export function createFormStore(): FormStore {
         values = initial === undefined ? unsetValueAtPath(values, name) : setValueAtPath(values, name, initial);
         const key = encodeNamePath(name); errors.delete(key); errorPaths.delete(key); errorSources.delete(key); notify(name); validateDependents(name);
       });
+      notifyDirty();
     },
-    isFieldsDirty: () => false,
-    markFieldsClean: () => undefined,
+    isFieldsDirty: (names) => isDirty(names),
+    markFieldsClean: (names) => {
+      if (!names?.length) cleanValues = structuredClone(values);
+      else names.forEach((name) => {
+        const current = getValueAtPath(values, name);
+        cleanValues = current === undefined ? unsetValueAtPath(cleanValues, name) : setValueAtPath(cleanValues, name, structuredClone(current));
+      });
+      notifyDirty();
+    },
     scrollToField: (name) => {
       const node = nodes.get(encodeNamePath(name)); if (!node) return;
       node.scrollIntoView?.({ behavior: "smooth", block: "center" });
@@ -259,18 +295,21 @@ export function createFormStore(): FormStore {
   };
   const store: FormStore = {
     instance,
-    initialize: (initial) => { if (!initialized) { initialized = true; initialValues = structuredClone(initial ?? {}); values = structuredClone(initialValues); } },
+    initialize: (initial) => { if (!initialized) { initialized = true; initialValues = structuredClone(initial ?? {}); values = structuredClone(initialValues); cleanValues = structuredClone(initialValues); lastDirty = false; } },
     setCallbacks: (next) => { callbacks = next; },
     setDefaultPreserve: (value) => { defaultPreserve = value; },
     subscribe: (listener) => { listeners.add(listener); return () => listeners.delete(listener); },
     subscribePath: (name, listener) => { const path = normalizeNamePath(name); const entry = { path, value: getValueAtPath(values, path), listener }; pathListeners.add(entry); return () => pathListeners.delete(entry); },
-    subscribeDirty: () => () => undefined,
+    subscribeDirty: (listener) => { dirtyListeners.add(listener); return () => dirtyListeners.delete(listener); },
     subscribeField: (name, listener) => { const entry = { path: normalizeNamePath(name), listener }; fieldListeners.add(entry); return () => fieldListeners.delete(entry); },
     registerField: (name, config) => {
       const path = normalizeNamePath(name); const key = encodeNamePath(path);
       const state = { ...config, path }; fields.set(key, state); retained.delete(key);
       rebuildDependencyIndex();
-      if (getValueAtPath(values, path) === undefined) values = setValueAtPath(values, path, "");
+      if (getValueAtPath(values, path) === undefined) {
+        values = setValueAtPath(values, path, "");
+        if (getValueAtPath(cleanValues, path) === undefined) cleanValues = setValueAtPath(cleanValues, path, "");
+      }
       return () => {
         const currentPath = state.path;
         const currentKey = encodeNamePath(currentPath);
@@ -338,7 +377,7 @@ export function createFormStore(): FormStore {
     getListKeys: (name) => [...(lists.get(encodeNamePath(name)) ?? [])],
     initializeList: (name, initialValue) => {
       const key = encodeNamePath(name); let value = getValueAtPath(values, name);
-      if (value === undefined && initialValue) { values = setValueAtPath(values, name, initialValue); value = initialValue; }
+      if (value === undefined && initialValue) { values = setValueAtPath(values, name, initialValue); cleanValues = setValueAtPath(cleanValues, name, structuredClone(initialValue)); value = initialValue; }
       if (!lists.has(key)) lists.set(key, Array.from({ length: Array.isArray(value) ? value.length : 0 }, nextListKey));
       listPaths.set(key, normalizeNamePath(name));
       retained.set(key, normalizeNamePath(name));
