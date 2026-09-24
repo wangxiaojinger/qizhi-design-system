@@ -1,6 +1,6 @@
 import { expectTypeOf, test } from "vitest";
 import { Form } from "./Form";
-import type { FormFailedResult, FormInstance, FormNamePath, FormRule, FormValues } from "./Form.types";
+import type { FormFailedResult, FormInstance, FormNamePath, FormRule, FormRuleFailure, FormValidationException, FormValues } from "./Form.types";
 
 test("Form v2 对外类型覆盖字段管理、校验和提交", () => {
   function Example() {
@@ -46,4 +46,20 @@ test("Form v3 对外类型覆盖嵌套路径、动态列表和监听", () => {
     </Form>;
   }
   expectTypeOf(Example).toBeFunction();
+});
+
+test("Form v4 对外类型覆盖异常分层和未保存修改", () => {
+  const failure: FormRuleFailure = { type: "network", message: "服务暂不可用" };
+  const exception: FormValidationException = { name: ["service", "region"], ...failure, type: "network" };
+  expectTypeOf(exception).toMatchTypeOf<FormValidationException>();
+
+  function DirtyState() {
+    const [form] = Form.useForm();
+    const dirty = Form.useDirty(form);
+    form.isFieldsDirty([["service", "region"]]);
+    form.markFieldsClean([["service", "region"]]);
+    return <Form form={form} onValidationException={(current) => current.message}>{String(dirty)}</Form>;
+  }
+
+  expectTypeOf(DirtyState).toBeFunction();
 });

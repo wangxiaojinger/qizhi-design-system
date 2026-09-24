@@ -15,6 +15,11 @@ function useWatch(name: FormNamePath, form?: FormInstance): unknown {
   if (!store) throw new Error("Form.useWatch 必须在 Form 内使用或传入 form 实例。");
   return useSyncExternalStore((listener) => store.subscribePath(name, listener), () => store.instance.getFieldValue(name), () => store.instance.getFieldValue(name));
 }
+function useDirty(form?: FormInstance): boolean {
+  const contextStore = useContext(FormContext); const store = form ? getFormStore(form) : contextStore;
+  if (!store) throw new Error("Form.useDirty 必须在 Form 内使用或传入 form 实例。");
+  return useSyncExternalStore((listener) => store.subscribeDirty(listener), () => store.instance.isFieldsDirty(), () => store.instance.isFieldsDirty());
+}
 
 const FormRoot = forwardRef<HTMLFormElement, FormProps>(function Form({ layout = "vertical", form, initialValues, onValuesChange, onFinish, onFinishFailed, scrollToFirstError = false, preserve = true, className, children, ...formProps }, ref) {
   const [internalForm] = useForm(); const activeForm = form ?? internalForm; const store = getFormStore(activeForm);
@@ -56,4 +61,4 @@ function FormList({ name, initialValue, children }: FormListProps) {
   return children(keys.map((key, index) => ({ key, name: index })), operations);
 }
 
-export const Form = Object.assign(FormRoot, { Item: FormItem, List: FormList, useForm, useWatch }) as FormComponent;
+export const Form = Object.assign(FormRoot, { Item: FormItem, List: FormList, useForm, useWatch, useDirty }) as FormComponent;

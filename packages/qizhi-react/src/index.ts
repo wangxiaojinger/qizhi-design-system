@@ -269,6 +269,8 @@ export type {
   FormNameSegment,
   FormProps,
   FormRule,
+  FormRuleFailure,
+  FormValidationException,
   FormValidateStatus,
   FormValidateTrigger,
   FormValues,

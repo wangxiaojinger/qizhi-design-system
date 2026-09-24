@@ -8,6 +8,20 @@ import { Input } from "../input/Input";
 import { Select } from "../select/Select";
 
 describe("Form", () => {
+  it("v4 脏状态接口初始为干净并可通过 Hook 读取", () => {
+    let form: FormInstance | undefined;
+
+    function DirtyState() {
+      const [instance] = Form.useForm();
+      form = instance;
+      const dirty = Form.useDirty(instance);
+      return <Form form={instance} initialValues={{ serviceName: "initial" }}><output aria-label="修改状态">{dirty ? "有修改" : "已保存"}</output></Form>;
+    }
+
+    render(<DirtyState />);
+    expect(form?.isFieldsDirty()).toBe(false);
+    expect(screen.getByRole("status", { name: "修改状态" })).toHaveTextContent("已保存");
+  });
   it("renders a vertical native form by default and forwards its ref", () => {
     const ref = createRef<HTMLFormElement>();
     render(<Form ref={ref} aria-label="创建服务"><button type="submit">提交</button></Form>);

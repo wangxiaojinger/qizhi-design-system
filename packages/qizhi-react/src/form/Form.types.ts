@@ -8,6 +8,19 @@ export type FormNamePath = string | readonly FormNameSegment[];
 export type FormValidateTrigger = "onChange" | "onBlur";
 export type FormValidateStatus = "default" | "validating" | "success" | "warning" | "error";
 
+export interface FormRuleFailure {
+  type: "field" | "network";
+  message: string;
+  cause?: unknown;
+}
+
+export interface FormValidationException {
+  name: FormNamePath;
+  type: "network";
+  message: string;
+  cause?: unknown;
+}
+
 export interface FormRule {
   required?: boolean;
   message?: string;
@@ -15,7 +28,7 @@ export interface FormRule {
   max?: number;
   length?: number;
   pattern?: RegExp;
-  validator?: (value: unknown, values: FormValues) => void | Promise<void>;
+  validator?: (value: unknown, values: FormValues) => void | FormRuleFailure | Promise<void | FormRuleFailure>;
 }
 
 export interface FormErrorField {
@@ -37,6 +50,8 @@ export interface FormInstance {
   setFieldErrors: (name: FormNamePath, errors: string[]) => void;
   validateFields: () => Promise<FormValues>;
   resetFields: (names?: FormNamePath[]) => void;
+  isFieldsDirty: (names?: FormNamePath[]) => boolean;
+  markFieldsClean: (names?: FormNamePath[]) => void;
   scrollToField: (name: FormNamePath) => void;
   submit: () => void;
 }
@@ -48,6 +63,7 @@ export interface FormProps extends Omit<FormHTMLAttributes<HTMLFormElement>, "on
   onValuesChange?: (changedValues: FormValues, allValues: FormValues) => void;
   onFinish?: (values: FormValues) => void | Promise<void>;
   onFinishFailed?: (result: FormFailedResult) => void;
+  onValidationException?: (exception: FormValidationException) => void;
   scrollToFirstError?: boolean;
   preserve?: boolean;
   ref?: Ref<HTMLFormElement>;
@@ -87,4 +103,5 @@ export interface FormComponent {
   List: (props: FormListProps) => ReactNode;
   useForm: () => [FormInstance];
   useWatch: (name: FormNamePath, form?: FormInstance) => unknown;
+  useDirty: (form?: FormInstance) => boolean;
 }

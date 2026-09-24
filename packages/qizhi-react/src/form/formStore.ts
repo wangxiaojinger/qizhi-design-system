@@ -11,6 +11,7 @@ export interface FormStore {
   setDefaultPreserve(value: boolean): void;
   subscribe(listener: () => void): () => void;
   subscribePath(name: FormNamePath, listener: () => void): () => void;
+  subscribeDirty(listener: () => void): () => void;
   subscribeField(name: FormNamePath, listener: () => void): () => void;
   registerField(name: FormNamePath, config: FieldConfig): () => void;
   updateFieldConfig(name: FormNamePath, config: FieldConfig): void;
@@ -222,6 +223,8 @@ export function createFormStore(): FormStore {
         const key = encodeNamePath(name); errors.delete(key); errorPaths.delete(key); errorSources.delete(key); notify(name); validateDependents(name);
       });
     },
+    isFieldsDirty: () => false,
+    markFieldsClean: () => undefined,
     scrollToField: (name) => {
       const node = nodes.get(encodeNamePath(name)); if (!node) return;
       node.scrollIntoView?.({ behavior: "smooth", block: "center" });
@@ -236,6 +239,7 @@ export function createFormStore(): FormStore {
     setDefaultPreserve: (value) => { defaultPreserve = value; },
     subscribe: (listener) => { listeners.add(listener); return () => listeners.delete(listener); },
     subscribePath: (name, listener) => { const path = normalizeNamePath(name); const entry = { path, value: getValueAtPath(values, path), listener }; pathListeners.add(entry); return () => pathListeners.delete(entry); },
+    subscribeDirty: () => () => undefined,
     subscribeField: (name, listener) => { const entry = { path: normalizeNamePath(name), listener }; fieldListeners.add(entry); return () => fieldListeners.delete(entry); },
     registerField: (name, config) => {
       const path = normalizeNamePath(name); const key = encodeNamePath(path);
@@ -271,7 +275,7 @@ export function createFormStore(): FormStore {
         else if (typeof value === "string" && rule.pattern && !rule.pattern.test(value)) failed = true;
         if (!failed && rule.validator) try {
           const result = rule.validator(value, values);
-          if (result && typeof result.then === "function") { validating.add(key); notify(name); try { await result; } finally { validating.delete(key); notify(name); } }
+          if (result && typeof result === "object" && "then" in result && typeof result.then === "function") { validating.add(key); notify(name); try { await result; } finally { validating.delete(key); notify(name); } }
         } catch (error) { nextErrors.push(error instanceof Error ? error.message : rule.message ?? String(error)); break; }
         if (failed) { nextErrors.push(rule.message ?? "该字段校验失败"); break; }
       }
