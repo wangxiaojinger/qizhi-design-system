@@ -257,9 +257,21 @@ export type { EmptyProps } from "./empty/Empty.types";
 export { Form } from "./form/Form";
 export type {
   FormComponent,
+  FormErrorField,
+  FormFailedResult,
+  FormInstance,
   FormItemProps,
   FormLayout,
+  FormListField,
+  FormListOperations,
+  FormListProps,
+  FormNamePath,
+  FormNameSegment,
   FormProps,
+  FormRule,
+  FormValidateStatus,
+  FormValidateTrigger,
+  FormValues,
 } from "./form/Form.types";
 export { Divider } from "./divider/Divider";
 export type {
