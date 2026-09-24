@@ -191,10 +191,13 @@ export function createFormStore(): FormStore {
       const state = { ...config, path }; fields.set(key, state); retained.delete(key);
       if (getValueAtPath(values, path) === undefined) values = setValueAtPath(values, path, "");
       return () => {
-        if (fields.get(key) === state) fields.delete(key);
-        nodes.delete(key);
-        if (state.preserve ?? defaultPreserve) retained.set(key, path);
-        else { retained.delete(key); values = unsetValueAtPath(values, path); errors.delete(key); errorPaths.delete(key); errorSources.delete(key); validating.delete(key); notify(path); }
+        const currentPath = state.path;
+        const currentKey = encodeNamePath(currentPath);
+        if (currentKey !== key) return;
+        if (fields.get(currentKey) !== state) return;
+        fields.delete(currentKey); nodes.delete(currentKey);
+        if (state.preserve ?? defaultPreserve) retained.set(currentKey, currentPath);
+        else { retained.delete(currentKey); values = unsetValueAtPath(values, currentPath); errors.delete(currentKey); errorPaths.delete(currentKey); errorSources.delete(currentKey); validating.delete(currentKey); notify(currentPath); }
       };
     },
     updateFieldConfig: (name, config) => {

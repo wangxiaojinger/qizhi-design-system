@@ -86,4 +86,34 @@ describe("Form.List", () => {
     });
     expect(form?.getFieldValue("members")).toEqual(beforeInvalidMoves);
   });
+
+  it("移动 preserve=false 字段后不会按旧索引误清理其他条目", async () => {
+    let operations: { move(from: number, to: number): void } | undefined;
+    let form: ReturnType<typeof Form.useForm>[0] | undefined;
+
+    function Example() {
+      const [instance] = Form.useForm();
+      form = instance;
+      return (
+        <Form form={instance} initialValues={{ members: [{ name: "A" }, { name: "B" }] }}>
+          <Form.List name="members">{(fields, nextOperations) => {
+            operations = nextOperations;
+            return fields.map((field) => (
+              <Form.Item key={field.key} name={["members", field.name, "name"]} preserve={false}>
+                <input aria-label={`移动成员 ${field.name + 1}`} />
+              </Form.Item>
+            ));
+          }}</Form.List>
+        </Form>
+      );
+    }
+
+    render(<Example />);
+    await screen.findAllByRole("textbox");
+    act(() => operations?.move(1, 0));
+
+    expect(form?.getFieldValue("members")).toEqual([{ name: "B" }, { name: "A" }]);
+    expect(screen.getByRole("textbox", { name: "移动成员 1" })).toHaveValue("B");
+    expect(screen.getByRole("textbox", { name: "移动成员 2" })).toHaveValue("A");
+  });
 });
