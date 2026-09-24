@@ -1,6 +1,6 @@
 # QIZHI Form 真实业务复杂度契约 v4
 
-状态：已确认，待实施
+状态：已确认并实施（candidate_pass，独立最终验证 pending）
 负责人：林猫猫
 设计日期：2026-09-24
 
@@ -147,7 +147,7 @@ onRetry?: () => void;
 - 条件字段隐藏时，`preserve={false}` 删除字段值及全部后代状态；`preserve={true}` 保留并在重新挂载后恢复。
 - 多层对象提交保持真实对象结构，不暴露内部路径编码。
 - `resetFields([parentPath])` 恢复该父路径的完整初始子树，并清理该子树的字段错误、校验版本和校验中状态。
-- 无参数 `resetFields()` 恢复全部已注册或保留字段，并重新计算脏状态。
+- 无参数 `resetFields()` 恢复完整初始值树，包括此前因 `preserve={false}` 卸载的初始字段，并重新计算相对当前干净基线的脏状态。
 
 ## 8. 文档示例
 
@@ -177,9 +177,9 @@ onRetry?: () => void;
 ## 10. 完成门槛
 
 - [x] 契约经用户审阅确认。
-- [ ] 实施计划经用户确认。
-- [ ] 每项新增行为完成红灯到绿灯过程。
-- [ ] `pnpm typecheck`、`pnpm test`、`pnpm build`、`pnpm api:validate` 通过。
-- [ ] Form 与 AutoComplete 定向测试通过。
-- [ ] 新 Demo 完成三视口真实浏览器验收。
-- [ ] 执行者最多声明 `candidate_pass`；独立最终验证保持 `pending`。
+- [x] 实施计划经用户确认。
+- [x] 每项新增行为完成红灯到绿灯过程。
+- [x] `pnpm typecheck`、`pnpm test`、`pnpm build`、`pnpm api:validate` 通过。
+- [x] Form 与 AutoComplete 定向测试通过。
+- [x] 新 Demo 完成三视口真实浏览器验收。
+- [x] 执行者声明 `candidate_pass`；独立最终验证保持 `pending`。
