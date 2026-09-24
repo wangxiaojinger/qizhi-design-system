@@ -2,6 +2,26 @@ import { describe, expect, it, vi } from "vitest";
 import { createFormStore } from "./formStore";
 
 describe("formStore nested values", () => {
+  it("重置父路径恢复完整子树并清理后代错误且保留无关修改", () => {
+    const store = createFormStore();
+    store.initialize({ service: { name: "初始服务", region: "华北" }, owner: "Iris" });
+    store.registerField(["service", "name"], { rules: [], validateTrigger: "onChange" });
+    store.registerField(["service", "region"], { rules: [], validateTrigger: "onChange" });
+    store.registerField("owner", { rules: [], validateTrigger: "onChange" });
+    store.instance.setFieldValue(["service", "name"], "新服务");
+    store.instance.setFieldValue(["service", "region"], "华东");
+    store.instance.setFieldValue("owner", "MaoMao");
+    store.instance.setFieldErrors(["service", "region"], ["区域不可用"]);
+
+    store.instance.resetFields([["service"]]);
+
+    expect(store.instance.getFieldValue(["service"])).toEqual({ name: "初始服务", region: "华北" });
+    expect(store.instance.getFieldError(["service", "region"])).toEqual([]);
+    expect(store.instance.getFieldValue("owner")).toBe("MaoMao");
+    expect(store.instance.isFieldsDirty([["service"]])).toBe(false);
+    expect(store.instance.isFieldsDirty(["owner"])).toBe(true);
+  });
+
   it("跟踪程序化修改、恢复原值、列表变化和条件字段删除", () => {
     const store = createFormStore();
     store.initialize({ service: { name: "初始服务" }, endpoint: "https://api.qizhi.cn", members: [] });

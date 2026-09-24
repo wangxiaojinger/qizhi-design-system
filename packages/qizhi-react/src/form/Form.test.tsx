@@ -4,10 +4,50 @@ import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { Form } from "./Form";
 import type { FormInstance } from "./Form.types";
+import { AutoComplete } from "../auto-complete/AutoComplete";
 import { Input } from "../input/Input";
 import { Select } from "../select/Select";
 
 describe("Form", () => {
+  it("Input、Select 和 AutoComplete 统一写入表单并触发联动", async () => {
+    const user = userEvent.setup();
+    const onValuesChange = vi.fn();
+    const dependentValidator = vi.fn();
+
+    function WatchedValues() {
+      const name = Form.useWatch(["service", "name"]);
+      const type = Form.useWatch(["service", "type"]);
+      const region = Form.useWatch(["service", "region"]);
+      return <output aria-label="联动值">{JSON.stringify({ name, type, region })}</output>;
+    }
+
+    render(
+      <Form initialValues={{ service: { name: "", type: "", region: "" } }} onValuesChange={onValuesChange}>
+        <WatchedValues />
+        <Form.Item name={["service", "name"]}><Input aria-label="服务名称" /></Form.Item>
+        <Form.Item name={["service", "type"]}>
+          <Select aria-label="服务类型" options={[{ label: "远程服务", value: "remote" }]} />
+        </Form.Item>
+        <Form.Item name={["service", "region"]} dependencies={[["service", "type"]]} rules={[{ validator: dependentValidator }]}>
+          <AutoComplete aria-label="服务区域" data={["华北", "华东"]} />
+        </Form.Item>
+      </Form>,
+    );
+
+    await user.type(screen.getByRole("textbox", { name: "服务名称" }), "模型服务");
+    await user.click(screen.getByRole("combobox", { name: "服务类型" }));
+    await user.click(screen.getByRole("option", { name: "远程服务" }));
+    await user.type(screen.getByRole("combobox", { name: "服务区域" }), "华");
+    await user.click(screen.getByRole("option", { name: "华北" }));
+
+    expect(screen.getByRole("status", { name: "联动值" })).toHaveTextContent('{"name":"模型服务","type":"remote","region":"华北"}');
+    expect(onValuesChange).toHaveBeenLastCalledWith(
+      { service: { region: "华北" } },
+      { service: { name: "模型服务", type: "remote", region: "华北" } },
+    );
+    expect(dependentValidator).toHaveBeenCalled();
+  });
+
   it("v4 脏状态接口初始为干净并可通过 Hook 读取", () => {
     let form: FormInstance | undefined;
 

@@ -271,6 +271,11 @@ export function createFormStore(): FormStore {
       const targets = names ?? [...fields.values()].map((field) => field.path).concat([...retained.values()]);
       targets.forEach((name) => {
         invalidateValidationPath(name);
+        const targetPath = normalizeNamePath(name);
+        [...errorPaths].forEach(([errorKey, errorPath]) => {
+          if (!isSameOrAncestorPath(targetPath, errorPath)) return;
+          errors.delete(errorKey); errorPaths.delete(errorKey); errorSources.delete(errorKey);
+        });
         const initial = getValueAtPath(initialValues, name);
         values = initial === undefined ? unsetValueAtPath(values, name) : setValueAtPath(values, name, initial);
         const key = encodeNamePath(name); errors.delete(key); errorPaths.delete(key); errorSources.delete(key); notify(name); validateDependents(name);
