@@ -13,6 +13,10 @@ test("AutoComplete 对外类型与 v1 契约一致", () => {
       expectTypeOf(value).toEqualTypeOf<string>();
       expectTypeOf(current).toMatchTypeOf<AutoCompleteOption>();
     },
+    loading: false,
+    emptyContent: "暂无区域",
+    error: "查询失败",
+    onRetry: () => undefined,
   };
 
   <AutoComplete {...props} />;

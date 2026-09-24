@@ -36,6 +36,10 @@ const AutoCompleteBase = forwardRef<TriggerElement, AutoCompleteProps>(function 
     strict = false,
     filterOption,
     triggerElement,
+    loading = false,
+    emptyContent = "暂无匹配结果",
+    error,
+    onRetry,
     onChange,
     onSearch,
     onSelect,
@@ -73,6 +77,9 @@ const AutoCompleteBase = forwardRef<TriggerElement, AutoCompleteProps>(function 
       return (strict ? haystack : haystack.toLocaleLowerCase()).includes(needle);
     });
   }, [filterOption, options, query, strict]);
+  const hasQuery = Boolean(query.trim());
+  const panelState = !hasQuery ? "closed" : loading ? "loading" : error !== undefined ? "error" : visibleOptions.length ? "options" : "empty";
+  const panelOpen = open && panelState !== "closed";
 
   useEffect(() => {
     if (controlled) setQuery(value);
@@ -107,7 +114,7 @@ const AutoCompleteBase = forwardRef<TriggerElement, AutoCompleteProps>(function 
   };
   const handleKeyDown = (event: KeyboardEvent<TriggerElement>) => {
     if (event.key === "Escape") { setOpen(false); setActiveIndex(-1); return; }
-    if (!visibleOptions.length) return;
+    if (panelState !== "options" || !visibleOptions.length) return;
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
       setOpen(true);
@@ -134,11 +141,11 @@ const AutoCompleteBase = forwardRef<TriggerElement, AutoCompleteProps>(function 
     role: "combobox",
     disabled,
     "aria-autocomplete": "list",
-    "aria-expanded": open && visibleOptions.length > 0,
+    "aria-expanded": panelOpen,
     "aria-controls": popupId,
     "aria-activedescendant": activeIndex >= 0 ? `${popupId}-option-${activeIndex}` : undefined,
     onChange: (event) => updateValue(event.currentTarget.value),
-    onFocus: (event) => { setOpen(!disabled && !!query.trim() && visibleOptions.length > 0); onInputFocus?.(event as FocusEvent<HTMLInputElement>); },
+    onFocus: (event) => { setOpen(!disabled && hasQuery); onInputFocus?.(event as FocusEvent<HTMLInputElement>); },
     onBlur: (event) => onInputBlur?.(event as FocusEvent<HTMLInputElement>),
     onKeyDown: (event) => { handleKeyDown(event); onInputKeyDown?.(event as KeyboardEvent<HTMLInputElement>); },
   };
@@ -159,14 +166,17 @@ const AutoCompleteBase = forwardRef<TriggerElement, AutoCompleteProps>(function 
   }
 
   return (
-    <span ref={rootRef} className={joinClassNames("qizhi-auto-complete", open && visibleOptions.length > 0 && "qizhi-auto-complete--open", className)} style={style}>
+    <span ref={rootRef} className={joinClassNames("qizhi-auto-complete", panelOpen && "qizhi-auto-complete--open", className)} style={style}>
       {trigger}
-      {open && visibleOptions.length > 0 ? (
+      {panelOpen ? (
         <ul id={popupId} className="qizhi-auto-complete__popup" role="listbox">
-          {visibleOptions.map((option, index) => {
+          {panelState === "loading" ? <li className="qizhi-auto-complete__state" role="status" aria-live="polite">正在加载</li> : null}
+          {panelState === "error" ? <li className="qizhi-auto-complete__state qizhi-auto-complete__state--error" role="alert"><span>{error}</span>{onRetry ? <button className="qizhi-auto-complete__retry" type="button" onMouseDown={(event) => event.preventDefault()} onClick={onRetry}>重试</button> : null}</li> : null}
+          {panelState === "empty" ? <li className="qizhi-auto-complete__state" role="status">{emptyContent}</li> : null}
+          {panelState === "options" ? visibleOptions.map((option, index) => {
             const groupChanged = option.group != null && (index === 0 || option.group !== visibleOptions[index - 1].group);
             return <li key={`${option.value}-${index}`} className="qizhi-auto-complete__entry" role="presentation">{groupChanged ? <div className="qizhi-auto-complete__group">{option.group}</div> : null}<div id={`${popupId}-option-${index}`} className={joinClassNames("qizhi-auto-complete__option", index === activeIndex && "qizhi-auto-complete__option--active", option.disabled && "qizhi-auto-complete__option--disabled")} role="option" aria-selected={index === activeIndex} aria-disabled={option.disabled || undefined} onMouseDown={(event) => { event.preventDefault(); selectOption(option); }} onMouseEnter={() => { if (!option.disabled) setActiveIndex(index); }}>{option.label ?? option.value}</div></li>;
-          })}
+          }) : null}
         </ul>
       ) : null}
     </span>

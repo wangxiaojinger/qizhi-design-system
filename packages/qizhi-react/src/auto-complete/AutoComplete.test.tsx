@@ -35,7 +35,8 @@ describe("AutoComplete", () => {
     const input = screen.getByRole("combobox", { name: "严格匹配" });
 
     await user.type(input, "B");
-    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent("暂无匹配结果");
+    expect(screen.queryByRole("option")).not.toBeInTheDocument();
     await user.clear(input);
     await user.type(input, "b");
     expect(screen.getAllByRole("option")).toHaveLength(3);
@@ -125,6 +126,32 @@ describe("AutoComplete", () => {
     await user.click(screen.getByRole("button", { name: "外部" }));
     expect(onFocus).toHaveBeenCalledOnce();
     expect(onBlur).toHaveBeenCalledOnce();
+  });
+
+  it("展示加载、失败重试、空结果和成功候选四态", async () => {
+    const user = userEvent.setup();
+    const onRetry = vi.fn();
+    const onSelect = vi.fn();
+    const { rerender } = render(
+      <AutoComplete aria-label="区域" data={["华北旧候选"]} loading onRetry={onRetry} onSelect={onSelect} />,
+    );
+    const input = screen.getByRole("combobox", { name: "区域" });
+    await user.type(input, "华");
+
+    expect(screen.getByRole("status")).toHaveTextContent("正在加载");
+    await user.keyboard("{Enter}");
+    expect(onSelect).not.toHaveBeenCalled();
+
+    rerender(<AutoComplete aria-label="区域" data={["华北旧候选"]} error="查询失败" onRetry={onRetry} onSelect={onSelect} />);
+    expect(screen.getByText("查询失败")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "重试" }));
+    expect(onRetry).toHaveBeenCalledOnce();
+
+    rerender(<AutoComplete aria-label="区域" data={[]} emptyContent="没有匹配区域" onSelect={onSelect} />);
+    expect(screen.getByText("没有匹配区域")).toBeInTheDocument();
+
+    rerender(<AutoComplete aria-label="区域" data={["华北"]} onSelect={onSelect} />);
+    expect(screen.getByRole("option", { name: "华北" })).toBeInTheDocument();
   });
 
 });

@@ -23,6 +23,10 @@ export interface AutoCompleteProps
   strict?: boolean;
   filterOption?: AutoCompleteFilter;
   triggerElement?: ReactElement;
+  loading?: boolean;
+  emptyContent?: ReactNode;
+  error?: ReactNode;
+  onRetry?: () => void;
   onChange?: (value: string) => void;
   onSearch?: (value: string) => void;
   onSelect?: (value: string, option: AutoCompleteOption) => void;
