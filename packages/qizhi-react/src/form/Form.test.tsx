@@ -1,4 +1,4 @@
-import { createRef } from "react";
+import { createRef, useState } from "react";
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
@@ -270,6 +270,111 @@ describe("Form.Item", () => {
     act(() => form?.resetFields(["serviceName"]));
     expect(screen.getByRole("textbox", { name: "服务名称" })).toHaveValue("initial");
     expect(screen.getByRole("textbox", { name: "项目" })).toHaveValue("private");
+  });
+
+  it("按字段与表单 preserve 策略处理条件字段且不伪造用户变更", async () => {
+    const user = userEvent.setup();
+    const onValuesChange = vi.fn();
+    let form: FormInstance | undefined;
+
+    function Example() {
+      const [instance] = Form.useForm();
+      const [visible, setVisible] = useState(true);
+      form = instance;
+      return (
+        <Form form={instance} preserve={false} initialValues={{ kept: "A", removed: "B" }} onValuesChange={onValuesChange}>
+          {visible ? <>
+            <Form.Item name="kept" preserve><input aria-label="保留字段" /></Form.Item>
+            <Form.Item name="removed"><input aria-label="清理字段" /></Form.Item>
+          </> : null}
+          <button type="button" onClick={() => setVisible(false)}>隐藏字段</button>
+        </Form>
+      );
+    }
+
+    render(<Example />);
+    await user.click(screen.getByRole("button", { name: "隐藏字段" }));
+
+    expect(form?.getFieldValue("kept")).toBe("A");
+    expect(form?.getFieldValue("removed")).toBeUndefined();
+    expect(onValuesChange).not.toHaveBeenCalled();
+  });
+
+  it("默认保留卸载字段，字段级 preserve=false 可显式清理", async () => {
+    const user = userEvent.setup();
+    let form: FormInstance | undefined;
+
+    function Example() {
+      const [instance] = Form.useForm();
+      const [visible, setVisible] = useState(true);
+      form = instance;
+      return (
+        <Form form={instance} initialValues={{ kept: "A", removed: "B" }}>
+          {visible ? <>
+            <Form.Item name="kept"><input aria-label="默认保留字段" /></Form.Item>
+            <Form.Item name="removed" preserve={false}><input aria-label="显式清理字段" /></Form.Item>
+          </> : null}
+          <button type="button" onClick={() => setVisible(false)}>卸载字段</button>
+        </Form>
+      );
+    }
+
+    render(<Example />);
+    await user.click(screen.getByRole("button", { name: "卸载字段" }));
+
+    expect(form?.getFieldValue("kept")).toBe("A");
+    expect(form?.getFieldValue("removed")).toBeUndefined();
+  });
+
+  it("useWatch 响应目标路径变化并忽略无关兄弟字段", () => {
+    const parentRender = vi.fn();
+    const emailRender = vi.fn();
+    let form: FormInstance | undefined;
+
+    function ParentWatcher() {
+      const value = Form.useWatch(["user"]);
+      parentRender();
+      return <output aria-label="用户对象">{JSON.stringify(value)}</output>;
+    }
+    function EmailWatcher() {
+      const value = Form.useWatch(["user", "email"]);
+      emailRender();
+      return <output aria-label="邮箱监听">{String(value)}</output>;
+    }
+    function Example() {
+      const [instance] = Form.useForm();
+      form = instance;
+      return (
+        <Form form={instance} initialValues={{ user: { email: "old@qizhi.cn", name: "Iris" } }}>
+          <ParentWatcher />
+          <EmailWatcher />
+          <Form.Item name={["user", "email"]}><input aria-label="邮箱字段" /></Form.Item>
+          <Form.Item name={["user", "name"]}><input aria-label="姓名字段" /></Form.Item>
+        </Form>
+      );
+    }
+
+    render(<Example />);
+    expect(screen.getByLabelText("邮箱监听")).toHaveTextContent("old@qizhi.cn");
+    const emailRenderCount = emailRender.mock.calls.length;
+
+    act(() => form?.setFieldValue(["user", "name"], "MaoMao"));
+    expect(parentRender.mock.calls.length).toBeGreaterThan(1);
+    expect(emailRender).toHaveBeenCalledTimes(emailRenderCount);
+
+    act(() => form?.setFieldValue(["user", "email"], "new@qizhi.cn"));
+    expect(screen.getByLabelText("邮箱监听")).toHaveTextContent("new@qizhi.cn");
+    act(() => form?.resetFields([["user", "email"]]));
+    expect(screen.getByLabelText("邮箱监听")).toHaveTextContent("old@qizhi.cn");
+  });
+
+  it("useWatch 在 Form 上下文外且无显式实例时抛出清晰错误", () => {
+    function InvalidWatcher() {
+      Form.useWatch("field");
+      return null;
+    }
+
+    expect(() => render(<InvalidWatcher />)).toThrow("Form.useWatch 必须在 Form 内使用或传入 form 实例。");
   });
 
   it("在异步校验期间暴露校验中状态并展示失败原因", async () => {

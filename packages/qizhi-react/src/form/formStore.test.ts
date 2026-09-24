@@ -28,4 +28,30 @@ describe("formStore nested values", () => {
     await Promise.resolve();
     expect(validator).toHaveBeenCalledOnce();
   });
+
+  it("只重新校验命中的依赖字段并传入完整嵌套值", async () => {
+    const store = createFormStore();
+    const dependentValidator = vi.fn((_value, values) => {
+      if (values.account?.password !== "new") throw new Error("密码不一致");
+    });
+    const unrelatedValidator = vi.fn();
+    store.initialize({ account: { password: "old", confirmPassword: "old" }, nickname: "Iris" });
+    store.registerField(["account", "password"], { rules: [], validateTrigger: "onChange" });
+    store.registerField(["account", "confirmPassword"], {
+      rules: [{ validator: dependentValidator }],
+      validateTrigger: "onChange",
+      dependencies: [["account", "password"]],
+    });
+    store.registerField("nickname", { rules: [{ validator: unrelatedValidator }], validateTrigger: "onChange" });
+
+    store.instance.setFieldValue(["account", "password"], "new");
+    await Promise.resolve();
+
+    expect(dependentValidator).toHaveBeenCalledOnce();
+    expect(dependentValidator.mock.calls[0]?.[1]).toEqual({
+      account: { password: "new", confirmPassword: "old" },
+      nickname: "Iris",
+    });
+    expect(unrelatedValidator).not.toHaveBeenCalled();
+  });
 });
