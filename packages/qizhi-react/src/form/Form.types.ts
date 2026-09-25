@@ -97,6 +97,48 @@ export interface FormListProps {
   children: (fields: FormListField[], operations: FormListOperations) => ReactNode;
 }
 
+export type FormBulkEditKey = string | number;
+export type FormBulkEditMode = "keep" | "set" | "clear";
+export type FormBulkEditStatus = "ready" | "sourceChanged" | "complete";
+export type FormBulkEditBlockedCode = "no-changes" | "no-targets" | "source-changed";
+
+export interface FormBulkEditBlockedError extends Error {
+  code: FormBulkEditBlockedCode;
+}
+
+export interface FormBulkEditOptions<TRecord, TKey extends FormBulkEditKey> {
+  form: FormInstance;
+  records: readonly TRecord[];
+  getRowKey: (record: TRecord) => TKey;
+  fields: readonly FormNamePath[];
+  getFieldValue?: (record: TRecord, name: FormNamePath) => unknown;
+  isEqual?: (left: unknown, right: unknown, name: FormNamePath) => boolean;
+}
+
+export interface FormBulkEditFieldState {
+  name: FormNamePath;
+  mixed: boolean;
+  mode: FormBulkEditMode;
+  initialValue: unknown;
+}
+
+export interface FormBulkEditPatch<TKey extends FormBulkEditKey> {
+  targetKeys: readonly TKey[];
+  values: FormValues;
+  clearedFields: readonly FormNamePath[];
+}
+
+export interface FormBulkEditFailure<TKey extends FormBulkEditKey> {
+  key: TKey;
+  field?: FormNamePath;
+  message: string;
+}
+
+export interface FormBulkEditResult<TKey extends FormBulkEditKey> {
+  succeededKeys: readonly TKey[];
+  failures: readonly FormBulkEditFailure<TKey>[];
+}
+
 export interface FormComponent {
   (props: FormProps): ReactNode;
   Item: (props: FormItemProps) => ReactNode;
