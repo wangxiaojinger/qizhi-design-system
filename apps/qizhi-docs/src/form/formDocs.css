@@ -263,3 +263,70 @@
     animation: none;
   }
 }
+
+#component-form .form-docs-bulk-edit-summary,
+#component-form .form-docs-bulk-edit-warning,
+#component-form .form-docs-bulk-edit-results {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+#component-form .form-docs-bulk-edit-summary {
+  color: var(--qizhi-color-text-secondary, #5e6673);
+}
+
+#component-form .form-docs-bulk-edit-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+}
+
+#component-form .form-docs-bulk-edit-mixed {
+  margin: -16px 0 8px;
+  color: var(--qizhi-color-text-secondary, #5e6673);
+  font-size: 12px;
+}
+
+#component-form .form-docs-bulk-edit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+#component-form .form-docs-bulk-edit-warning {
+  padding: 12px;
+  color: var(--qizhi-color-warning-text, #8a5a00);
+  background: var(--qizhi-color-warning-bg, #fff7e8);
+  border: 1px solid var(--qizhi-color-warning-border, #ffcf8b);
+  border-radius: 4px;
+}
+
+#component-form .form-docs-bulk-edit-results {
+  display: grid;
+  gap: 8px;
+}
+
+#component-form .form-docs-bulk-edit-results output {
+  display: block;
+}
+
+#component-form .form-docs-bulk-edit-results pre {
+  max-width: 100%;
+  margin: 0;
+  padding: 12px;
+  overflow: auto;
+  white-space: pre-wrap;
+  background: #f7f8fa;
+  border-radius: 4px;
+}
+
+@media (max-width: 720px) {
+  #component-form .form-docs-bulk-edit-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  #component-form .form-docs-bulk-edit-actions > .qizhi-btn {
+    width: 100%;
+  }
+}

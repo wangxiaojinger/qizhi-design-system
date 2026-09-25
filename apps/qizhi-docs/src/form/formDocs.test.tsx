@@ -1,12 +1,12 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { FormDocsIsland } from "./FormDocsIsland";
-import { formApi, formInstanceApi, formItemApi, formListApi } from "./formApi";
+import { formApi, formBulkEditApi, formInstanceApi, formItemApi, formListApi } from "./formApi";
 import { formDemos } from "./formDocs.registry";
 
 describe("Form docs", () => {
-  it("preserves the existing Demos and appends the remote business Demo", () => {
-    expect(formDemos.map((demo) => demo.title)).toEqual(["基础用法", "表单布局", "受控表单", "业务校验闭环", "复杂表单联动", "远程联动与未保存修改"]);
+  it("preserves the existing Demos and appends the Bulk Edit Demo", () => {
+    expect(formDemos.map((demo) => demo.title)).toEqual(["基础用法", "表单布局", "受控表单", "业务校验闭环", "复杂表单联动", "远程联动与未保存修改", "批量编辑"]);
     expect(formDemos.map((demo) => demo.description)).toEqual([
       "非受控模式的基础用法，表单项采用垂直布局。",
       "Form 支持垂直和水平两种排列方式。",
@@ -14,18 +14,20 @@ describe("Form docs", () => {
       "演示前端校验、提交、后端字段错误回填以及修改后清除错误的完整链路。",
       "演示嵌套字段、依赖校验、条件字段保留策略和动态成员列表。",
       "演示异步校验竞态、网络异常分流、远程查询四态、条件字段清理和未保存修改判断。",
+      "演示混合值、仅提交改动字段、主动清空、部分失败回填以及失败记录重试。",
     ]);
     formDemos.forEach((demo) => {
       expect(demo.source).toContain('from "@wangxiaojinger/qizhi-react"');
       expect(demo.source).not.toContain("Demo.tsx");
     });
+    expect(formDemos.at(-1)?.source).toContain("Form.useBulkEdit");
   });
 
   it("renders the legacy field data and initial states through formal components", () => {
     render(<FormDocsIsland />);
 
-    expect(screen.getAllByRole("button", { name: "查看代码" })).toHaveLength(6);
-    expect(screen.getAllByRole("button", { name: "复制代码" })).toHaveLength(6);
+    expect(screen.getAllByRole("button", { name: "查看代码" })).toHaveLength(7);
+    expect(screen.getAllByRole("button", { name: "复制代码" })).toHaveLength(7);
     expect(screen.getAllByText("支持小写字母、数字、短横线，须以字母开头。")).toHaveLength(3);
 
     const basic = document.getElementById("表单-基础用法")!;
@@ -152,6 +154,7 @@ describe("Form docs", () => {
     expect(formApi.map((item) => item.name)).toEqual(["layout", "form", "initialValues", "onValuesChange", "onFinish", "onFinishFailed", "onValidationException", "scrollToFirstError", "preserve", "children", "className", "style"]);
     expect(formItemApi.map((item) => item.name)).toEqual(["name", "label", "required", "extra", "rules", "validateTrigger", "validateStatus", "help", "dependencies", "preserve", "children", "className", "style"]);
     expect(formListApi.map((item) => item.name)).toEqual(["name", "initialValue", "children"]);
+    expect(formBulkEditApi.map((item) => item.name)).toEqual(["form", "records", "getRowKey", "fields", "getFieldValue", "isEqual", "getFieldState", "getFieldFailures", "clearField", "keepField", "validate", "applyResult", "rebase", "reset", "status", "failures", "succeededKeys", "remainingKeys", "hasChanges"]);
     expect(formInstanceApi.map((item) => item.name)).toEqual(["getFieldsValue", "getFieldValue", "setFieldsValue", "setFieldValue", "getFieldError", "setFieldErrors", "validateFields", "resetFields", "isFieldsDirty", "markFieldsClean", "scrollToField", "submit"]);
     expect(formApi.find((item) => item.name === "layout")?.defaultValue).toBe("vertical");
     expect(formItemApi.find((item) => item.name === "required")?.defaultValue).toBe("false");
@@ -162,6 +165,51 @@ describe("Form docs", () => {
     expect(screen.getByRole("table", { name: "Form API" })).toBeInTheDocument();
     expect(screen.getByRole("table", { name: "Form.Item API" })).toBeInTheDocument();
     expect(screen.getByRole("table", { name: "Form.List API" })).toBeInTheDocument();
+    expect(screen.getByRole("table", { name: "Form.useBulkEdit API" })).toBeInTheDocument();
     expect(screen.getByRole("table", { name: "FormInstance API" })).toBeInTheDocument();
+  });
+
+  it("demonstrates mixed values, changed-only patches, partial recovery and rebase", async () => {
+    render(<FormDocsIsland />);
+    const demo = document.getElementById("表单-批量编辑")!;
+    const department = within(demo).getByRole("combobox", { name: "统一部门" });
+    const mixedDescription = within(demo).getByText("多个不同值");
+    expect(department).toHaveAttribute("aria-describedby", mixedDescription.id);
+
+    fireEvent.click(department);
+    fireEvent.click(screen.getByRole("option", { name: "产品部" }));
+    expect(department).not.toHaveAttribute("aria-describedby");
+    fireEvent.click(within(demo).getByRole("button", { name: "清空备注" }));
+    expect(within(demo).getByRole("textbox", { name: "统一备注" })).not.toHaveAttribute("aria-describedby");
+    fireEvent.click(within(demo).getByRole("button", { name: "校验并生成补丁" }));
+    const patch = await within(demo).findByRole("status", { name: "批量编辑补丁" });
+    expect(patch).toHaveTextContent('"department": "product"');
+    expect(patch).toHaveTextContent('"profile"');
+    expect(patch).toHaveTextContent('"remark"');
+    expect(patch).not.toHaveTextContent('"status"');
+
+    fireEvent.click(within(demo).getByRole("button", { name: "模拟部分成功" }));
+    expect(await within(demo).findByText("成功 1 条，失败 2 条")).toBeInTheDocument();
+    expect(within(demo).getAllByText(/没有修改部门的权限/)).toHaveLength(2);
+    const failureItems = within(demo).getAllByRole("listitem");
+    expect(failureItems).toHaveLength(2);
+    failureItems.forEach((item) => expect(item).toHaveAttribute("tabindex", "0"));
+    failureItems[0]?.focus();
+    expect(failureItems[0]).toHaveFocus();
+
+    fireEvent.click(within(demo).getByRole("button", { name: "模拟外部数据变化" }));
+    expect(await within(demo).findByRole("alert", { name: "批量编辑数据变化" })).toHaveTextContent("源数据已变化");
+    expect(department).toHaveValue("产品部");
+    fireEvent.click(within(demo).getByRole("button", { name: "基于最新数据重新开始" }));
+    await waitFor(() => expect(within(demo).queryByRole("alert", { name: "批量编辑数据变化" })).not.toBeInTheDocument());
+
+    fireEvent.click(department);
+    fireEvent.click(screen.getByRole("option", { name: "产品部" }));
+    fireEvent.click(within(demo).getByRole("button", { name: "清空备注" }));
+    fireEvent.click(within(demo).getByRole("button", { name: "校验并生成补丁" }));
+    fireEvent.click(await within(demo).findByRole("button", { name: "模拟部分成功" }));
+    fireEvent.click(within(demo).getByRole("button", { name: "仅重试失败成员" }));
+    expect(await within(demo).findByText("本次目标：member-2、member-3")).toBeInTheDocument();
+    expect(await within(demo).findByText("重试成功 2 条，失败 0 条")).toBeInTheDocument();
   });
 });

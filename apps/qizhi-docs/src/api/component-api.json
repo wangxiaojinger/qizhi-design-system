@@ -2519,6 +2519,125 @@
         }
       ]
     },
+    "formBulkEditApi": {
+      "source": "apps\\qizhi-docs\\src\\form\\formApi.ts",
+      "items": [
+        {
+          "name": "form",
+          "description": "由 Form.useForm 创建、承载批量编辑字段值和规则的表单实例。",
+          "type": "FormInstance",
+          "defaultValue": "—"
+        },
+        {
+          "name": "records",
+          "description": "同一数据结构下本轮需要批量编辑的记录。",
+          "type": "readonly TRecord[]",
+          "defaultValue": "—"
+        },
+        {
+          "name": "getRowKey",
+          "description": "返回稳定且唯一的字符串或数字记录 key。",
+          "type": "(record: TRecord) => TKey",
+          "defaultValue": "—"
+        },
+        {
+          "name": "fields",
+          "description": "显式声明允许批量编辑的字段路径；父子路径不能重叠。",
+          "type": "readonly FormNamePath[]",
+          "defaultValue": "—"
+        },
+        {
+          "name": "getFieldValue",
+          "description": "可选的记录字段读取器；默认按 FormNamePath 读取。",
+          "type": "(record, name) => unknown",
+          "defaultValue": "按路径读取"
+        },
+        {
+          "name": "isEqual",
+          "description": "可选的字段值比较器，用于判断共同值和混合值。",
+          "type": "(left, right, name) => boolean",
+          "defaultValue": "深度比较"
+        },
+        {
+          "name": "getFieldState",
+          "description": "返回字段是否混合、keep/set/clear 模式和初始共同值。",
+          "type": "(name) => FormBulkEditFieldState",
+          "defaultValue": "—"
+        },
+        {
+          "name": "getFieldFailures",
+          "description": "返回指定字段对应的逐记录业务失败；不会冒充前端规则错误。",
+          "type": "(name) => FormBulkEditFailure[]",
+          "defaultValue": "[]"
+        },
+        {
+          "name": "clearField",
+          "description": "将字段标记为主动清空，并与未修改状态明确区分。",
+          "type": "(name) => void",
+          "defaultValue": "—"
+        },
+        {
+          "name": "keepField",
+          "description": "撤销单个字段本轮修改，恢复共同值或混合值。",
+          "type": "(name) => void",
+          "defaultValue": "—"
+        },
+        {
+          "name": "validate",
+          "description": "只校验改动字段并生成差异补丁；无修改、无目标或源变化时拒绝。",
+          "type": "() => Promise<FormBulkEditPatch>",
+          "defaultValue": "—"
+        },
+        {
+          "name": "applyResult",
+          "description": "接收业务方提供的完整成功/失败分类，不发送请求。",
+          "type": "(result: FormBulkEditResult) => void",
+          "defaultValue": "—"
+        },
+        {
+          "name": "rebase",
+          "description": "放弃本轮修改并基于最新 records 重新建立编辑基线。",
+          "type": "() => void",
+          "defaultValue": "—"
+        },
+        {
+          "name": "reset",
+          "description": "撤销本轮修改并恢复当前已接纳的数据基线。",
+          "type": "() => void",
+          "defaultValue": "—"
+        },
+        {
+          "name": "status",
+          "description": "当前会话为可编辑、源数据变化或全部完成。",
+          "type": "\"ready\" | \"sourceChanged\" | \"complete\"",
+          "defaultValue": "ready"
+        },
+        {
+          "name": "failures",
+          "description": "当前待处理记录的逐条业务失败明细。",
+          "type": "readonly FormBulkEditFailure[]",
+          "defaultValue": "[]"
+        },
+        {
+          "name": "succeededKeys",
+          "description": "本轮已由业务回执确认成功的记录 key。",
+          "type": "readonly TKey[]",
+          "defaultValue": "[]"
+        },
+        {
+          "name": "remainingKeys",
+          "description": "下一次补丁仍需提交的记录 key；部分成功后只保留失败项。",
+          "type": "readonly TKey[]",
+          "defaultValue": "全部目标"
+        },
+        {
+          "name": "hasChanges",
+          "description": "是否至少存在一个 set 或 clear 字段。",
+          "type": "boolean",
+          "defaultValue": "false"
+        }
+      ]
+    },
     "formInstanceApi": {
       "source": "apps\\qizhi-docs\\src\\form\\formApi.ts",
       "items": [

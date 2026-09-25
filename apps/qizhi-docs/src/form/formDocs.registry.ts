@@ -11,6 +11,8 @@ import ComplexFieldsDemo from "./demos/ComplexFieldsDemo";
 import complexFieldsSource from "./demos/ComplexFieldsDemo.tsx?raw";
 import RemoteBusinessDemo from "./demos/RemoteBusinessDemo";
 import remoteBusinessSource from "./demos/RemoteBusinessDemo.tsx?raw";
+import BulkEditDemo from "./demos/BulkEditDemo";
+import bulkEditSource from "./demos/BulkEditDemo.tsx?raw";
 
 export interface FormDemoDefinition {
   id: string;
@@ -62,5 +64,12 @@ export const formDemos: readonly FormDemoDefinition[] = [
     description: "演示异步校验竞态、网络异常分流、远程查询四态、条件字段清理和未保存修改判断。",
     component: RemoteBusinessDemo,
     source: remoteBusinessSource,
+  },
+  {
+    id: "表单-批量编辑",
+    title: "批量编辑",
+    description: "演示混合值、仅提交改动字段、主动清空、部分失败回填以及失败记录重试。",
+    component: BulkEditDemo,
+    source: bulkEditSource,
   },
 ];
