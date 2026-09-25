@@ -1,6 +1,6 @@
 import { expect, expectTypeOf, test } from "vitest";
 import { Form } from "./Form";
-import type { FormFailedResult, FormInstance, FormNamePath, FormRule, FormRuleFailure, FormValidationException, FormValues } from "./Form.types";
+import type { FormDraftStorage, FormFailedResult, FormInstance, FormListField, FormListRowRule, FormListRule, FormNamePath, FormRule, FormRuleFailure, FormValidationException, FormValues } from "./Form.types";
 import type {
   FormBulkEditBlockedCode,
   FormBulkEditBlockedError,
@@ -61,6 +61,35 @@ test("Form v3 对外类型覆盖嵌套路径、动态列表和监听", () => {
   expectTypeOf(Example).toBeFunction();
 });
 
+test("Advanced Form.List 对外类型覆盖列表、整行校验与批量操作", () => {
+  const listRule: FormListRule = {
+    validator: async (rows, values) => {
+      expectTypeOf(rows).toEqualTypeOf<unknown[]>();
+      expectTypeOf(values).toEqualTypeOf<FormValues>();
+    },
+  };
+  const rowRule: FormListRowRule = async (row, index, values) => {
+    expectTypeOf(row).toEqualTypeOf<unknown>();
+    expectTypeOf(index).toEqualTypeOf<number>();
+    expectTypeOf(values).toEqualTypeOf<FormValues>();
+  };
+
+  const example = (
+    <Form.List name="members" min={1} max={10} rules={[listRule]} rowRules={[rowRule]}>
+      {(fields, operations, meta) => {
+        operations.addMany([{ name: "A" }, { name: "B" }]);
+        expectTypeOf(operations.canAdd(2)).toEqualTypeOf<boolean>();
+        expectTypeOf(operations.canRemove([0, 1])).toEqualTypeOf<boolean>();
+        expectTypeOf(fields).toEqualTypeOf<FormListField[]>();
+        expectTypeOf(meta.errors).toEqualTypeOf<string[]>();
+        return <Form.ErrorList errors={meta.errors} />;
+      }}
+    </Form.List>
+  );
+
+  expectTypeOf(example).not.toBeNever();
+});
+
 test("Form v4 对外类型覆盖异常分层和未保存修改", () => {
   const failure: FormRuleFailure = { type: "network", message: "服务暂不可用" };
   const exception: FormValidationException = { name: ["service", "region"], ...failure, type: "network" };
@@ -102,4 +131,73 @@ test("Form Bulk Edit 对外类型覆盖混合值、差异补丁和结果回填",
   expectTypeOf<FormBulkEditFieldState>().toHaveProperty("mixed");
   expectTypeOf<FormBulkEditFailure<string>>().toHaveProperty("message");
   expectTypeOf<FormBulkEditResult<string>>().toHaveProperty("succeededKeys");
+});
+
+test("Form Steps 对外类型覆盖步骤字段、切换和提交", () => {
+  function Wizard() {
+    const [form] = Form.useForm();
+    const steps = Form.useSteps({
+      form,
+      initialStep: 1,
+      steps: [
+        { key: "base", fields: ["name"] },
+        { key: "detail", fields: [["profile", "email"]] },
+      ],
+    });
+    expectTypeOf(steps.current).toEqualTypeOf<number>();
+    expectTypeOf(steps.next()).toEqualTypeOf<Promise<boolean>>();
+    expectTypeOf(steps.goTo(2)).toEqualTypeOf<Promise<boolean>>();
+    expectTypeOf(steps.submit()).toEqualTypeOf<Promise<boolean>>();
+    return <Form form={form}>{steps.current}</Form>;
+  }
+  expectTypeOf(Wizard).toBeFunction();
+});
+
+test("Form Steps 对外类型支持受控步骤", () => {
+  function ControlledWizard() {
+    const [form] = Form.useForm();
+    Form.useSteps({
+      form,
+      steps: [],
+      current: 2,
+      onCurrentChange: (next) => {
+        expectTypeOf(next).toEqualTypeOf<number>();
+      },
+    });
+    return <Form form={form} />;
+  }
+  expectTypeOf(ControlledWizard).toBeFunction();
+});
+
+test("Form Draft 对外类型要求显式存储与字段筛选", () => {
+  const storage: FormDraftStorage = {
+    load: async () => null,
+    save: async (input) => ({
+      status: "saved",
+      record: {
+        key: input.key,
+        version: input.version,
+        values: input.values,
+        metadata: input.metadata,
+        revision: "r1",
+        updatedAt: "2026-09-24T00:00:00.000Z",
+      },
+    }),
+    remove: async () => undefined,
+  };
+
+  function DraftState() {
+    const [form] = Form.useForm();
+    const draft = Form.useDraft({
+      form,
+      draftKey: "service:create:user-1",
+      version: "v1",
+      storage,
+      selectValues: (values) => ({ name: values.name }),
+    });
+    expectTypeOf(draft.save()).toEqualTypeOf<Promise<boolean>>();
+    return <Form form={form} />;
+  }
+
+  expectTypeOf(DraftState).toBeFunction();
 });

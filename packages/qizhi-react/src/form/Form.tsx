@@ -1,13 +1,17 @@
 import { Children, cloneElement, createContext, forwardRef, isValidElement, useContext, useEffect, useId, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { ChangeEvent, FocusEvent, ReactElement } from "react";
-import type { FormComponent, FormErrorField, FormInstance, FormItemProps, FormListProps, FormNamePath, FormProps, FormValidationException, FormValues } from "./Form.types";
-import { createFormStore, getFormStore, type FormStore } from "./formStore";
+import type { FormComponent, FormErrorField, FormErrorListProps, FormInstance, FormItemProps, FormListProps, FormListRowRule, FormListRule, FormNamePath, FormProps, FormStepsOptions, FormValidationException, FormValues } from "./Form.types";
+import { createFormStore, getFormStore, isValidationCancelled, type FormStore } from "./formStore";
+import { isSameOrAncestorPath } from "./formPath";
+import { useDraft } from "./formDraft";
 import { useBulkEdit } from "./formBulkEdit";
 import "./form.css";
 
 const joinClassNames = (...names: Array<string | undefined>) => names.filter(Boolean).join(" ");
 type FieldControlProps = { value?: unknown; onChange?: (...args: unknown[]) => void; onBlur?: (event: FocusEvent<HTMLElement>) => void; status?: string; "aria-invalid"?: boolean; "aria-describedby"?: string; "aria-label"?: string; "aria-labelledby"?: string };
 const FormContext = createContext<FormStore | null>(null);
+const emptyListRules: FormListRule[] = [];
+const emptyRowRules: FormListRowRule[] = [];
 const valueFromChange = (first: unknown) => first && typeof first === "object" && "target" in first ? (first as ChangeEvent<HTMLInputElement>).target.value : first;
 
 function useForm(): [FormInstance] { const storeRef = useRef<FormStore | null>(null); if (!storeRef.current) storeRef.current = createFormStore(); return [storeRef.current.instance]; }
@@ -21,6 +25,74 @@ function useDirty(form?: FormInstance): boolean {
   if (!store) throw new Error("Form.useDirty 必须在 Form 内使用或传入 form 实例。");
   return useSyncExternalStore((listener) => store.subscribeDirty(listener), () => store.instance.isFieldsDirty(), () => store.instance.isFieldsDirty());
 }
+function useSteps({ form, steps, initialStep = 1, current, onCurrentChange }: FormStepsOptions) {
+  const safeStep = (step: number) => Math.min(Math.max(1, Math.floor(step)), Math.max(1, steps.length));
+  const [internalCurrent, setInternalCurrent] = useState(() => safeStep(initialStep));
+  const activeCurrent = current === undefined ? internalCurrent : safeStep(current);
+  const pendingFocusRef = useRef<FormNamePath | undefined>(undefined);
+  const navigationRequestRef = useRef(0);
+  useEffect(() => {
+    if (pendingFocusRef.current === undefined) return;
+    const field = pendingFocusRef.current;
+    pendingFocusRef.current = undefined;
+    form.scrollToField(field);
+  }, [activeCurrent, form]);
+  const changeCurrent = (step: number) => {
+    const target = safeStep(step);
+    if (target === activeCurrent) return;
+    if (current === undefined) setInternalCurrent(target);
+    onCurrentChange?.(target);
+  };
+  const focusFirstError = (error: unknown) => {
+    const firstError = (error as { errorFields?: FormErrorField[] }).errorFields?.[0];
+    if (firstError) form.scrollToField(firstError.name);
+    return false;
+  };
+  const validateCurrent = async () => {
+    const request = ++navigationRequestRef.current;
+    const fields = steps[activeCurrent - 1]?.fields ?? [];
+    try { await form.validateFields([...fields]); return request === navigationRequestRef.current; }
+    catch (error) { return focusFirstError(error); }
+  };
+  const goTo = async (step: number) => {
+    const target = safeStep(step);
+    if (target === activeCurrent) return true;
+    if (target > activeCurrent && !await validateCurrent()) return false;
+    changeCurrent(target);
+    return true;
+  };
+  const submit = async () => {
+    const request = ++navigationRequestRef.current;
+    try {
+      await form.validateFields();
+      if (request !== navigationRequestRef.current) return false;
+      getFormStore(form)?.requestValidatedSubmit();
+      return true;
+    }
+    catch (error) {
+      const firstError = (error as { errorFields?: FormErrorField[] }).errorFields?.[0];
+      if (firstError) {
+        const errorStep = steps.findIndex((item) => item.fields.some((field) => isSameOrAncestorPath(field, firstError.name)));
+        if (errorStep >= 0 && errorStep + 1 !== activeCurrent) {
+          pendingFocusRef.current = firstError.name;
+          changeCurrent(errorStep + 1);
+        } else form.scrollToField(firstError.name);
+      }
+      return false;
+    }
+  };
+  return {
+    current: activeCurrent,
+    step: steps[activeCurrent - 1],
+    total: steps.length,
+    isFirst: activeCurrent <= 1,
+    isLast: activeCurrent >= steps.length,
+    next: () => goTo(activeCurrent + 1),
+    previous: () => changeCurrent(activeCurrent - 1),
+    goTo,
+    submit,
+  };
+}
 
 const FormRoot = forwardRef<HTMLFormElement, FormProps>(function Form({ layout = "vertical", form, initialValues, onValuesChange, onFinish, onFinishFailed, onValidationException, scrollToFirstError = false, preserve = true, className, children, ...formProps }, ref) {
   const [internalForm] = useForm(); const activeForm = form ?? internalForm; const store = getFormStore(activeForm);
@@ -28,8 +100,8 @@ const FormRoot = forwardRef<HTMLFormElement, FormProps>(function Form({ layout =
   store.initialize(initialValues); store.setCallbacks({ onValuesChange, onValidationException }); store.setDefaultPreserve(preserve);
   const submittingRef = useRef(false);
   return <FormContext.Provider value={store}><form {...formProps} ref={(node) => { store.setFormNode(node); if (typeof ref === "function") ref(node); else if (ref) ref.current = node; }} className={joinClassNames("qizhi-form", `qizhi-form-layout-${layout}`, className)} onSubmit={async (event) => {
-    event.preventDefault(); if (submittingRef.current) return; submittingRef.current = true;
-    try { try { const values = await activeForm.validateFields(); await onFinish?.(values); } catch (error) { const result = error as { values?: FormValues; errorFields?: FormErrorField[] }; if (!result.errorFields || !result.values) { if ((error as FormValidationException)?.type === "network") return; throw error; } onFinishFailed?.({ values: result.values, errorFields: result.errorFields }); if (scrollToFirstError && result.errorFields[0]) activeForm.scrollToField(result.errorFields[0].name); } } finally { submittingRef.current = false; }
+    event.preventDefault(); const validatedSubmit = store.consumeValidatedSubmit(); if (submittingRef.current) return; submittingRef.current = true;
+    try { try { const values = validatedSubmit ? activeForm.getFieldsValue() : await activeForm.validateFields(); await onFinish?.(values); } catch (error) { if (isValidationCancelled(error)) return; const result = error as { values?: FormValues; errorFields?: FormErrorField[] }; if (!result.errorFields || !result.values) { if ((error as FormValidationException)?.type === "network") return; throw error; } onFinishFailed?.({ values: result.values, errorFields: result.errorFields }); if (scrollToFirstError && result.errorFields[0]) activeForm.scrollToField(result.errorFields[0].name); } } finally { submittingRef.current = false; }
   }}>{children}</form></FormContext.Provider>;
 });
 
@@ -54,12 +126,30 @@ function FormItem({ name, label, required = false, extra, rules = [], validateTr
   </div>;
 }
 
-function FormList({ name, initialValue, children }: FormListProps) {
+function FormList({ name, initialValue, min, max, rules = emptyListRules, rowRules = emptyRowRules, children }: FormListProps) {
   const store = useContext(FormContext); if (!store) throw new Error("Form.List 必须在 Form 内使用。");
-  const nameKey = JSON.stringify(name); store.initializeList(name, initialValue);
+  const nameKey = JSON.stringify(name); store.initializeList(name, initialValue); store.updateListConfig(name, { min, max, rules, rowRules });
+  const [, setVersion] = useState(0);
+  useEffect(() => store.registerList(name, { min, max, rules, rowRules }), [nameKey, store]);
+  useEffect(() => store.subscribeField(name, () => setVersion((value) => value + 1)), [nameKey, store]);
+  useEffect(() => { void store.validateList(name); }, [nameKey, max, min, rowRules, rules, store]);
   useSyncExternalStore((listener) => store.subscribePath(name, listener), () => store.instance.getFieldValue(name), () => store.instance.getFieldValue(name));
-  const keys = store.getListKeys(name); const operations = useMemo(() => ({ add: (value?: unknown, index?: number) => store.addListValue(name, value, index), remove: (index: number | number[]) => store.removeListValue(name, index), move: (from: number, to: number) => store.moveListValue(name, from, to) }), [nameKey, store]);
-  return children(keys.map((key, index) => ({ key, name: index })), operations);
+  const keys = store.getListKeys(name); const operations = useMemo(() => ({
+    add: (value?: unknown, index?: number) => store.addListValue(name, value, index),
+    addMany: (values: readonly unknown[], index?: number) => store.addListValues(name, values, index),
+    remove: (index: number | readonly number[]) => store.removeListValue(name, typeof index === "number" ? index : [...index]),
+    move: (from: number, to: number) => store.moveListValue(name, from, to),
+    canAdd: (count?: number) => store.canAddListValues(name, count),
+    canRemove: (index: number | readonly number[]) => store.canRemoveListValues(name, index),
+  }), [nameKey, store]);
+  return children(keys.map((key, index) => ({ key, name: index, errors: store.getListRowErrors(name, key) })), operations, { errors: store.getListErrors(name) });
 }
 
-export const Form = Object.assign(FormRoot, { Item: FormItem, List: FormList, useForm, useWatch, useDirty, useBulkEdit }) as FormComponent;
+function FormErrorList({ errors = [], className, style }: FormErrorListProps) {
+  if (!errors.length) return null;
+  return <div className={joinClassNames("qizhi-form-error-list", className)} style={style} role="alert">
+    {errors.map((error, index) => <div key={index}>{error}</div>)}
+  </div>;
+}
+
+export const Form = Object.assign(FormRoot, { Item: FormItem, List: FormList, ErrorList: FormErrorList, useForm, useWatch, useDirty, useSteps, useDraft, useBulkEdit }) as FormComponent;

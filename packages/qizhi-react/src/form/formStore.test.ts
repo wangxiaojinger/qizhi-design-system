@@ -2,6 +2,18 @@ import { describe, expect, it, vi } from "vitest";
 import { createFormStore } from "./formStore";
 
 describe("formStore nested values", () => {
+  it("setFieldsValue 把数组作为完整路径值替换", () => {
+    const store = createFormStore();
+    store.initialize({ team: { members: [{ name: "A" }, { name: "B" }] }, untouched: "keep" });
+    store.initializeList(["team", "members"]);
+
+    store.instance.setFieldsValue({ team: { members: [] } });
+
+    expect(store.instance.getFieldValue(["team", "members"])).toEqual([]);
+    expect(store.instance.getFieldValue("untouched")).toBe("keep");
+    expect(store.getListKeys(["team", "members"])).toHaveLength(0);
+  });
+
   it("重置父路径恢复完整子树并清理后代错误且保留无关修改", () => {
     const store = createFormStore();
     store.initialize({ service: { name: "初始服务", region: "华北" }, owner: "Iris" });
@@ -220,5 +232,92 @@ describe("formStore nested values", () => {
     store.instance.setFieldValue(["user", "email"], "new@qizhi.cn");
     expect(emailListener).toHaveBeenCalledOnce();
     expect(userListener).toHaveBeenCalledTimes(2);
+  });
+
+  it("拒绝无效列表数量配置并允许零上下限", () => {
+    const store = createFormStore();
+    store.initialize({ members: [] });
+    expect(() => store.registerList("members", { min: -1, rules: [], rowRules: [] })).toThrow(/min/);
+    expect(() => store.registerList("members", { max: 1.5, rules: [], rowRules: [] })).toThrow(/max/);
+    expect(() => store.registerList("members", { min: 2, max: 1, rules: [], rowRules: [] })).toThrow(/min.*max/);
+    expect(() => store.registerList("members", { min: 0, max: 0, rules: [], rowRules: [] })).not.toThrow();
+  });
+
+  it("按最终数量原子执行批量新增与去重删除", () => {
+    const onValuesChange = vi.fn();
+    const store = createFormStore();
+    store.initialize({ members: [{ name: "A" }, { name: "B" }] });
+    store.setCallbacks({ onValuesChange });
+    store.initializeList("members");
+    store.registerList("members", { min: 1, max: 4, rules: [], rowRules: [] });
+
+    expect(store.canAddListValues("members", 2)).toBe(true);
+    store.addListValues("members", [{ name: "C" }, { name: "D" }], 1);
+    expect(store.instance.getFieldValue("members")).toEqual([
+      { name: "A" }, { name: "C" }, { name: "D" }, { name: "B" },
+    ]);
+    expect(store.canAddListValues("members", 1)).toBe(false);
+    const keysAtMax = store.getListKeys("members");
+    store.addListValues("members", [{ name: "E" }]);
+    expect(store.instance.getFieldValue("members")).toHaveLength(4);
+    expect(store.getListKeys("members")).toEqual(keysAtMax);
+
+    expect(store.canRemoveListValues("members", [0, 0, -1, 99])).toBe(true);
+    store.removeListValue("members", [0, 0, -1, 99]);
+    expect(store.instance.getFieldValue("members")).toHaveLength(3);
+    expect(store.canRemoveListValues("members", [0, 1, 2])).toBe(false);
+    store.removeListValue("members", [0, 1, 2]);
+    expect(store.instance.getFieldValue("members")).toHaveLength(3);
+
+    store.addListValues("members", []);
+    expect(store.canAddListValues("members", 0)).toBe(true);
+    expect(() => store.canAddListValues("members", 1.5)).toThrow(/count/);
+    expect(onValuesChange).toHaveBeenCalledTimes(2);
+  });
+
+  it("校验整个列表并让整行错误跟随稳定 key 迁移", async () => {
+    const store = createFormStore();
+    store.initialize({ members: [{ name: "A", start: 1, end: 2 }, { name: "A", start: 3, end: 2 }] });
+    store.initializeList("members");
+    store.registerList("members", {
+      min: 1,
+      max: 10,
+      rules: [{ validator: (rows) => new Set(rows.map((row) => (row as { name: string }).name)).size === rows.length ? undefined : { type: "field", message: "成员名称不能重复" } }],
+      rowRules: [(row) => (row as { start: number; end: number }).start < (row as { start: number; end: number }).end ? undefined : { type: "field", message: "开始值必须小于结束值" }],
+    });
+
+    await store.validateList("members");
+    const invalidKey = store.getListKeys("members")[1]!;
+    expect(store.getListErrors("members")).toEqual(["成员名称不能重复"]);
+    expect(store.getListRowErrors("members", invalidKey)).toEqual(["开始值必须小于结束值"]);
+    await expect(store.instance.validateFields()).rejects.toMatchObject({
+      errorFields: expect.arrayContaining([
+        { name: "members", errors: ["成员名称不能重复"] },
+        { name: ["members", 1], errors: ["开始值必须小于结束值"] },
+      ]),
+    });
+
+    store.moveListValue("members", 1, 0);
+    expect(store.getListRowErrors("members", invalidKey)).toEqual(["开始值必须小于结束值"]);
+    store.removeListValue("members", 0);
+    expect(store.getListRowErrors("members", invalidKey)).toEqual([]);
+  });
+
+  it("重置列表时清除列表级与整行错误", async () => {
+    const store = createFormStore();
+    store.initialize({ members: [{ start: 2, end: 1 }] });
+    store.initializeList("members");
+    store.registerList("members", {
+      rules: [{ validator: () => ({ type: "field", message: "列表错误" }) }],
+      rowRules: [() => ({ type: "field", message: "整行错误" })],
+    });
+    await store.validateList("members");
+    const rowKey = store.getListKeys("members")[0]!;
+    expect(store.getListErrors("members")).toEqual(["列表错误"]);
+    expect(store.getListRowErrors("members", rowKey)).toEqual(["整行错误"]);
+
+    store.instance.resetFields();
+    expect(store.getListErrors("members")).toEqual([]);
+    expect(store.getListRowErrors("members", rowKey)).toEqual([]);
   });
 });

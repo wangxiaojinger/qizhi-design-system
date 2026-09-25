@@ -48,7 +48,7 @@ export interface FormInstance {
   setFieldValue: (name: FormNamePath, value: unknown) => void;
   getFieldError: (name: FormNamePath) => string[];
   setFieldErrors: (name: FormNamePath, errors: string[]) => void;
-  validateFields: () => Promise<FormValues>;
+  validateFields: (names?: FormNamePath[]) => Promise<FormValues>;
   resetFields: (names?: FormNamePath[]) => void;
   isFieldsDirty: (names?: FormNamePath[]) => boolean;
   markFieldsClean: (names?: FormNamePath[]) => void;
@@ -85,16 +85,38 @@ export interface FormItemProps {
   style?: CSSProperties;
 }
 
-export interface FormListField { key: string; name: number }
+export interface FormListRule {
+  message?: string;
+  validator?: (listValue: unknown[], values: FormValues) => void | FormRuleFailure | Promise<void | FormRuleFailure>;
+}
+export type FormListRowRule = (
+  rowValue: unknown,
+  index: number,
+  allValues: FormValues,
+) => void | FormRuleFailure | Promise<void | FormRuleFailure>;
+export interface FormListMeta { errors: string[] }
+export interface FormErrorListProps {
+  errors?: readonly ReactNode[];
+  className?: string;
+  style?: CSSProperties;
+}
+export interface FormListField { key: string; name: number; errors: string[] }
 export interface FormListOperations {
   add: (defaultValue?: unknown, insertIndex?: number) => void;
-  remove: (index: number | number[]) => void;
+  addMany: (values: readonly unknown[], insertIndex?: number) => void;
+  remove: (index: number | readonly number[]) => void;
   move: (from: number, to: number) => void;
+  canAdd: (count?: number) => boolean;
+  canRemove: (index: number | readonly number[]) => boolean;
 }
 export interface FormListProps {
   name: FormNamePath;
   initialValue?: unknown[];
-  children: (fields: FormListField[], operations: FormListOperations) => ReactNode;
+  min?: number;
+  max?: number;
+  rules?: FormListRule[];
+  rowRules?: FormListRowRule[];
+  children: (fields: FormListField[], operations: FormListOperations, meta: FormListMeta) => ReactNode;
 }
 
 export type FormBulkEditKey = string | number;
@@ -155,12 +177,95 @@ export interface FormBulkEditController<TKey extends FormBulkEditKey> {
   hasChanges: boolean;
 }
 
+export interface FormStep {
+  key: string;
+  fields: readonly FormNamePath[];
+}
+
+export interface FormStepsOptions {
+  form: FormInstance;
+  steps: readonly FormStep[];
+  initialStep?: number;
+  current?: number;
+  onCurrentChange?: (current: number) => void;
+}
+
+export interface FormStepsController {
+  current: number;
+  step: FormStep | undefined;
+  total: number;
+  isFirst: boolean;
+  isLast: boolean;
+  next: () => Promise<boolean>;
+  previous: () => void;
+  goTo: (step: number) => Promise<boolean>;
+  submit: () => Promise<boolean>;
+}
+
+export interface FormDraftRecord<TValues extends FormValues = FormValues, TMetadata = unknown> {
+  key: string;
+  version: string;
+  revision: string;
+  values: TValues;
+  metadata?: TMetadata;
+  updatedAt: string;
+  expiresAt?: string;
+}
+
+export interface FormDraftSaveInput<TValues extends FormValues = FormValues, TMetadata = unknown> {
+  key: string;
+  version: string;
+  values: TValues;
+  metadata?: TMetadata;
+  expectedRevision?: string;
+  force?: boolean;
+}
+
+export type FormDraftSaveResult<TValues extends FormValues = FormValues, TMetadata = unknown> =
+  | { status: "saved"; record: FormDraftRecord<TValues, TMetadata> }
+  | { status: "conflict"; remote: FormDraftRecord<TValues, TMetadata> };
+
+export interface FormDraftStorage<TValues extends FormValues = FormValues, TMetadata = unknown> {
+  load: (key: string) => Promise<FormDraftRecord<TValues, TMetadata> | null>;
+  save: (input: FormDraftSaveInput<TValues, TMetadata>) => Promise<FormDraftSaveResult<TValues, TMetadata>>;
+  remove: (key: string, expectedRevision?: string) => Promise<void>;
+}
+
+export type FormDraftStatus = "idle" | "loading" | "ready" | "saving" | "saved" | "expired" | "version-mismatch" | "conflict" | "error";
+
+export interface FormDraftOptions<TValues extends FormValues = FormValues, TMetadata = unknown> {
+  form: FormInstance;
+  draftKey: string;
+  version: string;
+  storage: FormDraftStorage<TValues, TMetadata>;
+  selectValues: (values: FormValues) => TValues;
+  getMetadata?: () => TMetadata;
+  onRestoreMetadata?: (metadata: TMetadata | undefined) => void;
+  autoSave?: false | { debounceMs: number };
+}
+
+export interface FormDraftController<TValues extends FormValues = FormValues, TMetadata = unknown> {
+  status: FormDraftStatus;
+  record: FormDraftRecord<TValues, TMetadata> | null;
+  conflict: FormDraftRecord<TValues, TMetadata> | null;
+  error: unknown;
+  load: () => Promise<FormDraftRecord<TValues, TMetadata> | null>;
+  restore: () => boolean;
+  save: () => Promise<boolean>;
+  remove: () => Promise<boolean>;
+  useRemote: () => boolean;
+  overwrite: () => Promise<boolean>;
+}
+
 export interface FormComponent {
   (props: FormProps): ReactNode;
   Item: (props: FormItemProps) => ReactNode;
   List: (props: FormListProps) => ReactNode;
+  ErrorList: (props: FormErrorListProps) => ReactNode;
   useForm: () => [FormInstance];
   useWatch: (name: FormNamePath, form?: FormInstance) => unknown;
   useDirty: (form?: FormInstance) => boolean;
+  useSteps: (options: FormStepsOptions) => FormStepsController;
+  useDraft: <TValues extends FormValues = FormValues, TMetadata = unknown>(options: FormDraftOptions<TValues, TMetadata>) => FormDraftController<TValues, TMetadata>;
   useBulkEdit: <TRecord, TKey extends FormBulkEditKey>(options: FormBulkEditOptions<TRecord, TKey>) => FormBulkEditController<TKey>;
 }

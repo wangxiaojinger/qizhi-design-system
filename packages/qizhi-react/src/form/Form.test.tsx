@@ -9,6 +9,17 @@ import { Input } from "../input/Input";
 import { Select } from "../select/Select";
 
 describe("Form", () => {
+  it("Form.ErrorList 仅在有错误时按顺序输出可访问反馈", () => {
+    const { rerender } = render(<Form.ErrorList errors={[]} />);
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+
+    rerender(<Form.ErrorList errors={["数量不足", <span key="duplicate">成员重复</span>]} className="custom-errors" />);
+    const alert = screen.getByRole("alert");
+    expect(alert).toHaveClass("qizhi-form-error-list", "custom-errors");
+    expect(alert).toHaveTextContent("数量不足成员重复");
+    expect([...alert.children].map((node) => node.textContent)).toEqual(["数量不足", "成员重复"]);
+  });
+
   it("Input、Select 和 AutoComplete 统一写入表单并触发联动", async () => {
     const user = userEvent.setup();
     const onValuesChange = vi.fn();

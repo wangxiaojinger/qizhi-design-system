@@ -1,8 +1,9 @@
-import type { FormErrorField, FormInstance, FormNamePath, FormNameSegment, FormProps, FormRule, FormRuleFailure, FormValidationException, FormValidateTrigger, FormValues } from "./Form.types";
+import type { FormErrorField, FormInstance, FormListRowRule, FormListRule, FormNamePath, FormNameSegment, FormProps, FormRule, FormRuleFailure, FormValidationException, FormValidateTrigger, FormValues } from "./Form.types";
 import { buildValueAtPath, encodeNamePath, getValueAtPath, isSameOrAncestorPath, normalizeNamePath, setValueAtPath, unsetValueAtPath } from "./formPath";
 
 type FieldConfig = { rules: FormRule[]; validateTrigger: FormValidateTrigger; dependencies?: FormNamePath[]; preserve?: boolean };
 type FieldState = FieldConfig & { path: FormNameSegment[] };
+type ListConfig = { path: FormNameSegment[]; min?: number; max?: number; rules: FormListRule[]; rowRules: FormListRowRule[] };
 
 export interface FormStore {
   instance: FormInstance;
@@ -13,24 +14,47 @@ export interface FormStore {
   subscribePath(name: FormNamePath, listener: () => void): () => void;
   subscribeDirty(listener: () => void): () => void;
   subscribeField(name: FormNamePath, listener: () => void): () => void;
+  markValuesClean(values: FormValues): void;
   registerField(name: FormNamePath, config: FieldConfig): () => void;
   updateFieldConfig(name: FormNamePath, config: FieldConfig): void;
   setFieldValueFromControl(name: FormNamePath, value: unknown): void;
   setFormNode(node: HTMLFormElement | null): void;
+  requestValidatedSubmit(): void;
+  consumeValidatedSubmit(): boolean;
   setFieldNode(name: FormNamePath, node: HTMLDivElement | null): void;
-  validateField(name: FormNamePath): Promise<string[]>;
+  validateField(name: FormNamePath, cancelOnStale?: boolean): Promise<string[]>;
   getFieldErrors(name: FormNamePath): string[];
   isFieldValidating(name: FormNamePath): boolean;
   getListKeys(name: FormNamePath): string[];
   initializeList(name: FormNamePath, initialValue?: unknown[]): void;
+  registerList(name: FormNamePath, config: Omit<ListConfig, "path">): () => void;
+  updateListConfig(name: FormNamePath, config: Omit<ListConfig, "path">): void;
+  canAddListValues(name: FormNamePath, count?: number): boolean;
+  canRemoveListValues(name: FormNamePath, index: number | readonly number[]): boolean;
+  addListValues(name: FormNamePath, values: readonly unknown[], index?: number): void;
+  validateList(name: FormNamePath, cancelOnStale?: boolean): Promise<{ errors: string[]; rowErrors: Array<{ index: number; errors: string[] }> }>;
+  getListErrors(name: FormNamePath): string[];
+  getListRowErrors(name: FormNamePath, rowKey: string): string[];
   addListValue(name: FormNamePath, value?: unknown, index?: number): void;
-  removeListValue(name: FormNamePath, index: number | number[]): void;
+  removeListValue(name: FormNamePath, index: number | readonly number[]): void;
   moveListValue(name: FormNamePath, from: number, to: number): void;
 }
 
 const stores = new WeakMap<FormInstance, FormStore>();
 let listKey = 0;
 const nextListKey = () => `qizhi-form-list-${++listKey}`;
+const validationCancelled = Symbol("qizhi-form-validation-cancelled");
+const assertListLimits = (min?: number, max?: number) => {
+  if (min !== undefined && (!Number.isSafeInteger(min) || min < 0)) throw new Error("Form.List min 必须是非负安全整数。");
+  if (max !== undefined && (!Number.isSafeInteger(max) || max < 0)) throw new Error("Form.List max 必须是非负安全整数。");
+  if (min !== undefined && max !== undefined && min > max) throw new Error("Form.List min 不能大于 max。");
+};
+const validRemovalIndexes = (length: number, input: number | readonly number[]) =>
+  [...new Set(typeof input === "number" ? [input] : input)]
+    .filter((index) => Number.isSafeInteger(index) && index >= 0 && index < length)
+    .sort((left, right) => right - left);
+
+export const isValidationCancelled = (error: unknown): boolean => error === validationCancelled;
 
 const isEqualValue = (left: unknown, right: unknown): boolean => {
   if (Object.is(left, right)) return true;
@@ -45,11 +69,11 @@ const isEqualValue = (left: unknown, right: unknown): boolean => {
   return false;
 };
 
-const leafEntries = (value: unknown, path: FormNameSegment[] = []): Array<[FormNameSegment[], unknown]> => {
-  if (Array.isArray(value)) return value.flatMap((item, index) => leafEntries(item, [...path, index]));
+const valueEntries = (value: unknown, path: FormNameSegment[] = []): Array<[FormNameSegment[], unknown]> => {
+  if (Array.isArray(value)) return [[path, value]];
   if (value && typeof value === "object") {
     const entries = Object.entries(value as FormValues);
-    return entries.length ? entries.flatMap(([key, item]) => leafEntries(item, [...path, key])) : [[path, value]];
+    return entries.length ? entries.flatMap(([key, item]) => valueEntries(item, [...path, key])) : [[path, value]];
   }
   return [[path, value]];
 };
@@ -62,8 +86,10 @@ export function createFormStore(): FormStore {
   let callbacks: Pick<FormProps, "onValuesChange" | "onValidationException"> = {};
   let defaultPreserve = true;
   let formNode: HTMLFormElement | null = null;
+  let validatedSubmitPending = false;
   const fields = new Map<string, FieldState>();
   const retained = new Map<string, FormNameSegment[]>();
+  const retainedFields = new Map<string, FieldState>();
   const errors = new Map<string, string[]>();
   const errorPaths = new Map<string, FormNameSegment[]>();
   const errorSources = new Map<string, "client" | "server">();
@@ -76,6 +102,10 @@ export function createFormStore(): FormStore {
   const fieldListeners = new Set<{ path: FormNameSegment[]; listener: () => void }>();
   const lists = new Map<string, string[]>();
   const listPaths = new Map<string, FormNameSegment[]>();
+  const listConfigs = new Map<string, ListConfig>();
+  const listErrors = new Map<string, string[]>();
+  const listRowErrors = new Map<string, Map<string, string[]>>();
+  const listValidationVersions = new Map<string, number>();
   const dependencyIndex = new Map<string, { path: FormNameSegment[]; dependents: Set<string> }>();
   let lastDirty = false;
 
@@ -134,6 +164,7 @@ export function createFormStore(): FormStore {
     values = unsetValueAtPath(values, path);
     [...fields].forEach(([key, field]) => { if (isDescendant(field.path)) fields.delete(key); });
     [...retained].forEach(([key, candidate]) => { if (isDescendant(candidate)) retained.delete(key); });
+    [...retainedFields].forEach(([key, field]) => { if (isDescendant(field.path)) retainedFields.delete(key); });
     [...errors].forEach(([key]) => { if (isDescendant(statePath(key))) errors.delete(key); });
     [...errorPaths].forEach(([key, candidate]) => { if (isDescendant(candidate)) errorPaths.delete(key); });
     [...errorSources].forEach(([key]) => { if (isDescendant(statePath(key))) errorSources.delete(key); });
@@ -141,6 +172,9 @@ export function createFormStore(): FormStore {
     [...nodes].forEach(([key]) => { if (isDescendant(statePath(key))) nodes.delete(key); });
     [...lists].forEach(([key]) => { if (isDescendant(listPaths.get(key))) lists.delete(key); });
     [...listPaths].forEach(([key, candidate]) => { if (isDescendant(candidate)) listPaths.delete(key); });
+    [...listConfigs].forEach(([key, config]) => { if (isDescendant(config.path)) listConfigs.delete(key); });
+    [...listErrors].forEach(([key]) => { if (!listConfigs.has(key)) listErrors.delete(key); });
+    [...listRowErrors].forEach(([key]) => { if (!listConfigs.has(key)) listRowErrors.delete(key); });
     rebuildDependencyIndex();
     notifyDirty();
   };
@@ -172,6 +206,16 @@ export function createFormStore(): FormStore {
     retained.forEach((path) => { const nextPath = remapPath(path); if (nextPath) nextRetained.set(encodeNamePath(nextPath), nextPath); });
     retained.clear(); nextRetained.forEach((path, key) => retained.set(key, path));
 
+    const nextRetainedFields = new Map<string, FieldState>();
+    retainedFields.forEach((field) => {
+      const path = remapPath(field.path);
+      if (!path) return;
+      field.path = path;
+      field.dependencies = field.dependencies?.map((dependency) => remapPath(normalizeNamePath(dependency))).filter((dependency): dependency is FormNameSegment[] => Boolean(dependency));
+      nextRetainedFields.set(encodeNamePath(path), field);
+    });
+    retainedFields.clear(); nextRetainedFields.forEach((field, key) => retainedFields.set(key, field));
+
     const nextErrors = new Map<string, string[]>();
     const nextErrorPaths = new Map<string, FormNameSegment[]>();
     errors.forEach((value, key) => {
@@ -195,6 +239,21 @@ export function createFormStore(): FormStore {
     const nextNodes = new Map<string, HTMLDivElement>();
     nodes.forEach((node, key) => { const sourcePath = pathForKey(key); const path = sourcePath && remapPath(sourcePath); if (path) nextNodes.set(encodeNamePath(path), node); });
     nodes.clear(); nextNodes.forEach((node, key) => nodes.set(key, node));
+
+    const originalListPaths: Array<[string, FormNameSegment[]]> = [...listPaths.entries()].map(([key, path]) => [key, [...path]]);
+    originalListPaths.forEach(([oldKey, originalPath]) => {
+      if (!isSameOrAncestorPath(listPath, originalPath) || originalPath.length <= listPath.length) return;
+      const nextPath = remapPath(originalPath);
+      const keys = lists.get(oldKey); const config = listConfigs.get(oldKey); const currentErrors = listErrors.get(oldKey); const rowErrors = listRowErrors.get(oldKey); const version = listValidationVersions.get(oldKey);
+      lists.delete(oldKey); listPaths.delete(oldKey); listConfigs.delete(oldKey); listErrors.delete(oldKey); listRowErrors.delete(oldKey); listValidationVersions.delete(oldKey);
+      if (!nextPath) return;
+      const nextKey = encodeNamePath(nextPath);
+      if (keys) lists.set(nextKey, keys); listPaths.set(nextKey, nextPath);
+      if (config) listConfigs.set(nextKey, { ...config, path: nextPath });
+      if (currentErrors) listErrors.set(nextKey, currentErrors);
+      if (rowErrors) listRowErrors.set(nextKey, rowErrors);
+      if (version !== undefined) listValidationVersions.set(nextKey, version + 1);
+    });
   };
 
   const registeredValues = () => {
@@ -227,6 +286,33 @@ export function createFormStore(): FormStore {
     });
     dependentKeys.forEach((key) => { const field = fields.get(key); if (field) void store.validateField(field.path).catch(() => undefined); });
   };
+  const clearDescendantErrors = (name: FormNamePath) => {
+    const path = normalizeNamePath(name);
+    [...errorPaths].forEach(([key, errorPath]) => {
+      if (!isSameOrAncestorPath(path, errorPath)) return;
+      errors.delete(key);
+      errorPaths.delete(key);
+      errorSources.delete(key);
+    });
+  };
+  const syncAffectedLists = (changed: FormNamePath) => {
+    listPaths.forEach((listPath, listKeyValue) => {
+      if (!isSameOrAncestorPath(changed, listPath)) return;
+      const listValue = getValueAtPath(values, listPath);
+      const nextLength = Array.isArray(listValue) ? listValue.length : 0;
+      remapListState(listPath, (index) => index < nextLength ? index : undefined);
+      const nextKeys = (lists.get(listKeyValue) ?? []).slice(0, nextLength);
+      while (nextKeys.length < nextLength) nextKeys.push(nextListKey());
+      lists.set(listKeyValue, nextKeys);
+      listPaths.forEach((nestedPath, nestedKey) => {
+        if (!isSameOrAncestorPath(listPath, nestedPath) || nestedPath.length <= listPath.length) return;
+        const index = nestedPath[listPath.length];
+        if (typeof index !== "number" || index < nextLength) return;
+        lists.delete(nestedKey);
+        listPaths.delete(nestedKey);
+      });
+    });
+  };
   const setValue = (name: FormNamePath, value: unknown, user: boolean) => {
     const previous = getValueAtPath(values, name);
     if (Object.is(previous, value)) return;
@@ -238,15 +324,21 @@ export function createFormStore(): FormStore {
     notifyDirty();
     if (fields.get(key)?.validateTrigger === "onChange" && user) void store.validateField(name).catch(() => undefined);
     validateDependents(name);
+    listConfigs.forEach((config) => {
+      if (isSameOrAncestorPath(config.path, name) || isSameOrAncestorPath(name, config.path)) void store.validateList(config.path).catch(() => undefined);
+    });
   };
   const instance: FormInstance = {
     getFieldsValue: registeredValues,
     getFieldValue: (name) => getValueAtPath(values, name),
     setFieldsValue: (nextValues) => {
-      leafEntries(nextValues).forEach(([path, value]) => {
+      valueEntries(nextValues).forEach(([path, value]) => {
         values = setValueAtPath(values, path, value);
-        const key = encodeNamePath(path); errors.delete(key); errorPaths.delete(key); errorSources.delete(key);
+        invalidateValidationPath(path);
+        clearDescendantErrors(path);
+        syncAffectedLists(path);
         notify(path); notifyDirty(); validateDependents(path);
+        listConfigs.forEach((config) => { if (isSameOrAncestorPath(config.path, path) || isSameOrAncestorPath(path, config.path)) void store.validateList(config.path).catch(() => undefined); });
       });
     },
     setFieldValue: (name, value) => setValue(name, value, false),
@@ -257,11 +349,23 @@ export function createFormStore(): FormStore {
       else { errorSources.delete(key); errorPaths.delete(key); }
       notify(name);
     },
-    validateFields: async () => {
+    validateFields: async (names) => {
       const errorFields: FormErrorField[] = [];
-      for (const field of fields.values()) {
-        const fieldErrors = await store.validateField(field.path);
+      const allFields = [...fields.values(), ...retainedFields.values()];
+      const selectedFields = names === undefined
+        ? allFields
+        : allFields.filter((field) => names.some((name) => isSameOrAncestorPath(name, field.path)));
+      for (const field of selectedFields) {
+        const fieldErrors = await store.validateField(field.path, true);
         if (fieldErrors.length) errorFields.push({ name: field.path.length === 1 && typeof field.path[0] === "string" ? field.path[0] : field.path, errors: fieldErrors });
+      }
+      const selectedLists = [...listConfigs.values()].filter((list) => names === undefined || names.some((name) => isSameOrAncestorPath(name, list.path) || isSameOrAncestorPath(list.path, name)));
+      for (const list of selectedLists) {
+        const result = await store.validateList(list.path, true);
+        if (result.errors.length) errorFields.push({ name: publicNamePath(list.path), errors: result.errors });
+        result.rowErrors.forEach(({ index, errors: currentErrors }) => {
+          if (currentErrors.length) errorFields.push({ name: [...list.path, index], errors: currentErrors });
+        });
       }
       const result = registeredValues();
       if (errorFields.length) throw { values: result, errorFields };
@@ -272,7 +376,8 @@ export function createFormStore(): FormStore {
       if (!names) {
         targets.forEach(invalidateValidationPath);
         values = structuredClone(initialValues);
-        errors.clear(); errorPaths.clear(); errorSources.clear(); validating.clear();
+        errors.clear(); errorPaths.clear(); errorSources.clear(); validating.clear(); listErrors.clear(); listRowErrors.clear();
+        listValidationVersions.forEach((_version, key) => listValidationVersions.set(key, (_version ?? 0) + 1));
         listPaths.forEach((listPath, listKeyValue) => {
           const listValue = getValueAtPath(values, listPath);
           lists.set(listKeyValue, Array.from({ length: Array.isArray(listValue) ? listValue.length : 0 }, nextListKey));
@@ -284,6 +389,11 @@ export function createFormStore(): FormStore {
       targets.forEach((name) => {
         invalidateValidationPath(name);
         const targetPath = normalizeNamePath(name);
+        listConfigs.forEach((config, listKeyValue) => {
+          if (!isSameOrAncestorPath(targetPath, config.path) && !isSameOrAncestorPath(config.path, targetPath)) return;
+          listErrors.delete(listKeyValue); listRowErrors.delete(listKeyValue);
+          listValidationVersions.set(listKeyValue, (listValidationVersions.get(listKeyValue) ?? 0) + 1);
+        });
         [...errorPaths].forEach(([errorKey, errorPath]) => {
           if (!isSameOrAncestorPath(targetPath, errorPath)) return;
           errors.delete(errorKey); errorPaths.delete(errorKey); errorSources.delete(errorKey);
@@ -309,7 +419,12 @@ export function createFormStore(): FormStore {
       notifyDirty();
     },
     scrollToField: (name) => {
-      const node = nodes.get(encodeNamePath(name)); if (!node) return;
+      const targetPath = normalizeNamePath(name);
+      const node = nodes.get(encodeNamePath(name)) ?? [...nodes].find(([key]) => {
+        const field = fields.get(key) ?? retainedFields.get(key);
+        return field ? isSameOrAncestorPath(targetPath, field.path) : false;
+      })?.[1];
+      if (!node) return;
       node.scrollIntoView?.({ behavior: "smooth", block: "center" });
       node.querySelector<HTMLElement>("input, textarea, select, button, [tabindex]:not([tabindex='-1'])")?.focus();
     },
@@ -324,9 +439,17 @@ export function createFormStore(): FormStore {
     subscribePath: (name, listener) => { const path = normalizeNamePath(name); const entry = { path, value: getValueAtPath(values, path), listener }; pathListeners.add(entry); return () => pathListeners.delete(entry); },
     subscribeDirty: (listener) => { dirtyListeners.add(listener); return () => dirtyListeners.delete(listener); },
     subscribeField: (name, listener) => { const entry = { path: normalizeNamePath(name), listener }; fieldListeners.add(entry); return () => fieldListeners.delete(entry); },
+    markValuesClean: (nextValues) => {
+      valueEntries(nextValues).forEach(([path, value]) => {
+        cleanValues = value === undefined
+          ? unsetValueAtPath(cleanValues, path)
+          : setValueAtPath(cleanValues, path, structuredClone(value));
+      });
+      notifyDirty();
+    },
     registerField: (name, config) => {
       const path = normalizeNamePath(name); const key = encodeNamePath(path);
-      const state = { ...config, path }; fields.set(key, state); retained.delete(key);
+      const state = { ...config, path }; fields.set(key, state); retained.delete(key); retainedFields.delete(key);
       rebuildDependencyIndex();
       if (getValueAtPath(values, path) === undefined) {
         values = setValueAtPath(values, path, "");
@@ -339,7 +462,7 @@ export function createFormStore(): FormStore {
         if (fields.get(currentKey) !== state) return;
         nextValidationVersion(currentKey); validating.delete(currentKey);
         fields.delete(currentKey); nodes.delete(currentKey); rebuildDependencyIndex();
-        if (state.preserve ?? defaultPreserve) retained.set(currentKey, currentPath);
+        if (state.preserve ?? defaultPreserve) { retained.set(currentKey, currentPath); retainedFields.set(currentKey, state); }
         else { clearPathState(currentPath); notify(currentPath); }
       };
     },
@@ -349,11 +472,21 @@ export function createFormStore(): FormStore {
     },
     setFieldValueFromControl: (name, value) => setValue(name, value, true),
     setFormNode: (node) => { formNode = node; },
+    requestValidatedSubmit: () => {
+      if (!formNode) return;
+      validatedSubmitPending = true;
+      formNode.requestSubmit();
+    },
+    consumeValidatedSubmit: () => {
+      const pending = validatedSubmitPending;
+      validatedSubmitPending = false;
+      return pending;
+    },
     setFieldNode: (name, node) => { const key = encodeNamePath(name); if (node) nodes.set(key, node); else nodes.delete(key); },
-    validateField: async (name) => {
-      const key = encodeNamePath(name); const field = fields.get(key); if (!field) return [];
+    validateField: async (name, cancelOnStale = false) => {
+      const key = encodeNamePath(name); const field = fields.get(key) ?? retainedFields.get(key); if (!field) return [];
       const version = nextValidationVersion(key);
-      const isLatest = () => validationVersions.get(key) === version && fields.get(key) === field;
+      const isLatest = () => validationVersions.get(key) === version && (fields.get(key) ?? retainedFields.get(key)) === field;
       const value = getValueAtPath(values, name); const nextErrors: string[] = [];
       for (const rule of field.rules) {
         let failed = false;
@@ -369,7 +502,10 @@ export function createFormStore(): FormStore {
             try { result = await result; }
             finally { if (isLatest()) { validating.delete(key); notify(name); } }
           }
-          if (!isLatest()) return [];
+          if (!isLatest()) {
+            if (cancelOnStale) throw validationCancelled;
+            return [];
+          }
           if (isRuleFailure(result)) {
             if (result.type === "network") {
               const exception: FormValidationException = { name: publicNamePath(name), type: "network", message: result.message, cause: result.cause };
@@ -379,7 +515,10 @@ export function createFormStore(): FormStore {
             nextErrors.push(result.message); break;
           }
         } catch (error) {
-          if (!isLatest()) return [];
+          if (!isLatest()) {
+            if (cancelOnStale) throw validationCancelled;
+            return [];
+          }
           if (isRuleFailure(error) && error.type === "network") {
             if (!("name" in error)) callbacks.onValidationException?.({ name: publicNamePath(name), type: "network", message: error.message, cause: error.cause });
             throw error;
@@ -388,7 +527,10 @@ export function createFormStore(): FormStore {
         }
         if (failed) { nextErrors.push(rule.message ?? "该字段校验失败"); break; }
       }
-      if (!isLatest()) return [];
+      if (!isLatest()) {
+        if (cancelOnStale) throw validationCancelled;
+        return [];
+      }
       errors.set(key, nextErrors);
       if (nextErrors.length) { errorSources.set(key, "client"); errorPaths.set(key, normalizeNamePath(name)); }
       else { errorSources.delete(key); errorPaths.delete(key); }
@@ -404,14 +546,89 @@ export function createFormStore(): FormStore {
       listPaths.set(key, normalizeNamePath(name));
       retained.set(key, normalizeNamePath(name));
     },
-    addListValue: (name, value = {}, index) => {
-      const current = [...((getValueAtPath(values, name) as unknown[]) ?? [])]; const at = Math.max(0, Math.min(index ?? current.length, current.length)); current.splice(at, 0, value);
-      const key = encodeNamePath(name); const keys = [...(lists.get(key) ?? [])]; keys.splice(at, 0, nextListKey()); lists.set(key, keys);
+    registerList: (name, config) => {
+      assertListLimits(config.min, config.max);
+      const path = normalizeNamePath(name); const key = encodeNamePath(path); const state = { ...config, path };
+      listConfigs.set(key, state);
+      return () => { if (listConfigs.get(key) === state) listConfigs.delete(key); };
+    },
+    updateListConfig: (name, config) => {
+      assertListLimits(config.min, config.max);
+      const path = normalizeNamePath(name); const key = encodeNamePath(path); const current = listConfigs.get(key);
+      if (current) Object.assign(current, config);
+      else listConfigs.set(key, { ...config, path });
+    },
+    validateList: async (name, cancelOnStale = false) => {
+      const key = encodeNamePath(name); const config = listConfigs.get(key);
+      if (!config) return { errors: [], rowErrors: [] };
+      const version = (listValidationVersions.get(key) ?? 0) + 1; listValidationVersions.set(key, version);
+      const isLatest = () => listValidationVersions.get(key) === version && listConfigs.get(key) === config;
+      const value = getValueAtPath(values, name); const rows = Array.isArray(value) ? value : [];
+      const keys = [...(lists.get(key) ?? [])]; const nextErrors: string[] = [];
+      if (config.min !== undefined && rows.length < config.min) nextErrors.push(`至少需要 ${config.min} 项`);
+      if (config.max !== undefined && rows.length > config.max) nextErrors.push(`最多允许 ${config.max} 项`);
+      for (const rule of config.rules) {
+        if (!rule.validator) continue;
+        try {
+          const result = await rule.validator(rows, values);
+          if (!isLatest()) { if (cancelOnStale) throw validationCancelled; return { errors: [], rowErrors: [] }; }
+          if (isRuleFailure(result)) {
+            if (result.type === "network") { const exception: FormValidationException = { name: publicNamePath(name), type: "network", message: result.message, cause: result.cause }; callbacks.onValidationException?.(exception); throw exception; }
+            nextErrors.push(result.message);
+          }
+        } catch (error) {
+          if (!isLatest()) { if (cancelOnStale) throw validationCancelled; return { errors: [], rowErrors: [] }; }
+          if (isRuleFailure(error) && error.type === "network") throw error;
+          nextErrors.push(error instanceof Error ? error.message : rule.message ?? String(error));
+        }
+      }
+      const nextRowErrors = new Map<string, string[]>();
+      for (let index = 0; index < rows.length; index += 1) {
+        const rowKey = keys[index]; if (!rowKey) continue; const currentErrors: string[] = [];
+        for (const rule of config.rowRules) {
+          try {
+            const result = await rule(rows[index], index, values);
+            if (!isLatest() || lists.get(key)?.[index] !== rowKey) { if (cancelOnStale) throw validationCancelled; return { errors: [], rowErrors: [] }; }
+            if (isRuleFailure(result)) {
+              if (result.type === "network") { const exception: FormValidationException = { name: [...config.path, index], type: "network", message: result.message, cause: result.cause }; callbacks.onValidationException?.(exception); throw exception; }
+              currentErrors.push(result.message);
+            }
+          } catch (error) {
+            if (!isLatest()) { if (cancelOnStale) throw validationCancelled; return { errors: [], rowErrors: [] }; }
+            if (isRuleFailure(error) && error.type === "network") throw error;
+            currentErrors.push(error instanceof Error ? error.message : String(error));
+          }
+        }
+        if (currentErrors.length) nextRowErrors.set(rowKey, currentErrors);
+      }
+      if (!isLatest()) { if (cancelOnStale) throw validationCancelled; return { errors: [], rowErrors: [] }; }
+      listErrors.set(key, nextErrors); listRowErrors.set(key, nextRowErrors); notify(name);
+      return { errors: [...nextErrors], rowErrors: keys.map((rowKey, index) => ({ index, errors: [...(nextRowErrors.get(rowKey) ?? [])] })) };
+    },
+    getListErrors: (name) => [...(listErrors.get(encodeNamePath(name)) ?? [])],
+    getListRowErrors: (name, rowKey) => [...(listRowErrors.get(encodeNamePath(name))?.get(rowKey) ?? [])],
+    canAddListValues: (name, count = 1) => {
+      if (!Number.isSafeInteger(count) || count < 0) throw new Error("Form.List count 必须是非负安全整数。");
+      const current = getValueAtPath(values, name); const length = Array.isArray(current) ? current.length : 0;
+      const max = listConfigs.get(encodeNamePath(name))?.max;
+      return max === undefined || length + count <= max;
+    },
+    canRemoveListValues: (name, index) => {
+      const current = getValueAtPath(values, name); const length = Array.isArray(current) ? current.length : 0;
+      const indexes = validRemovalIndexes(length, index); const min = listConfigs.get(encodeNamePath(name))?.min;
+      return min === undefined || length - indexes.length >= min;
+    },
+    addListValues: (name, nextValues, index) => {
+      if (!nextValues.length || !store.canAddListValues(name, nextValues.length)) return;
+      const current = [...((getValueAtPath(values, name) as unknown[]) ?? [])]; const at = Math.max(0, Math.min(index ?? current.length, current.length)); current.splice(at, 0, ...nextValues);
+      const key = encodeNamePath(name); const keys = [...(lists.get(key) ?? [])]; keys.splice(at, 0, ...nextValues.map(() => nextListKey())); lists.set(key, keys);
       remapListState(name, (oldIndex) => oldIndex >= at ? oldIndex + 1 : oldIndex); setValue(name, current, true);
     },
+    addListValue: (name, value = {}, index) => store.addListValues(name, [value], index),
     removeListValue: (name, index) => {
-      const current = [...((getValueAtPath(values, name) as unknown[]) ?? [])]; const indexes = [...new Set(Array.isArray(index) ? index : [index])].filter((item) => item >= 0 && item < current.length).sort((a, b) => b - a);
-      if (!indexes.length) return; const key = encodeNamePath(name); const keys = [...(lists.get(key) ?? [])]; indexes.forEach((item) => { current.splice(item, 1); keys.splice(item, 1); }); lists.set(key, keys);
+      const current = [...((getValueAtPath(values, name) as unknown[]) ?? [])]; const indexes = validRemovalIndexes(current.length, index);
+      if (!indexes.length || !store.canRemoveListValues(name, indexes)) return; const key = encodeNamePath(name); const keys = [...(lists.get(key) ?? [])]; const removedKeys = indexes.map((item) => keys[item]).filter((item): item is string => Boolean(item)); indexes.forEach((item) => { current.splice(item, 1); keys.splice(item, 1); }); lists.set(key, keys);
+      removedKeys.forEach((rowKey) => listRowErrors.get(key)?.delete(rowKey));
       const removed = new Set(indexes); remapListState(name, (oldIndex) => removed.has(oldIndex) ? undefined : oldIndex - indexes.filter((item) => item < oldIndex).length); setValue(name, current, true);
     },
     moveListValue: (name, from, to) => {

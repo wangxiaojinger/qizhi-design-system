@@ -4,6 +4,20 @@ import type { FormValidationException } from "@wangxiaojinger/qizhi-react";
 
 type QueryState = "ready" | "loading" | "empty" | "error";
 
+function validateServiceEndpoint(value: unknown) {
+  if (!value) return;
+  try {
+    const url = new URL(String(value));
+    const hostname = url.hostname;
+    const isIpAddress = /^(?:\d{1,3}\.){3}\d{1,3}$/.test(hostname) || hostname.startsWith("[");
+    const suffix = hostname.split(".").at(-1) ?? "";
+    const hasCompleteDomain = hostname.includes(".") && suffix.length >= 2;
+    if (!(["http:", "https:"].includes(url.protocol) && (hostname === "localhost" || isIpAddress || hasCompleteDomain))) throw new Error();
+  } catch {
+    throw new Error("请输入完整的 HTTP(S) 服务地址");
+  }
+}
+
 function ConditionalRemoteFields() {
   const serviceType = Form.useWatch(["service", "type"]);
 
@@ -15,7 +29,10 @@ function ConditionalRemoteFields() {
         name={["service", "endpoint"]}
         label="服务地址"
         preserve={false}
-        rules={[{ required: true, message: "请输入服务地址" }]}
+        rules={[
+          { required: true, message: "请输入服务地址" },
+          { validator: validateServiceEndpoint },
+        ]}
       >
         <Input aria-label="服务地址" allowClear={false} />
       </Form.Item>
@@ -95,14 +112,19 @@ export default function RemoteBusinessDemo() {
         name={["service", "name"]}
         label="服务名称"
         validateTrigger="onChange"
-        rules={[{
-          validator: async (value) => {
-            const current = String(value ?? "");
-            await new Promise((resolve) => window.setTimeout(resolve, current === "slow-invalid" ? 120 : 10));
-            if (current === "slow-invalid") return { type: "field", message: "旧请求返回的名称错误" };
-            if (current === "network-service") return { type: "network", message: "名称校验服务暂不可用" };
+        required
+        rules={[
+          { required: true, message: "请输入服务名称" },
+          { pattern: /^[a-z][a-z0-9-]*$/, message: "须以小写字母开头，仅支持小写字母、数字和短横线" },
+          {
+            validator: async (value) => {
+              const current = String(value ?? "");
+              await new Promise((resolve) => window.setTimeout(resolve, current === "slow-invalid" ? 120 : 10));
+              if (current === "slow-invalid") return { type: "field", message: "旧请求返回的名称错误" };
+              if (current === "network-service") return { type: "network", message: "名称校验服务暂不可用" };
+            },
           },
-        }]}
+        ]}
       >
         <Input aria-label="远程服务名称" allowClear={false} onChange={() => setNetworkError("")} />
       </Form.Item>

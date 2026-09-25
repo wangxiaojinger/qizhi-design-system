@@ -39,6 +39,24 @@
   line-height: 18px;
 }
 
+.qizhi-form-item-help {
+  color: var(--color-text-4);
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.qizhi-form-item--error .qizhi-form-item-help {
+  color: var(--color-danger);
+}
+
+.qizhi-form-error-list {
+  display: grid;
+  gap: 8px;
+  color: var(--color-danger);
+  font-size: 14px;
+  line-height: 22px;
+}
+
 .qizhi-form-layout-horizontal {
   width: min(100%, 710px);
 }
@@ -68,4 +86,3 @@
     text-align: left;
   }
 }
-

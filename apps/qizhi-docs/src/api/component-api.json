@@ -2638,6 +2638,82 @@
         }
       ]
     },
+    "formDraftApi": {
+      "source": "apps\\qizhi-docs\\src\\form\\formApi.ts",
+      "items": [
+        {
+          "name": "form",
+          "description": "由 Form.useForm 创建、需要保存和恢复值的表单实例。",
+          "type": "FormInstance",
+          "defaultValue": "—"
+        },
+        {
+          "name": "draftKey",
+          "description": "由业务方构造的草稿唯一标识，应区分用户、业务对象和表单场景。",
+          "type": "string",
+          "defaultValue": "—"
+        },
+        {
+          "name": "version",
+          "description": "业务表单结构版本；远端版本不匹配时禁止恢复。",
+          "type": "string",
+          "defaultValue": "—"
+        },
+        {
+          "name": "storage",
+          "description": "业务方显式提供的异步存储适配器；组件库不默认绑定本地或远端存储。",
+          "type": "FormDraftStorage",
+          "defaultValue": "—"
+        },
+        {
+          "name": "selectValues",
+          "description": "必填的字段筛选函数，只返回允许持久化的表单值。",
+          "type": "(values: FormValues) => FormValues",
+          "defaultValue": "—"
+        },
+        {
+          "name": "getMetadata",
+          "description": "保存稳定步骤 key 等非字段业务状态。",
+          "type": "() => TMetadata",
+          "defaultValue": "—"
+        },
+        {
+          "name": "onRestoreMetadata",
+          "description": "草稿恢复后接收 metadata，由业务项目恢复步骤等外部状态。",
+          "type": "(metadata?: TMetadata) => void",
+          "defaultValue": "—"
+        },
+        {
+          "name": "autoSave",
+          "description": "可选的防抖自动保存；默认关闭，避免组件库隐式产生存储请求。",
+          "type": "false | { debounceMs: number }",
+          "defaultValue": "false"
+        }
+      ]
+    },
+    "formErrorListApi": {
+      "source": "apps\\qizhi-docs\\src\\form\\formApi.ts",
+      "items": [
+        {
+          "name": "errors",
+          "description": "按传入顺序展示的错误内容；为空时不渲染错误容器。",
+          "type": "readonly ReactNode[]",
+          "defaultValue": "[]"
+        },
+        {
+          "name": "className",
+          "description": "错误列表根节点的附加类名。",
+          "type": "string",
+          "defaultValue": "—"
+        },
+        {
+          "name": "style",
+          "description": "错误列表根节点的内联样式。",
+          "type": "CSSProperties",
+          "defaultValue": "—"
+        }
+      ]
+    },
     "formInstanceApi": {
       "source": "apps\\qizhi-docs\\src\\form\\formApi.ts",
       "items": [
@@ -2679,8 +2755,8 @@
         },
         {
           "name": "validateFields",
-          "description": "校验所有已注册字段；成功时返回表单值，失败时拒绝并携带字段错误。",
-          "type": "() => Promise<Record<string, unknown>>",
+          "description": "校验全部或指定路径下的已注册字段；失败时拒绝并携带字段错误。",
+          "type": "(names?: FormNamePath[]) => Promise<Record<string, unknown>>",
           "defaultValue": "—"
         },
         {
@@ -2814,9 +2890,68 @@
           "defaultValue": "—"
         },
         {
+          "name": "min",
+          "description": "允许的最少条目数；用户操作不能突破该下限。",
+          "type": "number",
+          "defaultValue": "—"
+        },
+        {
+          "name": "max",
+          "description": "允许的最多条目数；用户操作不能突破该上限。",
+          "type": "number",
+          "defaultValue": "—"
+        },
+        {
+          "name": "rules",
+          "description": "校验整个列表的同步或异步自定义规则，错误通过 meta.errors 展示。",
+          "type": "FormListRule[]",
+          "defaultValue": "[]"
+        },
+        {
+          "name": "rowRules",
+          "description": "校验每一整行的同步或异步规则，错误随稳定行 key 迁移。",
+          "type": "FormListRowRule[]",
+          "defaultValue": "[]"
+        },
+        {
           "name": "children",
-          "description": "接收稳定字段描述和新增、删除、移动操作的渲染函数。",
-          "type": "(fields, operations) => ReactNode",
+          "description": "接收稳定字段、列表操作和列表错误元信息的渲染函数。",
+          "type": "(fields, operations, meta) => ReactNode",
+          "defaultValue": "—"
+        }
+      ]
+    },
+    "formStepsApi": {
+      "source": "apps\\qizhi-docs\\src\\form\\formApi.ts",
+      "items": [
+        {
+          "name": "form",
+          "description": "由 Form.useForm 创建、供多步骤流程校验和提交的表单实例。",
+          "type": "FormInstance",
+          "defaultValue": "—"
+        },
+        {
+          "name": "steps",
+          "description": "按顺序声明稳定步骤 key 及该步骤负责校验的字段路径。",
+          "type": "readonly FormStep[]",
+          "defaultValue": "—"
+        },
+        {
+          "name": "initialStep",
+          "description": "首次渲染的步骤，从 1 开始并自动限制在有效范围。",
+          "type": "number",
+          "defaultValue": "1"
+        },
+        {
+          "name": "current",
+          "description": "受控模式下的当前步骤，是步骤位置的唯一真实状态并限制在有效范围。",
+          "type": "number",
+          "defaultValue": "—"
+        },
+        {
+          "name": "onCurrentChange",
+          "description": "导航成功且步骤真实变化后通知目标步骤；校验失败或边界未变化时不触发。",
+          "type": "(current: number) => void",
           "defaultValue": "—"
         }
       ]

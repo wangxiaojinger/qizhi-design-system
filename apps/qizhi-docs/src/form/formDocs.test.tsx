@@ -1,19 +1,22 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { FormDocsIsland } from "./FormDocsIsland";
-import { formApi, formBulkEditApi, formInstanceApi, formItemApi, formListApi } from "./formApi";
+import { formApi, formBulkEditApi, formDraftApi, formErrorListApi, formInstanceApi, formItemApi, formListApi, formStepsApi } from "./formApi";
 import { formDemos } from "./formDocs.registry";
 
 describe("Form docs", () => {
-  it("preserves the existing Demos and appends the Bulk Edit Demo", () => {
-    expect(formDemos.map((demo) => demo.title)).toEqual(["基础用法", "表单布局", "受控表单", "业务校验闭环", "复杂表单联动", "远程联动与未保存修改", "批量编辑"]);
+  it("preserves the existing Demos and appends the Draft Demo", () => {
+    expect(formDemos.map((demo) => demo.title)).toEqual(["基础用法", "表单布局", "受控表单", "业务校验闭环", "复杂表单联动", "多步骤表单", "远程联动与未保存修改", "表单草稿", "高级动态列表", "批量编辑"]);
     expect(formDemos.map((demo) => demo.description)).toEqual([
       "非受控模式的基础用法，表单项采用垂直布局。",
       "Form 支持垂直和水平两种排列方式。",
       "表单统一收集和更新各表单项的值。",
       "演示前端校验、提交、后端字段错误回填以及修改后清除错误的完整链路。",
       "演示嵌套字段、依赖校验、条件字段保留策略和动态成员列表。",
+      "按步骤校验字段并保留跨步骤数据，提交失败时返回首个错误所在步骤。",
       "演示异步校验竞态、网络异常分流、远程查询四态、条件字段清理和未保存修改判断。",
+      "通过业务方提供的存储适配器保存和恢复指定字段，并处理版本、过期与并发冲突。",
+      "演示数量限制、列表与整行校验、批量新增以及嵌套列表状态迁移。",
       "演示混合值、仅提交改动字段、主动清空、部分失败回填以及失败记录重试。",
     ]);
     formDemos.forEach((demo) => {
@@ -26,8 +29,8 @@ describe("Form docs", () => {
   it("renders the legacy field data and initial states through formal components", () => {
     render(<FormDocsIsland />);
 
-    expect(screen.getAllByRole("button", { name: "查看代码" })).toHaveLength(7);
-    expect(screen.getAllByRole("button", { name: "复制代码" })).toHaveLength(7);
+    expect(screen.getAllByRole("button", { name: "查看代码" })).toHaveLength(10);
+    expect(screen.getAllByRole("button", { name: "复制代码" })).toHaveLength(10);
     expect(screen.getAllByText("支持小写字母、数字、短横线，须以字母开头。")).toHaveLength(3);
 
     const basic = document.getElementById("表单-基础用法")!;
@@ -79,6 +82,46 @@ describe("Form docs", () => {
     fireEvent.click(within(demo).getByRole("combobox", { name: "服务类型" }));
     fireEvent.click(screen.getByRole("option", { name: "本地服务" }));
     expect(within(demo).queryByRole("textbox", { name: "服务地址" })).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ["表单-复杂表单联动", "提交复杂表单"],
+    ["表单-远程联动与未保存修改", "提交远程表单"],
+  ])("%s rejects incomplete service URLs before submission", async (demoId, submitName) => {
+    render(<FormDocsIsland />);
+    const demo = document.getElementById(demoId)!;
+    const endpoint = within(demo).getByRole("textbox", { name: "服务地址" });
+
+    fireEvent.change(endpoint, { target: { value: "https://api.q" } });
+    fireEvent.click(within(demo).getByRole("button", { name: submitName }));
+    expect(await within(demo).findByRole("alert")).toHaveTextContent("请输入完整的 HTTP(S) 服务地址");
+
+    fireEvent.change(endpoint, { target: { value: "https://api.qizhi.cn" } });
+    expect(within(demo).queryByText("请输入完整的 HTTP(S) 服务地址")).not.toBeInTheDocument();
+  });
+
+  it("blocks invalid step email, empty member names and invalid remote service names", async () => {
+    render(<FormDocsIsland />);
+
+    const wizard = document.getElementById("表单-多步骤表单")!;
+    fireEvent.change(within(wizard).getByRole("textbox", { name: "服务名称" }), { target: { value: "valid-service" } });
+    fireEvent.click(within(wizard).getByRole("button", { name: "下一步" }));
+    fireEvent.change(await within(wizard).findByRole("textbox", { name: "联系邮箱" }), { target: { value: "invalid-email" } });
+    fireEvent.click(within(wizard).getByRole("button", { name: "下一步" }));
+    expect(await within(wizard).findByRole("alert")).toHaveTextContent("请输入有效的邮箱地址");
+
+    const complex = document.getElementById("表单-复杂表单联动")!;
+    fireEvent.click(within(complex).getByRole("button", { name: "新增成员" }));
+    fireEvent.click(within(complex).getByRole("button", { name: "提交复杂表单" }));
+    expect(await within(complex).findByText("请输入成员名称")).toBeInTheDocument();
+    expect(within(complex).queryByRole("status", { name: "复杂表单提交结果" })).not.toBeInTheDocument();
+
+    const remote = document.getElementById("表单-远程联动与未保存修改")!;
+    const remoteName = within(remote).getByRole("textbox", { name: "远程服务名称" });
+    fireEvent.change(remoteName, { target: { value: "Invalid Name" } });
+    fireEvent.click(within(remote).getByRole("button", { name: "提交远程表单" }));
+    expect(await within(remote).findByText("须以小写字母开头，仅支持小写字母、数字和短横线")).toBeInTheDocument();
+    expect(within(remote).queryByRole("status", { name: "远程表单提交结果" })).not.toBeInTheDocument();
   });
 
   it("demonstrates frontend validation and server field-error recovery", async () => {
@@ -153,7 +196,10 @@ describe("Form docs", () => {
   it("keeps API metadata aligned with the Form v4 business-state contract", () => {
     expect(formApi.map((item) => item.name)).toEqual(["layout", "form", "initialValues", "onValuesChange", "onFinish", "onFinishFailed", "onValidationException", "scrollToFirstError", "preserve", "children", "className", "style"]);
     expect(formItemApi.map((item) => item.name)).toEqual(["name", "label", "required", "extra", "rules", "validateTrigger", "validateStatus", "help", "dependencies", "preserve", "children", "className", "style"]);
-    expect(formListApi.map((item) => item.name)).toEqual(["name", "initialValue", "children"]);
+    expect(formListApi.map((item) => item.name)).toEqual(["name", "initialValue", "min", "max", "rules", "rowRules", "children"]);
+    expect(formErrorListApi.map((item) => item.name)).toEqual(["errors", "className", "style"]);
+    expect(formStepsApi.map((item) => item.name)).toEqual(["form", "steps", "initialStep", "current", "onCurrentChange"]);
+    expect(formDraftApi.map((item) => item.name)).toEqual(["form", "draftKey", "version", "storage", "selectValues", "getMetadata", "onRestoreMetadata", "autoSave"]);
     expect(formBulkEditApi.map((item) => item.name)).toEqual(["form", "records", "getRowKey", "fields", "getFieldValue", "isEqual", "getFieldState", "getFieldFailures", "clearField", "keepField", "validate", "applyResult", "rebase", "reset", "status", "failures", "succeededKeys", "remainingKeys", "hasChanges"]);
     expect(formInstanceApi.map((item) => item.name)).toEqual(["getFieldsValue", "getFieldValue", "setFieldsValue", "setFieldValue", "getFieldError", "setFieldErrors", "validateFields", "resetFields", "isFieldsDirty", "markFieldsClean", "scrollToField", "submit"]);
     expect(formApi.find((item) => item.name === "layout")?.defaultValue).toBe("vertical");
@@ -165,6 +211,9 @@ describe("Form docs", () => {
     expect(screen.getByRole("table", { name: "Form API" })).toBeInTheDocument();
     expect(screen.getByRole("table", { name: "Form.Item API" })).toBeInTheDocument();
     expect(screen.getByRole("table", { name: "Form.List API" })).toBeInTheDocument();
+    expect(screen.getByRole("table", { name: "Form.ErrorList API" })).toBeInTheDocument();
+    expect(screen.getByRole("table", { name: "Form.useSteps API" })).toBeInTheDocument();
+    expect(screen.getByRole("table", { name: "Form.useDraft API" })).toBeInTheDocument();
     expect(screen.getByRole("table", { name: "Form.useBulkEdit API" })).toBeInTheDocument();
     expect(screen.getByRole("table", { name: "FormInstance API" })).toBeInTheDocument();
   });

@@ -4,6 +4,110 @@ import { describe, expect, it, vi } from "vitest";
 import { Form } from "./Form";
 
 describe("Form.List", () => {
+  it("向渲染函数提供数量守卫、批量新增、列表错误和行错误", async () => {
+    const user = userEvent.setup();
+    render(
+      <Form initialValues={{ members: [{ name: "A", start: 2, end: 1 }] }}>
+        <Form.List
+          name="members"
+          min={1}
+          max={2}
+          rules={[{ validator: (rows) => rows.length === 1 ? { type: "field", message: "需要第二位成员" } : undefined }]}
+          rowRules={[(row) => (row as { start: number; end: number }).start < (row as { start: number; end: number }).end ? undefined : { type: "field", message: "开始值必须小于结束值" }]}
+        >
+          {(fields, operations, meta) => <>
+            <button type="button" disabled={!operations.canAdd(1)} onClick={() => operations.addMany([{ name: "B", start: 1, end: 2 }])}>批量新增</button>
+            <button type="button" disabled={!operations.canRemove(0)} onClick={() => operations.remove(0)}>删除首行</button>
+            {fields.map((field) => <Form.ErrorList key={field.key} errors={field.errors} />)}
+            <Form.ErrorList errors={meta.errors} />
+          </>}
+        </Form.List>
+      </Form>,
+    );
+
+    expect(screen.getByRole("button", { name: "删除首行" })).toBeDisabled();
+    expect(await screen.findByText("需要第二位成员")).toBeInTheDocument();
+    expect(screen.getByText("开始值必须小于结束值")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "批量新增" }));
+    expect(screen.getByRole("button", { name: "批量新增" })).toBeDisabled();
+    expect(screen.queryByText("需要第二位成员")).not.toBeInTheDocument();
+  });
+
+  it("程序化恢复会同步列表数量、值和嵌套列表", async () => {
+    let form: ReturnType<typeof Form.useForm>[0] | undefined;
+
+    function Example() {
+      const [instance] = Form.useForm();
+      form = instance;
+      return (
+        <Form form={instance} initialValues={{ team: { members: [{ name: "A", aliases: ["A1"] }, { name: "B", aliases: [] }] } }}>
+          <Form.List name={["team", "members"]}>{(fields) => fields.map((field) => (
+            <div key={field.key}>
+              <Form.Item name={["team", "members", field.name, "name"]}>
+                <input aria-label={`恢复成员 ${field.name + 1}`} />
+              </Form.Item>
+              <Form.List name={["team", "members", field.name, "aliases"]}>{(aliases) => aliases.map((alias) => (
+                <Form.Item key={alias.key} name={["team", "members", field.name, "aliases", alias.name]}>
+                  <input aria-label={`成员 ${field.name + 1} 别名 ${alias.name + 1}`} />
+                </Form.Item>
+              ))}</Form.List>
+            </div>
+          ))}</Form.List>
+        </Form>
+      );
+    }
+
+    render(<Example />);
+    expect(await screen.findAllByRole("textbox", { name: /恢复成员/ })).toHaveLength(2);
+
+    act(() => form?.setFieldsValue({ team: { members: [
+      { name: "A", aliases: ["A1", "A2"] },
+      { name: "B", aliases: [] },
+      { name: "C", aliases: [] },
+      { name: "D", aliases: [] },
+      { name: "E", aliases: [] },
+    ] } }));
+    expect(screen.getAllByRole("textbox", { name: /恢复成员/ })).toHaveLength(5);
+    expect(screen.getAllByRole("textbox", { name: /别名/ })).toHaveLength(2);
+
+    act(() => form?.setFieldsValue({ team: { members: [{ name: "Z", aliases: [] }] } }));
+    expect(screen.getAllByRole("textbox", { name: /恢复成员/ })).toHaveLength(1);
+    expect(screen.getByRole("textbox", { name: "恢复成员 1" })).toHaveValue("Z");
+    expect(screen.queryByRole("textbox", { name: /别名/ })).not.toBeInTheDocument();
+  });
+
+  it("缩短列表恢复时不会让旧字段清理掉新值或首项节点", async () => {
+    let form: ReturnType<typeof Form.useForm>[0] | undefined;
+    const scrollIntoView = vi.fn();
+    Element.prototype.scrollIntoView = scrollIntoView;
+
+    function Example({ preserve }: { preserve: boolean }) {
+      const [instance] = Form.useForm();
+      form = instance;
+      return <Form form={instance} initialValues={{ members: [{ name: "A" }, { name: "B" }] }}>
+        <Form.List name="members">{(fields) => fields.map((field) => (
+          <Form.Item key={field.key} name={["members", field.name, "name"]} preserve={preserve}>
+            <input aria-label={`恢复成员 ${field.name + 1}`} data-list-key={field.key} />
+          </Form.Item>
+        ))}</Form.List>
+      </Form>;
+    }
+
+    const view = render(<Example preserve={false} />);
+    const firstKey = (await screen.findByRole("textbox", { name: "恢复成员 1" })).getAttribute("data-list-key");
+    act(() => form?.setFieldsValue({ members: [{ name: "restored" }] }));
+    expect(screen.getByRole("textbox", { name: "恢复成员 1" })).toHaveValue("restored");
+    expect(screen.getByRole("textbox", { name: "恢复成员 1" })).toHaveAttribute("data-list-key", firstKey);
+
+    view.rerender(<Example preserve />);
+    act(() => {
+      form?.setFieldsValue({ members: [{ name: "again" }] });
+      form?.scrollToField(["members", 0]);
+    });
+    expect(screen.getByRole("textbox", { name: "恢复成员 1" })).toHaveValue("again");
+    expect(scrollIntoView).toHaveBeenCalled();
+  });
+
   it("渲染初始条目，新增后只通知一次并提交数组值", async () => {
     const user = userEvent.setup();
     const onValuesChange = vi.fn();

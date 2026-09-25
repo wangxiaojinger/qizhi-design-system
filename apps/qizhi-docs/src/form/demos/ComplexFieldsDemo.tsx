@@ -1,6 +1,20 @@
 import { useState } from "react";
 import { Button, Form, Input, Select } from "@wangxiaojinger/qizhi-react";
 
+function validateServiceEndpoint(value: unknown) {
+  if (!value) return;
+  try {
+    const url = new URL(String(value));
+    const hostname = url.hostname;
+    const isIpAddress = /^(?:\d{1,3}\.){3}\d{1,3}$/.test(hostname) || hostname.startsWith("[");
+    const suffix = hostname.split(".").at(-1) ?? "";
+    const hasCompleteDomain = hostname.includes(".") && suffix.length >= 2;
+    if (!(["http:", "https:"].includes(url.protocol) && (hostname === "localhost" || isIpAddress || hasCompleteDomain))) throw new Error();
+  } catch {
+    throw new Error("请输入完整的 HTTP(S) 服务地址");
+  }
+}
+
 function ConditionalEndpoint() {
   const serviceType = Form.useWatch("serviceType");
   return serviceType === "remote" ? (
@@ -8,7 +22,10 @@ function ConditionalEndpoint() {
       name={["service", "endpoint"]}
       label="服务地址"
       preserve={false}
-      rules={[{ required: true, message: "请输入服务地址" }]}
+      rules={[
+        { required: true, message: "请输入服务地址" },
+        { validator: validateServiceEndpoint },
+      ]}
     >
       <Input aria-label="服务地址" allowClear={false} />
     </Form.Item>
@@ -64,7 +81,12 @@ export default function ComplexFieldsDemo() {
           <div className="form-docs-complex-list">
             {fields.map((field, index) => (
               <div className="form-docs-complex-row" key={field.key}>
-                <Form.Item name={["members", field.name, "name"]} label={`成员 ${index + 1}`}>
+                <Form.Item
+                  name={["members", field.name, "name"]}
+                  label={`成员 ${index + 1}`}
+                  required
+                  rules={[{ required: true, message: "请输入成员名称" }]}
+                >
                   <Input aria-label={`成员 ${index + 1} 名称`} allowClear={false} />
                 </Form.Item>
                 <div className="form-docs-complex-actions">

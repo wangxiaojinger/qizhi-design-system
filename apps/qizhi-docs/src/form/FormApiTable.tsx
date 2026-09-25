@@ -11,6 +11,12 @@ export function FormApiTable() {
       <ApiTable api="formItemApi" label="Form.Item API" />
       <h3>Form.List</h3>
       <ApiTable api="formListApi" label="Form.List API" />
+      <h3>Form.ErrorList</h3>
+      <ApiTable api="formErrorListApi" label="Form.ErrorList API" />
+      <h3>Form.useSteps</h3>
+      <ApiTable api="formStepsApi" label="Form.useSteps API" />
+      <h3>Form.useDraft</h3>
+      <ApiTable api="formDraftApi" label="Form.useDraft API" />
       <h3>Form.useBulkEdit</h3>
       <ApiTable api="formBulkEditApi" label="Form.useBulkEdit API" />
       <h3>FormInstance</h3>

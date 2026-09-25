@@ -63,11 +63,67 @@
   margin-bottom: 16px;
 }
 
+#component-form .form-draft-demo__actions,
+#component-form .form-draft-demo__conflict {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+#component-form .form-draft-demo__conflict {
+  padding: 12px;
+  border: 1px solid var(--color-warning-light-3);
+  background: var(--color-warning-light-1);
+}
+
+#component-form .form-draft-demo__state {
+  display: grid;
+  gap: 4px;
+  width: min(100%, var(--form-control-width));
+  color: var(--color-text-2);
+  font-size: 13px;
+  line-height: 22px;
+}
+
 #component-form .form-docs-complex-list {
   display: grid;
   gap: 16px;
   width: min(100%, 720px);
   margin-bottom: 20px;
+}
+
+#component-form .form-advanced-list {
+  display: grid;
+  gap: 16px;
+  width: min(100%, 900px);
+}
+
+#component-form .form-advanced-list__row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border-2);
+}
+
+#component-form .form-advanced-list__fields {
+  display: grid;
+  grid-template-columns: minmax(180px, 2fr) minmax(100px, 1fr) minmax(100px, 1fr);
+  gap: 12px;
+  min-width: 0;
+}
+
+#component-form .form-advanced-list__actions,
+#component-form .form-advanced-list__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 8px;
+}
+
+#component-form .form-advanced-list__row > .qizhi-form-error-list {
+  grid-column: 1 / -1;
 }
 
 #component-form .form-docs-complex-row {
@@ -87,6 +143,11 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+}
+
+#component-form .form-docs-complex-actions {
+  align-self: start;
+  margin-top: 30px;
 }
 
 #component-form .form-docs-inline-control {
@@ -208,6 +269,30 @@
   margin-top: 64px;
 }
 
+#component-form .form-steps-demo {
+  display: grid;
+  gap: 32px;
+  width: 100%;
+}
+
+#component-form .form-steps-demo .qizhi-form {
+  margin-inline: auto;
+}
+
+#component-form .form-steps-demo__actions {
+  display: flex;
+  gap: 12px;
+}
+
+#component-form .form-steps-demo__summary,
+#component-form .form-steps-demo__result {
+  min-height: 22px;
+  margin: 0;
+  color: var(--color-text-3);
+  font-size: 14px;
+  line-height: 22px;
+}
+
 #component-form .qizhi-api-section > h3:not(:first-of-type) {
   margin-top: 32px;
 }
@@ -230,6 +315,15 @@
 
   #component-form .form-docs-complex-row {
     grid-template-columns: 1fr;
+  }
+
+  #component-form .form-docs-complex-actions {
+    margin-top: 0;
+  }
+
+  #component-form .form-advanced-list__row,
+  #component-form .form-advanced-list__fields {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   #component-form .form-docs-port-control,
@@ -263,7 +357,6 @@
     animation: none;
   }
 }
-
 #component-form .form-docs-bulk-edit-summary,
 #component-form .form-docs-bulk-edit-warning,
 #component-form .form-docs-bulk-edit-results {

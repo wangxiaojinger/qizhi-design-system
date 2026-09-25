@@ -1,10 +1,13 @@
-import type { FormBulkEditController, FormBulkEditOptions, FormInstance, FormItemProps, FormListProps, FormProps } from "@wangxiaojinger/qizhi-react";
+import type { FormBulkEditController, FormBulkEditOptions, FormDraftOptions, FormErrorListProps, FormInstance, FormItemProps, FormListProps, FormProps, FormStepsOptions } from "@wangxiaojinger/qizhi-react";
 import type { ComponentApiItem } from "../api/ApiTable";
 
 type FormApiItem = ComponentApiItem<keyof FormProps>;
 type FormItemApiItem = ComponentApiItem<keyof FormItemProps>;
 type FormInstanceApiItem = ComponentApiItem<keyof FormInstance>;
 type FormListApiItem = ComponentApiItem<keyof FormListProps>;
+type FormErrorListApiItem = ComponentApiItem<keyof FormErrorListProps>;
+type FormStepsApiItem = ComponentApiItem<keyof FormStepsOptions>;
+type FormDraftApiItem = ComponentApiItem<keyof FormDraftOptions>;
 type FormBulkEditApiItem = ComponentApiItem<keyof FormBulkEditOptions<unknown, string> | keyof FormBulkEditController<string>>;
 
 export const formApi = [
@@ -41,8 +44,37 @@ export const formItemApi = [
 export const formListApi = [
   { name: "name", description: "动态列表在表单值中的字段路径。", type: "FormNamePath", defaultValue: "—" },
   { name: "initialValue", description: "列表路径尚无值时使用的初始数组。", type: "unknown[]", defaultValue: "—" },
-  { name: "children", description: "接收稳定字段描述和新增、删除、移动操作的渲染函数。", type: "(fields, operations) => ReactNode", defaultValue: "—" },
+  { name: "min", description: "允许的最少条目数；用户操作不能突破该下限。", type: "number", defaultValue: "—" },
+  { name: "max", description: "允许的最多条目数；用户操作不能突破该上限。", type: "number", defaultValue: "—" },
+  { name: "rules", description: "校验整个列表的同步或异步自定义规则，错误通过 meta.errors 展示。", type: "FormListRule[]", defaultValue: "[]" },
+  { name: "rowRules", description: "校验每一整行的同步或异步规则，错误随稳定行 key 迁移。", type: "FormListRowRule[]", defaultValue: "[]" },
+  { name: "children", description: "接收稳定字段、列表操作和列表错误元信息的渲染函数。", type: "(fields, operations, meta) => ReactNode", defaultValue: "—" },
 ] as const satisfies readonly FormListApiItem[];
+
+export const formErrorListApi = [
+  { name: "errors", description: "按传入顺序展示的错误内容；为空时不渲染错误容器。", type: "readonly ReactNode[]", defaultValue: "[]" },
+  { name: "className", description: "错误列表根节点的附加类名。", type: "string", defaultValue: "—" },
+  { name: "style", description: "错误列表根节点的内联样式。", type: "CSSProperties", defaultValue: "—" },
+] as const satisfies readonly FormErrorListApiItem[];
+
+export const formStepsApi = [
+  { name: "form", description: "由 Form.useForm 创建、供多步骤流程校验和提交的表单实例。", type: "FormInstance", defaultValue: "—" },
+  { name: "steps", description: "按顺序声明稳定步骤 key 及该步骤负责校验的字段路径。", type: "readonly FormStep[]", defaultValue: "—" },
+  { name: "initialStep", description: "首次渲染的步骤，从 1 开始并自动限制在有效范围。", type: "number", defaultValue: "1" },
+  { name: "current", description: "受控模式下的当前步骤，是步骤位置的唯一真实状态并限制在有效范围。", type: "number", defaultValue: "—" },
+  { name: "onCurrentChange", description: "导航成功且步骤真实变化后通知目标步骤；校验失败或边界未变化时不触发。", type: "(current: number) => void", defaultValue: "—" },
+] as const satisfies readonly FormStepsApiItem[];
+
+export const formDraftApi = [
+  { name: "form", description: "由 Form.useForm 创建、需要保存和恢复值的表单实例。", type: "FormInstance", defaultValue: "—" },
+  { name: "draftKey", description: "由业务方构造的草稿唯一标识，应区分用户、业务对象和表单场景。", type: "string", defaultValue: "—" },
+  { name: "version", description: "业务表单结构版本；远端版本不匹配时禁止恢复。", type: "string", defaultValue: "—" },
+  { name: "storage", description: "业务方显式提供的异步存储适配器；组件库不默认绑定本地或远端存储。", type: "FormDraftStorage", defaultValue: "—" },
+  { name: "selectValues", description: "必填的字段筛选函数，只返回允许持久化的表单值。", type: "(values: FormValues) => FormValues", defaultValue: "—" },
+  { name: "getMetadata", description: "保存稳定步骤 key 等非字段业务状态。", type: "() => TMetadata", defaultValue: "—" },
+  { name: "onRestoreMetadata", description: "草稿恢复后接收 metadata，由业务项目恢复步骤等外部状态。", type: "(metadata?: TMetadata) => void", defaultValue: "—" },
+  { name: "autoSave", description: "可选的防抖自动保存；默认关闭，避免组件库隐式产生存储请求。", type: "false | { debounceMs: number }", defaultValue: "false" },
+] as const satisfies readonly FormDraftApiItem[];
 
 export const formBulkEditApi = [
   { name: "form", description: "由 Form.useForm 创建、承载批量编辑字段值和规则的表单实例。", type: "FormInstance", defaultValue: "—" },
@@ -73,7 +105,7 @@ export const formInstanceApi = [
   { name: "setFieldValue", description: "写入单个字段路径的值并清除该字段错误；不触发 onValuesChange。", type: "(name: FormNamePath, value: unknown) => void", defaultValue: "—" },
   { name: "getFieldError", description: "返回指定字段路径当前的错误文案列表。", type: "(name: FormNamePath) => string[]", defaultValue: "—" },
   { name: "setFieldErrors", description: "回填指定字段路径的后端错误；用户修改该字段后自动清除。", type: "(name: FormNamePath, errors: string[]) => void", defaultValue: "—" },
-  { name: "validateFields", description: "校验所有已注册字段；成功时返回表单值，失败时拒绝并携带字段错误。", type: "() => Promise<Record<string, unknown>>", defaultValue: "—" },
+  { name: "validateFields", description: "校验全部或指定路径下的已注册字段；失败时拒绝并携带字段错误。", type: "(names?: FormNamePath[]) => Promise<Record<string, unknown>>", defaultValue: "—" },
   { name: "resetFields", description: "将指定字段路径或全部已注册字段恢复为初始值，并清除错误。", type: "(names?: FormNamePath[]) => void", defaultValue: "—" },
   { name: "isFieldsDirty", description: "判断全部或指定字段是否相对当前干净基线发生变化。", type: "(names?: FormNamePath[]) => boolean", defaultValue: "—" },
   { name: "markFieldsClean", description: "将全部或指定字段的当前值记录为新的干净基线。", type: "(names?: FormNamePath[]) => void", defaultValue: "—" },

@@ -34,13 +34,13 @@ const buildManifest = async () => {
           || !defaultBehaviors.every((item) => typeof item === "string"))) {
           throw new Error(`Invalid default behaviors for ${name}`);
         }
-        apis[name] = { source: relative(repoRoot, path), items: value,
+        apis[name] = { source: relative(repoRoot, path).replaceAll("/", "\\"), items: value,
           ...(defaultBehaviors ? { defaultBehaviors } : {}) };
       } else if (Array.isArray(value)) {
         value.forEach((group) => {
           if (!group || typeof group.title !== "string" || !isApiItems(group.items)) return;
           const key = `${name}:${group.title}`;
-          apis[key] = { source: relative(repoRoot, path), items: group.items };
+          apis[key] = { source: relative(repoRoot, path).replaceAll("/", "\\"), items: group.items };
         });
       }
     }
