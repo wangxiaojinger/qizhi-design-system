@@ -1,6 +1,19 @@
-import { expectTypeOf, test } from "vitest";
+import { expect, expectTypeOf, test } from "vitest";
 import { Form } from "./Form";
 import type { FormFailedResult, FormInstance, FormNamePath, FormRule, FormRuleFailure, FormValidationException, FormValues } from "./Form.types";
+import type {
+  FormBulkEditBlockedCode,
+  FormBulkEditBlockedError,
+  FormBulkEditController,
+  FormBulkEditFailure,
+  FormBulkEditFieldState,
+  FormBulkEditKey,
+  FormBulkEditMode,
+  FormBulkEditOptions,
+  FormBulkEditPatch,
+  FormBulkEditResult,
+  FormBulkEditStatus,
+} from "../index";
 
 test("Form v2 对外类型覆盖字段管理、校验和提交", () => {
   function Example() {
@@ -62,4 +75,31 @@ test("Form v4 对外类型覆盖异常分层和未保存修改", () => {
   }
 
   expectTypeOf(DirtyState).toBeFunction();
+});
+
+test("Form Bulk Edit 对外类型覆盖混合值、差异补丁和结果回填", () => {
+  function BulkEditState() {
+    const [form] = Form.useForm();
+    const options: FormBulkEditOptions<{ id: string; department: string }, string> = {
+      form,
+      records: [{ id: "1", department: "研发部" }],
+      getRowKey: (record) => record.id,
+      fields: ["department", ["profile", "remark"]],
+    };
+    const bulk = Form.useBulkEdit(options);
+    expectTypeOf(bulk).toEqualTypeOf<FormBulkEditController<string>>();
+    expectTypeOf(bulk.validate()).toEqualTypeOf<Promise<FormBulkEditPatch<string>>>();
+    expectTypeOf(bulk.status).toEqualTypeOf<FormBulkEditStatus>();
+    return <Form form={form} />;
+  }
+
+  expect(Form.useBulkEdit).toBeTypeOf("function");
+  expectTypeOf(BulkEditState).toBeFunction();
+  expectTypeOf<FormBulkEditKey>().toEqualTypeOf<string | number>();
+  expectTypeOf<FormBulkEditMode>().toEqualTypeOf<"keep" | "set" | "clear">();
+  expectTypeOf<FormBulkEditBlockedCode>().toEqualTypeOf<"no-changes" | "no-targets" | "source-changed">();
+  expectTypeOf<FormBulkEditBlockedError>().toMatchTypeOf<Error>();
+  expectTypeOf<FormBulkEditFieldState>().toHaveProperty("mixed");
+  expectTypeOf<FormBulkEditFailure<string>>().toHaveProperty("message");
+  expectTypeOf<FormBulkEditResult<string>>().toHaveProperty("succeededKeys");
 });

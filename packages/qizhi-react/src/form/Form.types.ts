@@ -162,4 +162,5 @@ export interface FormComponent {
   useForm: () => [FormInstance];
   useWatch: (name: FormNamePath, form?: FormInstance) => unknown;
   useDirty: (form?: FormInstance) => boolean;
+  useBulkEdit: <TRecord, TKey extends FormBulkEditKey>(options: FormBulkEditOptions<TRecord, TKey>) => FormBulkEditController<TKey>;
 }

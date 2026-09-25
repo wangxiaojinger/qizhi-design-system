@@ -2,6 +2,7 @@ import { Children, cloneElement, createContext, forwardRef, isValidElement, useC
 import type { ChangeEvent, FocusEvent, ReactElement } from "react";
 import type { FormComponent, FormErrorField, FormInstance, FormItemProps, FormListProps, FormNamePath, FormProps, FormValidationException, FormValues } from "./Form.types";
 import { createFormStore, getFormStore, type FormStore } from "./formStore";
+import { useBulkEdit } from "./formBulkEdit";
 import "./form.css";
 
 const joinClassNames = (...names: Array<string | undefined>) => names.filter(Boolean).join(" ");
@@ -61,4 +62,4 @@ function FormList({ name, initialValue, children }: FormListProps) {
   return children(keys.map((key, index) => ({ key, name: index })), operations);
 }
 
-export const Form = Object.assign(FormRoot, { Item: FormItem, List: FormList, useForm, useWatch, useDirty }) as FormComponent;
+export const Form = Object.assign(FormRoot, { Item: FormItem, List: FormList, useForm, useWatch, useDirty, useBulkEdit }) as FormComponent;

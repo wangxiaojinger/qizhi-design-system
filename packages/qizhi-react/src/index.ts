@@ -256,6 +256,17 @@ export { Empty } from "./empty/Empty";
 export type { EmptyProps } from "./empty/Empty.types";
 export { Form } from "./form/Form";
 export type {
+  FormBulkEditBlockedCode,
+  FormBulkEditBlockedError,
+  FormBulkEditController,
+  FormBulkEditFailure,
+  FormBulkEditFieldState,
+  FormBulkEditKey,
+  FormBulkEditMode,
+  FormBulkEditOptions,
+  FormBulkEditPatch,
+  FormBulkEditResult,
+  FormBulkEditStatus,
   FormComponent,
   FormErrorField,
   FormFailedResult,
