@@ -52,7 +52,9 @@ export function transformPromptSvgMarkup(svg, item) {
     .replace(/\bid="([^"]+)"/gi, 'id="__QIZHI_ICON_ID__-$1"')
     .replace(/url\(#([^)]+)\)/gi, "url(#__QIZHI_ICON_ID__-$1)");
   if (item.colorMode === "currentColor") {
-    markup = markup.replace(/\b(fill|stroke)="black"/gi, '$1="currentColor"');
+    markup = markup
+      .replace(/\b(fill|stroke)="black"/gi, '$1="currentColor"')
+      .replace(/\s+(?:fill|stroke)-opacity="[^"]*"/gi, "");
   }
   return { viewBox, markup: markup.trim() };
 }

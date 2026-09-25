@@ -5,5 +5,5 @@ import { createQizhiMarkupIcon } from "../../createQizhiMarkupIcon";
 export const StatusNotStartedIcon = createQizhiMarkupIcon(
   "StatusNotStartedIcon",
   "0 0 16 16",
-  "<circle cx=\"8\" cy=\"8\" r=\"7\" fill=\"none\"/>\n<circle cx=\"8\" cy=\"8\" r=\"5.5\" fill=\"none\" stroke=\"currentColor\" stroke-opacity=\"0.25\" stroke-width=\"3\" stroke-dasharray=\"2 2\"/>",
+  "<circle cx=\"8\" cy=\"8\" r=\"7\" fill=\"none\"/>\n<circle cx=\"8\" cy=\"8\" r=\"5.5\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"3\" stroke-dasharray=\"2 2\"/>",
 );

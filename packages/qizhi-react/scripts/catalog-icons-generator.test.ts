@@ -16,6 +16,7 @@ describe("catalog icon SVG generator", () => {
       expect(markup, item.componentName).not.toMatch(/\son[a-z]+=/i);
       expect(markup, item.componentName).not.toContain("#8C8C8C");
       expect(markup, item.componentName).toContain("currentColor");
+      expect(markup, item.componentName).not.toMatch(/(?:fill|stroke)-opacity=/i);
     }
   });
 });

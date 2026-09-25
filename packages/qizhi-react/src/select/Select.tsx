@@ -53,6 +53,7 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(prop
     defaultOpen = false,
     onOpenChange,
     onPopupScroll,
+    onBlur,
     className,
     style,
     id,
@@ -235,7 +236,10 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(prop
     onClick: () => setVisible(!isOpen),
     onKeyDown: handleKeyDown,
     onPointerDown: () => setKeyboardFocused(false),
-    onBlur: () => setKeyboardFocused(false),
+    onBlur: (event: React.FocusEvent<HTMLElement>) => {
+      setKeyboardFocused(false);
+      onBlur?.(event as React.FocusEvent<HTMLInputElement>);
+    },
   };
 
   const menu = (
@@ -256,7 +260,7 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(prop
     {addBefore != null ? <span className="qizhi-select__before">{addBefore}</span> : null}
     {trigger ? trigger(commonTriggerProps) : <div className={`${CONTROL_CONTAINER_CLASS_NAME} qizhi-select__control`} style={autoWidth ? { width: "max-content" } : undefined}>
       {multiple ? <div className="qizhi-select__tags" aria-label="已选项">{shownTags.map((option, index) => <Tag key={String(option.value)} className={join("qizhi-select__tag", !renderTag && "qizhi-tag-closable")} draggable={dragToSort} onMouseDown={(event) => event.preventDefault()} onDragStart={(event: DragEvent<HTMLSpanElement>) => event.dataTransfer.setData("text/qizhi-select-index", String(index))} onDragOver={dragToSort ? (event) => event.preventDefault() : undefined} onDrop={dragToSort ? (event) => { event.preventDefault(); const from = Number(event.dataTransfer.getData("text/qizhi-select-index")); if (Number.isInteger(from) && from !== index) { const next = [...multipleValue]; const [item] = next.splice(from, 1); next.splice(index, 0, item); emitMultiple(next); } } : undefined}>{renderTag ? renderTag(option, true) : <>{option.label}<button className="qizhi-tag-close-btn" type="button" aria-label={`删除 ${textOf(option.label)}`} onClick={(event) => { event.stopPropagation(); remove(option.value); }}><CloseIcon /></button></>}</Tag>)}{hiddenCount > 0 ? <Tag className="qizhi-select__tag qizhi-select__tag--more">{renderMore ? renderMore(hiddenCount) : `+${hiddenCount} 个更多`}</Tag> : null}</div> : null}
-      <input ref={inputRef} id={id} name={name} className="qizhi-select__input" role="combobox" aria-haspopup="listbox" aria-expanded={isOpen} aria-controls={popupId} aria-activedescendant={activeIndex >= 0 ? `${popupId}-option-${activeIndex}` : undefined} aria-autocomplete={searchEnabled ? "list" : undefined} aria-label={props["aria-label"] ?? placeholder} aria-labelledby={props["aria-labelledby"]} disabled={disabled} readOnly={!searchEnabled && !allowCreate && tokenSeparators.length === 0} placeholder={hasValue ? "" : placeholder} value={isOpen && (searchEnabled || allowCreate || tokenSeparators.length) ? query : multiple ? query : selectedSingle ? textOf(selectedSingle.label) : query} onChange={(event) => handleInput(event.target.value)} onPointerDown={() => setKeyboardFocused(false)} onBlur={() => setKeyboardFocused(false)} onClick={() => setVisible(!isOpen)} onKeyDown={handleKeyDown} />
+      <input ref={inputRef} id={id} name={name} className="qizhi-select__input" role="combobox" aria-haspopup="listbox" aria-expanded={isOpen} aria-controls={popupId} aria-activedescendant={activeIndex >= 0 ? `${popupId}-option-${activeIndex}` : undefined} aria-autocomplete={searchEnabled ? "list" : undefined} aria-label={props["aria-label"] ?? placeholder} aria-labelledby={props["aria-labelledby"]} aria-describedby={props["aria-describedby"]} aria-invalid={props["aria-invalid"]} disabled={disabled} readOnly={!searchEnabled && !allowCreate && tokenSeparators.length === 0} placeholder={hasValue ? "" : placeholder} value={isOpen && (searchEnabled || allowCreate || tokenSeparators.length) ? query : multiple ? query : selectedSingle ? textOf(selectedSingle.label) : query} onChange={(event) => handleInput(event.target.value)} onPointerDown={() => setKeyboardFocused(false)} onBlur={(event) => { setKeyboardFocused(false); onBlur?.(event); }} onClick={() => setVisible(!isOpen)} onKeyDown={handleKeyDown} />
       {allowClear && hasValue && !disabled ? <button type="button" className="qizhi-select__clear" aria-label="清除选择" onMouseDown={(event) => event.preventDefault()} onClick={clear}><CloseIcon /></button> : null}
       <span className="qizhi-select__arrow" aria-hidden="true"><ArrowDownIcon viewBox="1.6 1.6 12.8 12.8" /></span>
     </div>}

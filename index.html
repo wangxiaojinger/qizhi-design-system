@@ -522,8 +522,53 @@
               <section class="qizhi-changelog__day" id="changelog-2026-09-24" data-toc-label="2026-09-24">
                 <header class="qizhi-changelog__day-head">
                   <h2><time datetime="2026-09-24">2026-09-24</time></h2>
-                  <span class="qizhi-changelog__count">8 次更新</span>
+                  <span class="qizhi-changelog__count">11 次更新</span>
                 </header>
+
+                <article class="qizhi-changelog__entry">
+                  <header class="qizhi-changelog__entry-head">
+                    <div>
+                      <h3>新增企业表单草稿编排能力</h3>
+                      <div class="qizhi-changelog__meta">
+                        <span class="qizhi-changelog__commit">5c68466</span>
+                      </div>
+                    </div>
+                  </header>
+                  <ul>
+                    <li>新增存储无关的 Form.useDraft，支持字段筛选、版本与过期判断、冲突处理和可选自动保存。</li>
+                    <li>补齐动态列表恢复、可控步骤、官网同源示例、API 元数据和三视口验收。</li>
+                  </ul>
+                </article>
+
+                <article class="qizhi-changelog__entry">
+                  <header class="qizhi-changelog__entry-head">
+                    <div>
+                      <h3>补齐多步骤表单验收闭环</h3>
+                      <div class="qizhi-changelog__meta">
+                        <span class="qizhi-changelog__commit">5c68466</span>
+                      </div>
+                    </div>
+                  </header>
+                  <ul>
+                    <li>补充指定步骤切换、字段卸载恢复、提交首错回跳和单轮异步校验测试。</li>
+                    <li>复用已通过的全量校验结果进入提交，避免异步校验器重复执行。</li>
+                  </ul>
+                </article>
+
+                <article class="qizhi-changelog__entry">
+                  <header class="qizhi-changelog__entry-head">
+                    <div>
+                      <h3>新增多步骤表单编排能力</h3>
+                      <div class="qizhi-changelog__meta">
+                        <span class="qizhi-changelog__commit">5c68466</span>
+                      </div>
+                    </div>
+                  </header>
+                  <ul>
+                    <li>新增步骤级校验、前后切换、跨步骤数据保留、首错定位和全量提交编排。</li>
+                    <li>复用正式 Steps 与 Form 组件补充官网示例、公共类型、API 元数据和契约测试。</li>
+                  </ul>
+                </article>
 
                 <article class="qizhi-changelog__entry">
                   <header class="qizhi-changelog__entry-head">

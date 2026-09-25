@@ -38,6 +38,9 @@ export const selectApi = [
   { name: "defaultOpen", description: "非受控初始打开状态。", type: "boolean", defaultValue: "false" },
   { name: "onOpenChange", description: "弹层打开状态变化时触发。", type: "(open: boolean) => void", defaultValue: "—" },
   { name: "onPopupScroll", description: "下拉弹层滚动时触发，可用于分页加载远程选项。", type: "UIEventHandler<HTMLDivElement>", defaultValue: "—" },
+  { name: "onBlur", description: "选择器输入节点失去焦点时触发，可与 Form 的失焦校验配合。", type: "FocusEventHandler<HTMLInputElement>", defaultValue: "—" },
+  { name: "aria-describedby", description: "关联帮助或错误说明元素。", type: "string", defaultValue: "—" },
+  { name: "aria-invalid", description: "向辅助技术暴露当前值是否无效。", type: "boolean | AriaAttributes['aria-invalid']", defaultValue: "—" },
 ] as const satisfies readonly SelectApiItem[];
 
 export const selectOptionCardApi = [

@@ -50,7 +50,7 @@ describe("Select docs", () => {
   });
 
   it("API 元数据覆盖 Select 的补充说明和信息卡片公开属性", () => {
-    expect(selectApi.map((item) => item.name)).toEqual(expect.arrayContaining(["options", "mode", "value", "onChange", "showSearch", "dropdownRender", "popupWidth", "renderOptionDescription"]));
+    expect(selectApi.map((item) => item.name)).toEqual(expect.arrayContaining(["options", "mode", "value", "onChange", "showSearch", "dropdownRender", "popupWidth", "renderOptionDescription", "onBlur", "aria-describedby", "aria-invalid"]));
     expect(selectApi.map((item) => String(item.name))).not.toContain("triggerProps");
     expect(selectOptionCardApi.map((item) => item.name)).toEqual(["name", "fields"]);
   });

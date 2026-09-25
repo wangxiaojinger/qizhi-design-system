@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  renderDirectionCompatibilityModule,
   renderDirectionIconComponent,
   transformDirectionSvg,
   validateDirectionSvg,
@@ -25,13 +26,14 @@ describe("direction icon generator", () => {
     );
   });
 
-  it("preserves geometry and opacity while removing legacy IDs and fixed size", () => {
+  it("preserves geometry while removing legacy IDs, fixed size and paint opacity", () => {
     const result = transformDirectionSvg(validSvg);
 
     expect(result.viewBox).toBe("0 0 16 16");
     expect(result.jsx).toContain('d="M2 2H14V14H2Z"');
     expect(result.jsx).toContain('fill="currentColor"');
-    expect(result.jsx).toContain('fillOpacity="0.45"');
+    expect(result.jsx).not.toContain("fillOpacity");
+    expect(result.jsx).not.toContain("strokeOpacity");
     expect(result.jsx).not.toContain("legacy-group");
     expect(result.jsx).not.toContain('id="Vector"');
     expect(result.jsx).not.toContain('width="16"');
@@ -49,5 +51,17 @@ describe("direction icon generator", () => {
     expect(component).toContain('"ExampleIcon"');
     expect(component).toContain('"0 0 16 16"');
     expect(renderDirectionIconComponent({ componentName: "ExampleIcon", sourceFile: "source/direction/example.svg", svg: validSvg })).toBe(component);
+  });
+
+  it("rewrites compatibility modules as opacity-free aliases", () => {
+    const module = renderDirectionCompatibilityModule(
+      "ExpandRightDiagonalFilledIcon",
+      "ExpandCollapseRightDiagonalExpandedFilledIcon",
+    );
+
+    expect(module).toContain(
+      'export { ExpandRightDiagonalFilledIcon as ExpandCollapseRightDiagonalExpandedFilledIcon } from "./ExpandRightDiagonalFilledIcon";',
+    );
+    expect(module).not.toMatch(/opacity/i);
   });
 });

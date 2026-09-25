@@ -57,12 +57,15 @@ interface SelectCommonProps {
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   onPopupScroll?: (event: UIEvent<HTMLDivElement>) => void;
+  onBlur?: FocusEventHandler<HTMLInputElement>;
   className?: string;
   style?: CSSProperties;
   id?: string;
   name?: string;
   "aria-label"?: string;
   "aria-labelledby"?: string;
+  "aria-describedby"?: string;
+  "aria-invalid"?: boolean | "false" | "true" | "grammar" | "spelling";
 }
 
 export interface SelectSingleProps extends SelectCommonProps {

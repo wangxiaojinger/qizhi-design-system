@@ -12,6 +12,17 @@ const successSvg = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" 
 </svg>`;
 
 describe("fixed palette prompt icon generator", () => {
+  it("removes paint opacity from currentColor prompt icons", () => {
+    const item = { colorMode: "currentColor" };
+    const currentColorSvg = successSvg
+      .replace('fill="#52C41A"', 'fill="black" fill-opacity="0.45" stroke="black" stroke-opacity="0.45"');
+    const result = transformPromptSvgMarkup(currentColorSvg, item);
+
+    expect(result.markup).toContain('fill="currentColor"');
+    expect(result.markup).toContain('stroke="currentColor"');
+    expect(result.markup).not.toMatch(/(?:fill|stroke)-opacity=/i);
+  });
+
   it("preserves the approved fixed paint instead of converting it to currentColor", () => {
     const result = transformFixedPaletteSvg(successSvg, ["#52C41A"]);
 

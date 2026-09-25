@@ -5,5 +5,5 @@ import { createQizhiIcon } from "../createQizhiIcon";
 export const ArrowLeftFilledIcon = createQizhiIcon(
   "ArrowLeftFilledIcon",
   "0 0 16 16",
-  <path d="M5.33331 8L9.33331 4V12L5.33331 8Z" fill="currentColor" fillOpacity="0.45" />,
+  <path d="M5.33331 8L9.33331 4V12L5.33331 8Z" fill="currentColor" />,
 );

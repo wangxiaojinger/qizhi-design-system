@@ -50,8 +50,7 @@ export function transformDirectionSvg(svg) {
   const jsx = path
     .replace(/\s+id="[^"]*"/gi, "")
     .replace(/\bfill="black"/gi, 'fill="currentColor"')
-    .replace(/\bfill-opacity=/gi, "fillOpacity=")
-    .replace(/\bstroke-opacity=/gi, "strokeOpacity=")
+    .replace(/\s+(?:fill|stroke)-opacity="[^"]*"/gi, "")
     .replace(/\s*\/?>$/, " />");
 
   return { viewBox, jsx };
@@ -60,6 +59,10 @@ export function transformDirectionSvg(svg) {
 export function renderDirectionIconComponent({ componentName, sourceFile, svg }) {
   const { viewBox, jsx } = transformDirectionSvg(svg);
   return `// 由 scripts/build-direction-icons.mjs 生成，禁止手改。\n// Source: ${sourceFile}\nimport { createQizhiIcon } from "../createQizhiIcon";\n\nexport const ${componentName} = createQizhiIcon(\n  "${componentName}",\n  "${viewBox}",\n  ${jsx},\n);\n`;
+}
+
+export function renderDirectionCompatibilityModule(componentName, compatibilityName) {
+  return `// 由 scripts/build-direction-icons.mjs 生成，禁止手改。\nexport { ${componentName} as ${compatibilityName} } from "./${componentName}";\n`;
 }
 
 export async function buildDirectionIcons() {
@@ -81,6 +84,10 @@ export async function buildDirectionIcons() {
     exports.push(`export { ${item.componentName} } from "./${item.componentName}";`);
     for (const compatibilityName of item.compatibilityNames ?? []) {
       exports.push(`export { ${item.componentName} as ${compatibilityName} } from "./${item.componentName}";`);
+      await writeFile(
+        resolve(generatedDirectory, `${compatibilityName}.tsx`),
+        renderDirectionCompatibilityModule(item.componentName, compatibilityName),
+      );
     }
   }
   await writeFile(resolve(generatedDirectory, "index.ts"), `${exports.join("\n")}\nexport * from "./prompt";\nexport * from "./catalog";\n`);

@@ -26,13 +26,6 @@ const correctedSources = new Map([
     "provided:在线推理.svg",
   ]],
 ]);
-const solidCurrentColorComponentNames = new Set([
-  "TagIcon",
-  "TeamIcon",
-  "TimeIcon",
-  "UserPersonIcon",
-]);
-
 const decodeHtml = (value) => value
   .replaceAll("&amp;amp;", "&")
   .replaceAll("&amp;", "&")
@@ -135,9 +128,6 @@ export async function buildCatalogIcons() {
     const sourcePath = resolve(iconDirectory, item.sourceFile);
     let svg = await readFile(sourcePath, "utf8");
     svg = svg.replace(/#(?:8C8C8C|818181)/gi, "black");
-    if (solidCurrentColorComponentNames.has(item.componentName)) {
-      svg = svg.replaceAll('fill-opacity="0.45"', 'fill-opacity="1"');
-    }
     let component = renderPromptMarkupIconComponent({
       componentName: item.componentName,
       sourceFile: item.sourceFile,
