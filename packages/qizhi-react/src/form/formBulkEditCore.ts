@@ -22,6 +22,8 @@ export interface BulkEditSnapshot<TRecord, TKey extends FormBulkEditKey> {
   records: readonly TRecord[];
   rowKeys: readonly TKey[];
   fields: readonly BulkEditSnapshotField[];
+  valuesByField: ReadonlyMap<string, readonly unknown[]>;
+  isEqual: (left: unknown, right: unknown, name: FormNamePath) => boolean;
 }
 
 export interface CreateBulkEditSnapshotOptions<TRecord, TKey extends FormBulkEditKey> {
@@ -126,7 +128,35 @@ export function createBulkEditSnapshot<TRecord, TKey extends FormBulkEditKey>({
         initialValue: mixed ? undefined : firstValue,
       };
     }),
+    valuesByField: new Map(normalizedFields.map((name, index) => [
+      encodedFields[index]!,
+      records.map((record) => getFieldValue(record, name)),
+    ])),
+    isEqual,
   };
+}
+
+export function areBulkEditSnapshotsEqual<TRecord, TKey extends FormBulkEditKey>(
+  accepted: BulkEditSnapshot<TRecord, TKey>,
+  latest: BulkEditSnapshot<TRecord, TKey>,
+  keys: readonly TKey[] = accepted.rowKeys,
+): boolean {
+  if (accepted.fields.length !== latest.fields.length) return false;
+  if (accepted.fields.some((field, index) => field.encodedName !== latest.fields[index]?.encodedName)) return false;
+  if (keys.length === accepted.rowKeys.length && (
+    latest.rowKeys.length !== accepted.rowKeys.length
+    || accepted.rowKeys.some((key, index) => !Object.is(key, latest.rowKeys[index]))
+  )) return false;
+  return keys.every((key) => {
+    const acceptedIndex = accepted.rowKeys.findIndex((candidate) => Object.is(candidate, key));
+    const latestIndex = latest.rowKeys.findIndex((candidate) => Object.is(candidate, key));
+    if (acceptedIndex < 0 || latestIndex < 0) return false;
+    return accepted.fields.every((field) => latest.isEqual(
+      accepted.valuesByField.get(field.encodedName)?.[acceptedIndex],
+      latest.valuesByField.get(field.encodedName)?.[latestIndex],
+      field.name,
+    ));
+  });
 }
 
 export function buildBulkEditPatch<TRecord, TKey extends FormBulkEditKey>(

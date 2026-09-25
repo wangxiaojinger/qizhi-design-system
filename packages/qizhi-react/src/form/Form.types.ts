@@ -139,6 +139,22 @@ export interface FormBulkEditResult<TKey extends FormBulkEditKey> {
   failures: readonly FormBulkEditFailure<TKey>[];
 }
 
+export interface FormBulkEditController<TKey extends FormBulkEditKey> {
+  getFieldState: (name: FormNamePath) => FormBulkEditFieldState;
+  getFieldFailures: (name: FormNamePath) => readonly FormBulkEditFailure<TKey>[];
+  clearField: (name: FormNamePath) => void;
+  keepField: (name: FormNamePath) => void;
+  validate: () => Promise<FormBulkEditPatch<TKey>>;
+  applyResult: (result: FormBulkEditResult<TKey>) => void;
+  rebase: () => void;
+  reset: () => void;
+  status: FormBulkEditStatus;
+  failures: readonly FormBulkEditFailure<TKey>[];
+  succeededKeys: readonly TKey[];
+  remainingKeys: readonly TKey[];
+  hasChanges: boolean;
+}
+
 export interface FormComponent {
   (props: FormProps): ReactNode;
   Item: (props: FormItemProps) => ReactNode;
