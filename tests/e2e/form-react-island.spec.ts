@@ -1,19 +1,23 @@
 import { expect, test } from "@playwright/test";
 
 test("Form 保留旧站契约并覆盖复杂字段、远程状态与响应式几何", async ({ page }, testInfo) => {
+  test.setTimeout(60_000);
   const errors: string[] = [];
   page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
   page.on("pageerror", (error) => errors.push(error.message));
+  await page.route("https://cdn.jsdelivr.net/**", (route) => route.fulfill({ contentType: "text/css", body: "" }));
   await page.goto("/#component-form");
 
-  await expect(page.locator("#component-form article.codebox-wrapper")).toHaveCount(6);
+  await expect(page.locator("#component-form article.codebox-wrapper")).toHaveCount(7);
   await expect(page.locator("#component-form .qz-demo-title").filter({ hasText: "基础用法" })).toHaveCount(1);
   await expect(page.locator("#component-form .qz-demo-title").filter({ hasText: "表单布局" })).toHaveCount(1);
   await expect(page.locator("#component-form .qz-demo-title").filter({ hasText: "受控表单" })).toHaveCount(1);
+  await expect(page.locator("#component-form .qz-demo-title").filter({ hasText: "批量编辑" })).toHaveCount(1);
   await expect(page.getByRole("table", { name: "Form API" })).toBeVisible();
   await expect(page.getByRole("table", { name: "Form.Item API" })).toBeVisible();
   await expect(page.getByRole("table", { name: "Form.List API" })).toBeVisible();
-  await expect(page.locator("#component-form .qizhi-form")).toHaveCount(6);
+  await expect(page.getByRole("table", { name: "Form.useBulkEdit API" })).toBeVisible();
+  await expect(page.locator("#component-form .qizhi-form")).toHaveCount(7);
 
   const basic = page.locator("#表单-基础用法");
   const name = basic.getByRole("textbox", { name: "服务名称" });
@@ -127,6 +131,59 @@ test("Form 保留旧站契约并覆盖复杂字段、远程状态与响应式几
   await remote.getByRole("button", { name: "保存当前修改" }).click();
   await expect(dirtyStatus).toHaveText("所有修改已保存");
 
+  const bulk = page.locator("#表单-批量编辑");
+  const bulkDepartment = bulk.getByRole("combobox", { name: "统一部门" });
+  await expect(bulkDepartment).toHaveAttribute("aria-describedby", "bulk-edit-department-mixed");
+  await bulkDepartment.click();
+  await page.getByRole("option", { name: "产品部" }).click();
+  await bulk.getByRole("button", { name: "清空备注" }).click();
+  await bulk.getByRole("button", { name: "校验并生成补丁" }).click();
+  const bulkPatch = bulk.getByRole("status", { name: "批量编辑补丁" });
+  await expect(bulkPatch).toContainText('"department": "product"');
+  await expect(bulkPatch).toContainText('"remark"');
+  await expect(bulkPatch).not.toContainText('"status"');
+  await bulk.getByRole("button", { name: "模拟部分成功" }).click();
+  await expect(bulk.getByRole("alert").filter({ hasText: "没有修改部门的权限" })).toBeVisible();
+  const bulkFailureItems = bulk.getByRole("listitem");
+  await expect(bulkFailureItems).toHaveCount(2);
+  await bulkFailureItems.first().focus();
+  await expect(bulkFailureItems.first()).toBeFocused();
+
+  const bulkDemo = bulk.locator(".demo");
+  const bulkRegions = bulk.locator(".form-docs-bulk-edit-fields, .form-docs-bulk-edit-actions, .form-docs-bulk-edit-results, [aria-label='批量编辑失败明细']");
+  const bulkBounds = await bulkDemo.boundingBox();
+  expect(bulkBounds).not.toBeNull();
+  for (const region of await bulkRegions.all()) {
+    const bounds = await region.boundingBox();
+    expect(bounds).not.toBeNull();
+    expect(bounds!.x).toBeGreaterThanOrEqual(bulkBounds!.x - 1);
+    expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(bulkBounds!.x + bulkBounds!.width + 1);
+  }
+  if ((page.viewportSize()?.width ?? 0) <= 720) {
+    await expect(bulk.locator(".form-docs-bulk-edit-actions")).toHaveCSS("flex-direction", "column");
+    const actionBoxes = await bulk.locator(".form-docs-bulk-edit-actions > button").evaluateAll((buttons) =>
+      buttons.map((button) => ({ left: button.getBoundingClientRect().left, width: button.getBoundingClientRect().width })),
+    );
+    expect(new Set(actionBoxes.map((box) => Math.round(box.left))).size).toBe(1);
+    expect(new Set(actionBoxes.map((box) => Math.round(box.width))).size).toBe(1);
+  }
+
+  await bulk.getByRole("button", { name: "模拟外部数据变化" }).click();
+  await expect(bulk.getByRole("alert", { name: "批量编辑数据变化" })).toContainText("源数据已变化");
+  await expect(bulkDepartment).toHaveValue("产品部");
+  await expect(bulk.getByRole("button", { name: "仅重试失败成员" })).toBeDisabled();
+  await bulk.getByRole("button", { name: "基于最新数据重新开始" }).click();
+  await expect(bulk.getByRole("alert", { name: "批量编辑数据变化" })).toHaveCount(0);
+
+  await bulkDepartment.click();
+  await page.getByRole("option", { name: "产品部" }).click();
+  await bulk.getByRole("button", { name: "清空备注" }).click();
+  await bulk.getByRole("button", { name: "校验并生成补丁" }).click();
+  await bulk.getByRole("button", { name: "模拟部分成功" }).click();
+  await bulk.getByRole("button", { name: "仅重试失败成员" }).click();
+  await expect(bulk.getByLabel("批量编辑目标")).toHaveText("本次目标：member-2、member-3");
+  await expect(bulk.getByLabel("批量编辑结果")).toHaveText("重试成功 2 条，失败 0 条");
+
   const region = remote.getByRole("combobox", { name: "部署区域" });
   await region.fill("loading");
   await expect(remote.getByText("正在加载")).toBeVisible();
@@ -189,4 +246,5 @@ test("Form 保留旧站契约并覆盖复杂字段、远程状态与响应式几
   await controlled.locator(".demo").screenshot({ path: testInfo.outputPath(`form-controlled-${testInfo.project.name}.png`) });
   await complex.locator(".demo").screenshot({ path: testInfo.outputPath(`form-complex-${testInfo.project.name}.png`) });
   await remote.locator(".demo").screenshot({ path: testInfo.outputPath(`form-remote-${testInfo.project.name}.png`) });
+  await bulk.locator(".demo").screenshot({ path: testInfo.outputPath(`form-bulk-edit-${testInfo.project.name}.png`) });
 });
