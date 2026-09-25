@@ -41,6 +41,25 @@ function Harness({
   </Form>;
 }
 
+function ValidationHarness({
+  records,
+  expose,
+  statusValidator,
+}: {
+  records: readonly Member[];
+  expose: (bulk: FormBulkEditController<string>) => void;
+  statusValidator?: () => void | Promise<void>;
+}) {
+  const [form] = Form.useForm();
+  const bulk = useBulkEdit({ form, records, getRowKey: (record) => record.id, fields: ["department", "status", ["profile", "remark"]] });
+  expose(bulk);
+  return <Form form={form}>
+    <Form.Item name="department" label="部门" rules={[{ required: true, message: "请选择部门" }]}><input /></Form.Item>
+    <Form.Item name="status" label="状态" rules={[{ validator: statusValidator }]}><input /></Form.Item>
+    <Form.Item name={["profile", "remark"]} label="备注" rules={[{ required: true, message: "请输入备注" }]}><input /></Form.Item>
+  </Form>;
+}
+
 describe("Form.useBulkEdit lifecycle", () => {
   it("initializes mixed and common fields without reporting a user change", async () => {
     const onValuesChange = vi.fn();
@@ -127,5 +146,101 @@ describe("Form.useBulkEdit lifecycle", () => {
     await waitFor(() => expect(screen.getByRole("textbox", { name: "状态" })).toHaveValue("disabled"));
     expect(bulk.status).toBe("ready");
     expect(bulk.hasChanges).toBe(false);
+  });
+
+  it("validates only bulk edits and returns stable blocked states", async () => {
+    const statusValidator = vi.fn();
+    let bulk!: FormBulkEditController<string>;
+    const view = render(<ValidationHarness records={initialMembers} statusValidator={statusValidator} expose={(value) => { bulk = value; }} />);
+    await screen.findByDisplayValue("enabled");
+
+    await expect(bulk.validate()).rejects.toMatchObject({ code: "no-changes" });
+    fireEvent.change(screen.getByRole("textbox", { name: "状态" }), { target: { value: "disabled" } });
+    statusValidator.mockClear();
+    await act(async () => { await expect(bulk.validate()).resolves.toMatchObject({ values: { status: "disabled" } }); });
+    expect(statusValidator).toHaveBeenCalledTimes(1);
+
+    act(() => bulk.clearField(["profile", "remark"]));
+    await act(async () => {
+      await expect(bulk.validate()).rejects.toMatchObject({
+        errorFields: [{ name: ["profile", "remark"], errors: ["请输入备注"] }],
+      });
+    });
+
+    act(() => bulk.keepField(["profile", "remark"]));
+    const changed = initialMembers.map((member) => member.id === "member-1" ? { ...member, department: "operations" } : member);
+    view.rerender(<ValidationHarness records={changed} statusValidator={statusValidator} expose={(value) => { bulk = value; }} />);
+    await waitFor(() => expect(bulk.status).toBe("sourceChanged"));
+    await expect(bulk.validate()).rejects.toMatchObject({ code: "source-changed" });
+  });
+
+  it("rejects validation when there are no target records", async () => {
+    let bulk!: FormBulkEditController<string>;
+    render(<ValidationHarness records={[]} expose={(value) => { bulk = value; }} />);
+    await waitFor(() => expect(bulk.remainingKeys).toEqual([]));
+    await expect(bulk.validate()).rejects.toMatchObject({ code: "no-targets" });
+  });
+
+  it("keeps failed records and retries only their keys", async () => {
+    const records = [...initialMembers, { id: "member-3", department: "design", status: "enabled", profile: { remark: "C" } }];
+    let bulk!: FormBulkEditController<string>;
+    render(<Harness records={records} expose={(value) => { bulk = value; }} />);
+    fireEvent.change(await screen.findByRole("textbox", { name: "部门" }), { target: { value: "product" } });
+    const firstPatch = await bulk.validate();
+    expect(firstPatch.targetKeys).toEqual(["member-1", "member-2", "member-3"]);
+
+    act(() => bulk.applyResult({
+      succeededKeys: ["member-1"],
+      failures: [
+        { key: "member-2", field: "department", message: "无部门权限" },
+        { key: "member-2", field: "status", message: "状态冲突" },
+        { key: "member-3", message: "记录已锁定" },
+      ],
+    }));
+    expect(bulk.succeededKeys).toEqual(["member-1"]);
+    expect(bulk.remainingKeys).toEqual(["member-2", "member-3"]);
+    expect(bulk.getFieldFailures("department")).toHaveLength(1);
+    await expect(bulk.validate()).resolves.toMatchObject({ targetKeys: ["member-2", "member-3"] });
+
+    act(() => bulk.applyResult({ succeededKeys: ["member-2", "member-3"], failures: [] }));
+    expect(bulk.status).toBe("complete");
+    expect(bulk.remainingKeys).toEqual([]);
+    expect(bulk.failures).toEqual([]);
+  });
+
+  it("rejects malformed results atomically", async () => {
+    let bulk!: FormBulkEditController<string>;
+    render(<Harness records={initialMembers} expose={(value) => { bulk = value; }} />);
+    fireEvent.change(await screen.findByRole("textbox", { name: "部门" }), { target: { value: "product" } });
+
+    expect(() => bulk.applyResult({ succeededKeys: ["member-1", "member-1"], failures: [{ key: "member-2", message: "失败" }] }))
+      .toThrow("成功 key 不能重复");
+    expect(() => bulk.applyResult({ succeededKeys: ["member-1"], failures: [{ key: "member-1", message: "失败" }, { key: "member-2", message: "失败" }] }))
+      .toThrow("同时成功和失败");
+    expect(() => bulk.applyResult({ succeededKeys: ["member-1"], failures: [{ key: "unknown", message: "失败" }] }))
+      .toThrow("未知 key");
+    expect(() => bulk.applyResult({ succeededKeys: ["member-1"], failures: [] }))
+      .toThrow("缺少 key");
+    expect(() => bulk.applyResult({ succeededKeys: ["member-1"], failures: [{ key: "member-2", message: "" }] }))
+      .toThrow("失败原因不能为空");
+    expect(() => bulk.applyResult({ succeededKeys: ["member-1"], failures: [{ key: "member-2", field: "role", message: "失败" }] }))
+      .toThrow("失败字段不在 fields 中");
+    expect(bulk.remainingKeys).toEqual(["member-1", "member-2"]);
+    expect(bulk.succeededKeys).toEqual([]);
+    expect(bulk.failures).toEqual([]);
+  });
+
+  it("does not return a stale patch after source data changes during async validation", async () => {
+    let resolveValidation!: () => void;
+    const pending = new Promise<void>((resolve) => { resolveValidation = resolve; });
+    let bulk!: FormBulkEditController<string>;
+    const view = render(<ValidationHarness records={initialMembers} statusValidator={() => pending} expose={(value) => { bulk = value; }} />);
+    fireEvent.change(await screen.findByRole("textbox", { name: "状态" }), { target: { value: "disabled" } });
+    const validation = bulk.validate();
+    const changed = initialMembers.map((member) => member.id === "member-1" ? { ...member, status: "archived" } : member);
+    view.rerender(<ValidationHarness records={changed} statusValidator={() => pending} expose={(value) => { bulk = value; }} />);
+    await waitFor(() => expect(bulk.status).toBe("sourceChanged"));
+    resolveValidation();
+    await expect(validation).rejects.toMatchObject({ name: "FormBulkEditValidationCancelled" });
   });
 });

@@ -11,7 +11,9 @@ import type {
 import {
   areBulkEditSnapshotsEqual,
   buildBulkEditPatch,
+  createBulkEditBlockedError,
   createBulkEditSnapshot,
+  validateBulkEditResult,
   type BulkEditSnapshot,
 } from "./formBulkEditCore";
 import { encodeNamePath, normalizeNamePath } from "./formPath";
@@ -38,10 +40,13 @@ export function useBulkEdit<TRecord, TKey extends FormBulkEditKey>({
   const succeededKeysRef = useRef<TKey[]>([]);
   const remainingKeysRef = useRef<TKey[]>([...latestSnapshot.rowKeys]);
   const statusRef = useRef<"ready" | "sourceChanged" | "complete">("ready");
+  const stateVersionRef = useRef(0);
+  const validationRequestRef = useRef(0);
   const [, forceRender] = useReducer((value: number) => value + 1, 0);
   const fieldsKey = latestSnapshot.fields.map((field) => field.encodedName).join("|");
 
   const hasChanges = () => [...modesRef.current.values()].some((mode) => mode !== "keep");
+  const getCurrentStatus = () => statusRef.current;
   const findAcceptedField = (name: FormNamePath) => {
     const encoded = encodeNamePath(name);
     const field = acceptedSnapshotRef.current.fields.find((candidate) => candidate.encodedName === encoded);
@@ -64,6 +69,8 @@ export function useBulkEdit<TRecord, TKey extends FormBulkEditKey>({
     succeededKeysRef.current = [];
     remainingKeysRef.current = [...snapshot.rowKeys];
     statusRef.current = "ready";
+    stateVersionRef.current += 1;
+    validationRequestRef.current += 1;
     writeSnapshotValues(snapshot);
     forceRender();
   };
@@ -78,6 +85,8 @@ export function useBulkEdit<TRecord, TKey extends FormBulkEditKey>({
     if (hasChanges()) {
       if (statusRef.current !== "sourceChanged") {
         statusRef.current = "sourceChanged";
+        stateVersionRef.current += 1;
+        validationRequestRef.current += 1;
         forceRender();
       }
       return;
@@ -100,6 +109,7 @@ export function useBulkEdit<TRecord, TKey extends FormBulkEditKey>({
       modesRef.current.set(field.encodedName, nextMode);
       failuresRef.current = nextFailures;
       if (statusRef.current === "complete") statusRef.current = "ready";
+      stateVersionRef.current += 1;
       forceRender();
     }));
     return () => unsubscribers.forEach((unsubscribe) => unsubscribe());
@@ -113,6 +123,47 @@ export function useBulkEdit<TRecord, TKey extends FormBulkEditKey>({
     modesRef.current.set(field.encodedName, mode);
     failuresRef.current = failuresRef.current.filter((failure) => failure.field === undefined || encodeNamePath(failure.field) !== field.encodedName);
     statusRef.current = "ready";
+    stateVersionRef.current += 1;
+    validationRequestRef.current += 1;
+    forceRender();
+  };
+
+  const validate = async () => {
+    if (getCurrentStatus() === "sourceChanged") throw createBulkEditBlockedError("source-changed");
+    if (!remainingKeysRef.current.length) throw createBulkEditBlockedError("no-targets");
+    const changedFields = acceptedSnapshotRef.current.fields
+      .filter((field) => (modesRef.current.get(field.encodedName) ?? "keep") !== "keep")
+      .map((field) => field.name);
+    if (!changedFields.length) throw createBulkEditBlockedError("no-changes");
+    const request = ++validationRequestRef.current;
+    const stateVersion = stateVersionRef.current;
+    await form.validateFields(changedFields);
+    if (
+      request !== validationRequestRef.current
+      || stateVersion !== stateVersionRef.current
+      || getCurrentStatus() === "sourceChanged"
+    ) {
+      throw Object.assign(new Error("Form.useBulkEdit 校验结果已过期。"), { name: "FormBulkEditValidationCancelled" });
+    }
+    return buildBulkEditPatch(acceptedSnapshotRef.current, modesRef.current, form.getFieldsValue(), remainingKeysRef.current);
+  };
+
+  const applyResult = (result: FormBulkEditResult<TKey>) => {
+    const classification = validateBulkEditResult(
+      remainingKeysRef.current,
+      acceptedSnapshotRef.current.fields.map((field) => field.name),
+      result,
+    );
+    const successful = new Set(classification.succeededKeys);
+    succeededKeysRef.current = [
+      ...succeededKeysRef.current,
+      ...remainingKeysRef.current.filter((key) => successful.has(key)),
+    ];
+    remainingKeysRef.current = classification.failedKeys;
+    failuresRef.current = [...result.failures];
+    statusRef.current = remainingKeysRef.current.length ? "ready" : "complete";
+    stateVersionRef.current += 1;
+    validationRequestRef.current += 1;
     forceRender();
   };
 
@@ -127,8 +178,8 @@ export function useBulkEdit<TRecord, TKey extends FormBulkEditKey>({
     },
     clearField: (name) => setFieldMode(name, "clear"),
     keepField: (name) => setFieldMode(name, "keep"),
-    validate: async () => buildBulkEditPatch(acceptedSnapshotRef.current, modesRef.current, form.getFieldsValue(), remainingKeysRef.current),
-    applyResult: (_result: FormBulkEditResult<TKey>) => { throw new Error("Form.useBulkEdit applyResult 尚未初始化。"); },
+    validate,
+    applyResult,
     rebase: () => acceptSnapshot(latestSnapshotRef.current),
     reset: () => acceptSnapshot(acceptedSnapshotRef.current),
     status: statusRef.current,
