@@ -1,13 +1,13 @@
 import { expect, test } from "@playwright/test";
 
-test("Table 保持十组 Demo、核心交互和三档响应式", async ({ page }, testInfo) => {
+test("Table 保持十一组 Demo、核心交互和三档响应式", async ({ page }, testInfo) => {
   const errors: string[] = [];
   page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("/#component-table");
+  await page.goto("/#component-table", { waitUntil: "domcontentloaded" });
 
   await expect(page.getByRole("heading", { name: "表格 Table" })).toBeVisible();
-  await expect(page.locator("#component-table article.codebox-wrapper")).toHaveCount(10);
+  await expect(page.locator("#component-table article.codebox-wrapper")).toHaveCount(11);
   await expect(page.locator("#table-basic tbody tr")).toHaveCount(4);
   const basicTable = page.locator("#table-basic .qizhi-table");
   const basicTableElement = page.locator("#table-basic table");
@@ -33,7 +33,7 @@ test("Table 保持十组 Demo、核心交互和三档响应式", async ({ page }
   await expect(page.locator("#table-sort .qizhi-table__sorter-icon path").first()).toHaveCSS("fill-opacity", "1");
   await expect(page.locator("#table-sort tbody tr").first()).toContainText("17000");
   await page.locator("#table-selection button[role='radio']", { hasText: "单选框" }).click();
-  await page.locator("#table-selection input[type='radio']:not(:disabled)").first().check();
+  await page.locator("#table-selection .qizhi-radio:not(.qizhi-radio-disabled)").first().click();
   await expect(page.locator("#table-selection input[type='radio']:checked")).toHaveCount(1);
   const disabledSelectionRow = page.locator("#table-selection input:disabled").locator("xpath=ancestor::tr");
   await expect(disabledSelectionRow).not.toHaveClass(/is-selected/);
@@ -76,23 +76,61 @@ test("Table 保持十组 Demo、核心交互和三档响应式", async ({ page }
   expect(errors).toEqual([]);
 });
 
-test("Table 三档 size 的表头与内容行保持同高", async ({ page }) => {
-  await page.goto("/#component-table");
+test("Table 默认自然换行，ellipsis 列保持单行省略", async ({ page }) => {
+  await page.goto("/#component-table", { waitUntil: "domcontentloaded" });
+
+  const contentDemo = page.locator("#table-content");
+  const wrappedTableCell = contentDemo.locator("tbody tr").first().locator(".qizhi-table__td").nth(1);
+  const wrappedCell = wrappedTableCell.locator(".qizhi-table__cell");
+  const ellipsisCell = contentDemo.locator("tbody tr").first().locator(".qizhi-table__cell").nth(2);
+  const basicCell = page.locator("#table-basic .qizhi-table__td").first();
+
+  expect(await wrappedTableCell.evaluate((node) => node.getBoundingClientRect().height)).toBeGreaterThan(
+    await basicCell.evaluate((node) => node.getBoundingClientRect().height),
+  );
+  await expect(wrappedCell).toHaveCSS("white-space", "normal");
+  await expect(ellipsisCell).toHaveCSS("white-space", "nowrap");
+  await expect(ellipsisCell).toHaveCSS("text-overflow", "ellipsis");
+  await expect(ellipsisCell).toHaveAttribute("title", /QIZHI/);
+});
+
+test("Table 排序图标的可见箭头为 8px 且间距为 4px", async ({ page }) => {
+  await page.goto("/#component-table", { waitUntil: "domcontentloaded" });
+
+  const icons = page.locator("#table-sort .qizhi-table__sorter").first().locator(".qizhi-table__sorter-icon");
+  await expect(icons).toHaveCount(2);
+  const geometry = await icons.evaluateAll((nodes) => {
+    const [ascend, descend] = nodes.map((node) => node.querySelector("path")!.getBoundingClientRect());
+    return {
+      arrowWidth: ascend.width,
+      arrowHeight: ascend.height,
+      visibleGap: descend.top - ascend.bottom,
+    };
+  });
+  expect(geometry.arrowWidth).toBe(8);
+  expect(geometry.arrowHeight).toBe(4);
+  expect(geometry.visibleGap).toBe(4);
+});
+
+test("Table 三档 size 通过单元格内边距控制密度", async ({ page }) => {
+  await page.goto("/#component-table", { waitUntil: "domcontentloaded" });
 
   const basicHeader = page.locator("#table-basic .qizhi-table__th").first();
   const basicCell = page.locator("#table-basic .qizhi-table__td").first();
-  await expect(basicHeader, "默认 Table 表头必须与旧规范同为 56px").toHaveCSS("height", "56px");
-  await expect(basicCell, "默认 Table 内容行必须为 56px").toHaveCSS("height", "56px");
+  await expect(basicHeader).toHaveCSS("padding-top", "16px");
+  await expect(basicHeader).toHaveCSS("padding-bottom", "16px");
+  await expect(basicCell).toHaveCSS("padding-top", "16px");
+  await expect(basicCell).toHaveCSS("padding-bottom", "16px");
 
   const propsDemo = page.locator("#table-props");
-  const propsHeader = propsDemo.locator(".qizhi-table__th").first();
+  const propsHeader = propsDemo.locator(".qizhi-table__th:not(.qizhi-table__selection)").first();
   const propsCell = propsDemo.locator(".qizhi-table__td").first();
-  await expect(propsHeader).toHaveCSS("height", "56px");
-  await expect(propsCell).toHaveCSS("height", "56px");
+  await expect(propsHeader).toHaveCSS("padding-top", "16px");
+  await expect(propsCell).toHaveCSS("padding-top", "16px");
   await propsDemo.getByRole("radio", { name: "中等 48px" }).click();
-  await expect(propsHeader).toHaveCSS("height", "48px");
-  await expect(propsCell).toHaveCSS("height", "48px");
+  await expect(propsHeader).toHaveCSS("padding-top", "12px");
+  await expect(propsCell).toHaveCSS("padding-top", "12px");
   await propsDemo.getByRole("radio", { name: "小 40px" }).click();
-  await expect(propsHeader).toHaveCSS("height", "40px");
-  await expect(propsCell).toHaveCSS("height", "40px");
+  await expect(propsHeader).toHaveCSS("padding-top", "8px");
+  await expect(propsCell).toHaveCSS("padding-top", "8px");
 });

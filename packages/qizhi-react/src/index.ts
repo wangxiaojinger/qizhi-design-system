@@ -558,6 +558,7 @@ export { Table } from "./table/Table";
 export type {
   TableCellProps,
   TableColumn,
+  TableColumnEllipsis,
   TableExpandable,
   TableFixed,
   TablePaginationConfig,

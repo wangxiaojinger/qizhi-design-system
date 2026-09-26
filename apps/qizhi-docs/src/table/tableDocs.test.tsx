@@ -1,13 +1,13 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { TableDocsIsland } from "./TableDocsIsland";
-import { tableApi } from "./tableApi";
+import { tableApi, tableColumnApi } from "./tableApi";
 import { tableDemos } from "./tableDocs.registry";
 
 describe("Table docs", () => {
-  it("renders the ten approved demos without unsupported sticky or grouped headers", () => {
+  it("renders the eleven approved demos without unsupported sticky or grouped headers", () => {
     render(<TableDocsIsland />);
-    expect(screen.getAllByRole("heading", { level: 2 }).map((node) => node.textContent)).toEqual(["基础用法", "排序", "固定列", "开启选择", "展开行", "嵌套子表格", "树形数据展示", "表格属性", "单元格合并", "拖拽排序", "API"]);
-    expect(document.querySelectorAll("article.codebox-wrapper")).toHaveLength(10);
+    expect(screen.getAllByRole("heading", { level: 2 }).map((node) => node.textContent)).toEqual(["基础用法", "多行与省略", "排序", "固定列", "开启选择", "展开行", "嵌套子表格", "树形数据展示", "表格属性", "单元格合并", "拖拽排序", "API"]);
+    expect(document.querySelectorAll("article.codebox-wrapper")).toHaveLength(11);
     expect(screen.queryByRole("heading", { name: "表头吸顶" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "表头分组" })).not.toBeInTheDocument();
     expect(screen.queryByText(/Demo\.tsx|Demo\.css/)).not.toBeInTheDocument();
@@ -15,7 +15,7 @@ describe("Table docs", () => {
 
   it("renders formal Table, Pagination and Empty and copies exact source", () => {
     render(<TableDocsIsland />);
-    expect(document.querySelectorAll(".qizhi-table").length).toBeGreaterThanOrEqual(10);
+    expect(document.querySelectorAll(".qizhi-table").length).toBeGreaterThanOrEqual(11);
     expect(document.querySelector(".qizhi-pagination")).toBeInTheDocument();
     expect(screen.getAllByRole("switch").every((node) =>
       node.classList.contains("qizhi-switch"))).toBe(true);
@@ -45,18 +45,20 @@ describe("Table docs", () => {
       ".component-example-actions .qizhi-btn",
     );
 
-    expect(actions).toHaveLength(20);
+    expect(actions).toHaveLength(22);
     expect([...actions].every((node) =>
       node.classList.contains("qizhi-code-action"))).toBe(true);
   });
 
   it("matches the Button docs spacing around code actions", () => {
     render(<TableDocsIsland />);
-    expect(document.querySelectorAll(".table-docs-actions")).toHaveLength(10);
+    expect(document.querySelectorAll(".table-docs-actions")).toHaveLength(11);
   });
 
   it("documents only the approved Table v1 API", () => {
     expect(tableApi.map((item) => item.name)).toEqual(["columns", "dataSource", "rowKey", "size", "border", "borderCell", "hover", "stripe", "showHeader", "loading", "scrollX", "rowSelection", "expandable", "childrenColumnName", "pagination", "empty", "draggable", "onSortChange", "onRowOrderChange"]);
+    expect(tableColumnApi.map((item) => item.name)).toEqual(["key", "title", "dataIndex", "width", "fixed", "ellipsis", "render", "sorter", "defaultSortOrder", "onCell"]);
+    expect(tableColumnApi.find((item) => item.name === "ellipsis")?.defaultValue).toBe("false");
     expect(tableApi.find((item) => item.name === "border")?.defaultValue).toBe("false");
   });
 

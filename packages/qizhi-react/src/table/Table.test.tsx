@@ -12,6 +12,38 @@ describe("Table", () => {
     expect(container.querySelector(".qizhi-table")).not.toHaveClass("is-bordered");
   });
 
+  it("wraps cell content by default and marks only ellipsis columns", () => {
+    const contentColumns: TableColumn<Row>[] = [
+      { key: "name", title: "姓名", dataIndex: "name" },
+      { key: "salary", title: "薪水", dataIndex: "salary", ellipsis: true },
+    ];
+    const { container } = render(
+      <Table rowKey="id" columns={contentColumns} dataSource={data} />,
+    );
+    const cells = container.querySelectorAll("tbody .qizhi-table__cell");
+
+    expect(cells[0]).not.toHaveClass("is-ellipsis");
+    expect(cells[1]).toHaveClass("is-ellipsis");
+    expect(cells[1]).toHaveAttribute("title", "2");
+  });
+
+  it("allows an ellipsis column to disable the native title", () => {
+    const contentColumns: TableColumn<Row>[] = [
+      {
+        key: "name",
+        title: "姓名",
+        dataIndex: "name",
+        ellipsis: { showTitle: false },
+      },
+    ];
+    const { container } = render(
+      <Table rowKey="id" columns={contentColumns} dataSource={data} />,
+    );
+
+    expect(container.querySelector(".qizhi-table__cell")).toHaveClass("is-ellipsis");
+    expect(container.querySelector(".qizhi-table__cell")).not.toHaveAttribute("title");
+  });
+
   it("cycles sorting and announces the active order", () => {
     const { container } = render(<Table aria-label="人员" rowKey="id" columns={columns} dataSource={data} />);
     expect(container.querySelectorAll(".qizhi-table__sorter-icon")).toHaveLength(2);
