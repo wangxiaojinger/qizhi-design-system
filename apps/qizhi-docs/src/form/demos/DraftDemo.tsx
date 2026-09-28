@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Button, Form, Input } from "@wangxiaojinger/qizhi-react";
 import type { FormDraftRecord, FormDraftSaveInput, FormDraftSaveResult, FormDraftStorage, FormValues } from "@wangxiaojinger/qizhi-react";
 
@@ -50,21 +50,20 @@ class MemoryDraftStorage implements FormDraftStorage<DraftValues, DraftMetadata>
 }
 
 const statusLabels = {
-  idle: "尚未检测草稿",
+  idle: "尚未保存草稿",
   loading: "正在检测草稿",
   ready: "发现可恢复草稿",
   saving: "正在保存草稿",
   saved: "草稿已保存",
-  expired: "草稿已过期",
-  "version-mismatch": "草稿版本不匹配",
-  conflict: "检测到远端冲突",
-  error: "草稿操作失败",
+  expired: "草稿已过期，无法恢复",
+  "version-mismatch": "草稿版本不兼容，无法恢复",
+  conflict: "草稿已在其他位置更新，请选择处理方式",
+  error: "草稿操作失败，请稍后重试",
 } as const;
 
 export default function DraftDemo() {
   const [form] = Form.useForm();
   const storage = useMemo(() => new MemoryDraftStorage(), []);
-  const [restoredStep, setRestoredStep] = useState("base");
   const draft = Form.useDraft<DraftValues, DraftMetadata>({
     form,
     draftKey: "service:create:user-1",
@@ -75,7 +74,6 @@ export default function DraftDemo() {
       description: values.description,
     }),
     getMetadata: () => ({ stepKey: "detail" }),
-    onRestoreMetadata: (metadata) => setRestoredStep(metadata?.stepKey ?? "base"),
   });
 
   const currentSafeValues = () => ({
@@ -83,16 +81,41 @@ export default function DraftDemo() {
     description: form.getFieldValue("description"),
   });
 
+  const saveDraft = async () => {
+    try {
+      await form.validateFields(["serviceName", "description"]);
+    } catch {
+      return;
+    }
+    await draft.save();
+  };
+
+  const draftStatusTone = draft.status === "conflict"
+    ? "is-warning"
+    : ["expired", "version-mismatch", "error"].includes(draft.status)
+      ? "is-error"
+      : "";
+
   return (
     <Form
       form={form}
       aria-label="表单草稿"
       initialValues={{ serviceName: "service-a", description: "初始描述", password: "initial-secret" }}
     >
-      <Form.Item name="serviceName" label="草稿服务名称">
+      <Form.Item
+        name="serviceName"
+        label="草稿服务名称"
+        required
+        rules={[{ required: true, message: "请输入草稿服务名称" }]}
+      >
         <Input aria-label="草稿服务名称" allowClear={false} />
       </Form.Item>
-      <Form.Item name="description" label="草稿描述">
+      <Form.Item
+        name="description"
+        label="草稿描述"
+        required
+        rules={[{ required: true, message: "请输入草稿描述" }]}
+      >
         <Input.TextArea aria-label="草稿描述" rows={2} />
       </Form.Item>
       <Form.Item name="password" label="访问密码" extra="密码字段不会进入草稿。">
@@ -100,7 +123,7 @@ export default function DraftDemo() {
       </Form.Item>
 
       <div className="form-draft-demo__actions">
-        <Button type="primary" onClick={() => void draft.save()}>保存草稿</Button>
+        <Button type="primary" onClick={() => void saveDraft()}>保存草稿</Button>
         <Button onClick={() => void draft.load()}>检测草稿</Button>
         <Button disabled={draft.status !== "ready"} onClick={draft.restore}>恢复草稿</Button>
         <Button onClick={() => void draft.remove()}>清除草稿</Button>
@@ -125,12 +148,14 @@ export default function DraftDemo() {
         </div>
       ) : null}
 
-      <div className="form-draft-demo__state" aria-live="polite">
-        <output aria-label="草稿状态">{draft.status}：{statusLabels[draft.status]}</output>
-        <output aria-label="草稿版本">{draft.record?.revision ?? draft.conflict?.revision ?? "无版本"}</output>
-        <output aria-label="恢复步骤">恢复步骤：{restoredStep}</output>
-        <output aria-label="草稿字段范围">已保存字段：serviceName、description；未保存字段：password</output>
-      </div>
+      <output
+        aria-label="草稿状态"
+        className={`form-draft-demo__status ${draftStatusTone}`.trim()}
+        role="status"
+      >
+        {statusLabels[draft.status]}
+      </output>
+
     </Form>
   );
 }

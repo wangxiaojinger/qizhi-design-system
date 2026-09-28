@@ -25,6 +25,7 @@
 }
 
 #component-form .qizhi-form-item-control > .qizhi-input,
+#component-form .qizhi-form-item-control > .qizhi-textarea,
 #component-form .qizhi-form-item-control > .qizhi-select,
 #component-form .form-docs-image-control > .qizhi-select {
   width: min(100%, var(--form-control-width));
@@ -34,6 +35,11 @@
   color: var(--color-success);
   font-size: 14px;
   line-height: 22px;
+}
+
+#component-form .form-docs-validation-submit {
+  justify-self: start;
+  width: fit-content;
 }
 
 #component-form .form-docs-dirty-status {
@@ -77,60 +83,34 @@
   background: var(--color-warning-light-1);
 }
 
-#component-form .form-draft-demo__state {
-  display: grid;
-  gap: 4px;
+#component-form .form-draft-demo__status {
+  display: block;
   width: min(100%, var(--form-control-width));
+  margin-bottom: 12px;
   color: var(--color-text-2);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 22px;
+}
+
+#component-form .form-draft-demo__status.is-warning {
+  color: var(--color-warning);
+}
+
+#component-form .form-draft-demo__status.is-error {
+  color: var(--color-danger);
 }
 
 #component-form .form-docs-complex-list {
   display: grid;
   gap: 16px;
-  width: min(100%, 720px);
+  width: min(100%, var(--form-control-width));
   margin-bottom: 20px;
-}
-
-#component-form .form-advanced-list {
-  display: grid;
-  gap: 16px;
-  width: min(100%, 900px);
-}
-
-#component-form .form-advanced-list__row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 12px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--color-border-2);
-}
-
-#component-form .form-advanced-list__fields {
-  display: grid;
-  grid-template-columns: minmax(180px, 2fr) minmax(100px, 1fr) minmax(100px, 1fr);
-  gap: 12px;
-  min-width: 0;
-}
-
-#component-form .form-advanced-list__actions,
-#component-form .form-advanced-list__toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: end;
-  gap: 8px;
-}
-
-#component-form .form-advanced-list__row > .qizhi-form-error-list {
-  grid-column: 1 / -1;
 }
 
 #component-form .form-docs-complex-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: end;
-  gap: 12px;
+  grid-template-columns: minmax(0, 1fr) 28px;
+  gap: 8px;
   min-width: 0;
 }
 
@@ -138,16 +118,21 @@
   margin-bottom: 0;
 }
 
-#component-form .form-docs-complex-actions,
 #component-form .form-docs-complex-toolbar {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-#component-form .form-docs-complex-actions {
+#component-form .form-docs-complex-delete {
   align-self: start;
   margin-top: 30px;
+  color: var(--color-text-3);
+}
+
+#component-form .form-docs-complex-delete:hover,
+#component-form .form-docs-complex-delete:focus-visible {
+  color: var(--color-danger);
 }
 
 #component-form .form-docs-inline-control {
@@ -284,15 +269,6 @@
   gap: 12px;
 }
 
-#component-form .form-steps-demo__summary,
-#component-form .form-steps-demo__result {
-  min-height: 22px;
-  margin: 0;
-  color: var(--color-text-3);
-  font-size: 14px;
-  line-height: 22px;
-}
-
 #component-form .qizhi-api-section > h3:not(:first-of-type) {
   margin-top: 32px;
 }
@@ -311,19 +287,6 @@
 
   #component-form .form-docs-command-row {
     grid-template-columns: 1fr;
-  }
-
-  #component-form .form-docs-complex-row {
-    grid-template-columns: 1fr;
-  }
-
-  #component-form .form-docs-complex-actions {
-    margin-top: 0;
-  }
-
-  #component-form .form-advanced-list__row,
-  #component-form .form-advanced-list__fields {
-    grid-template-columns: minmax(0, 1fr);
   }
 
   #component-form .form-docs-port-control,
@@ -371,19 +334,18 @@
 #component-form .form-docs-bulk-edit-fields {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 8px;
-}
-
-#component-form .form-docs-bulk-edit-mixed {
-  margin: -16px 0 8px;
-  color: var(--qizhi-color-text-secondary, #5e6673);
-  font-size: 12px;
+  gap: 24px;
 }
 
 #component-form .form-docs-bulk-edit-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+}
+
+#component-form .form-docs-bulk-edit-field-failures {
+  margin: 0;
+  padding-left: 20px;
 }
 
 #component-form .form-docs-bulk-edit-warning {
@@ -397,6 +359,18 @@
 #component-form .form-docs-bulk-edit-results {
   display: grid;
   gap: 8px;
+  padding: 16px;
+  border: 1px solid var(--qizhi-color-border, #e5e6eb);
+  border-radius: 4px;
+}
+
+#component-form .form-docs-bulk-edit-results h4,
+#component-form .form-docs-bulk-edit-results-label {
+  margin: 0;
+  color: var(--qizhi-color-text-primary, #1d2129);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 22px;
 }
 
 #component-form .form-docs-bulk-edit-results output {
@@ -411,6 +385,11 @@
   white-space: pre-wrap;
   background: #f7f8fa;
   border-radius: 4px;
+}
+
+#component-form .form-docs-bulk-edit-patch {
+  display: grid;
+  gap: 8px;
 }
 
 @media (max-width: 720px) {

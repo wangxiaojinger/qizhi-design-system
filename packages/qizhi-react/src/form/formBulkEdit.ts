@@ -149,6 +149,7 @@ export function useBulkEdit<TRecord, TKey extends FormBulkEditKey>({
   };
 
   const applyResult = (result: FormBulkEditResult<TKey>) => {
+    if (getCurrentStatus() === "sourceChanged") throw createBulkEditBlockedError("source-changed");
     const classification = validateBulkEditResult(
       remainingKeysRef.current,
       acceptedSnapshotRef.current.fields.map((field) => field.name),

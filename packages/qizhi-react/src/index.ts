@@ -569,6 +569,9 @@ export type {
   TableRowSelection,
   TableSize,
   TableSortOrder,
+  TableSortDirection,
+  TableSorterTooltip,
+  TableSorterTooltipTarget,
 } from "./table/Table.types";
 export { Tabs } from "./tabs/Tabs";
 export type {

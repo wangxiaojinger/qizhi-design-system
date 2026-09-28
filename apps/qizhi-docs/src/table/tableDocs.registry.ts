@@ -13,9 +13,9 @@ import DragDemo from "./demos/DragDemo"; import dragSource from "./demos/DragDem
 
 export interface TableDemoDefinition { id: string; title: string; description: string; component: ComponentType; source: string }
 export const tableDemos: readonly TableDemoDefinition[] = [
-  { id: "table-basic", title: "基础用法", description: "最基础的用法。默认尺寸使用 16px 上下内边距，单行数据保持稳定密度。", component: BasicDemo, source: basicSource },
+  { id: "table-basic", title: "基础用法", description: "使用完整的 TypeScript 数据和列定义，在单元格中组合链接、标签与操作。", component: BasicDemo, source: basicSource },
   { id: "table-content", title: "多行与省略", description: "单元格默认允许文本自然换行，行高随内容撑开。列设置 ellipsis 后保持单行省略，并可以通过 showTitle 控制原生提示。", component: ContentDemo, source: contentSource },
-  { id: "table-sort", title: "排序", description: "配置 Column 的 sorter，可以对表格进行排序。", component: SortDemo, source: sortSource },
+  { id: "table-sort", title: "排序", description: "通过 sorter、sortDirections 与 defaultSortOrder 配置排序，并可控制排序提示作用于完整表头或仅排序图标。", component: SortDemo, source: sortSource },
   { id: "table-fixed", title: "固定列", description: "当表格横向内容较多时，可以固定关键列，保持主要识别信息和操作入口可见。", component: FixedDemo, source: fixedSource },
   { id: "table-selection", title: "开启选择", description: "表格开启选择，可以设置 rowSelection.type 来使用复选框和单选框。checkbox 为复选框，radio 为单选框。", component: SelectionDemo, source: selectionSource },
   { id: "table-expand", title: "展开行", description: "当内容过长，可以通过 expandedRowRender 设置展开行。如果返回值是 null，不会渲染展开按钮。", component: ExpandDemo, source: expandSource },

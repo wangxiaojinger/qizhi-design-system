@@ -31,7 +31,7 @@ export default function ValidationLoopDemo() {
       >
         <Input allowClear={false} placeholder="请输入" />
       </Form.Item>
-      <Button type="primary" htmlType="submit">提交</Button>
+      <Button className="form-docs-validation-submit" type="primary" htmlType="submit">提交</Button>
       {message ? <span className="form-docs-submit-status" role="status">{message}</span> : null}
     </Form>
   );

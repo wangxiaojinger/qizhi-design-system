@@ -11,6 +11,13 @@
 .qizhi-input--disabled { background: var(--color-fill-1, #f7f8fa); color: var(--color-text-4, #c9cdd4); cursor: not-allowed; }
 .qizhi-input__field { box-sizing: border-box; width: 100%; min-width: 0; height: 100%; padding: 0 12px; border: 0; outline: 0; background: transparent; color: var(--color-text-1, #1d2129); font: inherit; font-size: 14px; }
 .qizhi-input__field::placeholder { color: var(--color-text-4, #c9cdd4); }
+.qizhi-input__field:-webkit-autofill,
+.qizhi-input__field:-webkit-autofill:hover,
+.qizhi-input__field:-webkit-autofill:focus {
+  box-shadow: 0 0 0 1000px var(--color-bg-2, #fff) inset;
+  -webkit-text-fill-color: var(--color-text-1, #1d2129);
+  caret-color: var(--color-text-1, #1d2129);
+}
 .qizhi-input__field:disabled { color: var(--color-text-4, #c9cdd4); cursor: not-allowed; }
 .qizhi-input__prefix, .qizhi-input__suffix { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; color: var(--color-text-3, #86909c); font-size: 14px; }
 .qizhi-input__prefix { margin-left: 12px; }

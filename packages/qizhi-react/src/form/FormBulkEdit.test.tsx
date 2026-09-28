@@ -243,4 +243,22 @@ describe("Form.useBulkEdit lifecycle", () => {
     resolveValidation();
     await expect(validation).rejects.toMatchObject({ name: "FormBulkEditValidationCancelled" });
   });
+
+  it("rejects a completed request after the source changes", async () => {
+    let bulk!: FormBulkEditController<string>;
+    const view = render(<Harness records={initialMembers} expose={(value) => { bulk = value; }} />);
+    fireEvent.change(await screen.findByRole("textbox", { name: "部门" }), { target: { value: "product" } });
+    await act(async () => {
+      await expect(bulk.validate()).resolves.toMatchObject({ targetKeys: ["member-1", "member-2"] });
+    });
+
+    const changed = initialMembers.map((member) => member.id === "member-1" ? { ...member, department: "operations" } : member);
+    view.rerender(<Harness records={changed} expose={(value) => { bulk = value; }} />);
+    await waitFor(() => expect(bulk.status).toBe("sourceChanged"));
+
+    expect(() => bulk.applyResult({ succeededKeys: ["member-1", "member-2"], failures: [] }))
+      .toThrow(expect.objectContaining({ code: "source-changed" }));
+    expect(bulk.status).toBe("sourceChanged");
+    expect(bulk.remainingKeys).toEqual(["member-1", "member-2"]);
+  });
 });

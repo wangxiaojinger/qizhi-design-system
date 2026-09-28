@@ -522,8 +522,143 @@
               <section class="qizhi-changelog__day" id="changelog-2026-09-26" data-toc-label="2026-09-26">
                 <header class="qizhi-changelog__day-head">
                   <h2><time datetime="2026-09-26">2026-09-26</time></h2>
-                  <span class="qizhi-changelog__count">2 次更新</span>
+                  <span class="qizhi-changelog__count">11 次更新</span>
                 </header>
+
+                <article class="qizhi-changelog__entry">
+                  <header class="qizhi-changelog__entry-head">
+                    <div>
+                      <h3>移除复杂表单的提交数据回显</h3>
+                      <div class="qizhi-changelog__meta">
+                        <span class="qizhi-changelog__commit">待提交</span>
+                      </div>
+                    </div>
+                  </header>
+                  <ul>
+                    <li>不再在页面底部输出包含服务、成员和密码字段的原始 JSON。</li>
+                    <li>提交成功统一使用全局 Toast，字段错误仍在对应输入控件下方展示。</li>
+                  </ul>
+                </article>
+
+                <article class="qizhi-changelog__entry">
+                  <header class="qizhi-changelog__entry-head">
+                    <div>
+                      <h3>移除表单草稿的业务侧调试信息</h3>
+                      <div class="qizhi-changelog__meta">
+                        <span class="qizhi-changelog__commit">待提交</span>
+                      </div>
+                    </div>
+                  </header>
+                  <ul>
+                    <li>从可视 Demo 移除调试详情，不再展示版本、步骤 key 和内部字段名。</li>
+                    <li>表单内仅保留自然语言草稿状态、恢复结果和冲突处理。</li>
+                  </ul>
+                </article>
+
+                <article class="qizhi-changelog__entry">
+                  <header class="qizhi-changelog__entry-head">
+                    <div>
+                      <h3>补齐多步骤表单的确认与提交反馈</h3>
+                      <div class="qizhi-changelog__meta">
+                        <span class="qizhi-changelog__commit">待提交</span>
+                      </div>
+                    </div>
+                  </header>
+                  <ul>
+                    <li>确认提交步骤继续展示可编辑的服务名称和联系邮箱，无需返回即可修改。</li>
+                    <li>提交成功改用全局 Toast，并统一清除浏览器自动填充产生的输入框底色。</li>
+                  </ul>
+                </article>
+
+                <article class="qizhi-changelog__entry">
+                  <header class="qizhi-changelog__entry-head">
+                    <div>
+                      <h3>收敛多步骤表单的提交反馈</h3>
+                      <div class="qizhi-changelog__meta">
+                        <span class="qizhi-changelog__commit">待提交</span>
+                      </div>
+                    </div>
+                  </header>
+                  <ul>
+                    <li>移除提交后对姓名、邮箱和内部 JSON 数据结构的直接回显。</li>
+                    <li>成功提交后仅展示自然语言“提交成功”。</li>
+                  </ul>
+                </article>
+
+                <article class="qizhi-changelog__entry">
+                  <header class="qizhi-changelog__entry-head">
+                    <div>
+                      <h3>移除高级动态列表示例</h3>
+                      <div class="qizhi-changelog__meta">
+                        <span class="qizhi-changelog__commit">待提交</span>
+                      </div>
+                    </div>
+                  </header>
+                  <ul>
+                    <li>从表单文档移除当前业务尚未使用的高级动态列表 Demo。</li>
+                    <li>保留底层 Form.List 能力及复杂表单中的基础动态成员列表。</li>
+                  </ul>
+                </article>
+
+                <article class="qizhi-changelog__entry">
+                  <header class="qizhi-changelog__entry-head">
+                    <div>
+                      <h3>精简复杂表单的成员删除操作</h3>
+                      <div class="qizhi-changelog__meta">
+                        <span class="qizhi-changelog__commit">待提交</span>
+                      </div>
+                    </div>
+                  </header>
+                  <ul>
+                    <li>移除成员上移、下移操作，将删除收敛为输入框右侧的图标按钮。</li>
+                    <li>删除图标在鼠标悬停和键盘聚焦时于右侧展示“删除”气泡。</li>
+                  </ul>
+                </article>
+
+                <article class="qizhi-changelog__entry">
+                  <header class="qizhi-changelog__entry-head">
+                    <div>
+                      <h3>收敛表单草稿的状态与错误反馈</h3>
+                      <div class="qizhi-changelog__meta">
+                        <span class="qizhi-changelog__commit">待提交</span>
+                      </div>
+                    </div>
+                  </header>
+                  <ul>
+                    <li>默认仅展示自然语言草稿状态，版本、步骤 key 与字段范围移入折叠的调试详情。</li>
+                    <li>必填错误回归对应输入控件下方，草稿过期、版本冲突等整体状态保留在操作区。</li>
+                  </ul>
+                </article>
+
+                <article class="qizhi-changelog__entry">
+                  <header class="qizhi-changelog__entry-head">
+                    <div>
+                      <h3>统一表单控件与成员操作宽度</h3>
+                      <div class="qizhi-changelog__meta">
+                        <span class="qizhi-changelog__commit">待提交</span>
+                      </div>
+                    </div>
+                  </header>
+                  <ul>
+                    <li>草稿描述与其他输入控件统一宽度，业务校验提交按钮恢复为内容宽度。</li>
+                    <li>成员上移、下移和删除操作改为与输入框等宽的图文按钮组。</li>
+                  </ul>
+                </article>
+
+                <article class="qizhi-changelog__entry">
+                  <header class="qizhi-changelog__entry-head">
+                    <div>
+                      <h3>统一批量编辑的混合值与提交反馈</h3>
+                      <div class="qizhi-changelog__meta">
+                        <span class="qizhi-changelog__commit">待提交</span>
+                      </div>
+                    </div>
+                  </header>
+                  <ul>
+                    <li>混合值统一在输入控件内展示，字段间距调整为 24px，业务失败归入对应表单项。</li>
+                    <li>提交信息仅在生成补丁后出现，并以明确标题区分目标、结果和补丁内容。</li>
+                  </ul>
+                </article>
 
                 <article class="qizhi-changelog__entry">
                   <header class="qizhi-changelog__entry-head">

@@ -1,23 +1,27 @@
 import { Table } from "@wangxiaojinger/qizhi-react";
+import type { TableColumn, TableSortDirection } from "@wangxiaojinger/qizhi-react";
 import { columns, people } from "./shared";
 
 export default function SortDemo() {
-  const sortable = columns.map((column) => ({
-    ...column,
-    sorter: (
-      first: (typeof people)[number],
-      second: (typeof people)[number],
-    ) => {
-      if (column.dataIndex === "salary") {
-        return first.salary - second.salary;
-      }
+  const sortable: TableColumn<(typeof people)[number]>[] = columns.map(
+    (column) => ({
+      ...column,
+      sorter: (first, second) => {
+        if (column.dataIndex === "salary") {
+          return first.salary - second.salary;
+        }
 
-      return String(first[column.dataIndex!]).localeCompare(
-        String(second[column.dataIndex!]),
-        "zh-CN",
-      );
-    },
-  }));
+        return String(first[column.dataIndex!]).localeCompare(
+          String(second[column.dataIndex!]),
+          "zh-CN",
+        );
+      },
+      ...(column.key === "name" ? {
+        sortDirections: ["descend"] as TableSortDirection[],
+        showSorterTooltip: { target: "full-header" as const },
+      } : null),
+    }),
+  );
 
   return (
     <Table
@@ -25,6 +29,10 @@ export default function SortDemo() {
       rowKey="key"
       columns={sortable}
       dataSource={people}
+      showSorterTooltip={{ target: "sorter-icon" }}
+      onSortChange={(order, column) => {
+        console.log("sort", order, column.key);
+      }}
     />
   );
 }

@@ -8,12 +8,29 @@ import { ArrowUpFilledIcon } from "../icon/generated/ArrowUpFilledIcon";
 import { MinusIcon } from "../icon/generated/catalog/MinusIcon";
 import { Pagination } from "../pagination/Pagination";
 import { Radio } from "../radio/Radio";
+import { Tooltip } from "../tooltip/Tooltip";
 import type { TableColumn, TableProps, TableRowKey, TableSortOrder } from "./Table.types";
 import "./table.css";
 
 const cx = (...parts: Array<string | false | undefined>) => parts.filter(Boolean).join(" ");
+const defaultSortDirections = ["ascend", "descend"] as const;
 
-export function Table<RecordType extends object>({ columns, dataSource, rowKey, size = "default", border = false, borderCell = false, hover = true, stripe = false, showHeader = true, loading = false, scrollX, rowSelection, expandable, childrenColumnName = "children" as keyof RecordType, pagination = false, empty, draggable = false, onSortChange, onRowOrderChange, className, style, "aria-label": ariaLabel = "表格", ...rest }: TableProps<RecordType>) {
+const nextSortOrder = <RecordType extends object>(
+  column: TableColumn<RecordType>,
+  current: TableSortOrder,
+): TableSortOrder => {
+  const directions = column.sortDirections?.length
+    ? column.sortDirections
+    : defaultSortDirections;
+  if (current === null) return directions[0];
+  const currentIndex = directions.indexOf(current);
+  return directions[currentIndex + 1] ?? null;
+};
+
+const sortAction = (order: TableSortOrder) =>
+  order === "ascend" ? "升序" : order === "descend" ? "降序" : "取消";
+
+export function Table<RecordType extends object>({ columns, dataSource, rowKey, size = "default", border = false, borderCell = false, hover = true, stripe = false, showHeader = true, loading = false, scrollX, rowSelection, expandable, childrenColumnName = "children" as keyof RecordType, pagination = false, empty, draggable = false, showSorterTooltip = true, onSortChange, onRowOrderChange, className, style, "aria-label": ariaLabel = "表格", ...rest }: TableProps<RecordType>) {
   const keyOf = (record: RecordType): TableRowKey => typeof rowKey === "function" ? rowKey(record) : record[rowKey] as TableRowKey;
   const defaultSort = columns.find((column) => column.defaultSortOrder);
   const [sort, setSort] = useState<{ key: string; order: TableSortOrder }>({ key: defaultSort?.key ?? "", order: defaultSort?.defaultSortOrder ?? null });
@@ -59,11 +76,78 @@ export function Table<RecordType extends object>({ columns, dataSource, rowKey, 
   };
   const changeSort = (column: TableColumn<RecordType>) => {
     const current = sort.key === column.key ? sort.order : null;
-    const next: TableSortOrder = current === null ? "ascend" : current === "ascend" ? "descend" : null;
+    const next = nextSortOrder(column, current);
     setSort({ key: column.key, order: next }); onSortChange?.(next, column);
   };
   const rowLabel = (record: RecordType) => String(columns[0]?.dataIndex == null ? keyOf(record) : record[columns[0].dataIndex]);
-  const headerCells = columns.map((column) => <th key={column.key} aria-sort={column.sorter ? (sort.key === column.key ? sort.order === "ascend" ? "ascending" : sort.order === "descend" ? "descending" : "none" : "none") : undefined} className={cx("qizhi-table__th", column.fixed && `is-fixed-${column.fixed}`)} style={{ width: column.width }}>{column.sorter ? <button type="button" className="qizhi-table__sort" aria-label={`按${String(column.title)}${sort.key === column.key && sort.order === "ascend" ? "降序" : sort.key === column.key && sort.order === "descend" ? "取消" : "升序"}排序`} onClick={() => changeSort(column)}>{column.title}<span className={cx("qizhi-table__sorter", sort.key === column.key && sort.order === "ascend" && "is-ascend", sort.key === column.key && sort.order === "descend" && "is-descend")} aria-hidden="true"><ArrowUpFilledIcon className="qizhi-table__sorter-icon is-ascend" viewBox="4 5.33334 8 4" width={8} height={4} /><ArrowDownFilledIcon className="qizhi-table__sorter-icon is-descend" viewBox="4 6.66666 8 4" width={8} height={4} /></span></button> : column.title}</th>);
+  const headerCells = columns.map((column) => {
+    if (!column.sorter) {
+      return (
+        <th
+          key={column.key}
+          className={cx("qizhi-table__th", column.fixed && `is-fixed-${column.fixed}`)}
+          style={{ width: column.width }}
+        >
+          {column.title}
+        </th>
+      );
+    }
+    const current = sort.key === column.key ? sort.order : null;
+    const next = nextSortOrder(column, current);
+    const action = sortAction(next);
+    const sorter = (
+      <span
+        className={cx(
+          "qizhi-table__sorter",
+          current === "ascend" && "is-ascend",
+          current === "descend" && "is-descend",
+        )}
+        aria-hidden="true"
+      >
+        <ArrowUpFilledIcon className="qizhi-table__sorter-icon is-ascend" viewBox="4 5.33334 8 4" width={8} height={4} />
+        <ArrowDownFilledIcon className="qizhi-table__sorter-icon is-descend" viewBox="4 6.66666 8 4" width={8} height={4} />
+      </span>
+    );
+    const tooltip = column.showSorterTooltip ?? showSorterTooltip;
+    const tooltipTarget = typeof tooltip === "object"
+      ? tooltip.target ?? "full-header"
+      : "full-header";
+    const sorterContent = tooltip && tooltipTarget === "sorter-icon" ? (
+      <Tooltip content={`点击${action}排序`} trigger="hover">
+        <span className="qizhi-table__sorter-target">{sorter}</span>
+      </Tooltip>
+    ) : sorter;
+    const button = (
+      <button
+        type="button"
+        className="qizhi-table__sort"
+        aria-label={`按${String(column.title)}${action}排序`}
+        onClick={() => changeSort(column)}
+      >
+        {column.title}
+        {sorterContent}
+      </button>
+    );
+    const headerContent = tooltip && tooltipTarget === "full-header" ? (
+      <Tooltip content={`点击${action}排序`} trigger={["hover", "focus"]}>
+        {button}
+      </Tooltip>
+    ) : button;
+    return (
+      <th
+        key={column.key}
+        aria-sort={current === "ascend"
+          ? "ascending"
+          : current === "descend"
+            ? "descending"
+            : "none"}
+        className={cx("qizhi-table__th", "is-sortable", column.fixed && `is-fixed-${column.fixed}`)}
+        style={{ width: column.width }}
+      >
+        {headerContent}
+      </th>
+    );
+  });
   const selectable = allRecords.filter((record) => !rowSelection?.getCheckboxProps?.(record).disabled);
   const allChecked = selectable.length > 0 && selectable.every((record) => selected.includes(keyOf(record)));
   const someChecked = selectable.some((record) => selected.includes(keyOf(record))) && !allChecked;

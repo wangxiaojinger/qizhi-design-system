@@ -65,6 +65,7 @@ describe("Link docs", () => {
     ]);
     expect(linkApi.map((item) => item.name)).not.toContain("loading");
     expect(linkApi.map((item) => item.name)).not.toContain("size");
+    expect(linkApi.find((item) => item.name === "hoverable")?.description).toContain("按下");
   });
 
   it("uses the formal Dropdown component in the approved composition demo", async () => {

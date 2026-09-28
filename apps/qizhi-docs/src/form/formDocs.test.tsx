@@ -6,7 +6,7 @@ import { formDemos } from "./formDocs.registry";
 
 describe("Form docs", () => {
   it("preserves the existing Demos and appends the Draft Demo", () => {
-    expect(formDemos.map((demo) => demo.title)).toEqual(["基础用法", "表单布局", "受控表单", "业务校验闭环", "复杂表单联动", "多步骤表单", "远程联动与未保存修改", "表单草稿", "高级动态列表", "批量编辑"]);
+    expect(formDemos.map((demo) => demo.title)).toEqual(["基础用法", "表单布局", "受控表单", "业务校验闭环", "复杂表单联动", "多步骤表单", "远程联动与未保存修改", "表单草稿", "批量编辑"]);
     expect(formDemos.map((demo) => demo.description)).toEqual([
       "非受控模式的基础用法，表单项采用垂直布局。",
       "Form 支持垂直和水平两种排列方式。",
@@ -16,7 +16,6 @@ describe("Form docs", () => {
       "按步骤校验字段并保留跨步骤数据，提交失败时返回首个错误所在步骤。",
       "演示异步校验竞态、网络异常分流、远程查询四态、条件字段清理和未保存修改判断。",
       "通过业务方提供的存储适配器保存和恢复指定字段，并处理版本、过期与并发冲突。",
-      "演示数量限制、列表与整行校验、批量新增以及嵌套列表状态迁移。",
       "演示混合值、仅提交改动字段、主动清空、部分失败回填以及失败记录重试。",
     ]);
     formDemos.forEach((demo) => {
@@ -29,8 +28,8 @@ describe("Form docs", () => {
   it("renders the legacy field data and initial states through formal components", () => {
     render(<FormDocsIsland />);
 
-    expect(screen.getAllByRole("button", { name: "查看代码" })).toHaveLength(10);
-    expect(screen.getAllByRole("button", { name: "复制代码" })).toHaveLength(10);
+    expect(screen.getAllByRole("button", { name: "查看代码" })).toHaveLength(9);
+    expect(screen.getAllByRole("button", { name: "复制代码" })).toHaveLength(9);
     expect(screen.getAllByText("支持小写字母、数字、短横线，须以字母开头。")).toHaveLength(3);
 
     const basic = document.getElementById("表单-基础用法")!;
@@ -66,16 +65,22 @@ describe("Form docs", () => {
     fireEvent.click(within(demo).getByRole("button", { name: "新增成员" }));
     expect(within(demo).getAllByRole("textbox", { name: /成员 \d+ 名称/ })).toHaveLength(3);
 
-    fireEvent.change(within(demo).getByRole("textbox", { name: "成员 2 名称" }), { target: { value: "成员乙" } });
-    fireEvent.click(within(demo).getByRole("button", { name: "成员 2 上移" }));
-    expect(within(demo).getByRole("textbox", { name: "成员 1 名称" })).toHaveValue("成员乙");
+    expect(within(demo).queryAllByRole("button", { name: /上移|下移/ })).toHaveLength(0);
+    const removeSecondMember = within(demo).getByRole("button", { name: "删除成员 2" });
+    expect(removeSecondMember).toHaveClass("qizhi-btn-icon-only", "form-docs-complex-delete");
+    fireEvent.focus(removeSecondMember);
+    expect(await screen.findByRole("tooltip", { name: "删除" })).toHaveAttribute("data-tooltip-position", "right");
     fireEvent.click(within(demo).getByRole("button", { name: "删除成员 3" }));
     expect(within(demo).getAllByRole("textbox", { name: /成员 \d+ 名称/ })).toHaveLength(2);
 
     fireEvent.click(within(demo).getByRole("button", { name: "模拟成员错误" }));
     expect(await within(demo).findByRole("alert")).toHaveTextContent("成员名称已存在");
 
-    fireEvent.change(within(demo).getByRole("textbox", { name: "登录密码" }), { target: { value: "new-password" } });
+    const password = demo.querySelector<HTMLInputElement>('input[aria-label="登录密码"]')!;
+    const confirmPassword = demo.querySelector<HTMLInputElement>('input[aria-label="确认密码"]')!;
+    expect(password).toHaveAttribute("type", "password");
+    expect(confirmPassword).toHaveAttribute("type", "password");
+    fireEvent.change(password, { target: { value: "new-password" } });
     expect(await within(demo).findByText("两次输入的密码不一致")).toBeInTheDocument();
 
     expect(within(demo).getByRole("textbox", { name: "服务地址" })).toBeInTheDocument();
@@ -127,6 +132,7 @@ describe("Form docs", () => {
   it("demonstrates frontend validation and server field-error recovery", async () => {
     render(<FormDocsIsland />);
     const demo = document.getElementById("表单-业务校验闭环")!;
+    expect(within(demo).getByRole("button", { name: "提交" })).toHaveClass("form-docs-validation-submit");
     const input = within(demo).getByRole("textbox", { name: "服务名称" });
 
     fireEvent.click(within(demo).getByRole("button", { name: "提交" }));
@@ -138,6 +144,27 @@ describe("Form docs", () => {
 
     fireEvent.change(input, { target: { value: "service-a" } });
     expect(within(demo).queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it("keeps draft controls and member operations on the shared form width", async () => {
+    render(<FormDocsIsland />);
+    const draft = document.getElementById("表单-表单草稿")!;
+    const draftName = within(draft).getByRole("textbox", { name: "草稿服务名称" });
+    expect(within(draft).getByRole("textbox", { name: "草稿描述" }).closest(".qizhi-textarea")).toBeInTheDocument();
+    expect(within(draft).getByRole("status", { name: "草稿状态" })).toHaveTextContent("尚未保存草稿");
+    expect(within(draft).queryByText(/idle/)).not.toBeInTheDocument();
+    expect(within(draft).queryByText("调试详情")).not.toBeInTheDocument();
+    expect(within(draft).queryByText(/serviceName|description|password/)).not.toBeInTheDocument();
+    fireEvent.change(draftName, { target: { value: "" } });
+    fireEvent.click(within(draft).getByRole("button", { name: "保存草稿" }));
+    expect(await within(within(draft).getByRole("group", { name: "草稿服务名称" })).findByRole("alert"))
+      .toHaveTextContent("请输入草稿服务名称");
+
+    const complex = document.getElementById("表单-复杂表单联动")!;
+    const remove = within(complex).getByRole("button", { name: "删除成员 1" });
+    expect(within(complex).queryAllByRole("button", { name: /上移|下移/ })).toHaveLength(0);
+    expect(remove.querySelector("svg")).toBeInTheDocument();
+    expect(remove).toHaveClass("qizhi-btn-icon-only");
   });
 
   it("demonstrates remote states, exception separation, conditional cleanup and dirty recovery", async () => {
@@ -174,6 +201,14 @@ describe("Form docs", () => {
     fireEvent.click(screen.getByRole("option", { name: "本地服务" }));
     expect(within(demo).queryByRole("textbox", { name: "服务地址" })).not.toBeInTheDocument();
     expect(within(demo).queryByRole("combobox", { name: "部署区域" })).not.toBeInTheDocument();
+
+    fireEvent.change(serviceName, { target: { value: "valid-service" } });
+    fireEvent.click(within(demo).getByRole("button", { name: "提交远程表单" }));
+    const toastContent = await screen.findByText("提交成功");
+    const toast = toastContent.closest(".qizhi-message");
+    expect(toast).toHaveTextContent("提交成功");
+    expect(toast).toHaveClass("qizhi-message", "qizhi-message--success");
+    expect(within(demo).queryByRole("status", { name: "远程表单提交结果" })).not.toBeInTheDocument();
   });
 
   it("switches only the layout Demo and keeps controlled fields controlled by the Demo", () => {
@@ -222,8 +257,13 @@ describe("Form docs", () => {
     render(<FormDocsIsland />);
     const demo = document.getElementById("表单-批量编辑")!;
     const department = within(demo).getByRole("combobox", { name: "统一部门" });
-    const mixedDescription = within(demo).getByText("多个不同值");
-    expect(department).toHaveAttribute("aria-describedby", mixedDescription.id);
+    const remark = within(demo).getByRole("textbox", { name: "统一备注" });
+    expect(department).toHaveAttribute("placeholder", "多个不同值");
+    expect(remark).toHaveAttribute("placeholder", "多个不同值");
+    expect(department).not.toHaveAttribute("aria-describedby");
+    expect(remark).not.toHaveAttribute("aria-describedby");
+    expect(within(demo).queryByText("备注为多个不同值")).not.toBeInTheDocument();
+    expect(within(demo).queryByRole("region", { name: "批量编辑提交信息" })).not.toBeInTheDocument();
 
     fireEvent.click(department);
     fireEvent.click(screen.getByRole("option", { name: "产品部" }));
@@ -231,16 +271,16 @@ describe("Form docs", () => {
     fireEvent.click(within(demo).getByRole("button", { name: "清空备注" }));
     expect(within(demo).getByRole("textbox", { name: "统一备注" })).not.toHaveAttribute("aria-describedby");
     fireEvent.click(within(demo).getByRole("button", { name: "校验并生成补丁" }));
-    const patch = await within(demo).findByRole("status", { name: "批量编辑补丁" });
-    expect(patch).toHaveTextContent('"department": "product"');
-    expect(patch).toHaveTextContent('"profile"');
-    expect(patch).toHaveTextContent('"remark"');
-    expect(patch).not.toHaveTextContent('"status"');
+    expect(await within(demo).findByRole("region", { name: "批量编辑提交信息" })).toBeInTheDocument();
+    expect(within(demo).getByText("本次目标：member-1、member-2、member-3")).toBeInTheDocument();
+    expect(within(demo).queryByRole("status", { name: "批量编辑补丁" })).not.toBeInTheDocument();
+    expect(within(demo).queryByText("提交补丁")).not.toBeInTheDocument();
+    expect(demo).not.toHaveTextContent('"department": "product"');
 
     fireEvent.click(within(demo).getByRole("button", { name: "模拟部分成功" }));
     expect(await within(demo).findByText("成功 1 条，失败 2 条")).toBeInTheDocument();
     expect(within(demo).getAllByText(/没有修改部门的权限/)).toHaveLength(2);
-    const failureItems = within(demo).getAllByRole("listitem");
+    const failureItems = within(within(demo).getByRole("list", { name: "批量编辑失败明细" })).getAllByRole("listitem");
     expect(failureItems).toHaveLength(2);
     failureItems.forEach((item) => expect(item).toHaveAttribute("tabindex", "0"));
     failureItems[0]?.focus();

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AutoComplete, Button, Form, Input, Select } from "@wangxiaojinger/qizhi-react";
+import { AutoComplete, Button, Form, Input, Message, Select } from "@wangxiaojinger/qizhi-react";
 import type { FormValidationException } from "@wangxiaojinger/qizhi-react";
 
 type QueryState = "ready" | "loading" | "empty" | "error";
@@ -73,7 +73,6 @@ export default function RemoteBusinessDemo() {
   const [form] = Form.useForm();
   const dirty = Form.useDirty(form);
   const [networkError, setNetworkError] = useState("");
-  const [submitted, setSubmitted] = useState("");
 
   useEffect(() => {
     if (!dirty) return undefined;
@@ -102,7 +101,9 @@ export default function RemoteBusinessDemo() {
         },
       }}
       onValidationException={handleValidationException}
-      onFinish={(values) => setSubmitted(JSON.stringify(values))}
+      onFinish={() => {
+        Message.success({ content: "提交成功" });
+      }}
     >
       <output className="form-docs-dirty-status" aria-label="未保存修改状态">
         {dirty ? "有未保存修改" : "所有修改已保存"}
@@ -147,7 +148,6 @@ export default function RemoteBusinessDemo() {
         <Button onClick={() => form.resetFields([["service"]])}>重置服务信息</Button>
         <Button onClick={() => form.resetFields()}>全部重置</Button>
       </div>
-      {submitted ? <output className="form-docs-submit-status" aria-label="远程表单提交结果">{submitted}</output> : null}
     </Form>
   );
 }

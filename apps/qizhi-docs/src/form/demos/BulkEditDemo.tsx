@@ -32,8 +32,8 @@ export default function BulkEditDemo() {
   const [form] = Form.useForm();
   const [members, setMembers] = useState<readonly Member[]>(initialMembers);
   const [patch, setPatch] = useState<FormBulkEditPatch<string> | null>(null);
-  const [targetSummary, setTargetSummary] = useState("尚未生成补丁");
-  const [resultSummary, setResultSummary] = useState("尚未模拟提交结果");
+  const [targetSummary, setTargetSummary] = useState<string | null>(null);
+  const [resultSummary, setResultSummary] = useState<string | null>(null);
   const bulk = Form.useBulkEdit({
     form,
     records: members,
@@ -84,18 +84,24 @@ export default function BulkEditDemo() {
       </div>
 
       <div className="form-docs-bulk-edit-fields">
-        <Form.Item name="department" label="统一部门">
+        <Form.Item
+          name="department"
+          label="统一部门"
+          validateStatus={departmentFailures.length ? "error" : undefined}
+          help={departmentFailures.length ? (
+            <ul className="form-docs-bulk-edit-field-failures" aria-label="部门修改失败明细">
+              {departmentFailures.map((failure, index) => (
+                <li key={`${failure.key}-${index}`}>{failure.key}：{failure.message}</li>
+              ))}
+            </ul>
+          ) : undefined}
+        >
           <Select
             aria-label="统一部门"
-            aria-describedby={departmentState.mixed && departmentState.mode === "keep" ? "bulk-edit-department-mixed" : undefined}
             options={departmentOptions}
             placeholder={departmentState.mixed ? "多个不同值" : "请选择部门"}
           />
         </Form.Item>
-        {departmentState.mixed && departmentState.mode === "keep" ? (
-          <p id="bulk-edit-department-mixed" className="form-docs-bulk-edit-mixed">多个不同值</p>
-        ) : null}
-        <Form.ErrorList errors={departmentFailures.map((failure) => `${failure.key}：${failure.message}`)} />
 
         <Form.Item name="status" label="统一状态">
           <Select aria-label="统一状态" options={statusOptions} />
@@ -104,14 +110,10 @@ export default function BulkEditDemo() {
         <Form.Item name={["profile", "remark"]} label="统一备注">
           <Input
             aria-label="统一备注"
-            aria-describedby={remarkState.mixed && remarkState.mode === "keep" ? "bulk-edit-remark-mixed" : undefined}
             placeholder={remarkState.mixed ? "多个不同值" : "请输入备注"}
             allowClear={false}
           />
         </Form.Item>
-        {remarkState.mixed && remarkState.mode === "keep" ? (
-          <p id="bulk-edit-remark-mixed" className="form-docs-bulk-edit-mixed">备注为多个不同值</p>
-        ) : null}
       </div>
 
       <div className="form-docs-bulk-edit-actions">
@@ -130,18 +132,20 @@ export default function BulkEditDemo() {
         </div>
       ) : null}
 
-      <div className="form-docs-bulk-edit-results" aria-live="polite">
-        <output aria-label="批量编辑目标">{targetSummary}</output>
-        <output aria-label="批量编辑结果">{resultSummary}</output>
-        {bulk.failures.length ? (
-          <ul aria-label="批量编辑失败明细">
-            {bulk.failures.map((failure, index) => (
-              <li key={`${failure.key}-${index}`} tabIndex={0}>{failure.key}：{failure.message}</li>
-            ))}
-          </ul>
-        ) : null}
-        <pre role="status" aria-label="批量编辑补丁">{patch ? JSON.stringify(patch, null, 2) : "尚未生成补丁"}</pre>
-      </div>
+      {targetSummary || resultSummary || patch || bulk.failures.length ? (
+        <section className="form-docs-bulk-edit-results" aria-label="批量编辑提交信息" aria-live="polite">
+          <h4>提交信息</h4>
+          {targetSummary ? <output aria-label="批量编辑目标">{targetSummary}</output> : null}
+          {resultSummary ? <output aria-label="批量编辑结果">{resultSummary}</output> : null}
+          {bulk.failures.length ? (
+            <ul aria-label="批量编辑失败明细">
+              {bulk.failures.map((failure, index) => (
+                <li key={`${failure.key}-${index}`} tabIndex={0}>{failure.key}：{failure.message}</li>
+              ))}
+            </ul>
+          ) : null}
+        </section>
+      ) : null}
     </Form>
   );
 }

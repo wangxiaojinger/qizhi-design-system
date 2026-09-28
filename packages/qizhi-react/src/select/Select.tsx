@@ -82,7 +82,7 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(prop
   const selectedValues = multiple ? multipleValue : singleValue === undefined ? [] : [singleValue];
   const selectedOptions = selectedValues.map((value) => options.find((option) => same(option.value, value)) ?? (allowCreate ? { label: String(value), value } : undefined)).filter(Boolean) as SelectOption[];
   const selectedSingle = selectedOptions[0];
-  const hasValue = selectedValues.length > 0;
+  const hasValue = selectedOptions.length > 0;
 
   useImperativeHandle(forwardedRef, () => (triggerRef.current ?? inputRef.current) as SelectHandle);
 
@@ -238,7 +238,7 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(prop
     onPointerDown: () => setKeyboardFocused(false),
     onBlur: (event: React.FocusEvent<HTMLElement>) => {
       setKeyboardFocused(false);
-      onBlur?.(event as React.FocusEvent<HTMLInputElement>);
+      onBlur?.(event);
     },
   };
 

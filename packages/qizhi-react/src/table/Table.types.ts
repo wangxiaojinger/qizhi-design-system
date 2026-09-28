@@ -4,6 +4,9 @@ import type { PaginationProps } from "../pagination/Pagination.types";
 export type TableSize = "default" | "middle" | "small";
 export type TableRowKey = string | number;
 export type TableSortOrder = "ascend" | "descend" | null;
+export type TableSortDirection = Exclude<TableSortOrder, null>;
+export type TableSorterTooltipTarget = "full-header" | "sorter-icon";
+export type TableSorterTooltip = boolean | { target?: TableSorterTooltipTarget };
 export type TableFixed = "left" | "right";
 export type TablePaginationPosition = "bottomLeft" | "bottomCenter" | "bottomRight";
 export type TableColumnEllipsis = boolean | { showTitle?: boolean };
@@ -18,7 +21,9 @@ export interface TableColumn<RecordType> {
   ellipsis?: TableColumnEllipsis;
   render?: (value: unknown, record: RecordType, index: number) => ReactNode;
   sorter?: (a: RecordType, b: RecordType) => number;
-  defaultSortOrder?: Exclude<TableSortOrder, null>;
+  sortDirections?: TableSortDirection[];
+  defaultSortOrder?: TableSortDirection;
+  showSorterTooltip?: TableSorterTooltip;
   onCell?: (record: RecordType, index: number) => TableCellProps;
 }
 
@@ -63,6 +68,7 @@ export interface TableProps<RecordType extends object> extends Omit<HTMLAttribut
   pagination?: false | TablePaginationConfig;
   empty?: ReactNode;
   draggable?: boolean;
+  showSorterTooltip?: TableSorterTooltip;
   onSortChange?: (order: TableSortOrder, column: TableColumn<RecordType>) => void;
   onRowOrderChange?: (dataSource: RecordType[], info: TableRowOrderInfo) => void;
 }

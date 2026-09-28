@@ -17,7 +17,7 @@
 | 证据 | 位置 | 可证明什么 | 不能证明什么 |
 |---|---|---|---|
 | 旧规范站方向图标区 | 根项目 `index.html` 的“方向指示类图标”区块 | 38 个图形、旧名称、顺序、线性/填充与状态 | React API、组件命名和包结构 |
-| 旧站 SVG DOM | 同一区块内的 38 个内联 `<svg>` | `viewBox`、路径、颜色、透明度、裁切和内部 ID 引用 | 可直接机械替换全部颜色 |
+| 旧站 SVG DOM | 同一区块内的 38 个内联 `<svg>` | `viewBox`、路径、颜色、裁切和内部 ID 引用 | 可直接机械替换全部颜色 |
 | QIZHI 现有 React 图标 | `packages/qizhi-react/src/icon/` | `XxxIcon` 命名、`currentColor` 与公共导出习惯 | 统一 Props、生成器和 manifest 已经存在 |
 | Arco Icon 工程 | Arco 官方 Icon 包、生成脚本及 React Icon 基类 | SVG 生成、分类、独立导出和 `currentColor` 的工程方法 | QIZHI 命名、中文语义和 v1 能力范围 |
 
@@ -61,8 +61,8 @@ export interface QizhiIconProps
 ## 5. DOM、样式与生成契约
 
 - 根元素固定为 `<svg>`，默认 `width="1em"`、`height="1em"`、`focusable="false"`。
-- 保留旧站 `viewBox`、路径、透明度、裁切关系和图形比例；删除源 SVG 固定宽高。
-- 单色主体的 `fill`/`stroke` 转换为 `currentColor`；`none`、透明度及用于镂空的颜色必须按图形语义保留。
+- 保留旧站 `viewBox`、路径、裁切关系和图形比例；删除源 SVG 固定宽高。
+- 单色主体的 `fill`/`stroke` 转换为 `currentColor`；移除路径上的 `fill-opacity` / `stroke-opacity`，`none` 及用于镂空的颜色仍按图形语义保留。
 - 删除未引用的内部 ID；仍被 `clipPath`、`mask`、渐变或 `href` 使用的 ID 必须在每次渲染时唯一。
 - 生成组件位于方向图标专属生成目录，并标注“由脚本生成，禁止手改”。人工调整只能修改 manifest、源映射或转换器。
 - 生成器必须拒绝脚本、外部资源、缺失 `viewBox`、失效 ID 引用、未知固定颜色和未映射源节点。

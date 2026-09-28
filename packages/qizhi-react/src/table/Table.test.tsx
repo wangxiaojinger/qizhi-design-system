@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { Table } from "./Table";
-import type { TableColumn } from "./Table.types";
+import type { TableColumn, TableSortOrder } from "./Table.types";
 
 type Row = { id: number; name: string; salary: number; children?: Row[] };
 const data: Row[] = [{ id: 1, name: "乙", salary: 2 }, { id: 2, name: "甲", salary: 1 }];
@@ -53,8 +53,71 @@ describe("Table", () => {
     fireEvent.click(sort);
     expect(screen.getAllByRole("row")[1]).toHaveTextContent("甲");
     expect(screen.getByRole("columnheader", { name: /薪水/ })).toHaveAttribute("aria-sort", "ascending");
+    expect(screen.getByRole("columnheader", { name: /薪水/ })).toHaveClass("is-sortable");
     fireEvent.click(screen.getByRole("button", { name: "按薪水降序排序" }));
     expect(screen.getAllByRole("row")[1]).toHaveTextContent("乙");
+  });
+
+  it("supports sorter Tooltip targets with column overrides", () => {
+    const tooltipColumns: TableColumn<Row>[] = [
+      {
+        key: "name",
+        title: "姓名",
+        dataIndex: "name",
+        sorter: (a, b) => a.name.localeCompare(b.name),
+        showSorterTooltip: { target: "full-header" },
+      },
+      {
+        key: "salary",
+        title: "薪水",
+        dataIndex: "salary",
+        sorter: (a, b) => a.salary - b.salary,
+      },
+    ];
+    const { container } = render(
+      <Table
+        rowKey="id"
+        columns={tooltipColumns}
+        dataSource={data}
+        showSorterTooltip={{ target: "sorter-icon" }}
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "按姓名升序排序" }))
+      .toHaveAttribute("aria-expanded", "false");
+    expect(container.querySelectorAll(".qizhi-table__sorter-target"))
+      .toHaveLength(1);
+    expect(container.querySelector(".qizhi-table__sorter-target"))
+      .toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("respects custom sort directions and reports each transition", () => {
+    const changes: TableSortOrder[] = [];
+    const customColumns: TableColumn<Row>[] = [
+      {
+        key: "salary",
+        title: "薪水",
+        dataIndex: "salary",
+        sorter: (a, b) => a.salary - b.salary,
+        sortDirections: ["descend"],
+      },
+    ];
+    render(
+      <Table
+        rowKey="id"
+        columns={customColumns}
+        dataSource={data}
+        onSortChange={(order) => changes.push(order)}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "按薪水降序排序" }));
+    expect(screen.getByRole("columnheader", { name: /薪水/ }))
+      .toHaveAttribute("aria-sort", "descending");
+    fireEvent.click(screen.getByRole("button", { name: "按薪水取消排序" }));
+    expect(screen.getByRole("columnheader", { name: /薪水/ }))
+      .toHaveAttribute("aria-sort", "none");
+    expect(changes).toEqual(["descend", null]);
   });
 
   it("shows fixed-column edge shadows only after horizontal scrolling", () => {

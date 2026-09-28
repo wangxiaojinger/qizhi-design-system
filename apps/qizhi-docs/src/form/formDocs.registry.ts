@@ -15,8 +15,6 @@ import StepsDemo from "./demos/StepsDemo";
 import stepsSource from "./demos/StepsDemo.tsx?raw";
 import DraftDemo from "./demos/DraftDemo";
 import draftSource from "./demos/DraftDemo.tsx?raw";
-import AdvancedListDemo from "./demos/AdvancedListDemo";
-import advancedListSource from "./demos/AdvancedListDemo.tsx?raw";
 import BulkEditDemo from "./demos/BulkEditDemo";
 import bulkEditSource from "./demos/BulkEditDemo.tsx?raw";
 
@@ -84,13 +82,6 @@ export const formDemos: readonly FormDemoDefinition[] = [
     description: "通过业务方提供的存储适配器保存和恢复指定字段，并处理版本、过期与并发冲突。",
     component: DraftDemo,
     source: draftSource,
-  },
-  {
-    id: "表单-高级动态列表",
-    title: "高级动态列表",
-    description: "演示数量限制、列表与整行校验、批量新增以及嵌套列表状态迁移。",
-    component: AdvancedListDemo,
-    source: advancedListSource,
   },
   {
     id: "表单-批量编辑",

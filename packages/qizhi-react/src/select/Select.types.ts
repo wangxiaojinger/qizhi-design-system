@@ -57,7 +57,7 @@ interface SelectCommonProps {
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   onPopupScroll?: (event: UIEvent<HTMLDivElement>) => void;
-  onBlur?: FocusEventHandler<HTMLInputElement>;
+  onBlur?: FocusEventHandler<HTMLElement>;
   className?: string;
   style?: CSSProperties;
   id?: string;

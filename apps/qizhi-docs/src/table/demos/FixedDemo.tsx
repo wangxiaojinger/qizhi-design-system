@@ -21,7 +21,7 @@ export default function FixedDemo() {
       title: "操作",
       width: 90,
       fixed: "right",
-      render: () => <Link>查看</Link>,
+      render: () => <Link hoverable={false}>查看</Link>,
     },
   ];
 
@@ -31,6 +31,7 @@ export default function FixedDemo() {
       rowKey="key"
       columns={columns}
       dataSource={people.slice(0, 4)}
+      hover={false}
       scrollX={1260}
     />
   );

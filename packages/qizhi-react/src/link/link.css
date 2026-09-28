@@ -67,7 +67,8 @@
   height: 16px;
 }
 
-.qizhi-link--hoverless:hover {
+.qizhi-link--hoverless:hover,
+.qizhi-link--hoverless:active {
   background: transparent;
 }
 

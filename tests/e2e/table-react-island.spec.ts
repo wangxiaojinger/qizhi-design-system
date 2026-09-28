@@ -8,7 +8,7 @@ test("Table 保持十一组 Demo、核心交互和三档响应式", async ({ pag
 
   await expect(page.getByRole("heading", { name: "表格 Table" })).toBeVisible();
   await expect(page.locator("#component-table article.codebox-wrapper")).toHaveCount(11);
-  await expect(page.locator("#table-basic tbody tr")).toHaveCount(4);
+  await expect(page.locator("#table-basic tbody tr")).toHaveCount(3);
   const basicTable = page.locator("#table-basic .qizhi-table");
   const basicTableElement = page.locator("#table-basic table");
   const basicHeaders = page.locator("#table-basic thead th");
@@ -23,15 +23,78 @@ test("Table 保持十一组 Demo、核心交互和三档响应式", async ({ pag
     return { width: divider.width, height: divider.height, color: divider.backgroundColor };
   })).toEqual({ width: "1px", height: "16px", color: "rgb(229, 230, 235)" });
   await expect(page.locator("#table-basic tbody tr").first().locator("td").first()).toHaveCSS("border-bottom-color", "rgb(242, 243, 245)");
+  const basicNameLink = page.getByRole("button", { name: "约翰·布朗", exact: true });
+  const basicAgeCell = page.locator("#table-basic tbody tr").first().locator("td").nth(1);
+  const basicDeleteLink = page.getByRole("button", { name: "删除 约翰·布朗" });
+  await expect(basicNameLink).toHaveCSS("color", await basicAgeCell.evaluate((node) => getComputedStyle(node).color));
+  await expect(basicDeleteLink).toHaveCSS("color", "rgb(134, 144, 156)");
+  await basicNameLink.hover();
+  await expect(basicNameLink).toHaveCSS("color", "rgb(87, 135, 255)");
+  await expect(basicNameLink).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await page.mouse.down();
+  await expect(basicNameLink).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await page.mouse.up();
+  const basicInviteLink = page.getByRole("button", { name: "邀请 约翰·布朗" });
+  await basicInviteLink.hover();
+  await expect(basicInviteLink).toHaveCSS("color", "rgb(87, 135, 255)");
+  await expect(basicInviteLink).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  const firstBasicRow = page.locator("#table-basic tbody tr").first();
+  const secondBasicRow = page.locator("#table-basic tbody tr").nth(1);
+  await expect(firstBasicRow.locator(".qizhi-tag")).toHaveCount(3);
+  await expect(firstBasicRow.locator(".qizhi-tag-gray")).toHaveCount(0);
+  await expect(firstBasicRow.locator(".qizhi-tag").first()).toHaveCSS(
+    "color",
+    "rgb(78, 89, 105)",
+  );
+  await expect(firstBasicRow.getByText("+2", { exact: true })).toBeVisible();
+  await firstBasicRow.getByText("+2", { exact: true }).hover();
+  await expect(page.getByRole("tooltip")).toContainText("设计系统");
+  await expect(page.getByRole("tooltip")).toContainText("可访问性");
+  const longTag = firstBasicRow.locator(".qizhi-tag", {
+    hasText: "资深前端开发工程师",
+  });
+  await expect(longTag).toHaveAttribute("aria-expanded", "false");
+  await longTag.hover();
+  await expect(page.getByRole("tooltip", {
+    name: "资深前端开发工程师",
+    exact: true,
+  })).toBeVisible();
+  expect((await firstBasicRow.boundingBox())?.height).toBe((await secondBasicRow.boundingBox())?.height);
   await page.locator("#table-basic tbody tr").first().hover();
   await expect(page.locator("#table-basic tbody tr").first().locator("td").first()).toHaveCSS("background-color", "rgb(247, 248, 250)");
+  await page.getByRole("button", { name: "邀请 约翰·布朗" }).click();
+  await expect(page.locator("#table-basic [aria-live='polite']")).toHaveText("已邀请 约翰·布朗");
+  await page.getByRole("button", { name: "删除 约翰·布朗" }).click();
+  await expect(page.locator("#table-basic tbody tr")).toHaveCount(2);
 
-  await page.locator("#table-sort button", { hasText: "薪水" }).click();
+  const salaryHeader = page.locator("#table-sort th", { hasText: "薪水" });
+  const salarySort = salaryHeader.getByRole("button");
+  await expect(page.locator("#table-sort [aria-live='polite']")).toHaveCount(0);
+  await expect(page.locator("#table-sort tbody tr").first()).toContainText("23000");
+  await salaryHeader.locator(".qizhi-table__sorter-target").hover();
+  await expect(page.getByRole("tooltip", {
+    name: "点击升序排序",
+    exact: true,
+  })).toBeVisible();
+  const salaryBox = await salaryHeader.boundingBox();
+  expect(salaryBox).not.toBeNull();
+  await salaryHeader.click({
+    position: { x: salaryBox!.width - 8, y: salaryBox!.height / 2 },
+  });
+  await expect(page.locator("#table-sort tbody tr").first()).toContainText("17000");
+  await salarySort.click();
   await expect(page.locator("#table-sort .qizhi-table__sorter-icon")).toHaveCount(8);
   await expect(page.locator("#table-sort .qizhi-table__sorter svg path")).toHaveCount(8);
   await expect(page.locator("#table-sort .qizhi-table__sorter").first()).toHaveCSS("color", "rgb(134, 144, 156)");
   await expect(page.locator("#table-sort .qizhi-table__sorter-icon path").first()).toHaveCSS("fill-opacity", "1");
-  await expect(page.locator("#table-sort tbody tr").first()).toContainText("17000");
+  await expect(page.locator("#table-sort tbody tr").first()).toContainText("27000");
+  const nameSort = page.locator("#table-sort th", { hasText: "姓名" })
+    .getByRole("button");
+  await nameSort.hover();
+  await expect(page.getByRole("tooltip", {
+    name: "点击降序排序",
+    exact: true,
+  })).toBeVisible();
   await page.locator("#table-selection button[role='radio']", { hasText: "单选框" }).click();
   await page.locator("#table-selection .qizhi-radio:not(.qizhi-radio-disabled)").first().click();
   await expect(page.locator("#table-selection input[type='radio']:checked")).toHaveCount(1);
@@ -58,6 +121,15 @@ test("Table 保持十一组 Demo、核心交互和三档响应式", async ({ pag
   await expect(page.locator("#table-fixed tbody tr").last().locator("td").first()).toHaveCSS("border-bottom-width", "0px");
   const fixedTable = page.locator("#table-fixed .qizhi-table");
   const fixedScroller = page.locator("#table-fixed .qizhi-table__scroll");
+  const fixedViewLink = page.locator("#table-fixed").getByRole("button", {
+    name: "查看",
+  }).first();
+  await fixedViewLink.hover();
+  await expect(fixedViewLink).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await expect(fixedViewLink.locator("xpath=ancestor::td")).toHaveCSS(
+    "background-color",
+    "rgb(255, 255, 255)",
+  );
   await expect(fixedTable).not.toHaveClass(/has-(left|right)-fixed-shadow/);
   expect(await page.locator("#table-fixed th.is-fixed-left").evaluate((node) => getComputedStyle(node, "::before").boxShadow)).toBe("none");
   await fixedScroller.evaluate((node) => { node.scrollLeft = 120; node.dispatchEvent(new Event("scroll")); });

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Button, Form, Input, Select } from "@wangxiaojinger/qizhi-react";
+import { Button, Form, Input, Message, Select, Tooltip } from "@wangxiaojinger/qizhi-react";
+import { DeleteIcon } from "@wangxiaojinger/qizhi-react/icon";
 
 function validateServiceEndpoint(value: unknown) {
   if (!value) return;
@@ -34,7 +34,6 @@ function ConditionalEndpoint() {
 
 export default function ComplexFieldsDemo() {
   const [form] = Form.useForm();
-  const [submitted, setSubmitted] = useState("");
 
   return (
     <Form
@@ -46,7 +45,9 @@ export default function ComplexFieldsDemo() {
         credentials: { password: "qizhi-pass", confirmPassword: "qizhi-pass" },
         members: [{ name: "成员甲" }, { name: "成员乙" }],
       }}
-      onFinish={(values) => setSubmitted(JSON.stringify(values))}
+      onFinish={() => {
+        Message.success({ content: "提交成功", className: "form-complex-submit-toast" });
+      }}
     >
       <Form.Item name="serviceType" label="服务类型">
         <Select
@@ -60,7 +61,7 @@ export default function ComplexFieldsDemo() {
       <ConditionalEndpoint />
 
       <Form.Item name={["credentials", "password"]} label="登录密码">
-        <Input aria-label="登录密码" allowClear={false} />
+        <Input aria-label="登录密码" type="password" allowClear={false} />
       </Form.Item>
       <Form.Item
         name={["credentials", "confirmPassword"]}
@@ -73,7 +74,7 @@ export default function ComplexFieldsDemo() {
           },
         }]}
       >
-        <Input aria-label="确认密码" allowClear={false} />
+        <Input aria-label="确认密码" type="password" allowClear={false} />
       </Form.Item>
 
       <Form.List name="members">
@@ -89,11 +90,16 @@ export default function ComplexFieldsDemo() {
                 >
                   <Input aria-label={`成员 ${index + 1} 名称`} allowClear={false} />
                 </Form.Item>
-                <div className="form-docs-complex-actions">
-                  <Button size="small" disabled={index === 0} onClick={() => operations.move(index, index - 1)} aria-label={`成员 ${index + 1} 上移`}>上移</Button>
-                  <Button size="small" disabled={index === fields.length - 1} onClick={() => operations.move(index, index + 1)} aria-label={`成员 ${index + 1} 下移`}>下移</Button>
-                  <Button size="small" status="danger" onClick={() => operations.remove(index)} aria-label={`删除成员 ${index + 1}`}>删除</Button>
-                </div>
+                <Tooltip content="删除" position="right" trigger={["hover", "focus"]}>
+                  <Button
+                    aria-label={`删除成员 ${index + 1}`}
+                    className="form-docs-complex-delete"
+                    icon={<DeleteIcon />}
+                    size="small"
+                    type="text"
+                    onClick={() => operations.remove(index)}
+                  />
+                </Tooltip>
               </div>
             ))}
             <div className="form-docs-complex-toolbar">
@@ -105,7 +111,6 @@ export default function ComplexFieldsDemo() {
       </Form.List>
 
       <Button type="primary" htmlType="submit">提交复杂表单</Button>
-      {submitted ? <output className="form-docs-submit-status" aria-label="复杂表单提交结果">{submitted}</output> : null}
     </Form>
   );
 }

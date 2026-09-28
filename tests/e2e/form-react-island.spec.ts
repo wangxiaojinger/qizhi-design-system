@@ -8,13 +8,13 @@ test("Form 保留旧站契约并覆盖复杂字段、远程状态与响应式几
   await page.route("https://cdn.jsdelivr.net/**", (route) => route.fulfill({ contentType: "text/css", body: "" }));
   await page.goto("/#component-form");
 
-  await expect(page.locator("#component-form article.codebox-wrapper")).toHaveCount(10);
+  await expect(page.locator("#component-form article.codebox-wrapper")).toHaveCount(9);
   await expect(page.locator("#component-form .qz-demo-title").filter({ hasText: "基础用法" })).toHaveCount(1);
   await expect(page.locator("#component-form .qz-demo-title").filter({ hasText: "表单布局" })).toHaveCount(1);
   await expect(page.locator("#component-form .qz-demo-title").filter({ hasText: "受控表单" })).toHaveCount(1);
   await expect(page.locator("#component-form .qz-demo-title").filter({ hasText: "多步骤表单" })).toHaveCount(1);
   await expect(page.locator("#component-form .qz-demo-title").filter({ hasText: "表单草稿" })).toHaveCount(1);
-  await expect(page.locator("#component-form .qz-demo-title").filter({ hasText: "高级动态列表" })).toHaveCount(1);
+  await expect(page.locator("#component-form .qz-demo-title").filter({ hasText: "高级动态列表" })).toHaveCount(0);
   await expect(page.locator("#component-form .qz-demo-title").filter({ hasText: "批量编辑" })).toHaveCount(1);
   await expect(page.getByRole("table", { name: "Form API" })).toBeVisible();
   await expect(page.getByRole("table", { name: "Form.Item API" })).toBeVisible();
@@ -23,7 +23,7 @@ test("Form 保留旧站契约并覆盖复杂字段、远程状态与响应式几
   await expect(page.getByRole("table", { name: "Form.useSteps API" })).toBeVisible();
   await expect(page.getByRole("table", { name: "Form.useDraft API" })).toBeVisible();
   await expect(page.getByRole("table", { name: "Form.useBulkEdit API" })).toBeVisible();
-  await expect(page.locator("#component-form .qizhi-form")).toHaveCount(10);
+  await expect(page.locator("#component-form .qizhi-form")).toHaveCount(9);
 
   const basic = page.locator("#表单-基础用法");
   const name = basic.getByRole("textbox", { name: "服务名称" });
@@ -98,25 +98,15 @@ test("Form 保留旧站契约并覆盖复杂字段、远程状态与响应式几
   await complex.getByRole("button", { name: "提交复杂表单" }).click();
   await expect(complex.getByText("请输入成员名称")).toBeVisible();
   await complex.getByRole("textbox", { name: "成员 3 名称" }).fill("成员丙");
-  await complex.getByRole("button", { name: "成员 3 上移" }).click();
-  await expect(complex.getByRole("textbox", { name: "成员 2 名称" })).toHaveValue("成员丙");
+  await expect(complex.getByRole("button", { name: /上移|下移/ })).toHaveCount(0);
+  await complex.getByRole("button", { name: "删除成员 2" }).focus();
+  await expect(page.getByRole("tooltip", { name: "删除" })).toBeVisible();
+  await expect(page.getByRole("tooltip", { name: "删除" })).toHaveAttribute("data-tooltip-position", "right");
   await complex.getByRole("button", { name: "删除成员 3" }).click();
   await expect(complex.getByRole("textbox", { name: /成员 \d+ 名称/ })).toHaveCount(2);
 
   await complex.getByRole("button", { name: "模拟成员错误" }).click();
   await expect(complex.getByRole("alert")).toContainText("成员名称已存在");
-
-  const advanced = page.locator("#表单-高级动态列表");
-  await expect(advanced.getByRole("button", { name: "删除第 1 行" })).toBeDisabled();
-  await advanced.getByRole("button", { name: "批量新增 2 项" }).click();
-  await expect(advanced.getByRole("textbox", { name: /第 \d+ 行名称/ })).toHaveCount(3);
-  await advanced.getByRole("textbox", { name: "第 2 行名称" }).fill("成员甲");
-  await advanced.getByRole("button", { name: "校验高级列表" }).click();
-  await expect(advanced.getByText("成员名称不能重复")).toBeVisible();
-  await advanced.getByRole("textbox", { name: "第 2 行名称" }).fill("成员乙更新");
-  await advanced.getByRole("textbox", { name: "第 1 行开始值" }).fill("3");
-  await advanced.getByRole("textbox", { name: "第 1 行结束值" }).fill("2");
-  await expect(advanced.getByText("开始值必须小于结束值")).toBeVisible();
 
   const wizard = page.locator("#表单-多步骤表单");
   await wizard.getByRole("button", { name: "下一步" }).click();
@@ -132,9 +122,18 @@ test("Form 保留旧站契约并覆盖复杂字段、远程状态与响应式几
   await expect(wizard.getByRole("textbox", { name: "服务名称" })).toHaveValue("wizard-service");
   await wizard.getByRole("button", { name: "下一步" }).click();
   await wizard.getByRole("button", { name: "下一步" }).click();
-  await expect(wizard.getByText("信息填写完成后提交表单。")).toBeVisible();
+  const confirmName = wizard.getByRole("textbox", { name: "服务名称" });
+  const confirmEmail = wizard.getByRole("textbox", { name: "联系邮箱" });
+  await expect(confirmName).toBeVisible();
+  await expect(confirmName).toBeEditable();
+  await expect(confirmName).toHaveValue("wizard-service");
+  await expect(confirmEmail).toBeVisible();
+  await expect(confirmEmail).toBeEditable();
+  await expect(confirmEmail).toHaveValue("owner@qizhi.cn");
+  await confirmName.fill("wizard-service-updated");
   await wizard.getByRole("button", { name: "提交" }).click();
-  await expect(wizard.locator(".form-steps-demo__result")).toContainText('"name":"wizard-service"');
+  await expect(page.getByRole("status").filter({ hasText: "提交成功" }).first()).toBeVisible();
+  await expect(wizard.locator(".form-steps-demo__result")).toHaveCount(0);
   await complex.getByRole("textbox", { name: "成员 1 名称" }).fill("成员甲更新");
   await expect(complex.getByRole("alert")).toHaveCount(0);
 
@@ -154,9 +153,10 @@ test("Form 保留旧站契约并覆盖复杂字段、远程状态与响应式几
   await page.getByRole("option", { name: "本地服务" }).click();
   await expect(complex.getByRole("textbox", { name: "服务地址" })).toHaveCount(0);
   await complex.getByRole("button", { name: "提交复杂表单" }).click();
-  const submitted = complex.getByRole("status", { name: "复杂表单提交结果" });
-  await expect(submitted).toContainText('"serviceType":"local"');
-  await expect(submitted).not.toContainText("endpoint");
+  await expect(page.locator(".form-complex-submit-toast")).toBeVisible();
+  await expect(page.locator(".form-complex-submit-toast")).toHaveText("提交成功");
+  await expect(complex.getByRole("status", { name: "复杂表单提交结果" })).toHaveCount(0);
+  await expect(complex.getByText(/"password"|"members"|"serviceType"/)).toHaveCount(0);
 
   await complex.getByRole("button", { name: "新增成员" }).focus();
   await page.keyboard.press("Tab");
@@ -166,12 +166,24 @@ test("Form 保留旧站契约并覆盖复杂字段、远程状态与响应式几
   await page.keyboard.press("Enter");
   await expect(complex.getByRole("alert")).toContainText("成员名称已存在");
   if ((page.viewportSize()?.width ?? 0) > 720) {
-    const firstMemberInput = await complex.getByRole("textbox", { name: "成员 1 名称" }).boundingBox();
-    const firstMemberMoveButton = await complex.getByRole("button", { name: "成员 1 上移" }).boundingBox();
+    const firstMemberInput = await complex.getByRole("textbox", { name: "成员 1 名称" })
+      .locator("xpath=ancestor::*[contains(concat(' ', normalize-space(@class), ' '), ' qizhi-input ')][1]")
+      .boundingBox();
+    const firstMemberDelete = await complex.getByRole("button", { name: "删除成员 1" }).boundingBox();
     expect(firstMemberInput).not.toBeNull();
-    expect(firstMemberMoveButton).not.toBeNull();
-    expect(Math.abs(firstMemberInput!.y - firstMemberMoveButton!.y)).toBeLessThanOrEqual(1);
+    expect(firstMemberDelete).not.toBeNull();
+    expect(firstMemberDelete!.x).toBeGreaterThanOrEqual(firstMemberInput!.x + firstMemberInput!.width);
+    const inputCenterY = firstMemberInput!.y + firstMemberInput!.height / 2;
+    const deleteCenterY = firstMemberDelete!.y + firstMemberDelete!.height / 2;
+    expect(Math.abs(inputCenterY - deleteCenterY)).toBeLessThanOrEqual(2);
   }
+
+  const validation = page.locator("#表单-业务校验闭环");
+  const validationSubmit = await validation.getByRole("button", { name: "提交" }).boundingBox();
+  const validationForm = await validation.getByRole("form", { name: "业务校验闭环表单" }).boundingBox();
+  expect(validationSubmit).not.toBeNull();
+  expect(validationForm).not.toBeNull();
+  expect(validationSubmit!.width).toBeLessThan(validationForm!.width);
 
   const remote = page.locator("#表单-远程联动与未保存修改");
   const remoteName = remote.getByRole("textbox", { name: "远程服务名称" });
@@ -190,36 +202,52 @@ test("Form 保留旧站契约并覆盖复杂字段、远程状态与响应式几
   const draftDescription = draft.getByRole("textbox", { name: "草稿描述" });
   const draftPassword = draft.getByLabel("草稿访问密码");
   const draftStatus = draft.getByRole("status", { name: "草稿状态" });
-  const draftRevision = draft.getByRole("status", { name: "草稿版本" });
+  await expect(draftStatus).toHaveText("尚未保存草稿");
+  await expect(draft.getByText(/idle：/)).toHaveCount(0);
+  await expect(draft.getByText("调试详情")).toHaveCount(0);
+  await expect(draft.getByText(/serviceName|description|password/)).toHaveCount(0);
+  const [draftNameBox, draftDescriptionBox] = await Promise.all([draftName.boundingBox(), draftDescription.boundingBox()]);
+  expect(draftNameBox).not.toBeNull();
+  expect(draftDescriptionBox).not.toBeNull();
+  expect(Math.abs(draftNameBox!.width - draftDescriptionBox!.width)).toBeLessThanOrEqual(1);
+
+  await draftName.fill("");
+  await draft.getByRole("button", { name: "保存草稿" }).click();
+  const draftNameError = draft.getByRole("group", { name: "草稿服务名称" }).getByRole("alert");
+  await expect(draftNameError).toHaveText("请输入草稿服务名称");
+  const [draftNameErrorBox, emptyDraftNameBox] = await Promise.all([
+    draftNameError.boundingBox(),
+    draftName.boundingBox(),
+  ]);
+  expect(draftNameErrorBox).not.toBeNull();
+  expect(emptyDraftNameBox).not.toBeNull();
+  expect(draftNameErrorBox!.y).toBeGreaterThanOrEqual(emptyDraftNameBox!.y + emptyDraftNameBox!.height);
 
   await draftName.fill("saved-service");
   await draftDescription.fill("saved-description");
   await draftPassword.fill("saved-password");
   await draft.getByRole("button", { name: "保存草稿" }).click();
-  await expect(draftStatus).toContainText("saved");
-  await expect(draftRevision).toHaveText("r1");
-  await expect(draft.getByRole("status", { name: "草稿字段范围" })).toContainText("未保存字段：password");
+  await expect(draftStatus).toHaveText("草稿已保存");
 
   await draftName.fill("changed-service");
   await draftDescription.fill("changed-description");
   await draftPassword.fill("changed-password");
   await draft.getByRole("button", { name: "检测草稿" }).click();
-  await expect(draftStatus).toContainText("ready");
+  await expect(draftStatus).toHaveText("发现可恢复草稿");
   await draft.getByRole("button", { name: "恢复草稿" }).click();
   await expect(draftName).toHaveValue("saved-service");
   await expect(draftDescription).toHaveValue("saved-description");
   await expect(draftPassword).toHaveValue("changed-password");
-  await expect(draft.getByRole("status", { name: "恢复步骤" })).toHaveText("恢复步骤：detail");
 
   await draft.getByRole("button", { name: "模拟版本不匹配" }).click();
-  await expect(draftStatus).toContainText("version-mismatch");
+  await expect(draftStatus).toHaveText("草稿版本不兼容，无法恢复");
   await expect(draftName).toHaveValue("saved-service");
   await draft.getByRole("button", { name: "模拟过期草稿" }).click();
-  await expect(draftStatus).toContainText("expired");
+  await expect(draftStatus).toHaveText("草稿已过期，无法恢复");
   await expect(draftName).toHaveValue("saved-service");
 
   await draft.getByRole("button", { name: "模拟远端冲突" }).click();
-  await expect(draftStatus).toContainText("conflict");
+  await expect(draftStatus).toHaveText("草稿已在其他位置更新，请选择处理方式");
   await expect(draftName).toHaveValue("saved-service");
   await draft.getByRole("button", { name: "选择远端版本" }).click();
   await expect(draftName).toHaveValue("remote-service");
@@ -227,25 +255,39 @@ test("Form 保留旧站契约并覆盖复杂字段、远程状态与响应式几
 
   await draftName.fill("local-overwrite");
   await draft.getByRole("button", { name: "模拟远端冲突" }).click();
-  await expect(draftStatus).toContainText("conflict");
+  await expect(draftStatus).toHaveText("草稿已在其他位置更新，请选择处理方式");
   await draft.getByRole("button", { name: "覆盖远端草稿" }).click();
-  await expect(draftStatus).toContainText("saved");
-  await expect(draftRevision).toHaveText("r6");
+  await expect(draftStatus).toHaveText("草稿已保存");
 
   const bulk = page.locator("#表单-批量编辑");
   const bulkDepartment = bulk.getByRole("combobox", { name: "统一部门" });
-  await expect(bulkDepartment).toHaveAttribute("aria-describedby", "bulk-edit-department-mixed");
+  const bulkRemark = bulk.getByRole("textbox", { name: "统一备注" });
+  await expect(bulkDepartment).toHaveAttribute("placeholder", "多个不同值");
+  await expect(bulkRemark).toHaveAttribute("placeholder", "多个不同值");
+  await expect(bulk.locator(".form-docs-bulk-edit-mixed")).toHaveCount(0);
+  await expect(bulk.getByRole("region", { name: "批量编辑提交信息" })).toHaveCount(0);
+  const bulkFields = bulk.locator(".form-docs-bulk-edit-fields > .qizhi-form-item");
+  for (let index = 1; index < await bulkFields.count(); index += 1) {
+    const [previousBox, currentBox] = await Promise.all([
+      bulkFields.nth(index - 1).boundingBox(),
+      bulkFields.nth(index).boundingBox(),
+    ]);
+    expect(previousBox).not.toBeNull();
+    expect(currentBox).not.toBeNull();
+    expect(currentBox!.y - (previousBox!.y + previousBox!.height)).toBe(24);
+  }
   await bulkDepartment.click();
   await page.getByRole("option", { name: "产品部" }).click();
   await bulk.getByRole("button", { name: "清空备注" }).click();
   await bulk.getByRole("button", { name: "校验并生成补丁" }).click();
+  await expect(bulk.getByRole("region", { name: "批量编辑提交信息" })).toBeVisible();
   const bulkPatch = bulk.getByRole("status", { name: "批量编辑补丁" });
   await expect(bulkPatch).toContainText('"department": "product"');
   await expect(bulkPatch).toContainText('"remark"');
   await expect(bulkPatch).not.toContainText('"status"');
   await bulk.getByRole("button", { name: "模拟部分成功" }).click();
   await expect(bulk.getByRole("alert").filter({ hasText: "没有修改部门的权限" })).toBeVisible();
-  const bulkFailureItems = bulk.getByRole("listitem");
+  const bulkFailureItems = bulk.getByRole("list", { name: "批量编辑失败明细" }).getByRole("listitem");
   await expect(bulkFailureItems).toHaveCount(2);
   await bulkFailureItems.first().focus();
   await expect(bulkFailureItems.first()).toBeFocused();
@@ -349,6 +391,5 @@ test("Form 保留旧站契约并覆盖复杂字段、远程状态与响应式几
   await wizard.locator(".demo").screenshot({ path: testInfo.outputPath(`form-steps-${testInfo.project.name}.png`) });
   await remote.locator(".demo").screenshot({ path: testInfo.outputPath(`form-remote-${testInfo.project.name}.png`) });
   await draft.locator(".demo").screenshot({ path: testInfo.outputPath(`form-draft-${testInfo.project.name}.png`) });
-  await advanced.locator(".demo").screenshot({ path: testInfo.outputPath(`form-advanced-list-${testInfo.project.name}.png`) });
   await bulk.locator(".demo").screenshot({ path: testInfo.outputPath(`form-bulk-edit-${testInfo.project.name}.png`) });
 });
