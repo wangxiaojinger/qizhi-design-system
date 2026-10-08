@@ -2,81 +2,81 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  column-gap: 8px;
+  column-gap: var(--component-button-gap);
   min-width: 0;
-  height: 32px;
-  padding: 0 12px;
-  border: 1px solid transparent;
-  border-radius: var(--border-radius-medium);
+  height: var(--component-button-control-height-medium);
+  padding: 0 var(--component-button-padding-inline-medium);
+  border: var(--component-button-border-width) solid transparent;
+  border-radius: var(--component-button-radius);
   background: transparent;
   color: var(--color-text-2);
   font: inherit;
-  font-size: 14px;
+  font-size: var(--component-button-font-size);
   line-height: 1;
-  font-weight: 400;
+  font-weight: var(--component-button-font-weight);
   white-space: nowrap;
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+  transition: background-color var(--component-button-motion-duration) var(--component-button-motion-easing), border-color var(--component-button-motion-duration) var(--component-button-motion-easing), color var(--component-button-motion-duration) var(--component-button-motion-easing), transform var(--component-button-motion-duration) var(--component-button-motion-easing);
 }
 
 .qizhi-btn-primary {
-  border-color: rgb(var(--primary-6));
-  background: rgb(var(--primary-6));
-  color: var(--color-white);
+  border-color: var(--component-button-primary-default);
+  background: var(--component-button-primary-default);
+  color: var(--component-button-primary-text);
 }
 
-.qizhi-btn-primary:hover { border-color: rgb(var(--primary-5)); background: rgb(var(--primary-5)); }
-.qizhi-btn-primary:active { border-color: rgb(var(--primary-7)); background: rgb(var(--primary-7)); transform: scale(0.98); }
+.qizhi-btn-primary:hover { border-color: var(--component-button-primary-hover); background: var(--component-button-primary-hover); }
+.qizhi-btn-primary:active { border-color: var(--component-button-primary-active); background: var(--component-button-primary-active); transform: scale(var(--component-button-active-scale)); }
 
 .qizhi-btn-secondary {
-  border-color: var(--color-border-2);
+  border-color: var(--component-button-secondary-border-default);
   background: transparent;
-  color: var(--color-text-2);
+  color: var(--component-button-secondary-text);
 }
 
-.qizhi-btn-secondary:hover { border-color: var(--color-border-3); background: var(--color-fill-1); color: var(--color-text-1); }
-.qizhi-btn-secondary:active { border-color: var(--color-border-4); background: var(--color-fill-2); color: var(--color-text-1); transform: scale(0.98); }
+.qizhi-btn-secondary:hover { border-color: var(--component-button-secondary-border-hover); background: var(--component-button-secondary-background-hover); color: var(--color-text-1); }
+.qizhi-btn-secondary:active { border-color: var(--component-button-secondary-border-active); background: var(--component-button-secondary-background-active); color: var(--color-text-1); transform: scale(var(--component-button-active-scale)); }
 
 .qizhi-btn-dashed {
-  border-color: var(--color-border-2);
+  border-color: var(--component-button-secondary-border-default);
   border-style: dashed;
   background: var(--color-bg-white);
   color: var(--color-text-2);
 }
 
 .qizhi-btn-dashed:hover { color: var(--color-text-1); }
-.qizhi-btn-dashed:active { border-color: var(--color-border-4); background: var(--color-fill-2); transform: scale(0.98); }
+.qizhi-btn-dashed:active { border-color: var(--component-button-secondary-border-active); background: var(--component-button-secondary-background-active); transform: scale(var(--component-button-active-scale)); }
 
 .qizhi-btn-text {
   color: rgb(var(--primary-6));
 }
 
 .qizhi-btn-text:hover { color: rgb(var(--primary-5)); }
-.qizhi-btn-text:active { color: rgb(var(--primary-7)); transform: scale(0.98); }
+.qizhi-btn-text:active { color: rgb(var(--primary-7)); transform: scale(var(--component-button-active-scale)); }
 
 .qizhi-btn-size-mini {
-  height: 24px;
-  padding: 0 11px;
+  height: var(--component-button-control-height-mini);
+  padding: 0 var(--component-button-padding-inline-mini);
 }
 
 .qizhi-btn-size-small {
-  height: 28px;
-  padding: 0 13px;
+  height: var(--component-button-control-height-small);
+  padding: 0 var(--component-button-padding-inline-small);
 }
 
 .qizhi-btn-size-large {
-  height: 36px;
-  padding: 0 15px;
+  height: var(--component-button-control-height-large);
+  padding: 0 var(--component-button-padding-inline-large);
 }
 
 .qizhi-btn-icon-only {
-  width: 32px;
+  width: var(--component-button-control-height-medium);
   padding: 0;
 }
 
-.qizhi-btn-size-mini.qizhi-btn-icon-only { width: 24px; }
-.qizhi-btn-size-small.qizhi-btn-icon-only { width: 28px; }
-.qizhi-btn-size-large.qizhi-btn-icon-only { width: 36px; }
+.qizhi-btn-size-mini.qizhi-btn-icon-only { width: var(--component-button-control-height-mini); }
+.qizhi-btn-size-small.qizhi-btn-icon-only { width: var(--component-button-control-height-small); }
+.qizhi-btn-size-large.qizhi-btn-icon-only { width: var(--component-button-control-height-large); }
 
 .qizhi-btn__icon,
 .qizhi-btn__label {
@@ -86,15 +86,15 @@
 }
 
 .qizhi-btn__icon {
-  width: 16px;
-  height: 16px;
-  flex: 0 0 16px;
+  width: var(--component-button-icon-size);
+  height: var(--component-button-icon-size);
+  flex: 0 0 var(--component-button-icon-size);
 }
 
-.qizhi-btn__icon svg { width: 16px; height: 16px; }
+.qizhi-btn__icon svg { width: var(--component-button-icon-size); height: var(--component-button-icon-size); }
 .qizhi-btn__loading-icon > .ri-loader-4-line {
   display: inline-flex;
-  font-size: 16px;
+  font-size: var(--component-button-icon-size);
   line-height: 1;
 }
 .qizhi-btn-long { width: 100%; }
@@ -117,9 +117,9 @@
 
 .qizhi-btn:disabled,
 .qizhi-btn.is-disabled {
-  border-color: var(--color-border-1);
-  background: var(--color-fill-2);
-  color: var(--color-text-4);
+  border-color: var(--component-button-disabled-border);
+  background: var(--component-button-disabled-background);
+  color: var(--component-button-disabled-text);
   cursor: not-allowed;
   transform: none;
 }
@@ -131,7 +131,7 @@
 .qizhi-btn-text:disabled,
 .qizhi-btn-text.is-disabled { border-color: transparent; background: transparent; color: var(--color-text-4); }
 .qizhi-btn-primary:disabled,
-.qizhi-btn-primary.is-disabled { border-color: rgb(var(--primary-3)); background: rgb(var(--primary-3)); color: var(--color-white); }
+.qizhi-btn-primary.is-disabled { border-color: var(--component-button-primary-disabled); background: var(--component-button-primary-disabled); color: var(--component-button-primary-text); }
 .qizhi-btn[class*="qizhi-btn-status-"]:disabled,
 .qizhi-btn[class*="qizhi-btn-status-"].is-disabled { border-color: rgb(var(--qizhi-status-3)); background: rgb(var(--qizhi-status-3)); color: var(--color-white); }
 .qizhi-btn.is-loading { pointer-events: none; }
@@ -140,8 +140,8 @@
 @keyframes qizhi-button-loading-spin { to { transform: rotate(360deg); } }
 
 .qizhi-btn:focus-visible {
-  outline: 2px solid rgb(var(--primary-6));
-  outline-offset: 2px;
+  outline: var(--component-button-focus-width) solid var(--component-button-focus-color);
+  outline-offset: var(--component-button-focus-offset);
 }
 
 @media (prefers-reduced-motion: reduce) {

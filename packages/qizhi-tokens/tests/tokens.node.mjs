@@ -137,6 +137,53 @@ test("shared control, border, motion, shadow, and layer scales preserve current 
   );
 });
 
+test("Button component tokens preserve legacy overrides and drive the component stylesheet", async () => {
+  const { tokens } = JSON.parse(await read(new URL("src/tokens.json", packageRoot)));
+  const css = await read(new URL("packages/qizhi-react/src/button/button.css", repoRoot));
+  const expected = {
+    "component.button.control.height.mini": "var(--control-height-mini)",
+    "component.button.control.height.small": "var(--control-height-small)",
+    "component.button.control.height.medium": "var(--control-height-medium)",
+    "component.button.control.height.large": "var(--control-height-large)",
+    "component.button.padding.inline.mini": "11px",
+    "component.button.padding.inline.small": "13px",
+    "component.button.padding.inline.medium": "12px",
+    "component.button.padding.inline.large": "15px",
+    "component.button.gap": "var(--space-8)",
+    "component.button.radius": "var(--border-radius-medium)",
+    "component.button.font.size": "var(--font-size-14)",
+    "component.button.font.weight": "var(--font-weight-400)",
+    "component.button.border.width": "var(--line-width-thin)",
+    "component.button.primary.default": "rgb(var(--primary-6))",
+    "component.button.primary.hover": "rgb(var(--primary-5))",
+    "component.button.primary.active": "rgb(var(--primary-7))",
+    "component.button.primary.disabled": "rgb(var(--primary-3))",
+    "component.button.primary.text": "var(--color-white)",
+    "component.button.secondary.text": "var(--color-text-2)",
+    "component.button.secondary.border.default": "var(--color-border-2)",
+    "component.button.secondary.border.hover": "var(--color-border-3)",
+    "component.button.secondary.border.active": "var(--color-border-4)",
+    "component.button.secondary.background.hover": "var(--color-fill-1)",
+    "component.button.secondary.background.active": "var(--color-fill-2)",
+    "component.button.disabled.text": "var(--color-text-4)",
+    "component.button.disabled.background": "var(--color-fill-2)",
+    "component.button.disabled.border": "var(--color-border-1)",
+    "component.button.icon.size": "var(--font-size-16)",
+    "component.button.focus.color": "rgb(var(--primary-6))",
+    "component.button.focus.width": "var(--line-width-thick)",
+    "component.button.focus.offset": "var(--space-2)",
+    "component.button.motion.duration": "var(--motion-duration-base)",
+    "component.button.motion.easing": "var(--motion-easing-standard)",
+    "component.button.active.scale": "0.98",
+  };
+
+  for (const [name, value] of Object.entries(expected)) {
+    assert.equal(tokens[name]?.tier, "component", `${name} must be a component token`);
+    assert.equal(tokens[name]?.value, value, `${name} must preserve the approved fallback`);
+    assert.match(css, new RegExp(`var\\(${tokens[name]?.cssVariable?.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`), `${name} is not consumed by button.css`);
+  }
+});
+
 const parseRootDeclarations = (css) => {
   const root = css.match(/:root\s*\{([\s\S]*?)\n\}/)?.[1] ?? "";
   return Object.fromEntries(
