@@ -54,7 +54,7 @@ test("TreeSelect 旧站布局、交互和浮层边界", async ({ page }, testInf
   });
   await lazy.click();
   await page.getByRole("button", { name: "展开待加载节点" }).click();
-  await expect(page.getByText("正在加载")).toBeAttached();
+  await expect(popup.getByText("正在加载", { exact: true })).toBeAttached();
   await expect(page.getByRole("treeitem", {
     name: "待加载节点的子节点",
   })).toBeVisible();

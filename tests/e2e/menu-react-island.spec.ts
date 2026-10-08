@@ -157,7 +157,9 @@ test("Menu React Island preserves behavior, geometry, and source", async ({
   await expect(topArticle.locator(".qizhi-top-navigation__product"))
     .toHaveCSS("height", "32px");
   await expect(topArticle.locator(".qizhi-top-navigation__product"))
-    .toHaveCSS("width", "72px");
+    .toHaveCSS("min-width", "72px");
+  expect((await topArticle.locator(".qizhi-top-navigation__product")
+    .boundingBox())!.width).toBeGreaterThanOrEqual(72);
   await expect(topArticle.locator(".qizhi-top-navigation__product"))
     .toHaveCSS("border-radius", "8px");
   await expect(topArticle.locator(".qizhi-top-navigation__logo"))

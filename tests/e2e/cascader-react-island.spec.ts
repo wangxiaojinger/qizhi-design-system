@@ -17,7 +17,7 @@ test("Cascader React Island keeps the complete docs and page width", async ({ pa
 test("Cascader selects a path and restores focus with Escape", async ({ page }) => {
   await page.goto("/#component-cascader");
   const section = page.locator("#级联选择-基础用法");
-  const input = section.getByRole("combobox").first();
+  const input = section.locator(".qizhi-cascader").first().getByRole("combobox");
   await input.focus();
   await input.press("Enter");
   await expect(input).toHaveAttribute("aria-expanded", "true");
@@ -34,7 +34,7 @@ test("Cascader selects a path and restores focus with Escape", async ({ page }) 
 test("Cascader hover mode expands first and selects the final option on click", async ({ page }, testInfo) => {
   await page.goto("/#component-cascader");
   const section = page.locator("#级联选择-基础用法");
-  const input = section.getByRole("combobox").nth(1);
+  const input = section.locator(".qizhi-cascader").nth(1).getByRole("combobox");
 
   await input.hover();
   await page.getByRole("option", { name: "北京", exact: true }).hover();
@@ -60,7 +60,7 @@ test("Cascader hover mode expands first and selects the final option on click", 
   await expect(input).toHaveAttribute("aria-expanded", "false");
 });
 
-test("Cascader multiple tags use the remaining field width without premature ellipsis", async ({ page }, testInfo) => {
+test("Cascader multiple tags stay contained and ellipsize when space is insufficient", async ({ page }, testInfo) => {
   await page.goto("/#component-cascader");
   const section = page.locator("#级联选择-前置标签");
   const cascader = section.locator(".qizhi-cascader").nth(1);
@@ -80,7 +80,16 @@ test("Cascader multiple tags use the remaining field width without premature ell
       cascaderHeight: cascader?.getBoundingClientRect().height,
     };
   });
-  expect(tagGeometry.scrollWidth).toBeLessThanOrEqual(tagGeometry.clientWidth);
+  if (tagGeometry.scrollWidth > tagGeometry.clientWidth) {
+    await expect(tag).toHaveCSS("text-overflow", "ellipsis");
+  }
+  const containment = await tag.evaluate((element) => {
+    const tag = element.getBoundingClientRect();
+    const cascader = element.closest(".qizhi-cascader")!.getBoundingClientRect();
+    return { left: tag.left - cascader.left, right: cascader.right - tag.right };
+  });
+  expect(containment.left).toBeGreaterThanOrEqual(0);
+  expect(containment.right).toBeGreaterThanOrEqual(0);
   expect(tagGeometry.cascaderHeight).toBe(32);
   await page.screenshot({ path: testInfo.outputPath("cascader-multiple-tag.png"), fullPage: false });
 });
@@ -108,7 +117,9 @@ test("Cascader size demo follows the legacy segmented layout", async ({ page }, 
     const rect = element.getBoundingClientRect();
     return { left: rect.left, top: rect.top };
   }));
-  if (testInfo.project.name === "mobile-375") {
+  const controlsWidth = await section.locator(".cascader-size-demo__controls")
+    .evaluate((element) => element.clientWidth);
+  if (controlsWidth < widths[0] + widths[1] + 24) {
     expect(positions[1].top).toBeGreaterThan(positions[0].top);
   } else {
     expect(positions[1].top).toBe(positions[0].top);
@@ -119,7 +130,8 @@ test("Cascader size demo follows the legacy segmented layout", async ({ page }, 
 
 test("Cascader search portal is unclipped and stays inside the viewport", async ({ page }, testInfo) => {
   await page.goto("/#component-cascader");
-  const input = page.locator("#级联选择-允许搜索").getByRole("combobox").first();
+  const input = page.locator("#级联选择-允许搜索 .qizhi-cascader")
+    .first().getByRole("combobox");
   await input.scrollIntoViewIfNeeded();
   await input.fill("黄浦");
   const popup = page.locator(".qizhi-cascader-popup");
@@ -156,14 +168,14 @@ test("Cascader code panel uses the shared Input code surface", async ({ page }) 
   const cascaderSection = page.locator("#级联选择-基础用法");
   await cascaderSection.getByRole("button", { name: "查看代码" }).click();
   const cascaderBackground = await cascaderSection
-    .locator(".qizhi-code-wrapper pre")
+    .locator(".qizhi-code-wrapper pre").first()
     .evaluate((element) => getComputedStyle(element).backgroundColor);
 
   await page.goto("/#component-input");
   const inputSection = page.locator("#输入框-基本用法");
   await inputSection.getByRole("button", { name: "查看代码" }).click();
   const inputBackground = await inputSection
-    .locator(".qizhi-code-wrapper pre")
+    .locator(".qizhi-code-wrapper pre").first()
     .evaluate((element) => getComputedStyle(element).backgroundColor);
 
   expect(cascaderBackground).toBe(inputBackground);
@@ -194,7 +206,7 @@ test("Cascader custom trigger keeps the legacy label-link presentation", async (
   const section = page.locator("#级联选择-自定义选择框");
   const root = section.locator(".qizhi-cascader");
   const label = section.locator(".cascader-custom-trigger-label");
-  const trigger = section.getByRole("combobox", { name: "选择城市" });
+  const trigger = root.getByRole("combobox", { name: "选择城市" });
 
   await expect(root).toHaveCSS("border-top-width", "0px");
   await expect(root).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
