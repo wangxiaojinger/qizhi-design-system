@@ -95,21 +95,37 @@ export const publicTokenValues = (manifest) => Object.fromEntries(
   }]),
 );
 
-export const renderMigrationMap = (manifest, legacyContract) => `${JSON.stringify(Object.fromEntries(
-  Object.entries(manifest.tokens).map(([name, token]) => [name, {
-    token: name,
-    cssVariable: token.cssVariable,
-    action: token.status === "deprecated"
+const migrationEntries = (manifest, legacyContract) => {
+  const tokenByCssVariable = new Map(Object.entries(manifest.tokens).map(([name, token]) => [token.cssVariable, name]));
+  return Object.fromEntries(Object.entries(manifest.tokens).map(([name, token]) => {
+    const referencedCssVariable = String(token.value).match(/^var\((--[a-zA-Z0-9-]+)\)$/)?.[1];
+    const action = token.status === "deprecated"
       ? "deprecated"
       : !(name in legacyContract)
         ? "add"
-        : /^var\(--/.test(token.value)
+        : referencedCssVariable
           ? "compat-alias"
-          : "keep",
+          : "keep";
+    return [name, {
+    token: name,
+    cssVariable: token.cssVariable,
+    action,
+    recommendedToken: token.replacedBy ?? (referencedCssVariable ? tokenByCssVariable.get(referencedCssVariable) : name) ?? name,
     valueType: classifyTokenValue(token.value),
     replacement: token.replacedBy ?? null,
     note: token.status === "deprecated" ? `Use ${token.replacedBy}` : token.description,
-  }]),
-), null, 2)}\n`;
+    }];
+  }));
+};
+
+export const renderMigrationMap = (manifest, legacyContract) => `${JSON.stringify(migrationEntries(manifest, legacyContract), null, 2)}\n`;
+
+export const renderMigrationMarkdown = (manifest, legacyContract) => {
+  const entries = Object.values(migrationEntries(manifest, legacyContract));
+  const counts = Object.fromEntries(["keep", "compat-alias", "add", "deprecated"].map((action) => [action, entries.filter((entry) => entry.action === action).length]));
+  const actionLabels = { keep: "保留", "compat-alias": "兼容别名", add: "新增", deprecated: "弃用" };
+  const rows = entries.map((entry) => `| \`${entry.token}\` | \`${entry.cssVariable}\` | ${actionLabels[entry.action]} | \`${entry.recommendedToken}\` | ${entry.valueType} | ${entry.note.replaceAll("|", "\\|")} |`).join("\n");
+  return `# QIZHI 变量重构映射表\n\n> 本文件由 \`packages/qizhi-tokens/src/tokens.json\` 与 \`src/legacy-contract.json\` 生成，请勿手工编辑。\n\n保留：${counts.keep}；兼容别名：${counts["compat-alias"]}；新增：${counts.add}；弃用：${counts.deprecated}\n\n| 原 Token | CSS 变量 | 处理方式 | 推荐 Token | 值类型 | 迁移说明 |\n| --- | --- | --- | --- | --- | --- |\n${rows}\n`;
+};
 
 export const renderTypes = () => "export type QizhiTokenTier = \"seed\" | \"map\" | \"alias\" | \"component\";\nexport type QizhiTokenStatus = \"stable\" | \"deprecated\";\nexport interface QizhiToken { readonly name: string; readonly value: string; readonly cssVariable: `--${string}`; readonly category: string; readonly description: string; readonly tier: QizhiTokenTier; readonly status: QizhiTokenStatus; readonly replacedBy?: string; }\nexport declare const tokens: Readonly<Record<string, QizhiToken>>;\n";

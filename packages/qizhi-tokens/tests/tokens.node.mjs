@@ -94,10 +94,16 @@ test("public token metadata and migration map are generated from the manifest", 
   assert.equal(Object.keys(migration).length, Object.keys(manifest.tokens).length);
   assert.deepEqual(new Set(Object.values(migration).map((entry) => entry.action)), new Set(["keep", "compat-alias", "add"]));
   assert.equal(migration["brand.blue.6"].action, "keep");
+  assert.equal(migration["brand.blue.6"].recommendedToken, "brand.blue.6");
   assert.equal(migration["primary.6"].action, "compat-alias");
+  assert.equal(migration["primary.6"].recommendedToken, "qizhiblue.6");
   assert.equal(migration["component.button.primary.default"].action, "add");
+  assert.equal(migration["component.button.primary.default"].recommendedToken, "component.button.primary.default");
   assert.equal(migration["primary.6"].valueType, "reference");
   assert.equal(packageJson.exports["./migration-map.json"], "./dist/migration-map.json");
+  const migrationDocument = await read(new URL("MIGRATION.md", packageRoot));
+  assert.match(migrationDocument, /\| `primary\.6` \| `--primary-6` \| 兼容别名 \| `qizhiblue\.6` \|/);
+  assert.match(migrationDocument, /保留：271；兼容别名：91；新增：155；弃用：0/);
 });
 
 test("shared typography and spacing scales expose the approved values", async () => {

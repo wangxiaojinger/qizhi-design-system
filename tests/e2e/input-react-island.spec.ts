@@ -73,6 +73,10 @@ test("Input React Island exposes the approved component family", async ({ page }
   await page.locator("#四种尺寸 .qizhi-radio-button", { hasText: "default" }).click();
   await expect(page.locator("#四种尺寸 .input-size-demo__grid .qizhi-input").first()).toHaveCSS("height", "32px");
 
+  await expect(page.locator("#输入框状态 .qizhi-input--error")).toHaveCSS("border-color", "rgb(255, 77, 79)");
+  await expect(page.locator("#输入框状态 .qizhi-input--warning")).toHaveCSS("border-color", "rgb(250, 173, 20)");
+  await expect(page.locator("#输入框状态 .qizhi-input--disabled")).toHaveCSS("background-color", "rgb(255, 255, 255)");
+
   await expect(page.locator("#前置、后置标签 .qizhi-input__group")).toHaveCount(4);
   await expect(page.locator("#前置、后置标签 .qizhi-input__addon").first()).toHaveCSS("white-space", "nowrap");
   await expect(page.locator("#前置、后置标签 select")).toHaveCount(0);
