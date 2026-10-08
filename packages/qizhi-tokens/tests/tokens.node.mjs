@@ -103,7 +103,7 @@ test("public token metadata and migration map are generated from the manifest", 
   assert.equal(packageJson.exports["./migration-map.json"], "./dist/migration-map.json");
   const migrationDocument = await read(new URL("MIGRATION.md", packageRoot));
   assert.match(migrationDocument, /\| `primary\.6` \| `--primary-6` \| 兼容别名 \| `qizhiblue\.6` \|/);
-  assert.match(migrationDocument, /保留：271；兼容别名：91；新增：161；弃用：0/);
+  assert.match(migrationDocument, /保留：271；兼容别名：91；新增：162；弃用：0/);
 });
 
 test("shared typography and spacing scales expose the approved values", async () => {
@@ -282,7 +282,7 @@ test("Modal component tokens preserve current geometry and legacy semantic color
   }
 });
 
-test("Table publishes a deferred component-token mapping without claiming CSS consumption", async () => {
+test("Table publishes stable component tokens for stylesheet consumption", async () => {
   const { tokens } = JSON.parse(await read(new URL("src/tokens.json", packageRoot)));
   const expected = {
     "component.table.header.background": "rgb(var(--gray-1))",
@@ -290,6 +290,7 @@ test("Table publishes a deferred component-token mapping without claiming CSS co
     "component.table.cell.padding.block.medium": "var(--space-12)",
     "component.table.cell.padding.block.small": "var(--space-8)",
     "component.table.cell.padding.inline": "var(--space-16)",
+    "component.table.cell.padding.inline.compact": "var(--space-12)",
     "component.table.font.size": "var(--font-size-14)",
     "component.table.line.height": "var(--line-height-regular)",
     "component.table.border": "var(--color-border-1)",
@@ -300,8 +301,9 @@ test("Table publishes a deferred component-token mapping without claiming CSS co
 
   for (const [name, value] of Object.entries(expected)) {
     assert.equal(tokens[name]?.tier, "component", `${name} must be a component token`);
+    assert.equal(tokens[name]?.status, "stable", `${name} must be stable`);
     assert.equal(tokens[name]?.value, value, `${name} must match the current Table baseline`);
-    assert.match(tokens[name]?.description ?? "", /deferred|延后/i);
+    assert.doesNotMatch(tokens[name]?.description ?? "", /candidate|deferred|候选|延后/i);
   }
 });
 

@@ -2,7 +2,7 @@
 
 > 本文件由 `packages/qizhi-tokens/src/tokens.json` 与 `src/legacy-contract.json` 生成，请勿手工编辑。
 
-保留：271；兼容别名：91；新增：161；弃用：0
+保留：271；兼容别名：91；新增：162；弃用：0
 
 | 原 Token | CSS 变量 | 处理方式 | 推荐 Token | 值类型 | 迁移说明 |
 | --- | --- | --- | --- | --- | --- |
@@ -518,14 +518,15 @@
 | `component.modal.text.primary` | `--component-modal-text-primary` | 新增 | `color.text.1` | reference | Modal text primary |
 | `component.modal.text.secondary` | `--component-modal-text-secondary` | 新增 | `color.text.2` | reference | Modal text secondary |
 | `component.modal.border` | `--component-modal-border` | 新增 | `color.border.1` | reference | Modal border |
-| `component.table.header.background` | `--component-table-header-background` | 新增 | `component.table.header.background` | color | Table header background 候选变量，CSS 消费延后 |
-| `component.table.cell.padding.block.large` | `--component-table-cell-padding-block-large` | 新增 | `space.16` | reference | Table cell padding block large 候选变量，CSS 消费延后 |
-| `component.table.cell.padding.block.medium` | `--component-table-cell-padding-block-medium` | 新增 | `space.12` | reference | Table cell padding block medium 候选变量，CSS 消费延后 |
-| `component.table.cell.padding.block.small` | `--component-table-cell-padding-block-small` | 新增 | `space.8` | reference | Table cell padding block small 候选变量，CSS 消费延后 |
-| `component.table.cell.padding.inline` | `--component-table-cell-padding-inline` | 新增 | `space.16` | reference | Table cell padding inline 候选变量，CSS 消费延后 |
-| `component.table.font.size` | `--component-table-font-size` | 新增 | `font.size.14` | reference | Table font size 候选变量，CSS 消费延后 |
-| `component.table.line.height` | `--component-table-line-height` | 新增 | `line.height.regular` | reference | Table line height 候选变量，CSS 消费延后 |
-| `component.table.border` | `--component-table-border` | 新增 | `color.border.1` | reference | Table border 候选变量，CSS 消费延后 |
-| `component.table.fixed.z.index` | `--component-table-fixed-z-index` | 新增 | `component.table.fixed.z.index` | number | Table fixed z index 候选变量，CSS 消费延后 |
-| `component.table.row.hover.background` | `--component-table-row-hover-background` | 新增 | `color.fill.1` | reference | Table row hover background 候选变量，CSS 消费延后 |
-| `component.table.row.selected.background` | `--component-table-row-selected-background` | 新增 | `color.primary.light.1` | reference | Table row selected background 候选变量，CSS 消费延后 |
+| `component.table.header.background` | `--component-table-header-background` | 新增 | `component.table.header.background` | color | Table header background |
+| `component.table.cell.padding.block.large` | `--component-table-cell-padding-block-large` | 新增 | `space.16` | reference | Table large cell block padding |
+| `component.table.cell.padding.block.medium` | `--component-table-cell-padding-block-medium` | 新增 | `space.12` | reference | Table medium cell block padding |
+| `component.table.cell.padding.block.small` | `--component-table-cell-padding-block-small` | 新增 | `space.8` | reference | Table small cell block padding |
+| `component.table.cell.padding.inline` | `--component-table-cell-padding-inline` | 新增 | `space.16` | reference | Table cell inline padding |
+| `component.table.cell.padding.inline.compact` | `--component-table-cell-padding-inline-compact` | 新增 | `space.12` | reference | Table compact cell inline padding |
+| `component.table.font.size` | `--component-table-font-size` | 新增 | `font.size.14` | reference | Table font size |
+| `component.table.line.height` | `--component-table-line-height` | 新增 | `line.height.regular` | reference | Table line height |
+| `component.table.border` | `--component-table-border` | 新增 | `color.border.1` | reference | Table border |
+| `component.table.fixed.z.index` | `--component-table-fixed-z-index` | 新增 | `component.table.fixed.z.index` | number | Table fixed column z index |
+| `component.table.row.hover.background` | `--component-table-row-hover-background` | 新增 | `color.fill.1` | reference | Table row hover background |
+| `component.table.row.selected.background` | `--component-table-row-selected-background` | 新增 | `color.primary.light.1` | reference | Table row selected background |
