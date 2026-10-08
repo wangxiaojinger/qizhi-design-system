@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import test from "node:test";
-import { classifyTokenValue } from "../scripts/token-utils.mjs";
+import { classifyTokenValue, validateManifest } from "../scripts/token-utils.mjs";
 
 const packageRoot = new URL("../", import.meta.url);
 const repoRoot = new URL("../../../", import.meta.url);
@@ -23,6 +23,52 @@ test("legacy public token names, values, and value types stay compatible", async
     assert.equal(current.value, legacy.value, `${name} changed value`);
     assert.equal(classifyTokenValue(current.value), legacy.valueType, `${name} changed value type`);
   }
+});
+
+test("all public tokens declare a valid tier and lifecycle status", async () => {
+  const manifest = JSON.parse(await read(new URL("src/tokens.json", packageRoot)));
+  const tiers = new Set(["seed", "map", "alias", "component"]);
+  const statuses = new Set(["stable", "deprecated"]);
+
+  for (const [name, token] of Object.entries(manifest.tokens)) {
+    assert.ok(tiers.has(token.tier), `${name} has invalid tier: ${token.tier}`);
+    assert.ok(statuses.has(token.status), `${name} has invalid status: ${token.status}`);
+  }
+});
+
+test("deprecated tokens require a resolvable replacement", () => {
+  const withoutReplacement = {
+    tokens: {
+      old: { name: "old", value: "1px", cssVariable: "--old", category: "test", description: "old", tier: "map", status: "deprecated" },
+    },
+  };
+  assert.ok(validateManifest(withoutReplacement).some((error) => error.includes("old") && error.includes("replacedBy")));
+
+  const missingReplacement = structuredClone(withoutReplacement);
+  missingReplacement.tokens.old.replacedBy = "missing";
+  assert.ok(validateManifest(missingReplacement).some((error) => error.includes("old") && error.includes("missing")));
+});
+
+test("token dependency validation rejects cycles and upward references", () => {
+  const token = (name, value, tier) => ({
+    name,
+    value,
+    cssVariable: `--${name}`,
+    category: "test",
+    description: name,
+    tier,
+    status: "stable",
+  });
+
+  const cycle = { tokens: { a: token("a", "var(--b)", "alias"), b: token("b", "var(--a)", "alias") } };
+  const cycleErrors = validateManifest(cycle).join("\n");
+  assert.match(cycleErrors, /cycle.*a.*b|cycle.*b.*a/i);
+
+  const upward = { tokens: { mapped: token("mapped", "var(--semantic)", "map"), semantic: token("semantic", "#fff", "alias") } };
+  assert.ok(validateManifest(upward).some((error) => error.includes("mapped") && error.includes("semantic")));
+
+  const componentChain = { tokens: { first: token("first", "var(--second)", "component"), second: token("second", "#fff", "component") } };
+  assert.ok(validateManifest(componentChain).some((error) => error.includes("first") && error.includes("second")));
 });
 
 const parseRootDeclarations = (css) => {
