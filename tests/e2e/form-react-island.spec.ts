@@ -279,11 +279,11 @@ test("Form 保留旧站契约并覆盖复杂字段、远程状态与响应式几
   await page.getByRole("option", { name: "产品部" }).click();
   await bulk.getByRole("button", { name: "清空备注" }).click();
   await bulk.getByRole("button", { name: "校验并生成补丁" }).click();
-  await expect(bulk.getByRole("region", { name: "批量编辑提交信息" })).toBeVisible();
-  const bulkPatch = bulk.getByRole("status", { name: "批量编辑补丁" });
-  await expect(bulkPatch).toContainText('"department": "product"');
-  await expect(bulkPatch).toContainText('"remark"');
-  await expect(bulkPatch).not.toContainText('"status"');
+  const bulkResults = bulk.getByRole("region", { name: "批量编辑提交信息" });
+  await expect(bulkResults).toBeVisible();
+  await expect(bulkResults).toContainText("本次目标：member-1、member-2、member-3");
+  await expect(bulk.getByRole("status", { name: "批量编辑补丁" })).toHaveCount(0);
+  await expect(bulkResults).not.toContainText('"department": "product"');
   await bulk.getByRole("button", { name: "模拟部分成功" }).click();
   await expect(bulk.getByRole("alert").filter({ hasText: "没有修改部门的权限" })).toBeVisible();
   const bulkFailureItems = bulk.getByRole("list", { name: "批量编辑失败明细" }).getByRole("listitem");
@@ -352,10 +352,8 @@ test("Form 保留旧站契约并覆盖复杂字段、远程状态与响应式几
   await expect(remote.getByRole("textbox", { name: "服务地址" })).toHaveCount(0);
   await expect(remote.getByRole("combobox", { name: "部署区域" })).toHaveCount(0);
   await remote.getByRole("button", { name: "提交远程表单" }).click();
-  const remoteSubmitted = remote.getByRole("status", { name: "远程表单提交结果" });
-  await expect(remoteSubmitted).toContainText('"type":"local"');
-  await expect(remoteSubmitted).not.toContainText("endpoint");
-  await expect(remoteSubmitted).not.toContainText("region");
+  await expect(page.getByText("提交成功", { exact: true })).toBeVisible();
+  await expect(remote.getByRole("status", { name: "远程表单提交结果" })).toHaveCount(0);
 
   await remote.getByRole("button", { name: "全部重置" }).click();
   await expect(remote.getByRole("textbox", { name: "服务地址" })).toHaveValue("https://api.qizhi.cn");

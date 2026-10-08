@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("Tabs 保持十一组业务 Demo、核心交互和三档响应式", async ({
+test("Tabs 保持十二组业务 Demo、核心交互和三档响应式", async ({
   page,
 }, testInfo) => {
   const errors: string[] = [];
@@ -17,7 +17,7 @@ test("Tabs 保持十一组业务 Demo、核心交互和三档响应式", async (
   await expect(page.getByRole("heading", { name: "标签页 Tabs" }))
     .toBeVisible();
   await expect(page.locator("#component-tabs article.codebox-wrapper"))
-    .toHaveCount(11);
+    .toHaveCount(12);
 
   const basic = page.locator("#标签页-基础用法");
   await basic.getByRole("tab", { name: "标签二" }).click();
