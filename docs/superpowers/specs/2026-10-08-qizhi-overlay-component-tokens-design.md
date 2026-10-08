@@ -144,11 +144,19 @@ Popover 箭头的中心偏移由 `component.popover.arrow.size / 2` 计算，外
 1. Token 测试先固定三组 Token 的名称、值、层级、状态、生成产物和 CSS 消费点；新增测试在实现前必须失败。
 2. CSS 契约测试要求每个消费点包含批准的旧变量与字面量回退，且 Tooltip `--qizhi-tooltip-bg` 的实例覆盖入口仍存在。
 3. 浏览器覆盖直接 Component Token 覆盖、代表性旧变量覆盖、Tooltip `color` 优先级、Popover 主体与箭头同步、Dropdown popup 与 item 状态。
-4. 以设计提交 `2300d6a` 生成迁移前视觉基线；比较三个组件的默认打开态、箭头、阴影、主要尺寸及 Dropdown 级联态。
+4. 以兼容回归修复提交 `2dc3434` 生成迁移前视觉基线；比较三个组件的默认打开态、箭头、阴影、主要尺寸及 Dropdown 级联态。
 5. 三档视口为 1440、1024、375px；检查 Portal 边界、局部弹层裁切、水平溢出、控制台错误和失败请求。
 6. 定向回归至少包含 Tooltip、Popover、Dropdown 的组件/文档测试与 E2E，以及以下直接消费者的真实打开态：Table、Slider、LogViewer、BusinessObjects 的 Tooltip；Select、BusinessObjects 的 Popover；Select、Cascader、TreeSelect、SideNavigation、Input 的 Dropdown 菜单。
 7. Dropdown 浏览器覆盖还需包含 text 触发器禁用态、primary/secondary 分割线与 loading 按钮，证明新增状态 Token 可以独立覆盖且默认视觉不变。
 8. 最终执行 `pnpm verify`，并记录准确测试数量、构建结果、视觉快照来源和范围审计。
+
+## 实施前置门禁
+
+- 已收紧 Cascader E2E 到 React Island 正式控件，避免冷加载时误操作旧静态 DOM；键盘、悬停、搜索和自定义触发器均使用组件根节点定位。
+- 已将 BusinessObjects 的 `min-height`、TopNavigation 的 `min-width` 和 Cascader 的容器响应式布局按真实 CSS 契约断言，不再把最小尺寸误当固定尺寸。
+- 已将 TreeSelect loading 与代码面板定位器限制到对应弹层或代码块，消除跨组件重复文案和多代码块歧义。
+- 开发服务器中的 `ResizeObserver loop completed with undelivered notifications` 仅在 Playwright viewport worker teardown 时由 Vite 开发客户端报告；页面自身 console/pageerror 为零。已构建产物按实际部署子路径验证，不包含 Vite 客户端，该警告不复现。
+- 前置回归结果：`pnpm verify` 通过（524 Tokens、20 Token 测试、464 文件 / 2416 Vitest）；12 组件三视口为 103 passed / 2 skipped；生产构建上的四组缺口回归为 46 passed / 2 skipped。
 
 ## 交付边界
 
