@@ -261,6 +261,29 @@ test("Modal component tokens preserve current geometry and legacy semantic color
   }
 });
 
+test("Table publishes a deferred component-token mapping without claiming CSS consumption", async () => {
+  const { tokens } = JSON.parse(await read(new URL("src/tokens.json", packageRoot)));
+  const expected = {
+    "component.table.header.background": "rgb(var(--gray-1))",
+    "component.table.cell.padding.block.large": "var(--space-16)",
+    "component.table.cell.padding.block.medium": "var(--space-12)",
+    "component.table.cell.padding.block.small": "var(--space-8)",
+    "component.table.cell.padding.inline": "var(--space-16)",
+    "component.table.font.size": "var(--font-size-14)",
+    "component.table.line.height": "var(--line-height-regular)",
+    "component.table.border": "var(--color-border-1)",
+    "component.table.fixed.z.index": "2",
+    "component.table.row.hover.background": "var(--color-fill-1)",
+    "component.table.row.selected.background": "var(--color-primary-light-1)",
+  };
+
+  for (const [name, value] of Object.entries(expected)) {
+    assert.equal(tokens[name]?.tier, "component", `${name} must be a component token`);
+    assert.equal(tokens[name]?.value, value, `${name} must match the current Table baseline`);
+    assert.match(tokens[name]?.description ?? "", /deferred|延后/i);
+  }
+});
+
 const parseRootDeclarations = (css) => {
   const root = css.match(/:root\s*\{([\s\S]*?)\n\}/)?.[1] ?? "";
   return Object.fromEntries(
