@@ -67,17 +67,8 @@ test("Tabs 保持十一组业务 Demo、核心交互和三档响应式", async (
   await page.locator("#component-tabs").screenshot({
     path: testInfo.outputPath(`tabs-${testInfo.project.name}.png`),
   });
-  const remixIconFailure = failedRequests.some((url) => (
-    url.startsWith("https://cdn.jsdelivr.net/npm/remixicon@")
-  ));
-  const unexpectedRequests = failedRequests.filter((url) => (
-    !url.startsWith("https://cdn.jsdelivr.net/npm/remixicon@")
-  ));
-  const unexpectedErrors = errors.filter((message) => (
-    !(remixIconFailure && message.includes("ERR_CONNECTION_CLOSED"))
-  ));
   expect({
-    errors: unexpectedErrors,
-    failedRequests: unexpectedRequests,
+    errors,
+    failedRequests,
   }).toEqual({ errors: [], failedRequests: [] });
 });

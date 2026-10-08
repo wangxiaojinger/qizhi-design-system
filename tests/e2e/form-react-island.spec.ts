@@ -5,7 +5,6 @@ test("Form 保留旧站契约并覆盖复杂字段、远程状态与响应式几
   const errors: string[] = [];
   page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.route("https://cdn.jsdelivr.net/**", (route) => route.fulfill({ contentType: "text/css", body: "" }));
   await page.goto("/#component-form");
 
   await expect(page.locator("#component-form article.codebox-wrapper")).toHaveCount(9);

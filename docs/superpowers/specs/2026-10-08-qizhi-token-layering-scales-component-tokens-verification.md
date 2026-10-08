@@ -47,15 +47,20 @@ QIZHI_DOCS_BASE_URL=http://127.0.0.1:5174 pnpm exec playwright test \
 ## 收口修复
 
 - `对话框-自定义页脚` 示例的按钮容器在 375px 下采用换行，并约束到示例宽度，消除了既有的文章内部横向溢出。
+- 将固定版本 Remix Icon 4.7.0 的 CSS 与字体文件迁入 `assets/remixicon/`，入口改用相对路径，并保留上游 Apache-2.0 `LICENSE`；运行时不再依赖 jsDelivr。
+- 删除 Form 的 CDN 拦截以及 Tabs、Tree 对 Remix CDN 请求失败和 `ERR_CONNECTION_CLOSED` 的容错，Tree 三个视口均在严格零控制台错误、零失败请求条件下通过。
 - Playwright 必须显式指向当前分支专用预览；默认 `127.0.0.1:5173` 可能属于其他工作树，不能作为本分支验收证据。
 
 ## 最终自动化验证
 
 - `pnpm verify`：通过。
 - Token 契约测试：20/20；Token 校验：523 项。
-- Workspace 测试：464 个文件、2415 项测试全部通过。
+- Workspace 测试：464 个文件、2416 项测试全部通过。
 - API 清单、TypeScript、文档构建、React 包构建与 bundle boundary smoke check：通过。
+- 生产构建已将 Remix Icon 字体生成为站内哈希资源，未保留 jsDelivr 运行时地址。
 - 构建仅保留既有的大 chunk 警告，不构成本阶段失败。
+
+补充诊断：额外执行 Form、Tabs、Tree 全量三视口用例时，Tree 3/3 通过；Tabs 因当前页面已有 12 组 Demo 而旧断言仍为 11、Form 因既有批量编辑状态断言与当前页面不一致而失败。这些实现和断言在迁移前基线 `c42a916` 与本分支之间没有变化，不归因于 Token 或本次资源自托管改动，也未通过放宽断言掩盖。
 
 ## 范围边界
 

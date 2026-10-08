@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { WorkspaceProbe } from "../../apps/qizhi-docs/src/button/WorkspaceProbe";
 import {
   Avatar,
@@ -67,6 +67,16 @@ it("resolves the public icon subpath from source in a clean workspace", () => {
 
   expect(tsconfig.compilerOptions.paths["@wangxiaojinger/qizhi-react/icon"])
     .toEqual(["./packages/qizhi-react/src/icon/index.ts"]);
+});
+
+it("self-hosts the pinned Remix Icon assets without a runtime CDN dependency", () => {
+  const html = readFileSync("index.html", "utf8");
+
+  expect(html).toContain('href="./assets/remixicon/remixicon.css"');
+  expect(html).not.toContain("cdn.jsdelivr.net/npm/remixicon@");
+  expect(existsSync("assets/remixicon/remixicon.css")).toBe(true);
+  expect(existsSync("assets/remixicon/remixicon.woff2")).toBe(true);
+  expect(existsSync("assets/remixicon/LICENSE")).toBe(true);
 });
 
 it("consumes Steps from the public package boundary", () => {
