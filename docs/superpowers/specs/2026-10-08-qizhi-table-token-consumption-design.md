@@ -17,6 +17,7 @@
 - 第一阶段已发布 11 个 `component.table.*` Token，但描述仍注明“CSS 消费延后”，`table.css` 尚未引用它们。
 - Table 默认、middle、small 的纵向内边距分别为 16、12、8px；桌面横向内边距为 16px，600px 以下为 12px。
 - 当前单一 `component.table.cell.padding.inline` 只能表达桌面 16px，无法在允许直接组件覆盖的同时准确表达移动端 12px。
+- 当前展开行规则使用 `.qizhi-table__expanded td` 后代选择器，会把外层 `16px 64px` 内边距错误施加到嵌套 Table；既定 Table 契约要求使用 `.qizhi-table__expanded > td`。
 - Tabs 同源 registry 和单元测试已明确为 12 组 Demo，E2E 仍断言 11。
 - Form 同源 Demo 和单元测试已明确不再展示“批量编辑补丁”原文，E2E 仍查找已移除的 `role=status`。
 
@@ -92,7 +93,7 @@ Token 清单自身继续从 Map 或 Alias 层引用旧公开变量，不反转�
 - 不改变自然换行和显式 `ellipsis` 契约。
 - 不改变固定列、展开行、嵌套 Table、树形、合并、拖拽、排序及选择行为。
 - 默认计算样式必须与迁移前一致；Token 覆盖测试只验证覆盖能力，不更新默认视觉基线。
-- 嵌套展开内容继续使用 `.qizhi-table__expanded > td` 范围，禁止用后代选择器影响内部 Table 单元格。
+- 恢复 `.qizhi-table__expanded > td` 的既定作用域，修复当前后代选择器污染嵌套 Table 单元格的问题；该项是明确缺陷修复，不纳入“默认像素完全不变”的区域。
 
 ## 测试与验收
 
@@ -103,7 +104,7 @@ Token 清单自身继续从 Map 或 Alias 层引用旧公开变量，不反转�
 3. 浏览器测试直接覆盖 `--component-table-*`，验证目标职责变化且非目标组件不受影响；
 4. 浏览器测试覆盖旧变量，验证兼容链继续传递到 Table；
 5. 三档密度、自然换行、ellipsis、固定列、展开／嵌套 Table 在 1440、1024、375px 下回归；
-6. 从实施前提交生成 Table 视觉基线，对默认态逐像素比较；
+6. 从实施前提交生成不受嵌套修复影响的 Table 视觉基线，对默认态逐像素比较；嵌套区域以精确几何断言验收；
 7. `pnpm verify`、Table 定向 Vitest、Form/Tabs/Table 定向 Playwright 全部执行并如实记录。
 
 ## 交付边界
