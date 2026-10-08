@@ -184,6 +184,54 @@ test("Button component tokens preserve legacy overrides and drive the component 
   }
 });
 
+test("Input and Select component tokens preserve shared scales and semantic override paths", async () => {
+  const { tokens } = JSON.parse(await read(new URL("src/tokens.json", packageRoot)));
+  const inputCss = await read(new URL("packages/qizhi-react/src/input/input.css", repoRoot));
+  const selectCss = await read(new URL("packages/qizhi-react/src/select/select.css", repoRoot));
+  const shared = {
+    "control.height.mini": "var(--control-height-mini)",
+    "control.height.small": "var(--control-height-small)",
+    "control.height.medium": "var(--control-height-medium)",
+    "control.height.large": "var(--control-height-large)",
+    "radius": "var(--border-radius-small)",
+    "font.size": "var(--font-size-14)",
+    "border.width": "var(--line-width-thin)",
+    "border.default": "var(--color-border-2)",
+    "border.hover": "var(--color-border-3)",
+    "border.focus": "rgb(var(--primary-6))",
+    "background.default": "var(--color-bg-2)",
+    "background.disabled": "var(--color-fill-1)",
+    "text.default": "var(--color-text-1)",
+    "text.disabled": "var(--color-text-4)",
+    "text.placeholder": "var(--color-text-4)",
+    "focus.ring": "var(--color-primary-light-1)",
+    "focus.width": "var(--line-width-thick)",
+    "icon.size": "var(--font-size-16)",
+    "motion.duration": "var(--motion-duration-fast)",
+    "motion.easing": "var(--motion-easing-standard)",
+  };
+
+  for (const [component, css] of [["input", inputCss], ["select", selectCss]]) {
+    for (const [suffix, value] of Object.entries(shared)) {
+      const name = `component.${component}.${suffix}`;
+      assert.equal(tokens[name]?.tier, "component", `${name} must be a component token`);
+      assert.equal(tokens[name]?.value, value, `${name} must preserve the approved fallback`);
+      assert.ok(css.includes(`var(${tokens[name]?.cssVariable}`), `${name} is not consumed by ${component}.css`);
+    }
+  }
+
+  assert.equal(tokens["component.input.padding.inline"]?.value, "var(--space-12)");
+  assert.ok(inputCss.includes("var(--component-input-padding-inline)"));
+  assert.equal(tokens["component.select.padding.inline"]?.value, "11px");
+  assert.ok(selectCss.includes("var(--component-select-padding-inline)"));
+  assert.equal(tokens["component.select.popup.shadow"]?.value, "var(--shadow-popup)");
+  assert.ok(selectCss.includes("var(--component-select-popup-shadow)"));
+  assert.equal(tokens["component.select.option.height"]?.value, "var(--control-height-medium)");
+  assert.ok(selectCss.includes("var(--component-select-option-height)"));
+  assert.equal(tokens["component.input.content.width"], undefined);
+  assert.equal(tokens["component.select.content.width"], undefined);
+});
+
 const parseRootDeclarations = (css) => {
   const root = css.match(/:root\s*\{([\s\S]*?)\n\}/)?.[1] ?? "";
   return Object.fromEntries(
