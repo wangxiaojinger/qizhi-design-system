@@ -4,11 +4,26 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import test from "node:test";
+import { classifyTokenValue } from "../scripts/token-utils.mjs";
 
 const packageRoot = new URL("../", import.meta.url);
 const repoRoot = new URL("../../../", import.meta.url);
 
 const read = async (url) => readFile(url, "utf8");
+
+test("legacy public token names, values, and value types stay compatible", async () => {
+  const manifest = JSON.parse(await read(new URL("src/tokens.json", packageRoot)));
+  const baseline = JSON.parse(await read(new URL("src/legacy-contract.json", packageRoot)));
+
+  assert.equal(Object.keys(baseline).length, 362);
+  for (const [name, legacy] of Object.entries(baseline)) {
+    const current = manifest.tokens[name];
+    assert.ok(current, `missing legacy token: ${name}`);
+    assert.equal(current.cssVariable, legacy.cssVariable, `${name} changed cssVariable`);
+    assert.equal(current.value, legacy.value, `${name} changed value`);
+    assert.equal(classifyTokenValue(current.value), legacy.valueType, `${name} changed value type`);
+  }
+});
 
 const parseRootDeclarations = (css) => {
   const root = css.match(/:root\s*\{([\s\S]*?)\n\}/)?.[1] ?? "";

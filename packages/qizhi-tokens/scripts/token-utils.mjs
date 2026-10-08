@@ -2,6 +2,18 @@ import { readFile } from "node:fs/promises";
 
 export const readManifest = async (url) => JSON.parse(await readFile(url, "utf8"));
 
+export const classifyTokenValue = (value) => {
+  const normalized = String(value).trim();
+  if (/^var\(--[a-zA-Z0-9-]+\)$/.test(normalized)) return "reference";
+  if (/^\d{1,3}\s*,\s*\d{1,3}\s*,\s*\d{1,3}$/.test(normalized)) return "rgb-channel";
+  if (/^(?:#[0-9a-f]{3,8}|rgba?\()/i.test(normalized)) return "color";
+  if (/^-?(?:\d+|\d*\.\d+)%$/.test(normalized)) return "percentage";
+  if (/^-?(?:\d+|\d*\.\d+)(?:px|rem|em|vh|vw|ms|s)$/.test(normalized)) return "length";
+  if (/^-?(?:\d+|\d*\.\d+)$/.test(normalized)) return "number";
+  if (/\b-?(?:\d+|\d*\.\d+)px\b/.test(normalized) && /(?:rgba?|#)/i.test(normalized)) return "shadow";
+  return "font-family";
+};
+
 export const validateManifest = (manifest) => {
   const errors = [];
   const entries = Object.entries(manifest.tokens ?? {});
