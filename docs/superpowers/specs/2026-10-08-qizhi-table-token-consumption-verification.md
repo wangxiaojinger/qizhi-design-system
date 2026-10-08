@@ -10,9 +10,9 @@
 
 ## 实施结果
 
-- Table 的 12 个既有候选 Component Token 已转为稳定 Token，并补充 `component.table.cell.padding.inline.compact`；当前公开 Token 总数为 524。
+- Table 原有 11 个 Component Token 已去除“候选/延后”描述并开始由 CSS 消费，同时新增 `component.table.cell.padding.inline.compact`；目前共有 12 个稳定 Table Component Token，公开 Token 总数为 524。
 - Table 字体、行高、表头背景、三档纵向内边距、桌面与移动端横向内边距、边框、hover、selected 和固定列层级已由 Component Token 消费。
-- 所有迁移采用 `Component Token → 旧变量 → 字面量` 回退链；旧变量仍可覆盖既有职责，未改名或删除旧公开变量。
+- 存在旧变量的职责采用 `Component Token → 旧变量 → 字面量` 回退链；固定列层级没有对应旧公开变量，采用 `Component Token → 字面量`。既有旧变量仍可覆盖原有职责，且未被改名或删除。
 - 展开行外层内边距选择器收敛为 `.qizhi-table__expanded > td`，避免把 64px 外层缩进传播到嵌套 Table 单元格。
 - Form 与 Tabs 浏览器断言已同步当前同源 Demo 契约：Tabs 为 12 组 Demo；Form 提交和批量编辑以当前可见成功状态为准，不再断言已移除的原始 JSON 状态。
 
