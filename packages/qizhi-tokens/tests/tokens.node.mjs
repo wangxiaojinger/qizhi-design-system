@@ -4,7 +4,13 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { spawnSync } from "node:child_process";
 import test from "node:test";
-import { classifyTokenValue, validateManifest } from "../scripts/token-utils.mjs";
+import {
+  classifyTokenValue,
+  publicTokenValues,
+  renderMigrationMap,
+  renderTypes,
+  validateManifest,
+} from "../scripts/token-utils.mjs";
 
 const packageRoot = new URL("../", import.meta.url);
 const repoRoot = new URL("../../../", import.meta.url);
@@ -69,6 +75,25 @@ test("token dependency validation rejects cycles and upward references", () => {
 
   const componentChain = { tokens: { first: token("first", "var(--second)", "component"), second: token("second", "#fff", "component") } };
   assert.ok(validateManifest(componentChain).some((error) => error.includes("first") && error.includes("second")));
+});
+
+test("public token metadata and migration map are generated from the manifest", async () => {
+  const manifest = JSON.parse(await read(new URL("src/tokens.json", packageRoot)));
+  const values = publicTokenValues(manifest);
+  const types = renderTypes();
+  const migration = JSON.parse(renderMigrationMap(manifest));
+  const packageJson = JSON.parse(await read(new URL("package.json", packageRoot)));
+
+  assert.deepEqual(
+    { tier: values["primary.6"].tier, status: values["primary.6"].status, replacedBy: values["primary.6"].replacedBy },
+    { tier: "alias", status: "stable", replacedBy: undefined },
+  );
+  assert.match(types, /QizhiTokenTier = "seed" \| "map" \| "alias" \| "component"/);
+  assert.match(types, /QizhiTokenStatus = "stable" \| "deprecated"/);
+  assert.equal(Object.keys(migration).length, Object.keys(manifest.tokens).length);
+  assert.deepEqual(new Set(Object.values(migration).map((entry) => entry.action)), new Set(["keep", "alias"]));
+  assert.equal(migration["primary.6"].valueType, "reference");
+  assert.equal(packageJson.exports["./migration-map.json"], "./dist/migration-map.json");
 });
 
 const parseRootDeclarations = (css) => {
@@ -136,6 +161,25 @@ test("validation rejects a stale TypeScript declaration", async () => {
 
   assert.equal(result.status, 1);
   assert.match(result.stderr, /dist\/index\.d\.ts is stale/);
+});
+
+test("validation rejects generated metadata after source metadata changes", async () => {
+  const tempRoot = await mkdtemp(join(tmpdir(), "qizhi-token-metadata-test-"));
+  const tempPackage = join(tempRoot, "qizhi-tokens");
+  await cp(new URL(".", packageRoot), tempPackage, { recursive: true });
+  const sourcePath = join(tempPackage, "src/tokens.json");
+  const manifest = JSON.parse(await readFile(sourcePath, "utf8"));
+  manifest.tokens["primary.6"].status = "deprecated";
+  manifest.tokens["primary.6"].replacedBy = "color.primary.light.1";
+  await writeFile(sourcePath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+
+  const result = spawnSync(process.execPath, ["scripts/validate.mjs"], {
+    cwd: tempPackage,
+    encoding: "utf8",
+  });
+
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /dist\/(tokens\.json|index\.js|migration-map\.json) is stale/);
 });
 
 test("generated artifacts are current and package exports are stable", async () => {

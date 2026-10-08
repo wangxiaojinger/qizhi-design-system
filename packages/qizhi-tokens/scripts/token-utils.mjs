@@ -89,7 +89,21 @@ export const publicTokenValues = (manifest) => Object.fromEntries(
     cssVariable: token.cssVariable,
     category: token.category,
     description: token.description,
+    tier: token.tier,
+    status: token.status,
+    ...(token.replacedBy ? { replacedBy: token.replacedBy } : {}),
   }]),
 );
 
-export const renderTypes = () => "export interface QizhiToken { readonly name: string; readonly value: string; readonly cssVariable: `--${string}`; readonly category: string; readonly description: string; }\nexport declare const tokens: Readonly<Record<string, QizhiToken>>;\n";
+export const renderMigrationMap = (manifest) => `${JSON.stringify(Object.fromEntries(
+  Object.entries(manifest.tokens).map(([name, token]) => [name, {
+    token: name,
+    cssVariable: token.cssVariable,
+    action: token.status === "deprecated" ? "deprecated" : /^var\(--/.test(token.value) ? "alias" : "keep",
+    valueType: classifyTokenValue(token.value),
+    replacement: token.replacedBy ?? null,
+    note: token.status === "deprecated" ? `Use ${token.replacedBy}` : token.description,
+  }]),
+), null, 2)}\n`;
+
+export const renderTypes = () => "export type QizhiTokenTier = \"seed\" | \"map\" | \"alias\" | \"component\";\nexport type QizhiTokenStatus = \"stable\" | \"deprecated\";\nexport interface QizhiToken { readonly name: string; readonly value: string; readonly cssVariable: `--${string}`; readonly category: string; readonly description: string; readonly tier: QizhiTokenTier; readonly status: QizhiTokenStatus; readonly replacedBy?: string; }\nexport declare const tokens: Readonly<Record<string, QizhiToken>>;\n";

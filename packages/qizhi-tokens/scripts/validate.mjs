@@ -1,5 +1,5 @@
 import { readFile } from "node:fs/promises";
-import { publicTokenValues, readManifest, renderCss, renderTypes, validateManifest } from "./token-utils.mjs";
+import { publicTokenValues, readManifest, renderCss, renderMigrationMap, renderTypes, validateManifest } from "./token-utils.mjs";
 
 const packageRoot = new URL("../", import.meta.url);
 const manifest = await readManifest(new URL("src/tokens.json", packageRoot));
@@ -10,6 +10,7 @@ const expected = {
   "dist/tokens.json": `${JSON.stringify(manifest, null, 2)}\n`,
   "dist/index.js": `export const tokens = ${JSON.stringify(publicTokenValues(manifest), null, 2)};\n`,
   "dist/index.d.ts": renderTypes(),
+  "dist/migration-map.json": renderMigrationMap(manifest),
 };
 
 for (const [path, content] of Object.entries(expected)) {
