@@ -232,6 +232,35 @@ test("Input and Select component tokens preserve shared scales and semantic over
   assert.equal(tokens["component.select.content.width"], undefined);
 });
 
+test("Modal component tokens preserve current geometry and legacy semantic colors", async () => {
+  const { tokens } = JSON.parse(await read(new URL("src/tokens.json", packageRoot)));
+  const css = await read(new URL("packages/qizhi-react/src/modal/modal.css", repoRoot));
+  const expected = {
+    "component.modal.z.index": "var(--z-index-modal)",
+    "component.modal.mask.background": "rgba(0, 0, 0, 0.45)",
+    "component.modal.radius": "var(--border-radius-large)",
+    "component.modal.shadow": "var(--shadow-modal)",
+    "component.modal.header.height": "56px",
+    "component.modal.title.font.size": "var(--font-size-16)",
+    "component.modal.title.line.height": "var(--line-height-24)",
+    "component.modal.content.padding.block": "var(--space-16)",
+    "component.modal.content.padding.inline": "var(--space-24)",
+    "component.modal.footer.gap": "var(--space-12)",
+    "component.modal.motion.duration": "180ms",
+    "component.modal.motion.easing": "var(--motion-easing-standard)",
+    "component.modal.background": "var(--color-bg-white)",
+    "component.modal.text.primary": "var(--color-text-1)",
+    "component.modal.text.secondary": "var(--color-text-2)",
+    "component.modal.border": "var(--color-border-1)",
+  };
+
+  for (const [name, value] of Object.entries(expected)) {
+    assert.equal(tokens[name]?.tier, "component", `${name} must be a component token`);
+    assert.equal(tokens[name]?.value, value, `${name} must preserve the approved value`);
+    assert.ok(css.includes(`var(${tokens[name]?.cssVariable}`), `${name} is not consumed by modal.css`);
+  }
+});
+
 const parseRootDeclarations = (css) => {
   const root = css.match(/:root\s*\{([\s\S]*?)\n\}/)?.[1] ?? "";
   return Object.fromEntries(
