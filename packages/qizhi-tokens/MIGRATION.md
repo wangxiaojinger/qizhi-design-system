@@ -2,7 +2,7 @@
 
 > 本文件由 `packages/qizhi-tokens/src/tokens.json` 与 `src/legacy-contract.json` 生成，请勿手工编辑。
 
-保留：271；兼容别名：91；新增：155；弃用：0
+保留：271；兼容别名：91；新增：161；弃用：0
 
 | 原 Token | CSS 变量 | 处理方式 | 推荐 Token | 值类型 | 迁移说明 |
 | --- | --- | --- | --- | --- | --- |
@@ -462,12 +462,16 @@
 | `component.input.border.default` | `--component-input-border-default` | 新增 | `color.border.2` | reference | input border default |
 | `component.input.border.hover` | `--component-input-border-hover` | 新增 | `color.border.3` | reference | input border hover |
 | `component.input.border.focus` | `--component-input-border-focus` | 新增 | `component.input.border.focus` | color | input border focus |
+| `component.input.border.error` | `--component-input-border-error` | 新增 | `color.danger` | reference | input border error |
+| `component.input.border.warning` | `--component-input-border-warning` | 新增 | `color.warning` | reference | input border warning |
 | `component.input.background.default` | `--component-input-background-default` | 新增 | `color.bg.2` | reference | input background default |
 | `component.input.background.disabled` | `--component-input-background-disabled` | 新增 | `color.fill.1` | reference | input background disabled |
 | `component.input.text.default` | `--component-input-text-default` | 新增 | `color.text.1` | reference | input text default |
 | `component.input.text.disabled` | `--component-input-text-disabled` | 新增 | `color.text.4` | reference | input text disabled |
 | `component.input.text.placeholder` | `--component-input-text-placeholder` | 新增 | `color.text.4` | reference | input text placeholder |
 | `component.input.focus.ring` | `--component-input-focus-ring` | 新增 | `color.primary.light.1` | reference | input focus ring |
+| `component.input.focus.error.ring` | `--component-input-focus-error-ring` | 新增 | `color.danger.light.1` | reference | input error focus ring |
+| `component.input.focus.warning.ring` | `--component-input-focus-warning-ring` | 新增 | `color.warning.light.1` | reference | input warning focus ring |
 | `component.input.focus.width` | `--component-input-focus-width` | 新增 | `line.width.thick` | reference | input focus width |
 | `component.input.icon.size` | `--component-input-icon-size` | 新增 | `font.size.16` | reference | input icon size |
 | `component.input.motion.duration` | `--component-input-motion-duration` | 新增 | `motion.duration.fast` | reference | input motion duration |
@@ -483,6 +487,8 @@
 | `component.select.border.default` | `--component-select-border-default` | 新增 | `color.border.2` | reference | select border default |
 | `component.select.border.hover` | `--component-select-border-hover` | 新增 | `color.border.3` | reference | select border hover |
 | `component.select.border.focus` | `--component-select-border-focus` | 新增 | `component.select.border.focus` | color | select border focus |
+| `component.select.border.error` | `--component-select-border-error` | 新增 | `color.danger` | reference | select border error |
+| `component.select.border.warning` | `--component-select-border-warning` | 新增 | `color.warning` | reference | select border warning |
 | `component.select.background.default` | `--component-select-background-default` | 新增 | `color.bg.2` | reference | select background default |
 | `component.select.background.disabled` | `--component-select-background-disabled` | 新增 | `color.fill.1` | reference | select background disabled |
 | `component.select.text.default` | `--component-select-text-default` | 新增 | `color.text.1` | reference | select text default |

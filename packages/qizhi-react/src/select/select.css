@@ -5,8 +5,8 @@
 .qizhi-select--mini .qizhi-select__control { height: var(--component-select-control-height-mini); }
 .qizhi-select--small .qizhi-select__control { height: var(--component-select-control-height-small); }
 .qizhi-select--large .qizhi-select__control { height: var(--component-select-control-height-large); }
-.qizhi-select--error .qizhi-select__control { border-color: rgb(var(--danger-6, 245 63 63)); }
-.qizhi-select--warning .qizhi-select__control { border-color: rgb(var(--warning-6, 255 125 0)); }
+.qizhi-select--error .qizhi-select__control { border-color: var(--component-select-border-error); }
+.qizhi-select--warning .qizhi-select__control { border-color: var(--component-select-border-warning); }
 .qizhi-select--disabled { cursor: not-allowed; color: var(--component-select-text-disabled); opacity: 1; }
 .qizhi-select--disabled .qizhi-select__control { background: var(--component-select-background-disabled); border-color: var(--component-select-border-default); box-shadow: none; cursor: not-allowed; }
 .qizhi-select--disabled .qizhi-select__input,

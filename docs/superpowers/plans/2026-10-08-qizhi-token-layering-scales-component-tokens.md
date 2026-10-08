@@ -304,11 +304,11 @@ git commit -m "feat(button): consume component design tokens"
 
 **Interfaces:**
 - Consumes: shared scales and semantic aliases from Task 4.
-- Produces: `component.input.*` and `component.select.*` tokens for sizing, spacing, radius, typography, borders, backgrounds, disabled states, focus ring, popup shadow, option height, icon size, and motion.
+- Produces: `component.input.*` and `component.select.*` tokens for sizing, spacing, radius, typography, default/hover/focus/error/warning borders, backgrounds, disabled states, focus rings already present in the baseline, popup shadow, option height, icon size, and motion.
 
 - [x] **Step 1: Add failing Input and Select token tests**
 
-Assert both component families exist, use shared control-height tokens, preserve `--primary-6`, `--color-border-*`, `--color-text-*`, and `--color-fill-*` fallback chains, and do not publish runtime values such as input content width as design tokens.
+Assert both component families exist, use shared control-height tokens, preserve `--primary-6`, `--color-border-*`, `--color-text-*`, `--color-fill-*`, `--color-danger`, and `--color-warning` fallback chains, and do not publish runtime values such as input content width as design tokens. Input's existing error/warning focus rings are componentized; Select does not add state-specific focus rings because they were absent from the pre-migration baseline.
 
 - [x] **Step 2: Run focused tests and verify RED**
 
@@ -463,6 +463,7 @@ git commit -m "feat(tokens): add deferred table token map"
 - Verify only: `tests/e2e/input-react-island.spec.ts`
 - Verify only: `tests/e2e/select-react-island.spec.ts`
 - Verify only: `tests/e2e/modal-react-island.spec.ts`
+- Verify only: `tests/e2e/token-phase1-visual-baseline.spec.ts` and its snapshots generated from baseline commit `c42a916`
 
 **Interfaces:**
 - Consumes: completed token architecture and component migrations.
@@ -499,14 +500,15 @@ Expected: every command passes. If a pre-existing unrelated failure appears, rec
 Run:
 
 ```bash
-pnpm exec playwright test tests/e2e/button-react-island.spec.ts tests/e2e/input-react-island.spec.ts tests/e2e/select-react-island.spec.ts tests/e2e/modal-react-island.spec.ts
+QIZHI_DOCS_BASE_URL=<current-preview> pnpm exec playwright test tests/e2e/button-react-island.spec.ts tests/e2e/input-react-island.spec.ts tests/e2e/select-react-island.spec.ts tests/e2e/modal-react-island.spec.ts
+QIZHI_DOCS_BASE_URL=<current-preview> pnpm exec playwright test tests/e2e/token-phase1-visual-baseline.spec.ts --workers=1
 ```
 
 Expected: all configured 1440/1024/375 projects pass with no new console errors or horizontal overflow.
 
 - [x] **Step 4: Inspect rendered screenshots and computed styles**
 
-Open the generated target screenshots for Button, Input, Select, and Modal. Compare default, hover/active where captured, focus-visible, disabled, error/warning, all sizes, and open overlays. Confirm computed heights remain 24/28/32/36px and the legacy `--primary-6` override probe affects the primary Button.
+Generate the checked-in Playwright snapshots from pre-migration commit `c42a916`, then compare the current branch against the same Button, Input, Select, and Modal regions at 1440/1024/375. Also inspect default, hover/active where captured, focus-visible, disabled, error/warning, all sizes, and open overlays. Confirm computed heights remain 24/28/32/36px and the legacy `--primary-6` override probe affects the primary Button.
 
 - [x] **Step 5: Record final candidate status**
 

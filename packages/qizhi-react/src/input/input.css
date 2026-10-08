@@ -4,10 +4,10 @@
 .qizhi-input--size-mini { --qizhi-input-height: var(--component-input-control-height-mini); }
 .qizhi-input--size-small { --qizhi-input-height: var(--component-input-control-height-small); }
 .qizhi-input--size-large { --qizhi-input-height: var(--component-input-control-height-large); }
-.qizhi-input--error { border-color: var(--color-danger, #f53f3f); }
-.qizhi-input--error:focus-within { box-shadow: 0 0 0 2px var(--color-danger-light-1, #ffece8); }
-.qizhi-input--warning { border-color: var(--color-warning, #ff7d00); }
-.qizhi-input--warning:focus-within { box-shadow: 0 0 0 2px var(--color-warning-light-1, #fff3e8); }
+.qizhi-input--error { border-color: var(--component-input-border-error); }
+.qizhi-input--error:focus-within { box-shadow: 0 0 0 var(--component-input-focus-width) var(--component-input-focus-error-ring); }
+.qizhi-input--warning { border-color: var(--component-input-border-warning); }
+.qizhi-input--warning:focus-within { box-shadow: 0 0 0 var(--component-input-focus-width) var(--component-input-focus-warning-ring); }
 .qizhi-input--disabled { background: var(--component-input-background-disabled); color: var(--component-input-text-disabled); cursor: not-allowed; }
 .qizhi-input__field { box-sizing: border-box; width: 100%; min-width: 0; height: 100%; padding: 0 var(--component-input-padding-inline); border: 0; outline: 0; background: transparent; color: var(--component-input-text-default); font: inherit; font-size: var(--component-input-font-size); }
 .qizhi-input__field::placeholder { color: var(--component-input-text-placeholder); }

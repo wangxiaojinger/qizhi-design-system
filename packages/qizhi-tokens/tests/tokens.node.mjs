@@ -103,7 +103,7 @@ test("public token metadata and migration map are generated from the manifest", 
   assert.equal(packageJson.exports["./migration-map.json"], "./dist/migration-map.json");
   const migrationDocument = await read(new URL("MIGRATION.md", packageRoot));
   assert.match(migrationDocument, /\| `primary\.6` \| `--primary-6` \| 兼容别名 \| `qizhiblue\.6` \|/);
-  assert.match(migrationDocument, /保留：271；兼容别名：91；新增：155；弃用：0/);
+  assert.match(migrationDocument, /保留：271；兼容别名：91；新增：161；弃用：0/);
 });
 
 test("shared typography and spacing scales expose the approved values", async () => {
@@ -209,6 +209,8 @@ test("Input and Select component tokens preserve shared scales and semantic over
     "border.default": "var(--color-border-2)",
     "border.hover": "var(--color-border-3)",
     "border.focus": "rgb(var(--primary-6))",
+    "border.error": "var(--color-danger)",
+    "border.warning": "var(--color-warning)",
     "background.default": "var(--color-bg-2)",
     "background.disabled": "var(--color-fill-1)",
     "text.default": "var(--color-text-1)",
@@ -228,6 +230,15 @@ test("Input and Select component tokens preserve shared scales and semantic over
       assert.equal(tokens[name]?.value, value, `${name} must preserve the approved fallback`);
       assert.ok(css.includes(`var(${tokens[name]?.cssVariable}`), `${name} is not consumed by ${component}.css`);
     }
+  }
+
+  for (const [name, value] of Object.entries({
+    "component.input.focus.error.ring": "var(--color-danger-light-1)",
+    "component.input.focus.warning.ring": "var(--color-warning-light-1)",
+  })) {
+    assert.equal(tokens[name]?.tier, "component", `${name} must be a component token`);
+    assert.equal(tokens[name]?.value, value, `${name} must preserve the approved fallback`);
+    assert.ok(inputCss.includes(`var(${tokens[name]?.cssVariable}`), `${name} is not consumed by input.css`);
   }
 
   assert.equal(tokens["component.input.padding.inline"]?.value, "var(--space-12)");
