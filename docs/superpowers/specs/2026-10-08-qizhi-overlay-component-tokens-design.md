@@ -15,6 +15,7 @@
 
 - 当前 Token 清单没有 `component.tooltip.*`、`component.popover.*` 或 `component.dropdown.*`。
 - Tooltip 与 Popover 使用 `position: fixed` 并挂载到 Portal；两者当前层级均为 1200。
+- 当前通用层级仅有 `z.index.tooltip = 1200`，没有语义独立的 Popover 层级 Token；本阶段补充 `z.index.popover = 1200`，避免 Popover 错误依赖 Tooltip 的变量。
 - Dropdown 使用组件内部的 `position: absolute`，当前层级为 20；它不是 Portal，不能与 Tooltip、Popover 强制共用层级。
 - Tooltip 通过内部变量 `--qizhi-tooltip-bg` 支持 `color` 属性覆盖，箭头与主体共享该变量。
 - Popover 的主体与箭头共享背景及边框，但宽度、阴影和箭头几何与 Tooltip 不同。
@@ -67,7 +68,7 @@ Tooltip 根节点将 `--qizhi-tooltip-bg` 的默认值改为 `var(--component-to
 | `component.popover.text` | `var(--color-text-1)` | 主文字颜色 |
 | `component.popover.content.text` | `var(--color-text-2)` | 内容文字颜色 |
 | `component.popover.border` | `var(--color-border-2)` | 主体和箭头边框 |
-| `component.popover.z.index` | `var(--z-index-tooltip)` | Portal 层级 |
+| `component.popover.z.index` | `var(--z-index-popover)` | Portal 层级 |
 | `component.popover.width` | `248px` | 默认宽度 |
 | `component.popover.padding.block` | `14px` | 纵向内边距 |
 | `component.popover.padding.inline` | `var(--space-16)` | 横向内边距 |
@@ -107,18 +108,25 @@ Popover 箭头的中心偏移由 `component.popover.arrow.size / 2` 计算，外
 | `component.dropdown.icon.size` | `16px` | 触发器、菜单与子菜单图标尺寸 |
 | `component.dropdown.motion.duration` | `var(--motion-duration-base)` | 箭头旋转时长 |
 | `component.dropdown.motion.easing` | `var(--motion-easing-standard)` | 箭头旋转缓动 |
+| `component.dropdown.trigger.disabled.text` | `var(--color-text-4)` | text 触发器禁用文字颜色 |
+| `component.dropdown.button.divider` | `rgba(255, 255, 255, 0.35)` | primary 分割按钮分隔线 |
+| `component.dropdown.button.secondary.divider` | `var(--color-border-2)` | secondary 分割按钮分隔线 |
+| `component.dropdown.button.loading.background` | `rgb(var(--primary-4))` | loading 切换按钮背景 |
+| `component.dropdown.button.loading.motion.duration` | `900ms` | loading 图标旋转周期 |
+| `component.dropdown.button.loading.motion.easing` | `linear` | loading 图标旋转缓动 |
 
-级联菜单的相对位置、4px 跨层间隙和 136px 特殊最小宽度属于结构与定位算法，本阶段不转为主题 Token。
+级联菜单的相对位置、4px 跨层间隙和 136px 特殊最小宽度属于结构与定位算法，本阶段不转为主题 Token。Dropdown.Button 的按钮高度、圆角与文字样式继续由 Button 及既有公共尺度负责；本阶段只为 Dropdown 自身覆盖的禁用、分隔和 loading 状态建立 Token。
 
 ## 消费与兼容规则
 
 1. `packages/qizhi-tokens/src/tokens.json` 是唯一可编辑 Token 源；CSS、JSON、JavaScript、类型和迁移映射继续由脚本生成。
-2. 有旧公共变量时使用 `Component Token → 旧变量 → 字面量`，例如 Dropdown 背景、边框、阴影及通用尺度。
-3. 没有旧公共变量时使用 `Component Token → 字面量`，例如 Dropdown 当前局部层级 20、Popover 248px 宽度和两个独有阴影。
-4. 不删除、不改名旧变量，不改变旧值和值类型。
-5. 不将 Tooltip、Popover、Dropdown 的组件 Token 互相引用。
-6. 不用新 Token 改写定位算法产生的 `top/right/bottom/left/transform`，也不改变 Portal 容器选择。
-7. `prefers-reduced-motion` 现有行为保持不变。
+2. 通用层级新增 `z.index.popover = 1200` / `--z-index-popover`，与 `z.index.tooltip` 数值相同但职责独立；两个变量互不引用。
+3. 有旧公共变量时使用 `Component Token → 旧变量 → 字面量`，例如 Dropdown 背景、边框、阴影及通用尺度。
+4. 没有旧公共变量时使用 `Component Token → 字面量`，例如 Dropdown 当前局部层级 20、Popover 248px 宽度和两个独有阴影。
+5. 不删除、不改名旧变量，不改变旧值和值类型。
+6. 不将 Tooltip、Popover、Dropdown 的组件 Token 互相引用。
+7. 不用新 Token 改写定位算法产生的 `top/right/bottom/left/transform`，也不改变 Portal 容器选择。
+8. `prefers-reduced-motion` 现有行为保持不变。
 
 ## 组件边界
 
@@ -136,10 +144,11 @@ Popover 箭头的中心偏移由 `component.popover.arrow.size / 2` 计算，外
 1. Token 测试先固定三组 Token 的名称、值、层级、状态、生成产物和 CSS 消费点；新增测试在实现前必须失败。
 2. CSS 契约测试要求每个消费点包含批准的旧变量与字面量回退，且 Tooltip `--qizhi-tooltip-bg` 的实例覆盖入口仍存在。
 3. 浏览器覆盖直接 Component Token 覆盖、代表性旧变量覆盖、Tooltip `color` 优先级、Popover 主体与箭头同步、Dropdown popup 与 item 状态。
-4. 以实施前提交 `38354ed` 生成迁移前视觉基线；比较三个组件的默认打开态、箭头、阴影、主要尺寸及 Dropdown 级联态。
+4. 以设计提交 `2300d6a` 生成迁移前视觉基线；比较三个组件的默认打开态、箭头、阴影、主要尺寸及 Dropdown 级联态。
 5. 三档视口为 1440、1024、375px；检查 Portal 边界、局部弹层裁切、水平溢出、控制台错误和失败请求。
-6. 定向回归至少包含 Tooltip、Popover、Dropdown 的组件/文档测试与 E2E，以及 Table、Slider、BusinessObjects、SideNavigation、Input 中真实打开相关浮层的路径。
-7. 最终执行 `pnpm verify`，并记录准确测试数量、构建结果、视觉快照来源和范围审计。
+6. 定向回归至少包含 Tooltip、Popover、Dropdown 的组件/文档测试与 E2E，以及以下直接消费者的真实打开态：Table、Slider、LogViewer、BusinessObjects 的 Tooltip；Select、BusinessObjects 的 Popover；Select、Cascader、TreeSelect、SideNavigation、Input 的 Dropdown 菜单。
+7. Dropdown 浏览器覆盖还需包含 text 触发器禁用态、primary/secondary 分割线与 loading 按钮，证明新增状态 Token 可以独立覆盖且默认视觉不变。
+8. 最终执行 `pnpm verify`，并记录准确测试数量、构建结果、视觉快照来源和范围审计。
 
 ## 交付边界
 
