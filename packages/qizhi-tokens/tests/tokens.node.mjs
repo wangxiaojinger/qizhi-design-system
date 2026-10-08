@@ -96,6 +96,47 @@ test("public token metadata and migration map are generated from the manifest", 
   assert.equal(packageJson.exports["./migration-map.json"], "./dist/migration-map.json");
 });
 
+test("shared typography and spacing scales expose the approved values", async () => {
+  const { tokens } = JSON.parse(await read(new URL("src/tokens.json", packageRoot)));
+  const values = (names) => names.map((name) => tokens[name]?.value);
+
+  assert.deepEqual(values([12, 14, 16, 18, 20, 24, 28, 32].map((size) => `font.size.${size}`)), ["12px", "14px", "16px", "18px", "20px", "24px", "28px", "32px"]);
+  assert.deepEqual(values([18, 20, 22, 24, 26, 28, 30, 32, 36].map((size) => `line.height.${size}`)), ["18px", "20px", "22px", "24px", "26px", "28px", "30px", "32px", "36px"]);
+  assert.deepEqual(values([0, 2, 4, 6, 8, 12, 16, 20, 24, 32, 40, 48].map((size) => `space.${size}`)), ["0px", "2px", "4px", "6px", "8px", "12px", "16px", "20px", "24px", "32px", "40px", "48px"]);
+});
+
+test("shared control, border, motion, shadow, and layer scales preserve current geometry", async () => {
+  const { tokens } = JSON.parse(await read(new URL("src/tokens.json", packageRoot)));
+  assert.deepEqual(
+    ["mini", "small", "medium", "large"].map((size) => tokens[`control.height.${size}`]?.value),
+    ["24px", "28px", "32px", "36px"],
+  );
+  assert.deepEqual(
+    ["none", "thin", "thick"].map((size) => tokens[`line.width.${size}`]?.value),
+    ["0px", "1px", "2px"],
+  );
+  assert.deepEqual(
+    ["fast", "base", "slow"].map((speed) => tokens[`motion.duration.${speed}`]?.value),
+    ["160ms", "200ms", "300ms"],
+  );
+  assert.deepEqual(
+    ["sticky", "dropdown", "modal", "message", "tooltip"].map((layer) => tokens[`z.index.${layer}`]?.value),
+    ["100", "60", "999", "1200", "1200"],
+  );
+  assert.deepEqual(
+    ["low", "popup", "modal"].map((level) => tokens[`shadow.${level}`]?.value),
+    [
+      "0 1px 2px rgba(0, 0, 0, 0.08)",
+      "0 6px 16px rgba(29, 33, 41, 0.12)",
+      "0 16px 48px rgba(0, 0, 0, 0.22)",
+    ],
+  );
+  assert.deepEqual(
+    ["standard", "enter", "exit"].map((kind) => tokens[`motion.easing.${kind}`]?.value),
+    ["ease", "ease-out", "ease-in"],
+  );
+});
+
 const parseRootDeclarations = (css) => {
   const root = css.match(/:root\s*\{([\s\S]*?)\n\}/)?.[1] ?? "";
   return Object.fromEntries(
