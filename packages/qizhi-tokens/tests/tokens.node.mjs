@@ -284,6 +284,7 @@ test("Modal component tokens preserve current geometry and legacy semantic color
 
 test("Table publishes stable component tokens for stylesheet consumption", async () => {
   const { tokens } = JSON.parse(await read(new URL("src/tokens.json", packageRoot)));
+  const css = await read(new URL("packages/qizhi-react/src/table/table.css", repoRoot));
   const expected = {
     "component.table.header.background": "rgb(var(--gray-1))",
     "component.table.cell.padding.block.large": "var(--space-16)",
@@ -304,7 +305,27 @@ test("Table publishes stable component tokens for stylesheet consumption", async
     assert.equal(tokens[name]?.status, "stable", `${name} must be stable`);
     assert.equal(tokens[name]?.value, value, `${name} must match the current Table baseline`);
     assert.doesNotMatch(tokens[name]?.description ?? "", /candidate|deferred|候选|延后/i);
+    assert.ok(css.includes(`var(${tokens[name]?.cssVariable}`), `${name} is not consumed by table.css`);
   }
+
+  for (const declaration of [
+    "font-size: var(--component-table-font-size, var(--font-size-14, 14px))",
+    "line-height: var(--component-table-line-height, var(--line-height-regular, 1.5))",
+    "background: var(--component-table-header-background, rgb(var(--gray-1, 247, 248, 250)))",
+    "padding-block: var(--component-table-cell-padding-block-large, var(--space-16, 16px))",
+    "padding-inline: var(--component-table-cell-padding-inline, var(--space-16, 16px))",
+    "padding-block: var(--component-table-cell-padding-block-medium, var(--space-12, 12px))",
+    "padding-block: var(--component-table-cell-padding-block-small, var(--space-8, 8px))",
+    "border: 1px solid var(--component-table-border, var(--color-border-1, #f2f3f5))",
+    "z-index: var(--component-table-fixed-z-index, 2)",
+    "background: var(--component-table-row-hover-background, var(--color-fill-1, #f7f8fa))",
+    "background: var(--component-table-row-selected-background, var(--color-primary-light-1, #f2f7ff))",
+    "padding-inline: var(--component-table-cell-padding-inline-compact, var(--space-12, 12px))",
+  ]) {
+    assert.ok(css.includes(declaration), `table.css is missing fallback: ${declaration}`);
+  }
+  assert.ok(css.includes(".qizhi-table__expanded > td"));
+  assert.ok(!css.includes(".qizhi-table__expanded td"));
 });
 
 const parseRootDeclarations = (css) => {
