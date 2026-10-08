@@ -79,9 +79,10 @@ test("token dependency validation rejects cycles and upward references", () => {
 
 test("public token metadata and migration map are generated from the manifest", async () => {
   const manifest = JSON.parse(await read(new URL("src/tokens.json", packageRoot)));
+  const baseline = JSON.parse(await read(new URL("src/legacy-contract.json", packageRoot)));
   const values = publicTokenValues(manifest);
   const types = renderTypes();
-  const migration = JSON.parse(renderMigrationMap(manifest));
+  const migration = JSON.parse(renderMigrationMap(manifest, baseline));
   const packageJson = JSON.parse(await read(new URL("package.json", packageRoot)));
 
   assert.deepEqual(
@@ -91,7 +92,10 @@ test("public token metadata and migration map are generated from the manifest", 
   assert.match(types, /QizhiTokenTier = "seed" \| "map" \| "alias" \| "component"/);
   assert.match(types, /QizhiTokenStatus = "stable" \| "deprecated"/);
   assert.equal(Object.keys(migration).length, Object.keys(manifest.tokens).length);
-  assert.deepEqual(new Set(Object.values(migration).map((entry) => entry.action)), new Set(["keep", "alias"]));
+  assert.deepEqual(new Set(Object.values(migration).map((entry) => entry.action)), new Set(["keep", "compat-alias", "add"]));
+  assert.equal(migration["brand.blue.6"].action, "keep");
+  assert.equal(migration["primary.6"].action, "compat-alias");
+  assert.equal(migration["component.button.primary.default"].action, "add");
   assert.equal(migration["primary.6"].valueType, "reference");
   assert.equal(packageJson.exports["./migration-map.json"], "./dist/migration-map.json");
 });

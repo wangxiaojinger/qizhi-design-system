@@ -3,6 +3,7 @@ import { publicTokenValues, readManifest, renderCss, renderMigrationMap, renderT
 
 const packageRoot = new URL("../", import.meta.url);
 const manifest = await readManifest(new URL("src/tokens.json", packageRoot));
+const legacyContract = await readManifest(new URL("src/legacy-contract.json", packageRoot));
 const errors = validateManifest(manifest);
 
 const expected = {
@@ -10,7 +11,7 @@ const expected = {
   "dist/tokens.json": `${JSON.stringify(manifest, null, 2)}\n`,
   "dist/index.js": `export const tokens = ${JSON.stringify(publicTokenValues(manifest), null, 2)};\n`,
   "dist/index.d.ts": renderTypes(),
-  "dist/migration-map.json": renderMigrationMap(manifest),
+  "dist/migration-map.json": renderMigrationMap(manifest, legacyContract),
 };
 
 for (const [path, content] of Object.entries(expected)) {

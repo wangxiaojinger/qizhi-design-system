@@ -95,11 +95,17 @@ export const publicTokenValues = (manifest) => Object.fromEntries(
   }]),
 );
 
-export const renderMigrationMap = (manifest) => `${JSON.stringify(Object.fromEntries(
+export const renderMigrationMap = (manifest, legacyContract) => `${JSON.stringify(Object.fromEntries(
   Object.entries(manifest.tokens).map(([name, token]) => [name, {
     token: name,
     cssVariable: token.cssVariable,
-    action: token.status === "deprecated" ? "deprecated" : /^var\(--/.test(token.value) ? "alias" : "keep",
+    action: token.status === "deprecated"
+      ? "deprecated"
+      : !(name in legacyContract)
+        ? "add"
+        : /^var\(--/.test(token.value)
+          ? "compat-alias"
+          : "keep",
     valueType: classifyTokenValue(token.value),
     replacement: token.replacedBy ?? null,
     note: token.status === "deprecated" ? `Use ${token.replacedBy}` : token.description,
