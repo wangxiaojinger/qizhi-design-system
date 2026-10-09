@@ -1,79 +1,79 @@
 .qizhi-tooltip {
-  --qizhi-tooltip-bg: var(--color-neutral-10, #1d2129);
+  --qizhi-tooltip-bg: var(--component-tooltip-background, var(--color-neutral-10, #1d2129));
   position: fixed;
-  z-index: 1200;
+  z-index: var(--component-tooltip-z-index, var(--z-index-tooltip, 1200));
   box-sizing: border-box;
   max-width: min(420px, calc(100vw - 16px));
-  min-height: 32px;
-  padding: 6px 12px;
-  border-radius: var(--border-radius-medium, 4px);
+  min-height: var(--component-tooltip-min-height, 32px);
+  padding: var(--component-tooltip-padding-block, var(--space-6, 6px)) var(--component-tooltip-padding-inline, var(--space-12, 12px));
+  border-radius: var(--component-tooltip-radius, var(--border-radius-medium, 4px));
   background: var(--qizhi-tooltip-bg);
-  color: #fff;
-  font-size: 14px;
-  line-height: 20px;
+  color: var(--component-tooltip-text, var(--color-white, #fff));
+  font-size: var(--component-tooltip-font-size, var(--font-size-14, 14px));
+  line-height: var(--component-tooltip-line-height, var(--line-height-20, 20px));
   text-align: left;
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.18);
+  box-shadow: var(--component-tooltip-shadow, 0 8px 20px rgba(15, 23, 42, 0.18));
   overflow-wrap: anywhere;
 }
 
 .qizhi-tooltip-mini {
-  min-height: 34px;
-  padding: 6px 14px;
-  font-size: 16px;
-  line-height: 22px;
+  min-height: var(--component-tooltip-mini-min-height, 34px);
+  padding-inline: var(--component-tooltip-mini-padding-inline, 14px);
+  font-size: var(--component-tooltip-mini-font-size, var(--font-size-16, 16px));
+  line-height: var(--component-tooltip-mini-line-height, var(--line-height-22, 22px));
 }
 
 .qizhi-tooltip__arrow {
   position: absolute;
-  width: 8px;
-  height: 8px;
+  width: var(--component-tooltip-arrow-size, 8px);
+  height: var(--component-tooltip-arrow-size, 8px);
   background: var(--qizhi-tooltip-bg);
   transform: rotate(45deg);
 }
 
 .qizhi-tooltip[data-tooltip-position^="top"] .qizhi-tooltip__arrow {
-  bottom: -4px;
-  left: calc(50% - 4px);
+  bottom: calc(var(--component-tooltip-arrow-size, 8px) * -0.5);
+  left: calc(50% - var(--component-tooltip-arrow-size, 8px) / 2);
 }
 
 .qizhi-tooltip[data-tooltip-position^="bottom"] .qizhi-tooltip__arrow {
-  top: -4px;
-  left: calc(50% - 4px);
+  top: calc(var(--component-tooltip-arrow-size, 8px) * -0.5);
+  left: calc(50% - var(--component-tooltip-arrow-size, 8px) / 2);
 }
 
 .qizhi-tooltip[data-tooltip-position^="left"] .qizhi-tooltip__arrow {
-  top: calc(50% - 4px);
-  right: -4px;
+  top: calc(50% - var(--component-tooltip-arrow-size, 8px) / 2);
+  right: calc(var(--component-tooltip-arrow-size, 8px) * -0.5);
 }
 
 .qizhi-tooltip[data-tooltip-position^="right"] .qizhi-tooltip__arrow {
-  top: calc(50% - 4px);
-  left: -4px;
+  top: calc(50% - var(--component-tooltip-arrow-size, 8px) / 2);
+  left: calc(var(--component-tooltip-arrow-size, 8px) * -0.5);
 }
 
 .qizhi-tooltip[data-tooltip-position$="Left"] .qizhi-tooltip__arrow {
   right: auto;
-  left: 18px;
+  left: calc(22px - var(--component-tooltip-arrow-size, 8px) / 2);
 }
 
 .qizhi-tooltip[data-tooltip-position$="Right"] .qizhi-tooltip__arrow {
-  right: 18px;
+  right: calc(22px - var(--component-tooltip-arrow-size, 8px) / 2);
   left: auto;
 }
 
 .qizhi-tooltip[data-tooltip-position$="Top"] .qizhi-tooltip__arrow {
-  top: 8px;
+  top: calc(12px - var(--component-tooltip-arrow-size, 8px) / 2);
   bottom: auto;
 }
 
 .qizhi-tooltip[data-tooltip-position$="Bottom"] .qizhi-tooltip__arrow {
   top: auto;
-  bottom: 8px;
+  bottom: calc(12px - var(--component-tooltip-arrow-size, 8px) / 2);
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .qizhi-tooltip {
-    animation: qizhi-tooltip-enter 0.16s ease-out;
+    animation: qizhi-tooltip-enter var(--component-tooltip-motion-duration, var(--motion-duration-fast, 160ms)) var(--component-tooltip-motion-easing, var(--motion-easing-enter, ease-out));
   }
 }
 

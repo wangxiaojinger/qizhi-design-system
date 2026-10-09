@@ -53,6 +53,12 @@ test("Select 布局与交互", async ({ page }, testInfo) => {
     if ((page.viewportSize()?.width ?? 0) >= 768) {
       for (let index = 0; index < 4; index += 1) await expect(basicControls.nth(index)).toHaveCSS("height", "32px");
     }
+    await expect(basic.locator(".qizhi-select--disabled .qizhi-select__control")).toHaveCSS("background-color", "rgb(247, 248, 250)");
+    await expect(basic.locator(".qizhi-select--error .qizhi-select__control")).toHaveCSS("border-color", "rgb(255, 77, 79)");
+    await expect(basic.locator(".qizhi-select--warning .qizhi-select__control")).toHaveCSS("border-color", "rgb(250, 173, 20)");
+    await page.addStyleTag({ content: ":root { --component-select-border-error: rgb(7, 8, 9); }" });
+    const errorSelect = basic.locator(".qizhi-select--error");
+    await expect(errorSelect.locator(".qizhi-select__control")).toHaveCSS("border-color", "rgb(7, 8, 9)");
 
     const clearDemo = page.locator("#选择器-允许清除");
     await clearDemo.getByRole("combobox").hover();

@@ -73,6 +73,15 @@ test("Input React Island exposes the approved component family", async ({ page }
   await page.locator("#四种尺寸 .qizhi-radio-button", { hasText: "default" }).click();
   await expect(page.locator("#四种尺寸 .input-size-demo__grid .qizhi-input").first()).toHaveCSS("height", "32px");
 
+  await expect(page.locator("#输入框状态 .qizhi-input--error")).toHaveCSS("border-color", "rgb(255, 77, 79)");
+  await expect(page.locator("#输入框状态 .qizhi-input--warning")).toHaveCSS("border-color", "rgb(250, 173, 20)");
+  await expect(page.locator("#输入框状态 .qizhi-input--disabled")).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  await page.addStyleTag({ content: ":root { --component-input-border-error: rgb(1, 2, 3); --component-input-focus-error-ring: rgb(4, 5, 6); }" });
+  const errorInput = page.locator("#输入框状态 .qizhi-input--error");
+  await expect(errorInput).toHaveCSS("border-color", "rgb(1, 2, 3)");
+  await errorInput.getByRole("textbox").focus();
+  await expect(errorInput).toHaveCSS("box-shadow", "rgb(4, 5, 6) 0px 0px 0px 2px");
+
   await expect(page.locator("#前置、后置标签 .qizhi-input__group")).toHaveCount(4);
   await expect(page.locator("#前置、后置标签 .qizhi-input__addon").first()).toHaveCSS("white-space", "nowrap");
   await expect(page.locator("#前置、后置标签 select")).toHaveCount(0);

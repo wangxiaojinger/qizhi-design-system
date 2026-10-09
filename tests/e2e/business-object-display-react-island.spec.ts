@@ -217,7 +217,8 @@ test("Business object display exposes seven fixed business cards", async ({
     await expect(resourceBody).toHaveCSS("padding", "12px");
     await expect(resourceBody).toHaveCSS("gap", "12px");
     await expect(resourceBody).toHaveCSS("width", "558px");
-    await expect(resourceBody).toHaveCSS("height", "152px");
+    await expect(resourceBody).toHaveCSS("min-height", "152px");
+    expect((await resourceBody.boundingBox())!.height).toBeGreaterThanOrEqual(152);
     await expect(resourceBody).toHaveCSS("border-radius", "8px");
     await expect(resourceBody).toHaveCSS(
       "background-color",

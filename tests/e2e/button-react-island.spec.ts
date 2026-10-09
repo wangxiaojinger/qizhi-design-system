@@ -15,6 +15,8 @@ test("Button static fallback keeps component styles when scripts are unavailable
   await expect(primaryButton).toHaveCSS("height", "32px");
   await expect(primaryButton).toHaveCSS("background-color", "rgb(51, 102, 255)");
   await expect(primaryButton).toHaveCSS("color", "rgb(255, 255, 255)");
+  await page.addStyleTag({ content: ":root { --primary-6: 80, 120, 255; }" });
+  await expect(primaryButton).toHaveCSS("background-color", "rgb(80, 120, 255)");
   await expect(page.locator('[id="图标按钮"] .ri-add-line')).toHaveCount(4);
   await expect(page.locator('[id="图标按钮"] .ri-delete-bin-line')).toHaveCount(1);
   await expect(page.locator('[id="图标按钮"] svg')).toHaveCount(0);
@@ -60,6 +62,24 @@ test("Button React Island keeps the legacy shell and exposes callable docs", asy
   const disabledTextButton = page.locator('[id="禁用按钮"]').getByRole("button", { name: "文本按钮" });
   await expect(disabledTextButton).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
   await expect(disabledTextButton).toHaveCSS("border-color", "rgba(0, 0, 0, 0)");
+  const sizeDemo = page.locator('[id="按钮尺寸"]');
+  for (const [name, height] of [["迷你", 24], ["小", 28], ["中", 32], ["大", 36]] as const) {
+    await expect(sizeDemo.getByRole("button", { name, exact: true })).toHaveCSS("height", `${height}px`);
+  }
+  const primaryButton = page.locator('[id="基本用法"]').getByRole("button", { name: "主要按钮" });
+  await primaryButton.hover();
+  await expect(primaryButton).toHaveCSS("background-color", "rgb(87, 135, 255)");
+  const primaryBox = await primaryButton.boundingBox();
+  if (!primaryBox) throw new Error("Primary button is not measurable");
+  await page.mouse.move(primaryBox.x + primaryBox.width / 2, primaryBox.y + primaryBox.height / 2);
+  await page.mouse.down();
+  await expect(primaryButton).toHaveCSS("background-color", "rgb(32, 70, 210)");
+  await page.mouse.up();
+  await page.mouse.move(0, 0);
+  await page.keyboard.press("Tab");
+  await primaryButton.focus();
+  await expect(primaryButton).toBeFocused();
+  await expect(primaryButton).toHaveCSS("outline-width", "2px");
   await expect.poll(() => page.locator('[id="加载中按钮"] .button-loading-grid').evaluate((grid) => {
     const buttons = [...grid.querySelectorAll(".qizhi-btn")];
     const columnCount = getComputedStyle(grid).gridTemplateColumns.split(" ").length;

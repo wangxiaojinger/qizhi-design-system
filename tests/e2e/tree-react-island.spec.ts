@@ -91,17 +91,8 @@ test("Tree 保持十三组 Demo、核心交互和三档响应式", async ({
     path: testInfo.outputPath(`tree-${testInfo.project.name}.png`),
   });
 
-  const remixIconFailure = failedRequests.some((url) => (
-    url.startsWith("https://cdn.jsdelivr.net/npm/remixicon@")
-  ));
-  const unexpectedRequests = failedRequests.filter((url) => (
-    !url.startsWith("https://cdn.jsdelivr.net/npm/remixicon@")
-  ));
-  const unexpectedErrors = errors.filter((message) => (
-    !(remixIconFailure && message.includes("ERR_CONNECTION_CLOSED"))
-  ));
   expect({
-    errors: unexpectedErrors,
-    failedRequests: unexpectedRequests,
+    errors,
+    failedRequests,
   }).toEqual({ errors: [], failedRequests: [] });
 });

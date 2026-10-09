@@ -155,11 +155,12 @@ test("Table 默认自然换行，ellipsis 列保持单行省略", async ({ page 
   const wrappedTableCell = contentDemo.locator("tbody tr").first().locator(".qizhi-table__td").nth(1);
   const wrappedCell = wrappedTableCell.locator(".qizhi-table__cell");
   const ellipsisCell = contentDemo.locator("tbody tr").first().locator(".qizhi-table__cell").nth(2);
-  const basicCell = page.locator("#table-basic .qizhi-table__td").first();
 
-  expect(await wrappedTableCell.evaluate((node) => node.getBoundingClientRect().height)).toBeGreaterThan(
-    await basicCell.evaluate((node) => node.getBoundingClientRect().height),
-  );
+  const wrappedGeometry = await wrappedCell.evaluate((node) => ({
+    height: node.getBoundingClientRect().height,
+    lineHeight: Number.parseFloat(getComputedStyle(node).lineHeight),
+  }));
+  expect(wrappedGeometry.height).toBeGreaterThan(wrappedGeometry.lineHeight * 1.5);
   await expect(wrappedCell).toHaveCSS("white-space", "normal");
   await expect(ellipsisCell).toHaveCSS("white-space", "nowrap");
   await expect(ellipsisCell).toHaveCSS("text-overflow", "ellipsis");
@@ -205,4 +206,65 @@ test("Table 三档 size 通过单元格内边距控制密度", async ({ page }) 
   await propsDemo.getByRole("radio", { name: "小 40px" }).click();
   await expect(propsHeader).toHaveCSS("padding-top", "8px");
   await expect(propsCell).toHaveCSS("padding-top", "8px");
+});
+
+test("Table 组件 Token 与旧尺度变量均可覆盖既有职责", async ({ page }) => {
+  const errors: string[] = [];
+  const failedRequests: string[] = [];
+  page.on("console", (message) => {
+    if (message.type() === "error") errors.push(message.text());
+  });
+  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("requestfailed", (request) => failedRequests.push(request.url()));
+
+  await page.goto("/#component-table", { waitUntil: "domcontentloaded" });
+  await page.addStyleTag({
+    content: `:root {
+      --component-table-header-background: rgb(1, 2, 3);
+      --component-table-cell-padding-block-large: 20px;
+      --component-table-cell-padding-inline: 18px;
+      --component-table-cell-padding-inline-compact: 10px;
+      --component-table-row-hover-background: rgb(4, 5, 6);
+      --component-table-row-selected-background: rgb(7, 8, 9);
+      --component-table-fixed-z-index: 7;
+    }`,
+  });
+
+  const basicHeader = page.locator("#table-basic .qizhi-table__th").first();
+  const basicCell = page.locator("#table-basic .qizhi-table__td").first();
+  await expect(basicHeader).toHaveCSS("background-color", "rgb(1, 2, 3)");
+  await expect(basicCell).toHaveCSS("background-color", "rgb(255, 255, 255)");
+  await expect(basicCell).toHaveCSS("padding-top", "20px");
+  await expect(basicCell).toHaveCSS(
+    "padding-left",
+    (page.viewportSize()?.width ?? 0) <= 600 ? "10px" : "18px",
+  );
+
+  await page.locator("#table-basic tbody tr").first().hover();
+  await expect(basicCell).toHaveCSS("background-color", "rgb(4, 5, 6)");
+
+  const selectionRow = page.locator("#table-selection tbody tr").first();
+  await selectionRow.locator(".qizhi-checkbox").click();
+  await basicHeader.hover();
+  await expect(selectionRow.locator(".qizhi-table__td").first())
+    .toHaveCSS("background-color", "rgb(7, 8, 9)");
+  await expect(page.locator("#table-fixed th.is-fixed-left").first())
+    .toHaveCSS("z-index", "7");
+
+  const outerExpandedCell = page.locator("#table-nested .qizhi-table__expanded > td").first();
+  const nestedCell = page.locator("#table-nested .qizhi-table__expanded .qizhi-table__td").first();
+  await expect(outerExpandedCell).toHaveCSS("padding-left", "64px");
+  await expect(nestedCell).toHaveCSS(
+    "padding-left",
+    (page.viewportSize()?.width ?? 0) <= 600 ? "10px" : "18px",
+  );
+
+  await page.addStyleTag({
+    content: `:root {
+      --component-table-cell-padding-block-large: initial;
+      --space-16: 22px;
+    }`,
+  });
+  await expect(basicCell).toHaveCSS("padding-top", "22px");
+  expect({ errors, failedRequests }).toEqual({ errors: [], failedRequests: [] });
 });

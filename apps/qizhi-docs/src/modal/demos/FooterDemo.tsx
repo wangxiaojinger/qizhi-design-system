@@ -12,7 +12,7 @@ export default function FooterDemo() {
   const close = () => setVariant(null);
   return (
     <>
-      <Space size="large">
+      <Space size="large" wrap>
         <Button type="primary" data-testid="modal-trigger" onClick={() => setVariant("disabled")}>
           打开自定义按钮属性模态框
         </Button>
