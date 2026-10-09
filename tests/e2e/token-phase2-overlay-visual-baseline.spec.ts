@@ -61,6 +61,7 @@ test("Dropdown basic open state matches the pre-migration baseline", async ({ pa
 test("Dropdown cascade open state matches the pre-migration baseline", async ({ page }) => {
   await prepare(page, "#component-dropdown");
   const demo = page.locator("#下拉菜单-多级菜单 .demo");
+  await expect(demo.locator(".qizhi-dropdown__submenu-trigger[data-item-key]")).toHaveCount(4);
   await demo.getByRole("button", { name: "Click" }).click();
   await demo.locator(".qizhi-dropdown__submenu-trigger").first().hover();
   await expect(demo.locator(".qizhi-dropdown__submenu-popup").first()).toBeVisible();
