@@ -261,7 +261,7 @@ export function SkillServiceCard({
           <p><span>更新时间：{updatedAt}</span><span>|</span><span>{project}</span></p>
         </div>
       </header>
-      <Popover content={popoverContent} position="top" trigger="hover">
+      <Popover content={popoverContent} position="top" trigger="hover" role="tooltip">
         <div className="qizhi-skill-service-card__summary" tabIndex={0}>
           <ol aria-hidden="true">
             {(previewLines ?? [summary]).map((_, index) => (

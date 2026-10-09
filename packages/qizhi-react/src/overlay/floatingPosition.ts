@@ -164,3 +164,30 @@ export const getFittedFloatingPlacement = (
     position,
   };
 };
+
+export interface FloatingOverlayLayoutOptions {
+  gap?: number;
+}
+
+export const getFloatingOverlayLayout = (
+  trigger: DOMRect,
+  popup: DOMRect,
+  requestedPosition: FloatingPosition,
+  options: FloatingOverlayLayoutOptions = {},
+) => {
+  const { gap = FLOATING_GAP } = options;
+  const next = getFittedFloatingPlacement(
+    trigger,
+    popup,
+    requestedPosition,
+    undefined,
+    gap,
+  );
+  const verticalPlacement = next.position.startsWith("top")
+    || next.position.startsWith("bottom");
+  const arrowOffset = verticalPlacement
+    ? trigger.left + trigger.width / 2 - next.left
+    : trigger.top + trigger.height / 2 - next.top;
+
+  return { ...next, arrowOffset };
+};

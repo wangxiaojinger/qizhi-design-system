@@ -4,6 +4,7 @@ export default function ManualDemo() {
   const open = () => {
     const handle = Modal.confirm({
       title: "提交中...",
+      icon: null,
       footer: null,
       content: <div className="qizhi-modal-status"><LoadingIcon />
         <span>对话框将在 1.5 秒后更新为成功状态。</span>

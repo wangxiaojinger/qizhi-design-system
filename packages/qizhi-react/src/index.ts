@@ -152,7 +152,14 @@ export type {
 export { Drawer } from "./drawer/Drawer";
 export type { DrawerProps } from "./drawer/Drawer.types";
 export { Modal } from "./modal/Modal";
-export type { ModalComponent, ModalConfirmConfig, ModalConfirmHandle, ModalProps } from "./modal/Modal.types";
+export type {
+  ModalComponent,
+  ModalConfirmConfig,
+  ModalConfirmHandle,
+  ModalContainer,
+  ModalHookApi,
+  ModalProps,
+} from "./modal/Modal.types";
 export { Message, useMessage } from "./message/Message";
 export { Notification, useNotification } from "./notification/Notification";
 export { Alert } from "./alert/Alert";
@@ -489,15 +496,20 @@ export type {
   PopconfirmProps,
 } from "./popconfirm/Popconfirm.types";
 export type {
+  PopoverHandle,
   PopoverPosition,
   PopoverProps,
   PopoverRole,
+  PopoverSemanticName,
   PopoverTrigger,
+  PopoverVariant,
 } from "./popover/Popover.types";
 export { Tooltip } from "./tooltip/Tooltip";
 export type {
+  TooltipHandle,
   TooltipPosition,
   TooltipProps,
+  TooltipSemanticName,
   TooltipTrigger,
 } from "./tooltip/Tooltip.types";
 export { Pagination } from "./pagination/Pagination";
@@ -630,6 +642,7 @@ export type {
   SelectHandle,
   SelectMultipleProps,
   SelectOption,
+  SelectOptionGroup,
   SelectProps,
   SelectRawValue,
   SelectSearchConfig,

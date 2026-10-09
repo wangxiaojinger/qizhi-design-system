@@ -1,5 +1,10 @@
 import { expectTypeOf, test } from "vitest";
-import type { TooltipPosition, TooltipProps, TooltipTrigger } from "./Tooltip.types";
+import type {
+  TooltipPosition,
+  TooltipProps,
+  TooltipSemanticName,
+  TooltipTrigger,
+} from "./Tooltip.types";
 
 test("exposes only the confirmed Tooltip v1 API", () => {
   expectTypeOf<TooltipPosition>().toEqualTypeOf<
@@ -9,6 +14,9 @@ test("exposes only the confirmed Tooltip v1 API", () => {
     | "rightTop" | "right" | "rightBottom"
   >();
   expectTypeOf<TooltipTrigger>().toEqualTypeOf<"hover" | "focus" | "click">();
+  expectTypeOf<TooltipSemanticName>().toEqualTypeOf<
+    "root" | "container" | "arrow"
+  >();
   expectTypeOf<keyof TooltipProps>().toEqualTypeOf<
     | "children"
     | "content"
@@ -20,5 +28,11 @@ test("exposes only the confirmed Tooltip v1 API", () => {
     | "defaultPopupVisible"
     | "onVisibleChange"
     | "getPopupContainer"
+    | "mouseEnterDelay"
+    | "mouseLeaveDelay"
+    | "arrow"
+    | "zIndex"
+    | "classNames"
+    | "styles"
   >();
 });

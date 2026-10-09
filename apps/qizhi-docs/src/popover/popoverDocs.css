@@ -13,6 +13,14 @@
 #component-popover .popover-placement-demo__item { display: flex; align-items: center; justify-content: center; }
 #component-popover .popover-placement-demo__item .qizhi-btn { width: 104px; }
 #component-popover .popover-closable-demo__copy { margin: 0 0 12px; }
+#component-popover .popover-copy-demo__trigger { color: var(--color-primary-6); cursor: pointer; }
+#component-popover .popover-copy-demo__trigger:focus-visible { outline: 2px solid var(--color-primary-3); outline-offset: 2px; }
+.qizhi-popover .popover-copy-demo__content { display: inline-flex; align-items: center; gap: 8px; color: inherit; white-space: nowrap; }
+.qizhi-popover .popover-copy-demo__button { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; padding: 0; color: inherit; background: transparent; border: 0; border-radius: 4px; cursor: pointer; }
+.qizhi-popover .popover-copy-demo__button:hover { background: rgba(255, 255, 255, 0.14); }
+.qizhi-popover .popover-copy-demo__button:focus-visible { outline: 2px solid currentColor; outline-offset: 1px; }
+.qizhi-popover .popover-copy-demo__button svg { color: inherit; }
+.qizhi-popover .popover-copy-demo__status:empty { display: none; }
 #component-popover .popover-closable-demo__actions { display: flex; justify-content: flex-end; }
 
 @media (min-width: 701px) {

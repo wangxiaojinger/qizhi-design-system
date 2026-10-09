@@ -4745,6 +4745,24 @@
           "defaultValue": "false"
         },
         {
+          "name": "destroyOnHidden",
+          "description": "关闭时是否销毁内部内容；默认保留内容状态。",
+          "type": "boolean",
+          "defaultValue": "false"
+        },
+        {
+          "name": "afterClose",
+          "description": "退出动画完成后的回调。",
+          "type": "() => void",
+          "defaultValue": "—"
+        },
+        {
+          "name": "getContainer",
+          "description": "指定对话框挂载容器；传入 `false` 时原地渲染。",
+          "type": "HTMLElement | () => HTMLElement | string | false",
+          "defaultValue": "document.body"
+        },
+        {
           "name": "closable",
           "description": "是否显示右上角关闭按钮。",
           "type": "boolean",
@@ -4802,6 +4820,84 @@
           "description": "确认对话框正文。",
           "type": "ReactNode",
           "defaultValue": "—"
+        },
+        {
+          "name": "icon",
+          "description": "确认标题前的图标；传入 `null` 隐藏默认警告图标。",
+          "type": "ReactNode | null",
+          "defaultValue": "WarningFilledIcon"
+        },
+        {
+          "name": "footer",
+          "description": "自定义页脚；传入 `null` 隐藏页脚。",
+          "type": "ReactNode",
+          "defaultValue": "—"
+        },
+        {
+          "name": "width",
+          "description": "确认对话框宽度。",
+          "type": "number | string",
+          "defaultValue": "416"
+        },
+        {
+          "name": "okText",
+          "description": "确认按钮文案。",
+          "type": "ReactNode",
+          "defaultValue": "确定"
+        },
+        {
+          "name": "cancelText",
+          "description": "取消按钮文案。",
+          "type": "ReactNode",
+          "defaultValue": "取消"
+        },
+        {
+          "name": "okButtonProps",
+          "description": "确认按钮属性。",
+          "type": "ButtonProps",
+          "defaultValue": "—"
+        },
+        {
+          "name": "cancelButtonProps",
+          "description": "取消按钮属性。",
+          "type": "ButtonProps",
+          "defaultValue": "—"
+        },
+        {
+          "name": "closable",
+          "description": "是否显示右上角关闭按钮。",
+          "type": "boolean",
+          "defaultValue": "false"
+        },
+        {
+          "name": "maskClosable",
+          "description": "点击遮罩是否触发取消。",
+          "type": "boolean",
+          "defaultValue": "false"
+        },
+        {
+          "name": "escToExit",
+          "description": "按 Escape 是否触发取消。",
+          "type": "boolean",
+          "defaultValue": "true"
+        },
+        {
+          "name": "hideCancel",
+          "description": "是否隐藏默认取消按钮。",
+          "type": "boolean",
+          "defaultValue": "false"
+        },
+        {
+          "name": "afterClose",
+          "description": "退出动画完成后的回调。",
+          "type": "() => void",
+          "defaultValue": "—"
+        },
+        {
+          "name": "getContainer",
+          "description": "指定确认框挂载容器；`false` 会跳过 Portal，静态调用渲染在临时宿主中，useModal 渲染在 holder 位置。",
+          "type": "HTMLElement | () => HTMLElement | string | false",
+          "defaultValue": "document.body"
         },
         {
           "name": "onOk",
@@ -5159,15 +5255,15 @@
         },
         {
           "name": "content",
-          "description": "浮层内容。",
+          "description": "浮层内容；为 null、undefined 或空字符串时不显示，数字 0 为有效内容。",
           "type": "ReactNode",
           "defaultValue": "—"
         },
         {
           "name": "trigger",
-          "description": "浮层的触发方式。",
-          "type": "\"hover\" | \"click\" | \"focus\" | \"contextMenu\"",
-          "defaultValue": "\"hover\""
+          "description": "浮层的触发方式，可传入一个或多个值。",
+          "type": "PopoverTrigger | PopoverTrigger[]",
+          "defaultValue": "[\"hover\", \"focus\"]"
         },
         {
           "name": "position",
@@ -5201,9 +5297,63 @@
         },
         {
           "name": "role",
-          "description": "浮层的可访问语义。",
+          "description": "浮层的可访问语义；交互内容使用 dialog，真实菜单使用 menu，tooltip 仅用于兼容非交互说明。",
           "type": "\"tooltip\" | \"dialog\" | \"menu\"",
-          "defaultValue": "\"tooltip\""
+          "defaultValue": "\"dialog\""
+        },
+        {
+          "name": "ariaLabel",
+          "description": "无标题且内容不是纯文本时，为浮层提供可访问名称。",
+          "type": "string",
+          "defaultValue": "—"
+        },
+        {
+          "name": "mouseEnterDelay",
+          "description": "鼠标移入后延迟显示的时间，单位为秒。",
+          "type": "number",
+          "defaultValue": "0"
+        },
+        {
+          "name": "mouseLeaveDelay",
+          "description": "鼠标离开触发元素和浮层后延迟隐藏的时间，单位为秒。",
+          "type": "number",
+          "defaultValue": "0.08"
+        },
+        {
+          "name": "arrow",
+          "description": "是否显示指向触发元素的箭头。",
+          "type": "boolean",
+          "defaultValue": "true"
+        },
+        {
+          "name": "zIndex",
+          "description": "浮层根元素的层级。",
+          "type": "number",
+          "defaultValue": "1200"
+        },
+        {
+          "name": "classNames",
+          "description": "为 root、title、content 和 arrow 语义结构设置类名。",
+          "type": "Partial<Record<PopoverSemanticName, string>>",
+          "defaultValue": "—"
+        },
+        {
+          "name": "styles",
+          "description": "为 root、title、content 和 arrow 语义结构设置样式。",
+          "type": "Partial<Record<PopoverSemanticName, CSSProperties>>",
+          "defaultValue": "—"
+        },
+        {
+          "name": "variant",
+          "description": "浮层的明暗样式；深色变体中的文字与图标操作可继承白色。",
+          "type": "\"light\" | \"dark\"",
+          "defaultValue": "\"light\""
+        },
+        {
+          "name": "forceAlign",
+          "description": "通过 PopoverHandle ref 手动重新计算浮层位置。",
+          "type": "PopoverHandle method",
+          "defaultValue": "—"
         }
       ]
     },
@@ -5431,8 +5581,8 @@
       "items": [
         {
           "name": "options",
-          "description": "可选项数据，包含标签、值和可选禁用状态。",
-          "type": "SelectOption[]",
+          "description": "扁平选项或带标题的分组选项；SelectOptionGroup 包含 label: ReactNode 和 options: SelectOption[]。",
+          "type": "Array<SelectOption | SelectOptionGroup>",
           "defaultValue": "—"
         },
         {
@@ -5457,6 +5607,30 @@
           "name": "onChange",
           "description": "选择、清除、删除或拖拽排序后触发。",
           "type": "SelectSingleProps['onChange'] | SelectMultipleProps['onChange']",
+          "defaultValue": "—"
+        },
+        {
+          "name": "onSelect",
+          "description": "选择单个选项时触发。",
+          "type": "(value: SelectRawValue, option: SelectOption) => void",
+          "defaultValue": "—"
+        },
+        {
+          "name": "onDeselect",
+          "description": "多选模式取消单个选项时触发；批量清空不逐项触发。",
+          "type": "(value: SelectRawValue, option: SelectOption) => void",
+          "defaultValue": "—"
+        },
+        {
+          "name": "onClear",
+          "description": "通过清除入口批量清空时触发一次。",
+          "type": "() => void",
+          "defaultValue": "—"
+        },
+        {
+          "name": "onFocus",
+          "description": "焦点首次进入选择器整体时触发，内部焦点移动不重复触发。",
+          "type": "FocusEventHandler<HTMLElement>",
           "defaultValue": "—"
         },
         {
@@ -5502,6 +5676,12 @@
           "defaultValue": "false"
         },
         {
+          "name": "searchValue",
+          "description": "受控搜索文本；输入变化由 onSearch 通知调用方。",
+          "type": "string",
+          "defaultValue": "—"
+        },
+        {
           "name": "filterOption",
           "description": "覆盖默认标签和值匹配逻辑。",
           "type": "(input: string, option: SelectOption) => boolean",
@@ -5512,6 +5692,18 @@
           "description": "搜索输入变化时触发，远程数据由调用方更新 options。",
           "type": "(input: string) => void",
           "defaultValue": "—"
+        },
+        {
+          "name": "loading",
+          "description": "展示加载状态并暂时阻止选择和创建。",
+          "type": "boolean",
+          "defaultValue": "false"
+        },
+        {
+          "name": "notFoundContent",
+          "description": "无匹配选项时的内容；传入 null 可隐藏。",
+          "type": "ReactNode",
+          "defaultValue": "\"暂无数据\""
         },
         {
           "name": "allowCreate",
@@ -5530,6 +5722,24 @@
           "description": "固定或根据容器响应式控制标签数。",
           "type": "number | \"responsive\"",
           "defaultValue": "—"
+        },
+        {
+          "name": "maxCount",
+          "description": "多选模式的最大选择数量；达到上限后禁用未选项。",
+          "type": "number",
+          "defaultValue": "—"
+        },
+        {
+          "name": "virtual",
+          "description": "为至少 100 项的固定高度扁平选项启用虚拟滚动；分组或自定义内容保持完整渲染。",
+          "type": "boolean",
+          "defaultValue": "true"
+        },
+        {
+          "name": "listHeight",
+          "description": "虚拟列表可视区域高度，单位为 px。",
+          "type": "number",
+          "defaultValue": "256"
         },
         {
           "name": "renderTag",
@@ -5617,7 +5827,7 @@
         },
         {
           "name": "onBlur",
-          "description": "选择器触发节点失去焦点时触发，可与 Form 的失焦校验配合。",
+          "description": "焦点离开选择器整体（含清除入口和弹层）时触发，可与 Form 的失焦校验配合。",
           "type": "FocusEventHandler<HTMLElement>",
           "defaultValue": "—"
         },
@@ -6754,7 +6964,7 @@
           "name": "trigger",
           "description": "气泡触发方式，可传入一个或多个值。",
           "type": "TooltipTrigger | TooltipTrigger[]",
-          "defaultValue": "[\"hover\", \"focus\", \"click\"]"
+          "defaultValue": "[\"hover\", \"focus\"]"
         },
         {
           "name": "mini",
@@ -6791,6 +7001,48 @@
           "description": "返回气泡挂载容器；回调参数为当前触发元素。",
           "type": "(trigger: HTMLElement) => Element",
           "defaultValue": "() => document.body"
+        },
+        {
+          "name": "mouseEnterDelay",
+          "description": "鼠标移入后延迟显示的时间，单位为秒。",
+          "type": "number",
+          "defaultValue": "0"
+        },
+        {
+          "name": "mouseLeaveDelay",
+          "description": "鼠标移出后延迟隐藏的时间，单位为秒。",
+          "type": "number",
+          "defaultValue": "0.08"
+        },
+        {
+          "name": "arrow",
+          "description": "是否显示指向触发元素的箭头。",
+          "type": "boolean",
+          "defaultValue": "true"
+        },
+        {
+          "name": "zIndex",
+          "description": "气泡根元素的层级。",
+          "type": "number",
+          "defaultValue": "1200"
+        },
+        {
+          "name": "classNames",
+          "description": "为 root、container 和 arrow 语义结构设置类名。",
+          "type": "Partial<Record<TooltipSemanticName, string>>",
+          "defaultValue": "—"
+        },
+        {
+          "name": "styles",
+          "description": "为 root、container 和 arrow 语义结构设置样式。",
+          "type": "Partial<Record<TooltipSemanticName, CSSProperties>>",
+          "defaultValue": "—"
+        },
+        {
+          "name": "forceAlign",
+          "description": "通过 TooltipHandle ref 手动重新计算气泡位置。",
+          "type": "TooltipHandle method",
+          "defaultValue": "—"
         }
       ]
     },

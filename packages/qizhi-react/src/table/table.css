@@ -26,7 +26,7 @@
 .qizhi-table__selection, .qizhi-table__expand { width: 48px; padding: 0; text-align: center; }
 .qizhi-table__cell { display: flex; align-items: center; gap: 8px; min-width: 0; white-space: normal; overflow-wrap: break-word; }
 .qizhi-table__cell.is-ellipsis { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; word-break: keep-all; }
-.qizhi-table__expanded td { padding: 16px 64px; background: rgb(var(--gray-1, 247, 248, 250)); }
+.qizhi-table__expanded > td { padding: 16px 64px; background: rgb(var(--gray-1, 247, 248, 250)); }
 .qizhi-table .is-fixed-left { position: sticky; left: 0; z-index: 2; }
 .qizhi-table .is-fixed-right { position: sticky; right: 0; z-index: 2; }
 .qizhi-table .is-fixed-left::before, .qizhi-table .is-fixed-right::before { position: absolute; top: 0; bottom: -1px; width: 12px; pointer-events: none; content: ""; }

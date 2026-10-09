@@ -166,6 +166,19 @@ test("Table 默认自然换行，ellipsis 列保持单行省略", async ({ page 
   await expect(ellipsisCell).toHaveAttribute("title", /QIZHI/);
 });
 
+test("嵌套表格单元格不继承展开容器的水平缩进", async ({ page }) => {
+  await page.goto("/#component-table", { waitUntil: "domcontentloaded" });
+
+  const nestedTable = page.locator("#table-nested .qizhi-table .qizhi-table");
+  const nestedNameCell = nestedTable.locator("tbody .qizhi-table__td").first();
+  const expectedInlinePadding = (page.viewportSize()?.width ?? 0) <= 600 ? "12px" : "16px";
+
+  await expect(nestedTable).toBeVisible();
+  await expect(nestedNameCell).toHaveCSS("padding-left", expectedInlinePadding);
+  await expect(nestedNameCell).toHaveCSS("padding-right", expectedInlinePadding);
+  expect(await nestedNameCell.evaluate((node) => node.getBoundingClientRect().height)).toBeLessThan(80);
+});
+
 test("Table 排序图标的可见箭头为 8px 且间距为 4px", async ({ page }) => {
   await page.goto("/#component-table", { waitUntil: "domcontentloaded" });
 

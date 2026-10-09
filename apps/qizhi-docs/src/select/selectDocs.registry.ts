@@ -9,6 +9,7 @@ import RemoteDemo from "./demos/RemoteDemo"; import remoteSource from "./demos/R
 import PopupWidthDemo from "./demos/PopupWidthDemo"; import popupWidthSource from "./demos/PopupWidthDemo.tsx?raw";
 import SizeDemo from "./demos/SizeDemo"; import sizeSource from "./demos/SizeDemo.tsx?raw";
 import OptionsDemo from "./demos/OptionsDemo"; import optionsSource from "./demos/OptionsDemo.tsx?raw";
+import GroupDemo from "./demos/GroupDemo"; import groupSource from "./demos/GroupDemo.tsx?raw";
 import TokenDemo from "./demos/TokenDemo"; import tokenSource from "./demos/TokenDemo.tsx?raw";
 import TriggerDemo from "./demos/TriggerDemo"; import triggerSource from "./demos/TriggerDemo.tsx?raw";
 import DropdownRenderDemo from "./demos/DropdownRenderDemo"; import dropdownRenderSource from "./demos/DropdownRenderDemo.tsx?raw";
@@ -21,6 +22,7 @@ import HideSelectedDemo from "./demos/HideSelectedDemo"; import hideSelectedSour
 import DragDemo from "./demos/DragDemo"; import dragSource from "./demos/DragDemo.tsx?raw";
 import AutoWidthDemo from "./demos/AutoWidthDemo"; import autoWidthSource from "./demos/AutoWidthDemo.tsx?raw";
 import MaxTagsDemo from "./demos/MaxTagsDemo"; import maxTagsSource from "./demos/MaxTagsDemo.tsx?raw";
+import VirtualDemo from "./demos/VirtualDemo"; import virtualSource from "./demos/VirtualDemo.tsx?raw";
 
 export interface SelectDemoDefinition { id: string; title: string; description: string; component: ComponentType; source: string; sectionBefore?: { title: string; description: string } }
 export const selectDemos: readonly SelectDemoDefinition[] = [
@@ -34,6 +36,7 @@ export const selectDemos: readonly SelectDemoDefinition[] = [
   { id: "选择器-自定义弹出框宽度", title: "自定义弹出框宽度", description: "弹出框可以根据内容自动调节宽度，最小宽度为输入框的宽度。", component: PopupWidthDemo, source: popupWidthSource },
   { id: "选择器-不同尺寸", title: "不同尺寸", description: "通过 size 选择 Select 的尺寸（mini、small、default、large），高度分别对应 24px、28px、32px、36px。", component: SizeDemo, source: sizeSource },
   { id: "选择器-指定可选项", title: "指定可选项", description: "通过传入 options 指定可选项。", component: OptionsDemo, source: optionsSource },
+  { id: "选择器-分组选项", title: "分组选项", description: "使用 SelectOptionGroup 建立选项层级，并通过独立事件识别选择、取消、清空和聚焦。", component: GroupDemo, source: groupSource },
   { id: "选择器-自动分词", title: "自动分词", description: "设置 tokenSeparators 可以使用自动分词功能。试试复制 北京,上海,深圳|南京/西安|杭州 到输入框里。只在 multiple 模式下可用。", component: TokenDemo, source: tokenSource },
   { id: "选择器-自定义触发节点", title: "自定义触发节点", description: "设置 trigger 可以自定义触发下拉框的节点，并保留完整键盘和 ARIA 协议。", component: TriggerDemo, source: triggerSource },
   { id: "选择器-扩展菜单", title: "扩展菜单", description: "使用 dropdownRender 对下拉菜单进行自由扩展。", component: DropdownRenderDemo, source: dropdownRenderSource },
@@ -46,4 +49,5 @@ export const selectDemos: readonly SelectDemoDefinition[] = [
   { id: "选择器-拖拽排序", title: "拖拽排序", description: "多选时，指定 dragToSort 属性以允许对已输入的值进行拖拽排序。", component: DragDemo, source: dragSource },
   { id: "选择器-宽度自适应", title: "宽度自适应", description: "通过 autoWidth 属性可以设置 Select 的宽度自适应。", component: AutoWidthDemo, source: autoWidthSource },
   { id: "选择器-最大标签数", title: "最大标签数", description: "通过 maxTagCount 属性可以设置 Select 的最大标签数。maxTagCount=responsive 时会根据容器尺寸动态显示标签数。", component: MaxTagsDemo, source: maxTagsSource },
+  { id: "选择器-大数据", title: "大数据", description: "100 项及以上的固定高度扁平列表默认使用虚拟滚动；可通过 virtual=false 关闭。", component: VirtualDemo, source: virtualSource },
 ];

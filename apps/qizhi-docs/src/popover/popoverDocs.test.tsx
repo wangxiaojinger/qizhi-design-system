@@ -4,11 +4,11 @@ import { popoverApi } from "./popoverApi";
 import { popoverDemos } from "./popoverDocs.registry";
 
 describe("Popover docs", () => {
-  it("renders the four approved demos in legacy order", () => {
+  it("renders the five approved demos in order", () => {
     render(<PopoverDocsIsland />);
-    expect(screen.getAllByRole("heading", { level: 2 }).map((node) => node.textContent)).toEqual(["基础用法", "触发方式", "位置", "浮层内关闭", "API"]);
-    expect(document.querySelectorAll("article.codebox-wrapper")).toHaveLength(4);
-    expect(document.querySelectorAll(".popover-demo-trigger")).toHaveLength(18);
+    expect(screen.getAllByRole("heading", { level: 2 }).map((node) => node.textContent)).toEqual(["基础用法", "文字与复制", "触发方式", "位置", "浮层内关闭", "API"]);
+    expect(document.querySelectorAll("article.codebox-wrapper")).toHaveLength(5);
+    expect(document.querySelectorAll(".popover-demo-trigger")).toHaveLength(19);
     expect(document.getElementById("popover-API")).toBeInTheDocument();
     expect(screen.queryByText(/Demo\.tsx|Demo\.css/)).not.toBeInTheDocument();
   });
@@ -31,9 +31,17 @@ describe("Popover docs", () => {
     expect(source).not.toContain("gridRow");
   });
 
+  it("documents a dark interactive copy popover from the rendered source", () => {
+    const demo = popoverDemos.find((item) => item.id === "popover-copy");
+    expect(demo?.source).toContain('variant="dark"');
+    expect(demo?.source).toContain("CopyIcon");
+    expect(demo?.source).toContain('aria-label="复制文本"');
+  });
+
   it("documents only the approved Popover API", () => {
-    expect(popoverApi.map((item) => item.name)).toEqual(["children", "title", "content", "trigger", "position", "popupVisible", "defaultPopupVisible", "onVisibleChange", "getPopupContainer", "role"]);
-    expect(popoverApi.find((item) => item.name === "trigger")?.defaultValue).toBe('"hover"');
+    expect(popoverApi.map((item) => item.name)).toEqual(["children", "title", "content", "trigger", "position", "popupVisible", "defaultPopupVisible", "onVisibleChange", "getPopupContainer", "role", "ariaLabel", "mouseEnterDelay", "mouseLeaveDelay", "arrow", "zIndex", "classNames", "styles", "variant", "forceAlign"]);
+    expect(popoverApi.find((item) => item.name === "trigger")?.defaultValue).toBe('["hover", "focus"]');
+    expect(popoverApi.find((item) => item.name === "role")?.defaultValue).toBe('"dialog"');
     expect(popoverApi.find((item) => item.name === "position")?.defaultValue).toBe('"top"');
     expect(popoverApi.find((item) => item.name === "getPopupContainer")?.type).toBe("(trigger: HTMLElement) => Element");
   });

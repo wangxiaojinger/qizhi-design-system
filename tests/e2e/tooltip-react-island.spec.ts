@@ -146,17 +146,10 @@ test("Tooltip 锁定五组旧站 Demo 与三档视觉交互契约", async ({
         (buttonRect?.x ?? 0) + (buttonRect?.width ?? 0),
       );
     }
-    if (position.endsWith("Top")) {
+    if (position.startsWith("left") || position.startsWith("right")) {
       const arrowCenter = (arrowRect?.y ?? 0) + (arrowRect?.height ?? 0) / 2;
-      expect(arrowCenter).toBeLessThan(
-        (tooltipRect?.y ?? 0) + (tooltipRect?.height ?? 0) * 0.45,
-      );
-    }
-    if (position.endsWith("Bottom")) {
-      const arrowCenter = (arrowRect?.y ?? 0) + (arrowRect?.height ?? 0) / 2;
-      expect(arrowCenter).toBeGreaterThan(
-        (tooltipRect?.y ?? 0) + (tooltipRect?.height ?? 0) * 0.55,
-      );
+      const triggerCenter = (buttonRect?.y ?? 0) + (buttonRect?.height ?? 0) / 2;
+      expect(Math.abs(arrowCenter - triggerCenter)).toBeLessThanOrEqual(1);
     }
     if (position === "rightBottom") {
       await page.waitForTimeout(200);
@@ -198,7 +191,7 @@ test("Tooltip 锁定五组旧站 Demo 与三档视觉交互契约", async ({
   );
   for (let index = 0; index < expectedColors.length; index += 1) {
     await colorTriggers.nth(index).hover();
-    await expect(page.getByRole("tooltip")).toHaveCSS(
+    await expect(page.getByRole("tooltip").locator(".qizhi-tooltip__container")).toHaveCSS(
       "background-color",
       expectedColors[index],
     );

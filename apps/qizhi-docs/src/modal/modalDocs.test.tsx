@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import { expect, test } from "vitest";
 import { ModalDocsIsland } from "./ModalDocsIsland";
 import { modalDemos } from "./modalDocs.registry";
+import { modalApi, modalConfirmApi } from "./modalApi";
 
 const titles = [
   "基础用法",
@@ -45,4 +46,37 @@ test("renders API from structured data without copy-style UI", () => {
   expect(screen.getByRole("table", { name: "Modal API" })).toBeVisible();
   expect(screen.getByRole("table", { name: "Modal.confirm API" })).toBeVisible();
   expect(screen.queryByRole("button", { name: "复制样式" })).not.toBeInTheDocument();
+});
+
+test("documents every public Modal.confirm option", () => {
+  expect(modalConfirmApi.map((item) => item.name)).toEqual([
+    "title",
+    "content",
+    "icon",
+    "footer",
+    "width",
+    "okText",
+    "cancelText",
+    "okButtonProps",
+    "cancelButtonProps",
+    "closable",
+    "maskClosable",
+    "escToExit",
+    "hideCancel",
+    "afterClose",
+    "getContainer",
+    "onOk",
+    "onCancel",
+  ]);
+});
+
+test("documents the second-stage lifecycle and container APIs", () => {
+  expect(modalApi.map((item) => item.name)).toEqual(expect.arrayContaining([
+    "destroyOnHidden",
+    "afterClose",
+    "getContainer",
+  ]));
+  render(<ModalDocsIsland />);
+  expect(screen.getByText("Modal.useModal")).toBeVisible();
+  expect(screen.getByText("[modal, contextHolder]")).toBeVisible();
 });

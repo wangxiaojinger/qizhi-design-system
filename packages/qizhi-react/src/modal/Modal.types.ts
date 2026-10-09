@@ -1,6 +1,8 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { ButtonNativeProps } from "../button/Button.types";
 
+export type ModalContainer = HTMLElement | string | (() => HTMLElement) | false;
+
 export interface ModalProps {
   open: boolean;
   title: ReactNode;
@@ -14,6 +16,9 @@ export interface ModalProps {
   cancelButtonProps?: ButtonNativeProps;
   okButtonProps?: ButtonNativeProps;
   confirmLoading?: boolean;
+  destroyOnHidden?: boolean;
+  afterClose?: () => void;
+  getContainer?: ModalContainer;
   closable?: boolean;
   maskClosable?: boolean;
   escToExit?: boolean;
@@ -26,6 +31,7 @@ export interface ModalProps {
 export interface ModalConfirmConfig {
   title: ReactNode;
   content?: ReactNode;
+  icon?: ReactNode | null;
   footer?: ReactNode;
   width?: number | string;
   okText?: ReactNode;
@@ -36,6 +42,8 @@ export interface ModalConfirmConfig {
   maskClosable?: boolean;
   escToExit?: boolean;
   hideCancel?: boolean;
+  afterClose?: () => void;
+  getContainer?: ModalContainer;
   onOk?: () => void | Promise<void>;
   onCancel?: () => void;
 }
@@ -45,7 +53,12 @@ export interface ModalConfirmHandle {
   close: () => void;
 }
 
+export interface ModalHookApi {
+  confirm: (config: ModalConfirmConfig) => ModalConfirmHandle;
+}
+
 export interface ModalComponent {
   (props: ModalProps): ReactNode;
   confirm: (config: ModalConfirmConfig) => ModalConfirmHandle;
+  useModal: () => readonly [ModalHookApi, ReactNode];
 }

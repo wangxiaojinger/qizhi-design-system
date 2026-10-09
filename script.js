@@ -9064,8 +9064,9 @@ const initModalDemos = () => {
     }
 
     if (type === "confirm") {
-      title.textContent = "确认删除";
-      body.innerHTML = '<div class="qizhi-modal-confirm"><i class="ri-error-warning-fill qizhi-modal-confirm__icon" aria-hidden="true"></i><div><div class="qizhi-modal-confirm__title">确认删除</div><p>确定要删除已选择的 3 个项目吗？删除后无法撤销此操作。</p></div></div>';
+      const confirmTitle = "确定要删除已选择的 3 个项目吗？删除后无法撤销此操作。";
+      title.closest(".qizhi-modal__header")?.remove();
+      body.innerHTML = `<div class="qizhi-modal-confirm"><i class="ri-error-warning-fill qizhi-modal-confirm__icon" aria-hidden="true"></i><h3 class="qizhi-modal-confirm__title" id="${title.id}">${confirmTitle}</h3></div>`;
       footer.append(createButton("取消"), createButton("删除", "danger"));
       return;
     }
@@ -9105,7 +9106,7 @@ const initModalDemos = () => {
     mask.type = "button";
     mask.setAttribute("aria-label", "关闭对话框");
     const dialog = document.createElement("section");
-    dialog.className = `qizhi-modal${type === "async" ? " qizhi-modal--form" : ""}`;
+    dialog.className = `qizhi-modal${type === "async" ? " qizhi-modal--form" : ""}${type === "confirm" ? " qizhi-modal--confirm" : ""}`;
     dialog.setAttribute("role", "dialog");
     dialog.setAttribute("aria-modal", "true");
     const titleId = `qizhi-modal-title-${Date.now()}`;

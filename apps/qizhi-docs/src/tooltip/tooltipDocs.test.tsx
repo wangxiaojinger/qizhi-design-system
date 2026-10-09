@@ -81,6 +81,13 @@ describe("Tooltip docs", () => {
       "defaultPopupVisible",
       "onVisibleChange",
       "getPopupContainer",
+      "mouseEnterDelay",
+      "mouseLeaveDelay",
+      "arrow",
+      "zIndex",
+      "classNames",
+      "styles",
+      "forceAlign",
     ]);
   });
 

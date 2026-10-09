@@ -8,7 +8,8 @@ export function TooltipApiTable() {
       </h2>
       <h3>Tooltip</h3>
       <p className="qizhi-api-section__note">
-        只列出 QIZHI Tooltip v1 已实现且属于本组件的能力。
+        默认通过 hover 和 focus 显示；内容为 null、undefined
+        或空字符串时不显示气泡。
       </p>
       <ApiTable api="tooltipApi" label="Tooltip API" />
     </section>

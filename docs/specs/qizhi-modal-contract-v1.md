@@ -1,7 +1,7 @@
 # QIZHI Modal React Contract v1
 
 状态：已确认  
-证据日期：2026-08-25
+证据日期：2026-10-09
 
 ## 范围
 
@@ -24,24 +24,27 @@
 
 ## 公共 API
 
-- `ModalProps`: `open`, `title`, `children`, `width`, `footer`, `onCancel`, `onOk`, `cancelText`, `okText`, `cancelButtonProps`, `okButtonProps`, `confirmLoading`, `closable`, `maskClosable`, `escToExit`, `hideCancel`, `className`, `style`。
+- `ModalProps`: `open`, `title`, `children`, `width`, `footer`, `onCancel`, `onOk`, `cancelText`, `okText`, `cancelButtonProps`, `okButtonProps`, `confirmLoading`, `destroyOnHidden`, `afterClose`, `getContainer`, `closable`, `maskClosable`, `escToExit`, `hideCancel`, `className`, `bodyClassName`, `style`。
 - `width` 默认 `520`；`closable`、`maskClosable`、`escToExit` 默认 `true`。
 - `onOk` 返回 Promise 时保持打开并进入 loading；resolve 后由受控调用方关闭，reject 后保持打开并恢复按钮。
 - `Modal.confirm(config)` 返回 `{ update, close }`，支持同节点更新和手动移除。
-- v1 不提供拖拽、全屏、嵌套、位置变体、自定义挂载容器或自定义动效。
+- `Modal.useModal()` 返回 `[modal, contextHolder]`，通过 holder 继承调用位置的 React Context。
+- 关闭时先执行退出动画，再调用 `afterClose`；`destroyOnHidden` 只控制动画结束后是否销毁内容。
+- v1 不提供拖拽、全屏、嵌套、位置变体或自定义动效。
 
 ## DOM、视觉与交互
 
-- Portal 到 `document.body`；遮罩 `rgba(0, 0, 0, 0.45)`；打开期间锁定页面滚动。
-- 默认宽 520px，最大宽为视口减 48px；最大高为视口减 48px。
-- Header 最小高 56px、水平内边距 20px；Body 内边距 24px；Footer 内边距 12px 20px、按钮间距 12px。
+- 默认 Portal 到 `document.body`；`getContainer` 可指定元素、选择器或函数，`false` 时跳过 Portal。静态 `Modal.confirm` 的宿主仍由组件创建在 `body`，`useModal` 的 holder 则保留调用位置的 Context。
+- 遮罩为 `rgba(0, 0, 0, 0.45)`；打开期间锁定页面滚动。
+- 默认宽 520px，默认最大宽高为视口减 48px；当视口宽度不大于 375px 时为视口减 32px。
+- Header 最小高 56px、水平内边距 24px；Body 内边距 24px；Footer 内边距 16px 24px、按钮间距 12px。
 - 关闭按钮 28px；180ms 透明度/位移/缩放动效，并兼容 reduced motion。
 - 支持关闭按钮、遮罩、取消、Escape、Tab 焦点闭环和关闭后焦点恢复。
 
 ## 复用边界
 
 - 复用 `Button`, `Form`, `Input`, `Select`, `Table`, `Checkbox`, `Space` 和 QIZHI 图标。
-- Alert 与 Steps 尚无正式 React 导出；两个旧 Demo 只保留经证据确认的组合内容，不扩展为本次公共组件 API。
+- Alert 与 Steps 已从 `@wangxiaojinger/qizhi-react` 正式导出，相关 Demo 直接复用公共组件。
 
 ## 验收门槛
 
@@ -49,4 +52,3 @@
 - 文档测试锁定 7 个 Demo、9 种触发、原文顺序、同源代码和无私有 Modal 结构。
 - Playwright 覆盖 1440/1024/375、实际坐标、盒模型、遮罩、焦点、表单、表格、截图和 Upload 消费回归。
 - 执行 `node --check script.js`、`pnpm typecheck`、`pnpm test`、`pnpm build` 和 `git diff --check`。
-

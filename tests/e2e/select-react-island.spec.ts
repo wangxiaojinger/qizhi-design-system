@@ -44,7 +44,7 @@ test("Select 布局与交互", async ({ page }, testInfo) => {
     const errors: string[] = [];
     page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
     await page.goto("/#component-select");
-    await expect(page.locator("#component-select .codebox-wrapper")).toHaveCount(22);
+    await expect(page.locator("#component-select .codebox-wrapper")).toHaveCount(24);
     await expect(page.locator("#component-select #select-API")).toBeVisible();
 
     const basic = page.locator("#选择器-基础用法");
@@ -53,6 +53,34 @@ test("Select 布局与交互", async ({ page }, testInfo) => {
     if ((page.viewportSize()?.width ?? 0) >= 768) {
       for (let index = 0; index < 4; index += 1) await expect(basicControls.nth(index)).toHaveCSS("height", "32px");
     }
+    const keyboardSelect = basic.getByRole("combobox").first();
+    await keyboardSelect.click();
+    await keyboardSelect.press("Escape");
+    await keyboardSelect.press("Tab");
+    const keyboardClear = basic.getByRole("button", { name: "清除选择" }).first();
+    await expect(keyboardClear).toBeVisible();
+    await expect(keyboardClear).toBeFocused();
+    await basic.screenshot({ path: testInfo.outputPath(`select-keyboard-clear-${testInfo.project.name}.png`) });
+    await keyboardClear.press("Enter");
+    await expect(keyboardSelect).toHaveValue("");
+    await keyboardSelect.press("Enter");
+    const keyboardPopup = page.locator(".qizhi-select-popup").last();
+    await keyboardPopup.evaluate((node) => {
+      node.style.maxHeight = "40px";
+      node.style.overflowY = "auto";
+    });
+    await keyboardSelect.press("ArrowUp");
+    const activeOptionId = await keyboardSelect.getAttribute("aria-activedescendant");
+    expect(activeOptionId).not.toBeNull();
+    const activeOption = page.locator(`#${activeOptionId}`);
+    await expect(activeOption).toHaveText("广州");
+    await expect(activeOption).toHaveClass(/is-active/);
+    await expect(activeOption).toHaveCSS("background-color", "rgb(242, 243, 245)");
+    const [activeBounds, popupBoundsAfterScroll] = await Promise.all([activeOption.boundingBox(), keyboardPopup.boundingBox()]);
+    expect(activeBounds!.y).toBeGreaterThanOrEqual(popupBoundsAfterScroll!.y);
+    expect(activeBounds!.y + activeBounds!.height).toBeLessThanOrEqual(popupBoundsAfterScroll!.y + popupBoundsAfterScroll!.height);
+    await keyboardPopup.screenshot({ path: testInfo.outputPath(`select-keyboard-active-${testInfo.project.name}.png`) });
+    await keyboardSelect.press("Escape");
 
     const clearDemo = page.locator("#选择器-允许清除");
     await clearDemo.getByRole("combobox").hover();
@@ -100,7 +128,7 @@ test("Select 布局与交互", async ({ page }, testInfo) => {
     expect(errors).toEqual([]);
 });
 
-test("Select 四种尺寸与多选、创建、联动", async ({ page }) => {
+test("Select 四种尺寸与多选、创建、联动", async ({ page }, testInfo) => {
   await page.goto("/#component-select");
   const size = page.locator("#选择器-不同尺寸");
   const slider = size.getByRole("slider", { name: "组件尺寸" });
@@ -128,6 +156,24 @@ test("Select 四种尺寸与多选、创建、联动", async ({ page }) => {
   await multiple.getByRole("combobox").click();
   await expect(multiple.locator(".qizhi-select__control")).toHaveCSS("border-color", "rgb(51, 102, 255)");
   await expect(multiple.locator(".qizhi-select__control")).toHaveCSS("box-shadow", "rgb(232, 242, 255) 0px 0px 0px 2px");
+  const multipleOptions = page.locator(".qizhi-select-popup").last().getByRole("option");
+  for (const [index, option] of (await multipleOptions.all()).entries()) {
+    const boxes = await option.evaluate((node) => {
+      const toBox = (element: Element) => {
+        const rect = element.getBoundingClientRect();
+        return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+      };
+      return {
+        option: toBox(node),
+        content: toBox(node.querySelector(".qizhi-select-popup__option-content")!),
+        check: toBox(node.querySelector(".qizhi-select-popup__check")!),
+      };
+    });
+    expect(boxes.content.x + boxes.content.width).toBeLessThanOrEqual(boxes.check.x);
+    expect(boxes.option.x + boxes.option.width - boxes.check.x - boxes.check.width).toBe(12);
+    expect(Math.abs((boxes.option.y + boxes.option.height / 2) - (boxes.check.y + boxes.check.height / 2)), `option ${index} checkbox should be vertically centered`).toBeLessThanOrEqual(1);
+  }
+  await page.locator(".qizhi-select-popup").last().screenshot({ path: testInfo.outputPath(`select-multiple-popup-${testInfo.project.name}.png`) });
   await page.getByRole("option", { name: "上海" }).last().click();
   await expect(multiple.getByRole("combobox")).toHaveAttribute("aria-expanded", "true");
 
@@ -137,10 +183,14 @@ test("Select 四种尺寸与多选、创建、联动", async ({ page }) => {
   await page.getByRole("option", { name: "北京" }).last().click();
   await expect(clearInput).toHaveAttribute("aria-expanded", "false");
   await expect(clearDemo.locator(".qizhi-select__control")).toHaveCSS("box-shadow", "none");
+  await expect(clearDemo.getByRole("button", { name: "清除选择" })).toBeVisible();
+  await clearInput.press("Tab");
+  await page.keyboard.press("Tab");
+  await page.mouse.move(0, 0);
   await expect(clearDemo.getByRole("button", { name: "清除选择" })).toBeHidden();
+  await clearInput.focus();
   await clearInput.press("Meta+Shift+A");
-  await expect(clearDemo.locator(".qizhi-select__control")).toHaveCSS("box-shadow", "none");
-  await expect(clearDemo.getByRole("button", { name: "清除选择" })).toBeHidden();
+  await expect(clearDemo.getByRole("button", { name: "清除选择" })).toBeVisible();
   await clearDemo.locator(".qizhi-select").hover();
   const clearButton = clearDemo.getByRole("button", { name: "清除选择" });
   const [buttonBox, iconBox] = await Promise.all([clearButton.boundingBox(), clearButton.locator("svg").boundingBox()]);
@@ -160,6 +210,13 @@ test("Select 四种尺寸与多选、创建、联动", async ({ page }) => {
 test("Select 高级 Demo 交互", async ({ page }) => {
   await page.goto("/#component-select");
 
+  const search = page.locator("#选择器-搜索 .qizhi-select").first().getByRole("combobox");
+  await search.click();
+  await search.press("ArrowDown");
+  await search.pressSequentially("北京 烤鸭");
+  await expect(search).toHaveValue("北京 烤鸭");
+  await search.press("Escape");
+
   const create = page.locator("#选择器-允许创建").locator(".qizhi-select").first();
   await create.getByRole("combobox").fill("成都");
   await page.getByRole("option", { name: "输入创建：成都" }).click();
@@ -169,6 +226,22 @@ test("Select 高级 Demo 交互", async ({ page }) => {
   await token.getByRole("combobox").fill("北京,上海|");
   await expect(token.getByRole("button", { name: "删除 北京" })).toBeVisible();
   await expect(token.getByRole("button", { name: "删除 上海" })).toBeVisible();
+
+  const grouped = page.locator("#选择器-分组选项");
+  const groupedStatus = grouped.locator(".demo").getByRole("status");
+  const groupedInput = grouped.getByRole("combobox");
+  await groupedInput.click();
+  const groupedPopup = page.locator(".qizhi-select-popup").last();
+  await expect(groupedPopup.getByRole("group", { name: "华北" })).toBeVisible();
+  await expect(groupedPopup.getByRole("group", { name: "华东" })).toBeVisible();
+  await groupedInput.press("ArrowDown");
+  await groupedInput.press("Enter");
+  await expect(groupedStatus).toHaveText("选择：北京");
+  await groupedPopup.getByRole("option", { name: "北京" }).click();
+  await expect(groupedStatus).toHaveText("取消：北京");
+  await groupedInput.fill("上海");
+  await expect(groupedPopup.getByRole("group", { name: "华北" })).toHaveCount(0);
+  await expect(groupedPopup.getByRole("group", { name: "华东" })).toBeVisible();
 
   const customTrigger = page.locator("#选择器-自定义触发节点");
   await customTrigger.getByRole("combobox").click();
@@ -191,6 +264,10 @@ test("Select 高级 Demo 交互", async ({ page }) => {
   await page.keyboard.press("Escape");
 
   const popupWidth = page.locator("#选择器-自定义弹出框宽度");
+  const blurSelect = popupWidth.getByRole("combobox").first();
+  await blurSelect.click();
+  await blurSelect.press("Tab");
+  await expect(blurSelect).toHaveAttribute("aria-expanded", "false");
   await popupWidth.getByRole("combobox").nth(1).click();
   await expect(page.locator(".qizhi-select-popup").last()).toHaveCSS("width", "300px");
   await page.keyboard.press("Escape");
@@ -198,4 +275,49 @@ test("Select 高级 Demo 交互", async ({ page }) => {
   const maxTags = page.locator("#选择器-最大标签数");
   await expect(maxTags.getByText("+1...", { exact: true })).toBeVisible();
   await expect(maxTags.getByText("+1", { exact: true })).toBeVisible();
+  const responsive = maxTags.locator(".qizhi-select").nth(2);
+  await responsive.evaluate((node) => { node.setAttribute("style", "width: 180px"); });
+  const narrowTagCount = await responsive.locator(".qizhi-select__tags .qizhi-tag")
+    .count();
+  await responsive.evaluate((node) => { node.setAttribute("style", "width: 520px"); });
+  await expect.poll(async () => responsive.locator(
+    ".qizhi-select__tags .qizhi-tag",
+  ).count()).toBeGreaterThan(narrowTagCount);
+
+  const virtual = page.locator("#选择器-大数据");
+  await virtual.getByRole("combobox").click();
+  const virtualPopup = page.locator(".qizhi-select-popup").last();
+  await expect(virtualPopup.getByRole("option")).toHaveCount(12);
+  await virtualPopup.evaluate((node) => { node.scrollTop = 3200; });
+  await expect(virtualPopup.getByRole("option", { name: "选项 101" }))
+    .toBeVisible();
+  await expect(virtualPopup.getByRole("option", { name: "选项 1", exact: true }))
+    .toHaveCount(0);
+  await page.keyboard.press("Escape");
+  await virtual.getByRole("combobox").press("ArrowUp");
+  const lastVirtualOption = virtualPopup.getByRole("option", { name: "选项 1000" });
+  await expect(lastVirtualOption).toBeVisible();
+  expect(await lastVirtualOption.evaluate((option) => {
+    const optionBounds = option.getBoundingClientRect();
+    const popupBounds = option.closest(".qizhi-select-popup")!.getBoundingClientRect();
+    return optionBounds.top >= popupBounds.top && optionBounds.bottom <= popupBounds.bottom;
+  })).toBe(true);
+  await page.keyboard.press("Escape");
+
+  const remote = page.locator("#选择器-远程搜索");
+  const remoteInput = remote.getByRole("combobox");
+  await remoteInput.click();
+  const remotePopup = page.locator(".qizhi-select-popup").last();
+  await expect(remotePopup.getByRole("option")).toHaveCount(4);
+  for (const name of ["张伟", "王芳", "李娜"]) {
+    await remotePopup.getByRole("option", { name }).click();
+  }
+  await expect(remotePopup.getByRole("option", { name: "刘洋" }))
+    .toHaveAttribute("aria-disabled", "true");
+  await remoteInput.fill("不存在");
+  await expect(remotePopup).toHaveAttribute("aria-busy", "true");
+  await expect(remotePopup.getByRole("status")).toHaveText("正在加载");
+  await expect(remotePopup.getByRole("status"))
+    .toHaveText("没有匹配用户", { timeout: 2000 });
+  await expect(remoteInput).toHaveValue("不存在");
 });

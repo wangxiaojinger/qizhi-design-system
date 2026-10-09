@@ -27,6 +27,7 @@ export default function AsyncDemo() {
             <span className="qizhi-modal-form__label is-required">姓名</span>
             <Input
               ref={nameRef}
+              className="qizhi-modal-form__control"
               value={name}
               status={invalid && !name ? "error" : "default"}
               placeholder="请输入姓名"
@@ -38,6 +39,7 @@ export default function AsyncDemo() {
               性别
             </span>
             <Select
+              className="qizhi-modal-form__control"
               value={gender}
               status={invalid && !gender ? "error" : "default"}
               options={[{ label: "男", value: "男" }, { label: "女", value: "女" }]}

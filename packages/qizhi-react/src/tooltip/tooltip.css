@@ -3,12 +3,19 @@
   position: fixed;
   z-index: 1200;
   box-sizing: border-box;
+  color: #fff;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.qizhi-tooltip__container {
+  box-sizing: border-box;
   max-width: min(420px, calc(100vw - 16px));
   min-height: 32px;
   padding: 6px 12px;
   border-radius: var(--border-radius-medium, 4px);
   background: var(--qizhi-tooltip-bg);
-  color: #fff;
+  color: inherit;
   font-size: 14px;
   line-height: 20px;
   text-align: left;
@@ -17,6 +24,11 @@
 }
 
 .qizhi-tooltip-mini {
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.qizhi-tooltip-mini .qizhi-tooltip__container {
   min-height: 34px;
   padding: 6px 14px;
   font-size: 16px;
@@ -33,42 +45,26 @@
 
 .qizhi-tooltip[data-tooltip-position^="top"] .qizhi-tooltip__arrow {
   bottom: -4px;
-  left: calc(50% - 4px);
+  left: clamp(8px, var(--qizhi-tooltip-arrow-offset), calc(100% - 8px));
+  transform: translateX(-50%) rotate(45deg);
 }
 
 .qizhi-tooltip[data-tooltip-position^="bottom"] .qizhi-tooltip__arrow {
   top: -4px;
-  left: calc(50% - 4px);
+  left: clamp(8px, var(--qizhi-tooltip-arrow-offset), calc(100% - 8px));
+  transform: translateX(-50%) rotate(45deg);
 }
 
 .qizhi-tooltip[data-tooltip-position^="left"] .qizhi-tooltip__arrow {
-  top: calc(50% - 4px);
+  top: clamp(8px, var(--qizhi-tooltip-arrow-offset), calc(100% - 8px));
   right: -4px;
+  transform: translateY(-50%) rotate(45deg);
 }
 
 .qizhi-tooltip[data-tooltip-position^="right"] .qizhi-tooltip__arrow {
-  top: calc(50% - 4px);
+  top: clamp(8px, var(--qizhi-tooltip-arrow-offset), calc(100% - 8px));
   left: -4px;
-}
-
-.qizhi-tooltip[data-tooltip-position$="Left"] .qizhi-tooltip__arrow {
-  right: auto;
-  left: 18px;
-}
-
-.qizhi-tooltip[data-tooltip-position$="Right"] .qizhi-tooltip__arrow {
-  right: 18px;
-  left: auto;
-}
-
-.qizhi-tooltip[data-tooltip-position$="Top"] .qizhi-tooltip__arrow {
-  top: 8px;
-  bottom: auto;
-}
-
-.qizhi-tooltip[data-tooltip-position$="Bottom"] .qizhi-tooltip__arrow {
-  top: auto;
-  bottom: 8px;
+  transform: translateY(-50%) rotate(45deg);
 }
 
 @media (prefers-reduced-motion: no-preference) {

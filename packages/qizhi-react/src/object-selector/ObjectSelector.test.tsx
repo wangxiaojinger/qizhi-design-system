@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { ObjectSelector } from "./ObjectSelector";
 import type { ObjectSelectorItem } from "./ObjectSelector.types";
 
@@ -97,8 +97,9 @@ describe("ObjectSelector", () => {
     fireEvent.click(screen.getByRole("radio", { name: /V3/ }));
     fireEvent.click(screen.getByRole("button", { name: "确认" }));
     expect(onChange).toHaveBeenCalledWith({ object: "inf-128k", version: "V3" }, items[1]);
-    expect(screen.getByText("INF-v1-128k")).toBeInTheDocument();
-    expect(screen.getByText("V3")).toBeInTheDocument();
+    const selectedObject = document.querySelector<HTMLElement>(".qizhi-selected-object")!;
+    expect(within(selectedObject).getByText("INF-v1-128k")).toBeInTheDocument();
+    expect(within(selectedObject).getByText("V3")).toBeInTheDocument();
   });
 
   it("cycles through visible objects with vertical arrow keys", () => {
@@ -119,7 +120,8 @@ describe("ObjectSelector", () => {
     fireEvent.click(screen.getByRole("option", { name: /INF-v1-128k/ }));
     fireEvent.click(screen.getByRole("button", { name: "取消" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    expect(screen.getByText("INF-v2-8k")).toBeInTheDocument();
+    const selectedObject = document.querySelector<HTMLElement>(".qizhi-selected-object")!;
+    expect(within(selectedObject).getByText("INF-v2-8k")).toBeInTheDocument();
     await waitFor(() => expect(switchButton).toHaveFocus());
   });
 });

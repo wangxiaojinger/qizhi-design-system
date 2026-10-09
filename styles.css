@@ -3405,6 +3405,15 @@ button.qizhi-metric-card.is-disabled {
   border-top: 1px solid var(--color-border-1);
 }
 
+.qizhi-modal--confirm .qizhi-modal__footer {
+  padding: 0 24px 24px;
+  border-top: 0;
+}
+
+.qizhi-modal.qizhi-modal--confirm {
+  width: min(416px, calc(100vw - 32px));
+}
+
 .qizhi-modal__button {
   min-width: 72px;
 }
@@ -3454,8 +3463,10 @@ button.qizhi-metric-card.is-disabled {
 }
 
 .qizhi-modal-confirm__title {
-  margin-bottom: 8px;
+  margin: 0;
   color: var(--color-text-1);
+  font-size: 16px;
+  line-height: 24px;
   font-weight: 500;
 }
 
