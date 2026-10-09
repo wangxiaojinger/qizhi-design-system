@@ -231,6 +231,34 @@ test("Overlay component tokens publish the approved independent stable contracts
   assert.doesNotMatch(tokens["z.index.popover"].value, /tooltip/i);
 });
 
+test("Tooltip consumes every component token through the approved compatibility fallbacks", async () => {
+  const css = await read(new URL("packages/qizhi-react/src/tooltip/tooltip.css", repoRoot));
+  const fallbacks = [
+    "--qizhi-tooltip-bg: var(--component-tooltip-background, var(--color-neutral-10, #1d2129))",
+    "z-index: var(--component-tooltip-z-index, var(--z-index-tooltip, 1200))",
+    "min-height: var(--component-tooltip-min-height, 32px)",
+    "padding: var(--component-tooltip-padding-block, var(--space-6, 6px)) var(--component-tooltip-padding-inline, var(--space-12, 12px))",
+    "border-radius: var(--component-tooltip-radius, var(--border-radius-medium, 4px))",
+    "color: var(--component-tooltip-text, var(--color-white, #fff))",
+    "font-size: var(--component-tooltip-font-size, var(--font-size-14, 14px))",
+    "line-height: var(--component-tooltip-line-height, var(--line-height-20, 20px))",
+    "box-shadow: var(--component-tooltip-shadow, 0 8px 20px rgba(15, 23, 42, 0.18))",
+    "width: var(--component-tooltip-arrow-size, 8px)",
+    "height: var(--component-tooltip-arrow-size, 8px)",
+    "min-height: var(--component-tooltip-mini-min-height, 34px)",
+    "padding-inline: var(--component-tooltip-mini-padding-inline, 14px)",
+    "font-size: var(--component-tooltip-mini-font-size, var(--font-size-16, 16px))",
+    "line-height: var(--component-tooltip-mini-line-height, var(--line-height-22, 22px))",
+    "var(--component-tooltip-motion-duration, var(--motion-duration-fast, 160ms))",
+    "var(--component-tooltip-motion-easing, var(--motion-easing-enter, ease-out))",
+  ];
+  for (const fallback of fallbacks) assert.ok(css.includes(fallback), `tooltip.css is missing: ${fallback}`);
+
+  assert.equal((css.match(/calc\([^;]*--component-tooltip-arrow-size/g) ?? []).length, 12);
+  assert.doesNotMatch(css, /(?:top|right|bottom|left): -4px/);
+  assert.doesNotMatch(css, /calc\(50% - 4px\)/);
+});
+
 test("Button component tokens preserve legacy overrides and drive the component stylesheet", async () => {
   const { tokens } = JSON.parse(await read(new URL("src/tokens.json", packageRoot)));
   const css = await read(new URL("packages/qizhi-react/src/button/button.css", repoRoot));
