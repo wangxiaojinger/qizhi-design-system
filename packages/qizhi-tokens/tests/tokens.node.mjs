@@ -259,6 +259,35 @@ test("Tooltip consumes every component token through the approved compatibility 
   assert.doesNotMatch(css, /calc\(50% - 4px\)/);
 });
 
+test("Popover consumes every component token through synchronized body and arrow fallbacks", async () => {
+  const css = await read(new URL("packages/qizhi-react/src/popover/popover.css", repoRoot));
+  const fallbacks = [
+    "z-index: var(--component-popover-z-index, var(--z-index-popover, 1200))",
+    "width: var(--component-popover-width, 248px)",
+    "padding: var(--component-popover-padding-block, 14px) var(--component-popover-padding-inline, var(--space-16, 16px))",
+    "color: var(--component-popover-text, var(--color-text-1, #1d2129))",
+    "background: var(--component-popover-background, var(--color-bg-5, #fff))",
+    "border: 1px solid var(--component-popover-border, var(--color-border-2, #e5e6eb))",
+    "border-radius: var(--component-popover-radius, var(--border-radius-medium, 4px))",
+    "box-shadow: var(--component-popover-shadow, 0 10px 28px rgba(15, 23, 42, 0.12))",
+    "font-size: var(--component-popover-font-size, var(--font-size-14, 14px))",
+    "line-height: var(--component-popover-line-height, var(--line-height-22, 22px))",
+    "margin-bottom: var(--component-popover-title-margin-block-end, var(--space-8, 8px))",
+    "font-weight: var(--component-popover-title-font-weight, var(--font-weight-500, 500))",
+    "color: var(--component-popover-content-text, var(--color-text-2, #4e5969))",
+    "width: var(--component-popover-arrow-size, 10px)",
+    "height: var(--component-popover-arrow-size, 10px)",
+    "var(--component-popover-motion-duration, 180ms)",
+    "var(--component-popover-motion-easing, var(--motion-easing-enter, ease-out))",
+  ];
+  for (const fallback of fallbacks) assert.ok(css.includes(fallback), `popover.css is missing: ${fallback}`);
+  assert.equal((css.match(/background: var\(--component-popover-background/g) ?? []).length, 2);
+  assert.equal((css.match(/var\(--component-popover-border/g) ?? []).length, 2);
+  assert.equal((css.match(/calc\([^;]*--component-popover-arrow-size/g) ?? []).length, 8);
+  assert.doesNotMatch(css, /(?:top|right|bottom|left): -6px/);
+  assert.doesNotMatch(css, /calc\(50% - 5px\)/);
+});
+
 test("Button component tokens preserve legacy overrides and drive the component stylesheet", async () => {
   const { tokens } = JSON.parse(await read(new URL("src/tokens.json", packageRoot)));
   const css = await read(new URL("packages/qizhi-react/src/button/button.css", repoRoot));
