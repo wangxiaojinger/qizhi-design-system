@@ -103,7 +103,7 @@ test("public token metadata and migration map are generated from the manifest", 
   assert.equal(packageJson.exports["./migration-map.json"], "./dist/migration-map.json");
   const migrationDocument = await read(new URL("MIGRATION.md", packageRoot));
   assert.match(migrationDocument, /\| `primary\.6` \| `--primary-6` \| 兼容别名 \| `qizhiblue\.6` \|/);
-  assert.match(migrationDocument, /保留：271；兼容别名：91；新增：162；弃用：0/);
+  assert.match(migrationDocument, /保留：271；兼容别名：91；新增：223；弃用：0/);
 });
 
 test("shared typography and spacing scales expose the approved values", async () => {
@@ -145,6 +145,90 @@ test("shared control, border, motion, shadow, and layer scales preserve current 
     ["standard", "enter", "exit"].map((kind) => tokens[`motion.easing.${kind}`]?.value),
     ["ease", "ease-out", "ease-in"],
   );
+});
+
+test("Overlay component tokens publish the approved independent stable contracts", async () => {
+  const { tokens } = JSON.parse(await read(new URL("src/tokens.json", packageRoot)));
+  const expected = {
+    "z.index.popover": "1200",
+    "component.tooltip.background": "var(--color-neutral-10)",
+    "component.tooltip.text": "var(--color-white)",
+    "component.tooltip.z.index": "var(--z-index-tooltip)",
+    "component.tooltip.min.height": "32px",
+    "component.tooltip.padding.block": "var(--space-6)",
+    "component.tooltip.padding.inline": "var(--space-12)",
+    "component.tooltip.radius": "var(--border-radius-medium)",
+    "component.tooltip.font.size": "var(--font-size-14)",
+    "component.tooltip.line.height": "var(--line-height-20)",
+    "component.tooltip.shadow": "0 8px 20px rgba(15, 23, 42, 0.18)",
+    "component.tooltip.arrow.size": "8px",
+    "component.tooltip.mini.min.height": "34px",
+    "component.tooltip.mini.padding.inline": "14px",
+    "component.tooltip.mini.font.size": "var(--font-size-16)",
+    "component.tooltip.mini.line.height": "var(--line-height-22)",
+    "component.tooltip.motion.duration": "var(--motion-duration-fast)",
+    "component.tooltip.motion.easing": "var(--motion-easing-enter)",
+    "component.popover.background": "var(--color-bg-5)",
+    "component.popover.text": "var(--color-text-1)",
+    "component.popover.content.text": "var(--color-text-2)",
+    "component.popover.border": "var(--color-border-2)",
+    "component.popover.z.index": "var(--z-index-popover)",
+    "component.popover.width": "248px",
+    "component.popover.padding.block": "14px",
+    "component.popover.padding.inline": "var(--space-16)",
+    "component.popover.radius": "var(--border-radius-medium)",
+    "component.popover.shadow": "0 10px 28px rgba(15, 23, 42, 0.12)",
+    "component.popover.font.size": "var(--font-size-14)",
+    "component.popover.line.height": "var(--line-height-22)",
+    "component.popover.title.margin.block.end": "var(--space-8)",
+    "component.popover.title.font.weight": "var(--font-weight-500)",
+    "component.popover.arrow.size": "10px",
+    "component.popover.motion.duration": "180ms",
+    "component.popover.motion.easing": "var(--motion-easing-enter)",
+    "component.dropdown.popup.background": "var(--color-bg-popup)",
+    "component.dropdown.popup.border": "var(--color-border-1)",
+    "component.dropdown.popup.z.index": "20",
+    "component.dropdown.popup.min.width": "112px",
+    "component.dropdown.popup.padding": "var(--space-4)",
+    "component.dropdown.popup.radius": "var(--border-radius-medium)",
+    "component.dropdown.popup.shadow": "var(--shadow)",
+    "component.dropdown.item.min.height": "32px",
+    "component.dropdown.item.padding.block": "5px",
+    "component.dropdown.item.padding.inline": "var(--space-12)",
+    "component.dropdown.item.radius": "var(--border-radius-small)",
+    "component.dropdown.item.text": "var(--color-text-2)",
+    "component.dropdown.item.font.size": "var(--font-size-14)",
+    "component.dropdown.item.line.height": "var(--line-height-22)",
+    "component.dropdown.item.hover.background": "var(--color-fill-2)",
+    "component.dropdown.item.hover.text": "var(--color-text-1)",
+    "component.dropdown.trigger.gap": "var(--space-4)",
+    "component.dropdown.icon.size": "16px",
+    "component.dropdown.motion.duration": "var(--motion-duration-base)",
+    "component.dropdown.motion.easing": "var(--motion-easing-standard)",
+    "component.dropdown.trigger.disabled.text": "var(--color-text-4)",
+    "component.dropdown.button.divider": "rgba(255, 255, 255, 0.35)",
+    "component.dropdown.button.secondary.divider": "var(--color-border-2)",
+    "component.dropdown.button.loading.background": "rgb(var(--primary-4))",
+    "component.dropdown.button.loading.motion.duration": "900ms",
+    "component.dropdown.button.loading.motion.easing": "linear",
+  };
+
+  assert.equal(Object.keys(expected).length, 61);
+  for (const [name, value] of Object.entries(expected)) {
+    const token = tokens[name];
+    assert.ok(token, `missing Overlay token: ${name}`);
+    assert.equal(token.value, value, `${name} has the wrong value`);
+    assert.equal(token.cssVariable, `--${name.replaceAll(".", "-")}`, `${name} has the wrong CSS variable`);
+    assert.equal(token.tier, name === "z.index.popover" ? "map" : "component", `${name} has the wrong tier`);
+    assert.equal(token.status, "stable", `${name} must be stable`);
+    assert.ok(token.description?.trim(), `${name} needs a responsibility description`);
+    assert.doesNotMatch(token.description, /deferred|todo|待定/i, `${name} has a deferred description`);
+  }
+
+  assert.equal(tokens["z.index.tooltip"].value, "1200");
+  assert.equal(tokens["z.index.popover"].value, "1200");
+  assert.doesNotMatch(tokens["z.index.tooltip"].value, /popover/i);
+  assert.doesNotMatch(tokens["z.index.popover"].value, /tooltip/i);
 });
 
 test("Button component tokens preserve legacy overrides and drive the component stylesheet", async () => {

@@ -2,7 +2,7 @@
 
 > 本文件由 `packages/qizhi-tokens/src/tokens.json` 与 `src/legacy-contract.json` 生成，请勿手工编辑。
 
-保留：271；兼容别名：91；新增：162；弃用：0
+保留：271；兼容别名：91；新增：223；弃用：0
 
 | 原 Token | CSS 变量 | 处理方式 | 推荐 Token | 值类型 | 迁移说明 |
 | --- | --- | --- | --- | --- | --- |
@@ -415,6 +415,7 @@
 | `z.index.modal` | `--z-index-modal` | 新增 | `z.index.modal` | number | modal 浮层层级 |
 | `z.index.message` | `--z-index-message` | 新增 | `z.index.message` | number | message 浮层层级 |
 | `z.index.tooltip` | `--z-index-tooltip` | 新增 | `z.index.tooltip` | number | tooltip 浮层层级 |
+| `z.index.popover` | `--z-index-popover` | 新增 | `z.index.popover` | number | popover 浮层层级 |
 | `shadow.low` | `--shadow-low` | 新增 | `shadow.low` | shadow | 低层容器阴影 |
 | `shadow.popup` | `--shadow-popup` | 新增 | `shadow.popup` | shadow | 普通浮层阴影 |
 | `shadow.modal` | `--shadow-modal` | 新增 | `shadow.modal` | shadow | 模态层阴影 |
@@ -530,3 +531,63 @@
 | `component.table.fixed.z.index` | `--component-table-fixed-z-index` | 新增 | `component.table.fixed.z.index` | number | Table fixed column z index |
 | `component.table.row.hover.background` | `--component-table-row-hover-background` | 新增 | `color.fill.1` | reference | Table row hover background |
 | `component.table.row.selected.background` | `--component-table-row-selected-background` | 新增 | `color.primary.light.1` | reference | Table row selected background |
+| `component.tooltip.background` | `--component-tooltip-background` | 新增 | `color.neutral.10` | reference | tooltip background responsibility |
+| `component.tooltip.text` | `--component-tooltip-text` | 新增 | `color.white` | reference | tooltip text responsibility |
+| `component.tooltip.z.index` | `--component-tooltip-z-index` | 新增 | `z.index.tooltip` | reference | tooltip z index responsibility |
+| `component.tooltip.min.height` | `--component-tooltip-min-height` | 新增 | `component.tooltip.min.height` | length | tooltip min height responsibility |
+| `component.tooltip.padding.block` | `--component-tooltip-padding-block` | 新增 | `space.6` | reference | tooltip padding block responsibility |
+| `component.tooltip.padding.inline` | `--component-tooltip-padding-inline` | 新增 | `space.12` | reference | tooltip padding inline responsibility |
+| `component.tooltip.radius` | `--component-tooltip-radius` | 新增 | `border.radius.medium` | reference | tooltip radius responsibility |
+| `component.tooltip.font.size` | `--component-tooltip-font-size` | 新增 | `font.size.14` | reference | tooltip font size responsibility |
+| `component.tooltip.line.height` | `--component-tooltip-line-height` | 新增 | `line.height.20` | reference | tooltip line height responsibility |
+| `component.tooltip.shadow` | `--component-tooltip-shadow` | 新增 | `component.tooltip.shadow` | shadow | tooltip shadow responsibility |
+| `component.tooltip.arrow.size` | `--component-tooltip-arrow-size` | 新增 | `component.tooltip.arrow.size` | length | tooltip arrow size responsibility |
+| `component.tooltip.mini.min.height` | `--component-tooltip-mini-min-height` | 新增 | `component.tooltip.mini.min.height` | length | tooltip mini min height responsibility |
+| `component.tooltip.mini.padding.inline` | `--component-tooltip-mini-padding-inline` | 新增 | `component.tooltip.mini.padding.inline` | length | tooltip mini padding inline responsibility |
+| `component.tooltip.mini.font.size` | `--component-tooltip-mini-font-size` | 新增 | `font.size.16` | reference | tooltip mini font size responsibility |
+| `component.tooltip.mini.line.height` | `--component-tooltip-mini-line-height` | 新增 | `line.height.22` | reference | tooltip mini line height responsibility |
+| `component.tooltip.motion.duration` | `--component-tooltip-motion-duration` | 新增 | `motion.duration.fast` | reference | tooltip motion duration responsibility |
+| `component.tooltip.motion.easing` | `--component-tooltip-motion-easing` | 新增 | `motion.easing.enter` | reference | tooltip motion easing responsibility |
+| `component.popover.background` | `--component-popover-background` | 新增 | `color.bg.5` | reference | popover background responsibility |
+| `component.popover.text` | `--component-popover-text` | 新增 | `color.text.1` | reference | popover text responsibility |
+| `component.popover.content.text` | `--component-popover-content-text` | 新增 | `color.text.2` | reference | popover content text responsibility |
+| `component.popover.border` | `--component-popover-border` | 新增 | `color.border.2` | reference | popover border responsibility |
+| `component.popover.z.index` | `--component-popover-z-index` | 新增 | `z.index.popover` | reference | popover z index responsibility |
+| `component.popover.width` | `--component-popover-width` | 新增 | `component.popover.width` | length | popover width responsibility |
+| `component.popover.padding.block` | `--component-popover-padding-block` | 新增 | `component.popover.padding.block` | length | popover padding block responsibility |
+| `component.popover.padding.inline` | `--component-popover-padding-inline` | 新增 | `space.16` | reference | popover padding inline responsibility |
+| `component.popover.radius` | `--component-popover-radius` | 新增 | `border.radius.medium` | reference | popover radius responsibility |
+| `component.popover.shadow` | `--component-popover-shadow` | 新增 | `component.popover.shadow` | shadow | popover shadow responsibility |
+| `component.popover.font.size` | `--component-popover-font-size` | 新增 | `font.size.14` | reference | popover font size responsibility |
+| `component.popover.line.height` | `--component-popover-line-height` | 新增 | `line.height.22` | reference | popover line height responsibility |
+| `component.popover.title.margin.block.end` | `--component-popover-title-margin-block-end` | 新增 | `space.8` | reference | popover title margin block end responsibility |
+| `component.popover.title.font.weight` | `--component-popover-title-font-weight` | 新增 | `font.weight.500` | reference | popover title font weight responsibility |
+| `component.popover.arrow.size` | `--component-popover-arrow-size` | 新增 | `component.popover.arrow.size` | length | popover arrow size responsibility |
+| `component.popover.motion.duration` | `--component-popover-motion-duration` | 新增 | `component.popover.motion.duration` | length | popover motion duration responsibility |
+| `component.popover.motion.easing` | `--component-popover-motion-easing` | 新增 | `motion.easing.enter` | reference | popover motion easing responsibility |
+| `component.dropdown.popup.background` | `--component-dropdown-popup-background` | 新增 | `color.bg.popup` | reference | dropdown popup background responsibility |
+| `component.dropdown.popup.border` | `--component-dropdown-popup-border` | 新增 | `color.border.1` | reference | dropdown popup border responsibility |
+| `component.dropdown.popup.z.index` | `--component-dropdown-popup-z-index` | 新增 | `component.dropdown.popup.z.index` | number | dropdown popup z index responsibility |
+| `component.dropdown.popup.min.width` | `--component-dropdown-popup-min-width` | 新增 | `component.dropdown.popup.min.width` | length | dropdown popup min width responsibility |
+| `component.dropdown.popup.padding` | `--component-dropdown-popup-padding` | 新增 | `space.4` | reference | dropdown popup padding responsibility |
+| `component.dropdown.popup.radius` | `--component-dropdown-popup-radius` | 新增 | `border.radius.medium` | reference | dropdown popup radius responsibility |
+| `component.dropdown.popup.shadow` | `--component-dropdown-popup-shadow` | 新增 | `shadow` | reference | dropdown popup shadow responsibility |
+| `component.dropdown.item.min.height` | `--component-dropdown-item-min-height` | 新增 | `component.dropdown.item.min.height` | length | dropdown item min height responsibility |
+| `component.dropdown.item.padding.block` | `--component-dropdown-item-padding-block` | 新增 | `component.dropdown.item.padding.block` | length | dropdown item padding block responsibility |
+| `component.dropdown.item.padding.inline` | `--component-dropdown-item-padding-inline` | 新增 | `space.12` | reference | dropdown item padding inline responsibility |
+| `component.dropdown.item.radius` | `--component-dropdown-item-radius` | 新增 | `border.radius.small` | reference | dropdown item radius responsibility |
+| `component.dropdown.item.text` | `--component-dropdown-item-text` | 新增 | `color.text.2` | reference | dropdown item text responsibility |
+| `component.dropdown.item.font.size` | `--component-dropdown-item-font-size` | 新增 | `font.size.14` | reference | dropdown item font size responsibility |
+| `component.dropdown.item.line.height` | `--component-dropdown-item-line-height` | 新增 | `line.height.22` | reference | dropdown item line height responsibility |
+| `component.dropdown.item.hover.background` | `--component-dropdown-item-hover-background` | 新增 | `color.fill.2` | reference | dropdown item hover background responsibility |
+| `component.dropdown.item.hover.text` | `--component-dropdown-item-hover-text` | 新增 | `color.text.1` | reference | dropdown item hover text responsibility |
+| `component.dropdown.trigger.gap` | `--component-dropdown-trigger-gap` | 新增 | `space.4` | reference | dropdown trigger gap responsibility |
+| `component.dropdown.icon.size` | `--component-dropdown-icon-size` | 新增 | `component.dropdown.icon.size` | length | dropdown icon size responsibility |
+| `component.dropdown.motion.duration` | `--component-dropdown-motion-duration` | 新增 | `motion.duration.base` | reference | dropdown motion duration responsibility |
+| `component.dropdown.motion.easing` | `--component-dropdown-motion-easing` | 新增 | `motion.easing.standard` | reference | dropdown motion easing responsibility |
+| `component.dropdown.trigger.disabled.text` | `--component-dropdown-trigger-disabled-text` | 新增 | `color.text.4` | reference | dropdown trigger disabled text responsibility |
+| `component.dropdown.button.divider` | `--component-dropdown-button-divider` | 新增 | `component.dropdown.button.divider` | color | dropdown button divider responsibility |
+| `component.dropdown.button.secondary.divider` | `--component-dropdown-button-secondary-divider` | 新增 | `color.border.2` | reference | dropdown button secondary divider responsibility |
+| `component.dropdown.button.loading.background` | `--component-dropdown-button-loading-background` | 新增 | `component.dropdown.button.loading.background` | color | dropdown button loading background responsibility |
+| `component.dropdown.button.loading.motion.duration` | `--component-dropdown-button-loading-motion-duration` | 新增 | `component.dropdown.button.loading.motion.duration` | length | dropdown button loading motion duration responsibility |
+| `component.dropdown.button.loading.motion.easing` | `--component-dropdown-button-loading-motion-easing` | 新增 | `component.dropdown.button.loading.motion.easing` | font-family | dropdown button loading motion easing responsibility |
