@@ -1,17 +1,21 @@
-import type { SelectOptionCardProps, SelectProps } from "@wangxiaojinger/qizhi-react";
+import type { SelectMultipleProps, SelectOptionCardProps, SelectSingleProps } from "@wangxiaojinger/qizhi-react";
 import type { ComponentApiItem } from "../api/ApiTable";
-export type SelectApiItem = ComponentApiItem<keyof SelectProps>;
+export type SelectApiItem = ComponentApiItem<keyof SelectSingleProps | keyof SelectMultipleProps>;
 export type SelectOptionCardApiItem = ComponentApiItem<keyof SelectOptionCardProps>;
 export const selectSelectionCardApi = [
   { name: "fields", description: "回填字段列表，与 SelectOptionCardField 共用字段结构；标签 text-2，值 text-1。", type: "readonly SelectOptionCardField[]", defaultValue: "必填" },
   { name: "className", description: "布局类名；组件固定使用 14px 字号、4px 圆角。与选择框的 4px 间距由组合容器控制。", type: "string", defaultValue: "—" },
 ] as const;
 export const selectApi = [
-  { name: "options", description: "可选项数据，包含标签、值和可选禁用状态。", type: "SelectOption[]", defaultValue: "—" },
+  { name: "options", description: "扁平选项或带标题的分组选项；SelectOptionGroup 包含 label: ReactNode 和 options: SelectOption[]。", type: "Array<SelectOption | SelectOptionGroup>", defaultValue: "—" },
   { name: "mode", description: "选择模式，并决定 value 和 onChange 的类型。", type: '"single" | "multiple"', defaultValue: '"single"' },
   { name: "value", description: "受控选中值。", type: "SelectRawValue | SelectRawValue[]", defaultValue: "—" },
   { name: "defaultValue", description: "非受控初始值。", type: "SelectRawValue | SelectRawValue[]", defaultValue: "—" },
   { name: "onChange", description: "选择、清除、删除或拖拽排序后触发。", type: "SelectSingleProps['onChange'] | SelectMultipleProps['onChange']", defaultValue: "—" },
+  { name: "onSelect", description: "选择单个选项时触发。", type: "(value: SelectRawValue, option: SelectOption) => void", defaultValue: "—" },
+  { name: "onDeselect", description: "多选模式取消单个选项时触发；批量清空不逐项触发。", type: "(value: SelectRawValue, option: SelectOption) => void", defaultValue: "—" },
+  { name: "onClear", description: "通过清除入口批量清空时触发一次。", type: "() => void", defaultValue: "—" },
+  { name: "onFocus", description: "焦点首次进入选择器整体时触发，内部焦点移动不重复触发。", type: "FocusEventHandler<HTMLElement>", defaultValue: "—" },
   { name: "placeholder", description: "未选择时显示的提示文字。", type: "string", defaultValue: '"请选择"' },
   { name: "size", description: "高度分别为 24px、28px、32px 和 36px。", type: '"mini" | "small" | "default" | "large"', defaultValue: '"default"' },
   { name: "status", description: "默认、错误或警告视觉状态。", type: '"default" | "error" | "warning"', defaultValue: '"default"' },
@@ -19,11 +23,17 @@ export const selectApi = [
   { name: "allowClear", description: "有值时在悬停或聚焦状态提供清除入口。", type: "boolean", defaultValue: "false" },
   { name: "addBefore", description: "输入区域前的稳定标签内容。", type: "ReactNode", defaultValue: "—" },
   { name: "showSearch", description: "启用搜索，对象形式可保留搜索输入。", type: "boolean | SelectSearchConfig", defaultValue: "false" },
+  { name: "searchValue", description: "受控搜索文本；输入变化由 onSearch 通知调用方。", type: "string", defaultValue: "—" },
   { name: "filterOption", description: "覆盖默认标签和值匹配逻辑。", type: "(input: string, option: SelectOption) => boolean", defaultValue: "—" },
   { name: "onSearch", description: "搜索输入变化时触发，远程数据由调用方更新 options。", type: "(input: string) => void", defaultValue: "—" },
+  { name: "loading", description: "展示加载状态并暂时阻止选择和创建。", type: "boolean", defaultValue: "false" },
+  { name: "notFoundContent", description: "无匹配选项时的内容；传入 null 可隐藏。", type: "ReactNode", defaultValue: '"暂无数据"' },
   { name: "allowCreate", description: "允许把不存在的搜索内容创建为选项。", type: "boolean | SelectCreateConfig", defaultValue: "false" },
   { name: "tokenSeparators", description: "多选模式的自动分词字符。", type: "string[]", defaultValue: "[]" },
   { name: "maxTagCount", description: "固定或根据容器响应式控制标签数。", type: 'number | "responsive"', defaultValue: "—" },
+  { name: "maxCount", description: "多选模式的最大选择数量；达到上限后禁用未选项。", type: "number", defaultValue: "—" },
+  { name: "virtual", description: "为至少 100 项的固定高度扁平选项启用虚拟滚动；分组或自定义内容保持完整渲染。", type: "boolean", defaultValue: "true" },
+  { name: "listHeight", description: "虚拟列表可视区域高度，单位为 px。", type: "number", defaultValue: "256" },
   { name: "renderTag", description: "自定义已选标签内容。", type: "(option: SelectOption, removable: boolean) => ReactNode", defaultValue: "—" },
   { name: "renderMore", description: "自定义被省略标签的摘要内容。", type: "(count: number) => ReactNode", defaultValue: "—" },
   { name: "hideSelected", description: "多选时在弹层中隐藏已选项。", type: "boolean", defaultValue: "false" },
@@ -38,7 +48,7 @@ export const selectApi = [
   { name: "defaultOpen", description: "非受控初始打开状态。", type: "boolean", defaultValue: "false" },
   { name: "onOpenChange", description: "弹层打开状态变化时触发。", type: "(open: boolean) => void", defaultValue: "—" },
   { name: "onPopupScroll", description: "下拉弹层滚动时触发，可用于分页加载远程选项。", type: "UIEventHandler<HTMLDivElement>", defaultValue: "—" },
-  { name: "onBlur", description: "选择器触发节点失去焦点时触发，可与 Form 的失焦校验配合。", type: "FocusEventHandler<HTMLElement>", defaultValue: "—" },
+  { name: "onBlur", description: "焦点离开选择器整体（含清除入口和弹层）时触发，可与 Form 的失焦校验配合。", type: "FocusEventHandler<HTMLElement>", defaultValue: "—" },
   { name: "aria-describedby", description: "关联帮助或错误说明元素。", type: "string", defaultValue: "—" },
   { name: "aria-invalid", description: "向辅助技术暴露当前值是否无效。", type: "boolean | AriaAttributes['aria-invalid']", defaultValue: "—" },
 ] as const satisfies readonly SelectApiItem[];

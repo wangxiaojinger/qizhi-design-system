@@ -5431,8 +5431,8 @@
       "items": [
         {
           "name": "options",
-          "description": "可选项数据，包含标签、值和可选禁用状态。",
-          "type": "SelectOption[]",
+          "description": "扁平选项或带标题的分组选项；SelectOptionGroup 包含 label: ReactNode 和 options: SelectOption[]。",
+          "type": "Array<SelectOption | SelectOptionGroup>",
           "defaultValue": "—"
         },
         {
@@ -5457,6 +5457,30 @@
           "name": "onChange",
           "description": "选择、清除、删除或拖拽排序后触发。",
           "type": "SelectSingleProps['onChange'] | SelectMultipleProps['onChange']",
+          "defaultValue": "—"
+        },
+        {
+          "name": "onSelect",
+          "description": "选择单个选项时触发。",
+          "type": "(value: SelectRawValue, option: SelectOption) => void",
+          "defaultValue": "—"
+        },
+        {
+          "name": "onDeselect",
+          "description": "多选模式取消单个选项时触发；批量清空不逐项触发。",
+          "type": "(value: SelectRawValue, option: SelectOption) => void",
+          "defaultValue": "—"
+        },
+        {
+          "name": "onClear",
+          "description": "通过清除入口批量清空时触发一次。",
+          "type": "() => void",
+          "defaultValue": "—"
+        },
+        {
+          "name": "onFocus",
+          "description": "焦点首次进入选择器整体时触发，内部焦点移动不重复触发。",
+          "type": "FocusEventHandler<HTMLElement>",
           "defaultValue": "—"
         },
         {
@@ -5502,6 +5526,12 @@
           "defaultValue": "false"
         },
         {
+          "name": "searchValue",
+          "description": "受控搜索文本；输入变化由 onSearch 通知调用方。",
+          "type": "string",
+          "defaultValue": "—"
+        },
+        {
           "name": "filterOption",
           "description": "覆盖默认标签和值匹配逻辑。",
           "type": "(input: string, option: SelectOption) => boolean",
@@ -5512,6 +5542,18 @@
           "description": "搜索输入变化时触发，远程数据由调用方更新 options。",
           "type": "(input: string) => void",
           "defaultValue": "—"
+        },
+        {
+          "name": "loading",
+          "description": "展示加载状态并暂时阻止选择和创建。",
+          "type": "boolean",
+          "defaultValue": "false"
+        },
+        {
+          "name": "notFoundContent",
+          "description": "无匹配选项时的内容；传入 null 可隐藏。",
+          "type": "ReactNode",
+          "defaultValue": "\"暂无数据\""
         },
         {
           "name": "allowCreate",
@@ -5530,6 +5572,24 @@
           "description": "固定或根据容器响应式控制标签数。",
           "type": "number | \"responsive\"",
           "defaultValue": "—"
+        },
+        {
+          "name": "maxCount",
+          "description": "多选模式的最大选择数量；达到上限后禁用未选项。",
+          "type": "number",
+          "defaultValue": "—"
+        },
+        {
+          "name": "virtual",
+          "description": "为至少 100 项的固定高度扁平选项启用虚拟滚动；分组或自定义内容保持完整渲染。",
+          "type": "boolean",
+          "defaultValue": "true"
+        },
+        {
+          "name": "listHeight",
+          "description": "虚拟列表可视区域高度，单位为 px。",
+          "type": "number",
+          "defaultValue": "256"
         },
         {
           "name": "renderTag",
@@ -5617,7 +5677,7 @@
         },
         {
           "name": "onBlur",
-          "description": "选择器触发节点失去焦点时触发，可与 Form 的失焦校验配合。",
+          "description": "焦点离开选择器整体（含清除入口和弹层）时触发，可与 Form 的失焦校验配合。",
           "type": "FocusEventHandler<HTMLElement>",
           "defaultValue": "—"
         },

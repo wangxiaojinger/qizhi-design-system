@@ -10,15 +10,19 @@ import CardSelectionDemo from "./demos/CardSelectionDemo";
 
 const legacyTitles = ["基础用法", "允许清除", "多选模式", "带有前置标签", "允许创建", "搜索", "远程搜索", "自定义弹出框宽度", "不同尺寸", "指定可选项", "自动分词", "自定义触发节点", "扩展菜单", "联动", "隐藏已选择项", "拖拽排序", "宽度自适应", "最大标签数"];
 const informationCardTitles = ["名称与字段信息", "图标与属性", "悬停补充信息", "选择后关联信息"];
+const selectTitles = [
+  ...legacyTitles.slice(0, 10),
+  "分组选项",
+  ...legacyTitles.slice(10, 13),
+  ...informationCardTitles,
+  ...legacyTitles.slice(13),
+  "大数据",
+];
 
 describe("Select docs", () => {
   it("在扩展菜单后保留旧站 18 组 Demo 并插入四个信息卡片选项", () => {
-    expect(selectDemos.map((demo) => demo.title)).toEqual([
-      ...legacyTitles.slice(0, 13),
-      ...informationCardTitles,
-      ...legacyTitles.slice(13),
-    ]);
-    expect(selectDemos).toHaveLength(22);
+    expect(selectDemos.map((demo) => demo.title)).toEqual(selectTitles);
+    expect(selectDemos).toHaveLength(24);
     selectDemos.forEach((demo) => {
       expect(demo.source).toContain('from "@wangxiaojinger/qizhi-react"');
       expect(demo.source).not.toContain("Demo.tsx");
@@ -40,7 +44,7 @@ describe("Select docs", () => {
       extendedMenu.compareDocumentPosition(sectionTitle) &
         Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
-    expect(screen.getAllByRole("heading", { level: 2 })).toHaveLength(24);
+    expect(screen.getAllByRole("heading", { level: 2 })).toHaveLength(26);
     informationCardTitles.forEach((title) => {
       expect(screen.getByRole("heading", { level: 2, name: title })).toBeInTheDocument();
     });
@@ -50,7 +54,7 @@ describe("Select docs", () => {
   });
 
   it("API 元数据覆盖 Select 的补充说明和信息卡片公开属性", () => {
-    expect(selectApi.map((item) => item.name)).toEqual(expect.arrayContaining(["options", "mode", "value", "onChange", "showSearch", "dropdownRender", "popupWidth", "renderOptionDescription", "onBlur", "aria-describedby", "aria-invalid"]));
+    expect(selectApi.map((item) => item.name)).toEqual(expect.arrayContaining(["options", "mode", "value", "onChange", "onSelect", "onDeselect", "onClear", "onFocus", "showSearch", "searchValue", "loading", "notFoundContent", "maxCount", "virtual", "listHeight", "dropdownRender", "popupWidth", "renderOptionDescription", "onBlur", "aria-describedby", "aria-invalid"]));
     expect(selectApi.map((item) => String(item.name))).not.toContain("triggerProps");
     expect(selectOptionCardApi.map((item) => item.name)).toEqual(["name", "fields"]);
   });
