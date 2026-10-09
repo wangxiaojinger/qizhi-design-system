@@ -10,6 +10,11 @@ export interface SelectOption {
   disabled?: boolean;
 }
 
+export interface SelectOptionGroup {
+  label: ReactNode;
+  options: SelectOption[];
+}
+
 export interface SelectSearchConfig { retainInputValue?: boolean }
 export interface SelectCreateConfig { formatter?: (input: string) => ReactNode }
 export interface SelectAutoWidth { minWidth?: number; maxWidth?: number }
@@ -30,7 +35,7 @@ export interface SelectTriggerProps {
 }
 
 interface SelectCommonProps {
-  options: SelectOption[];
+  options: Array<SelectOption | SelectOptionGroup>;
   placeholder?: string;
   size?: SelectSize;
   status?: SelectStatus;
@@ -38,11 +43,19 @@ interface SelectCommonProps {
   allowClear?: boolean;
   addBefore?: ReactNode;
   showSearch?: boolean | SelectSearchConfig;
+  searchValue?: string;
   filterOption?: (input: string, option: SelectOption) => boolean;
   onSearch?: (input: string) => void;
+  onSelect?: (value: SelectRawValue, option: SelectOption) => void;
+  onClear?: () => void;
+  onFocus?: FocusEventHandler<HTMLElement>;
+  loading?: boolean;
+  notFoundContent?: ReactNode;
   allowCreate?: boolean | SelectCreateConfig;
   tokenSeparators?: string[];
   maxTagCount?: number | "responsive";
+  virtual?: boolean;
+  listHeight?: number;
   renderTag?: (option: SelectOption, removable: boolean) => ReactNode;
   renderMore?: (count: number) => ReactNode;
   hideSelected?: boolean;
@@ -77,6 +90,8 @@ export interface SelectSingleProps extends SelectCommonProps {
 
 export interface SelectMultipleProps extends SelectCommonProps {
   mode: "multiple";
+  maxCount?: number;
+  onDeselect?: (value: SelectRawValue, option: SelectOption) => void;
   value?: SelectRawValue[];
   defaultValue?: SelectRawValue[];
   onChange?: (value: SelectRawValue[], options: SelectOption[]) => void;

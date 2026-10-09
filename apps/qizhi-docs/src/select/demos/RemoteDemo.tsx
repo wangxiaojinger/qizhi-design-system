@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Select } from "@wangxiaojinger/qizhi-react";
 
 const people = [
@@ -8,12 +9,34 @@ const people = [
 ];
 
 export default function RemoteDemo() {
+  const [searchValue, setSearchValue] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [options, setOptions] = useState(people);
+
+  useEffect(() => {
+    setLoading(true);
+    const timer = window.setTimeout(() => {
+      const keyword = searchValue.trim().toLowerCase();
+      setOptions(people.filter((person) => (
+        String(person.label).toLowerCase().includes(keyword)
+      )));
+      setLoading(false);
+    }, 300);
+    return () => window.clearTimeout(timer);
+  }, [searchValue]);
+
   return (
     <Select
       className="select-docs-wide"
       mode="multiple"
-      options={people}
+      options={options}
       showSearch
+      searchValue={searchValue}
+      onSearch={setSearchValue}
+      filterOption={() => true}
+      loading={loading}
+      notFoundContent="没有匹配用户"
+      maxCount={3}
       renderOption={(option) => (
         <>
           <span className="select-docs-avatar">

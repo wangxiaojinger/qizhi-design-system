@@ -630,6 +630,7 @@ export type {
   SelectHandle,
   SelectMultipleProps,
   SelectOption,
+  SelectOptionGroup,
   SelectProps,
   SelectRawValue,
   SelectSearchConfig,
