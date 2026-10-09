@@ -208,7 +208,7 @@ test("Overlay component tokens publish the approved independent stable contracts
     "component.dropdown.trigger.disabled.text": "var(--color-text-4)",
     "component.dropdown.button.divider": "rgba(255, 255, 255, 0.35)",
     "component.dropdown.button.secondary.divider": "var(--color-border-2)",
-    "component.dropdown.button.loading.background": "rgb(var(--primary-4))",
+    "component.dropdown.button.loading.background": "rgb(var(--primary-6))",
     "component.dropdown.button.loading.motion.duration": "900ms",
     "component.dropdown.button.loading.motion.easing": "linear",
   };
@@ -286,6 +286,24 @@ test("Popover consumes every component token through synchronized body and arrow
   assert.equal((css.match(/calc\([^;]*--component-popover-arrow-size/g) ?? []).length, 8);
   assert.doesNotMatch(css, /(?:top|right|bottom|left): -6px/);
   assert.doesNotMatch(css, /calc\(50% - 5px\)/);
+});
+
+test("Dropdown consumes all component tokens while retaining structural cascade rules", async () => {
+  const css = await read(new URL("packages/qizhi-react/src/dropdown/dropdown.css", repoRoot));
+  const names = ["popup-background", "popup-border", "popup-z-index", "popup-min-width", "popup-padding", "popup-radius", "popup-shadow", "item-min-height", "item-padding-block", "item-padding-inline", "item-radius", "item-text", "item-font-size", "item-line-height", "item-hover-background", "item-hover-text", "trigger-gap", "icon-size", "motion-duration", "motion-easing", "trigger-disabled-text", "button-divider", "button-secondary-divider", "button-loading-background", "button-loading-motion-duration", "button-loading-motion-easing"];
+  for (const name of names) assert.ok(css.includes(`var(--component-dropdown-${name}`), `dropdown.css does not consume ${name}`);
+  for (const fallback of [
+    "z-index: var(--component-dropdown-popup-z-index, 20)",
+    "box-shadow: var(--component-dropdown-popup-shadow, var(--shadow, 0 6px 16px rgba(29,33,41,.12)))",
+    "color: var(--component-dropdown-trigger-disabled-text, var(--color-text-4, #c9cdd4))",
+    "border-left-color: var(--component-dropdown-button-divider, rgba(255,255,255,.35))",
+    "border-left-color: var(--component-dropdown-button-secondary-divider, var(--color-border-2, #e5e6eb))",
+    "background: var(--component-dropdown-button-loading-background, rgb(var(--primary-6, 51,102,255)))",
+    "animation: qizhi-dropdown-spin var(--component-dropdown-button-loading-motion-duration, 900ms) var(--component-dropdown-button-loading-motion-easing, linear) infinite",
+  ]) assert.ok(css.includes(fallback), `dropdown.css is missing: ${fallback}`);
+  assert.match(css, /popup--cascade \{ min-width: 136px; \}/);
+  assert.equal((css.match(/calc\(100% \+ 4px\)/g) ?? []).length, 8);
+  assert.match(css, /transform: translateX\(-50%\)/);
 });
 
 test("Button component tokens preserve legacy overrides and drive the component stylesheet", async () => {
