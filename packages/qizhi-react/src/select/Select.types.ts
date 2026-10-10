@@ -35,6 +35,14 @@ export interface SelectTriggerProps {
   onBlur: FocusEventHandler<HTMLElement>;
 }
 
+export interface SelectValueRenderContext {
+  open: boolean;
+  searching: boolean;
+  query: string;
+  selectedOptions: SelectOption[];
+  valueText: string;
+}
+
 interface SelectCommonProps {
   options: Array<SelectOption | SelectOptionGroup>;
   placeholder?: string;
@@ -64,6 +72,7 @@ interface SelectCommonProps {
   autoWidth?: boolean | SelectAutoWidth;
   popupWidth?: "trigger" | "content" | number;
   renderOption?: (option: SelectOption) => ReactNode;
+  valueRender?: (context: SelectValueRenderContext) => ReactNode;
   renderOptionDescription?: (option: SelectOption) => ReactNode;
   dropdownRender?: (menu: ReactNode) => ReactNode;
   trigger?: (props: SelectTriggerProps) => ReactNode;

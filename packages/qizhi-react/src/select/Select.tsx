@@ -23,13 +23,13 @@ interface SelectOptionEntry {
   groupLabel?: ReactNode;
 }
 
-function useControlled<T>(controlled: T | undefined, initial: T, notify?: (value: T) => void) {
+function useControlled<T>(controlled: T | undefined, initial: T, notify?: (value: T) => void, controlledProp = controlled !== undefined) {
   const [inner, setInner] = useState(initial);
-  const value = controlled === undefined ? inner : controlled;
+  const value = controlledProp ? controlled as T : inner;
   const setValue = useCallback((next: T) => {
-    if (controlled === undefined) setInner(next);
+    if (!controlledProp) setInner(next);
     notify?.(next);
-  }, [controlled, notify]);
+  }, [controlledProp, notify]);
   return [value, setValue] as const;
 }
 
@@ -63,6 +63,7 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(prop
     autoWidth = false,
     popupWidth = "trigger",
     renderOption,
+    valueRender,
     renderOptionDescription,
     dropdownRender,
     trigger,
@@ -92,8 +93,8 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(prop
   const optionEntries = useMemo<SelectOptionEntry[]>(() => [...sourceEntries, ...createdOptions.map((option) => ({ option }))], [createdOptions, sourceEntries]);
   const options = useMemo(() => optionEntries.map((entry) => entry.option), [optionEntries]);
   const [isOpen, setOpen] = useControlled(open, defaultOpen, onOpenChange);
-  const [singleValue, setSingleValue] = useControlled<SelectRawValue | undefined>(multiple ? undefined : singleProps.value, multiple ? undefined : singleProps.defaultValue);
-  const [multipleValue, setMultipleValue] = useControlled<SelectRawValue[]>(multiple ? multipleProps.value : undefined, multiple ? multipleProps.defaultValue ?? [] : []);
+  const [singleValue, setSingleValue] = useControlled<SelectRawValue | undefined>(multiple ? undefined : singleProps.value, multiple ? undefined : singleProps.defaultValue, undefined, !multiple && (valueRender ? Object.hasOwn(singleProps, "value") : singleProps.value !== undefined));
+  const [multipleValue, setMultipleValue] = useControlled<SelectRawValue[]>(multiple ? multipleProps.value : undefined, multiple ? multipleProps.defaultValue ?? [] : [], undefined, multiple && (valueRender ? Object.hasOwn(multipleProps, "value") : multipleProps.value !== undefined));
   const [innerQuery, setInnerQuery] = useState("");
   const query = searchValue === undefined ? innerQuery : searchValue;
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -107,7 +108,8 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(prop
   const selectedValues = multiple ? multipleValue : singleValue === undefined ? [] : [singleValue];
   const selectedOptions = useMemo(() => selectedValues.map((value) => resolveOption(options, value, allowCreate)).filter(Boolean) as SelectOption[], [allowCreate, options, selectedValues]);
   const selectedSingle = selectedOptions[0];
-  const hasValue = selectedOptions.length > 0;
+  const hasValue = valueRender ? selectedValues.length > 0 : selectedOptions.length > 0;
+  const selectedValueText = selectedOptions.map((option) => textOf(option.label)).join("，");
   const [responsiveTagCount, setResponsiveTagCount] = useState(selectedOptions.length);
   const tagMeasureRefs = useRef(new Map<string, HTMLElement>());
   const moreMeasureRefs = useRef(new Map<number, HTMLElement>());
@@ -395,7 +397,7 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(prop
     "aria-controls": popupId,
     "aria-activedescendant": activeDescendant,
     "aria-label": props["aria-label"] ?? placeholder,
-    valueText: selectedOptions.map((option) => textOf(option.label)).join("，"),
+    valueText: selectedValueText,
     onClick: () => setVisible(!isOpen),
     onKeyDown: handleKeyDown,
     onPointerDown: () => setKeyboardFocused(false),
@@ -442,9 +444,10 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(prop
   return <div ref={rootRef} className={join("qizhi-select", `qizhi-select--${size}`, status !== "default" && `qizhi-select--${status}`, disabled && "qizhi-select--disabled", multiple && "qizhi-select--multiple", isOpen && "is-open", keyboardFocused && "is-keyboard-focused", hasValue && "has-value", autoWidth && "qizhi-select--auto-width", addBefore != null && "qizhi-select--grouped", className)} style={{ ...style, ...autoWidthStyle }} onFocus={handleFocus}>
     {addBefore != null ? <span className="qizhi-select__before">{addBefore}</span> : null}
     {trigger ? trigger(commonTriggerProps) : <div ref={controlRef} className={`${CONTROL_CONTAINER_CLASS_NAME} qizhi-select__control`} style={autoWidth ? { width: "max-content" } : undefined}>
-      {multiple ? <div className="qizhi-select__tags" aria-label="已选项">{shownTags.map((option, index) => <Tag key={keyOf(option.value)} className={join("qizhi-select__tag", !renderTag && "qizhi-tag-closable")} draggable={dragToSort} onMouseDown={(event) => event.preventDefault()} onDragStart={(event: DragEvent<HTMLSpanElement>) => event.dataTransfer.setData("text/qizhi-select-index", String(index))} onDragOver={dragToSort ? (event) => event.preventDefault() : undefined} onDrop={dragToSort ? (event) => { event.preventDefault(); const from = Number(event.dataTransfer.getData("text/qizhi-select-index")); if (Number.isInteger(from) && from !== index) { const next = [...multipleValue]; const [item] = next.splice(from, 1); next.splice(index, 0, item); emitMultiple(next); } } : undefined}>{renderTag ? renderTag(option, true) : <>{option.label}<button className="qizhi-tag-close-btn" type="button" aria-label={`删除 ${textOf(option.label)}`} onClick={(event) => { event.stopPropagation(); remove(option.value); }}><CloseIcon /></button></>}</Tag>)}{hiddenCount > 0 ? <Tag className="qizhi-select__tag qizhi-select__tag--more">{renderMore ? renderMore(hiddenCount) : `+${hiddenCount} 个更多`}</Tag> : null}</div> : null}
-      {multiple && maxTagCount === "responsive" ? <div className="qizhi-select__measure" aria-hidden="true">{selectedOptions.map((option) => <Tag key={keyOf(option.value)} ref={(node) => { if (node) tagMeasureRefs.current.set(keyOf(option.value), node); else tagMeasureRefs.current.delete(keyOf(option.value)); }}>{renderTag ? renderTag(option, true) : <>{option.label}<CloseIcon /></>}</Tag>)}{selectedOptions.map((_, index) => { const count = index + 1; return <Tag key={count} className="qizhi-select__tag qizhi-select__tag--more" ref={(node) => { if (node) moreMeasureRefs.current.set(count, node); else moreMeasureRefs.current.delete(count); }}>{renderMore ? renderMore(count) : `+${count} 个更多`}</Tag>; })}</div> : null}
-      <input ref={inputRef} id={id} name={name} className="qizhi-select__input" role="combobox" aria-haspopup="listbox" aria-expanded={isOpen} aria-controls={popupId} aria-activedescendant={activeDescendant} aria-autocomplete={searchEnabled ? "list" : undefined} aria-label={props["aria-label"] ?? placeholder} aria-labelledby={props["aria-labelledby"]} aria-describedby={props["aria-describedby"]} aria-invalid={props["aria-invalid"]} disabled={disabled} readOnly={!inputEditable} placeholder={hasValue ? "" : placeholder} value={isOpen && inputEditable ? query : multiple ? query : selectedSingle ? textOf(selectedSingle.label) : query} onChange={(event) => handleInput(event.target.value)} onPointerDown={() => setKeyboardFocused(false)} onBlur={handleBlur} onClick={() => setVisible(!isOpen)} onKeyDown={handleKeyDown} />
+      {valueRender ? <div className="qizhi-select__value-display" onMouseDown={(event) => event.preventDefault()} onClick={() => { inputRef.current?.focus(); setVisible(!isOpen); }}>{valueRender({ open: isOpen, searching: !!query, query, selectedOptions, valueText: selectedValueText })}</div> : null}
+      {multiple && !valueRender ? <div className="qizhi-select__tags" aria-label="已选项">{shownTags.map((option, index) => <Tag key={keyOf(option.value)} className={join("qizhi-select__tag", !renderTag && "qizhi-tag-closable")} draggable={dragToSort} onMouseDown={(event) => event.preventDefault()} onDragStart={(event: DragEvent<HTMLSpanElement>) => event.dataTransfer.setData("text/qizhi-select-index", String(index))} onDragOver={dragToSort ? (event) => event.preventDefault() : undefined} onDrop={dragToSort ? (event) => { event.preventDefault(); const from = Number(event.dataTransfer.getData("text/qizhi-select-index")); if (Number.isInteger(from) && from !== index) { const next = [...multipleValue]; const [item] = next.splice(from, 1); next.splice(index, 0, item); emitMultiple(next); } } : undefined}>{renderTag ? renderTag(option, true) : <>{option.label}<button className="qizhi-tag-close-btn" type="button" aria-label={`删除 ${textOf(option.label)}`} onClick={(event) => { event.stopPropagation(); remove(option.value); }}><CloseIcon /></button></>}</Tag>)}{hiddenCount > 0 ? <Tag className="qizhi-select__tag qizhi-select__tag--more">{renderMore ? renderMore(hiddenCount) : `+${hiddenCount} 个更多`}</Tag> : null}</div> : null}
+      {multiple && !valueRender && maxTagCount === "responsive" ? <div className="qizhi-select__measure" aria-hidden="true">{selectedOptions.map((option) => <Tag key={keyOf(option.value)} ref={(node) => { if (node) tagMeasureRefs.current.set(keyOf(option.value), node); else tagMeasureRefs.current.delete(keyOf(option.value)); }}>{renderTag ? renderTag(option, true) : <>{option.label}<CloseIcon /></>}</Tag>)}{selectedOptions.map((_, index) => { const count = index + 1; return <Tag key={count} className="qizhi-select__tag qizhi-select__tag--more" ref={(node) => { if (node) moreMeasureRefs.current.set(count, node); else moreMeasureRefs.current.delete(count); }}>{renderMore ? renderMore(count) : `+${count} 个更多`}</Tag>; })}</div> : null}
+      <input ref={inputRef} id={id} name={name} className="qizhi-select__input" role="combobox" aria-haspopup="listbox" aria-expanded={isOpen} aria-controls={popupId} aria-activedescendant={activeDescendant} aria-autocomplete={searchEnabled ? "list" : undefined} aria-label={props["aria-label"] ?? placeholder} aria-labelledby={props["aria-labelledby"]} aria-describedby={props["aria-describedby"]} aria-invalid={props["aria-invalid"]} disabled={disabled} readOnly={!inputEditable} placeholder={valueRender ? undefined : hasValue ? "" : placeholder} value={valueRender ? query : isOpen && inputEditable ? query : multiple ? query : selectedSingle ? textOf(selectedSingle.label) : query} onChange={(event) => handleInput(event.target.value)} onPointerDown={() => setKeyboardFocused(false)} onBlur={handleBlur} onClick={() => setVisible(!isOpen)} onKeyDown={handleKeyDown} />
       {allowClear && hasValue && !disabled ? <button type="button" className="qizhi-select__clear" aria-label="清除选择" onMouseDown={(event) => event.preventDefault()} onBlur={handleBlur} onClick={clear}><CloseIcon /></button> : null}
       <span className="qizhi-select__arrow" aria-hidden="true"><ArrowDownIcon viewBox="1.6 1.6 12.8 12.8" /></span>
     </div>}

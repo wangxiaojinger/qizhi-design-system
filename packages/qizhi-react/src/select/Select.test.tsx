@@ -553,4 +553,54 @@ describe("Select", () => {
     expect(onClear).toHaveBeenCalledTimes(1);
     expect(onDeselect).toHaveBeenCalledTimes(1);
   });
+
+  it("keeps the existing input rendering when valueRender is absent", () => {
+    const { unmount } = render(<Select options={options} defaultValue="beijing" aria-label="单选城市" />);
+    expect(screen.getByRole("combobox", { name: "单选城市" })).toHaveValue("北京");
+    expect(document.querySelector(".qizhi-select__value-display")).toBeNull();
+
+    unmount();
+    render(<Select mode="multiple" options={options} defaultValue={["beijing"]} aria-label="多选城市" />);
+    expect(screen.getByRole("button", { name: "删除 北京" })).toBeInTheDocument();
+    expect(document.querySelector(".qizhi-select__value-display")).toBeNull();
+  });
+
+  it("keeps undefined multiple value on the legacy uncontrolled path", () => {
+    render(<Select
+      mode="multiple"
+      value={undefined}
+      options={options}
+      aria-label="多选城市"
+    />);
+
+    expect(screen.getByRole("combobox", { name: "多选城市" }))
+      .toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /删除/ }))
+      .not.toBeInTheDocument();
+  });
+
+  it("renders an opt-in value display while retaining the real combobox input", async () => {
+    const user = userEvent.setup();
+    const contexts: Array<{ open: boolean; searching: boolean; query: string; valueText: string }> = [];
+    render(<Select
+      options={options}
+      defaultValue="beijing"
+      showSearch
+      aria-label="搜索城市"
+      valueRender={(context) => {
+        contexts.push({ open: context.open, searching: context.searching, query: context.query, valueText: context.valueText });
+        return <span>当前：{context.valueText}</span>;
+      }}
+    />);
+
+    const input = screen.getByRole("combobox", { name: "搜索城市" });
+    expect(input).toBeInstanceOf(HTMLInputElement);
+    expect(input).toHaveValue("");
+    expect(screen.getByText("当前：北京")).toBeInTheDocument();
+    await user.click(input);
+    await user.type(input, "上");
+
+    expect(screen.getByText("当前：北京")).toBeInTheDocument();
+    expect(contexts.at(-1)).toEqual({ open: true, searching: true, query: "上", valueText: "北京" });
+  });
 });

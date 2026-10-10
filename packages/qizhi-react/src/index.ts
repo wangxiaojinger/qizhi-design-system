@@ -632,6 +632,7 @@ export type {
   TimelineProps,
 } from "./timeline/Timeline.types";
 export { Select } from "./select/Select";
+export { FilterSelect } from "./select/FilterSelect";
 export { SelectOptionCard } from "./select/SelectOptionCard";
 export { SelectSelectionCard } from "./select/SelectSelectionCard";
 export type { SelectSelectionCardProps } from "./select/SelectSelectionCard";
@@ -650,7 +651,16 @@ export type {
   SelectSize,
   SelectStatus,
   SelectTriggerProps,
+  SelectValueRenderContext,
 } from "./select/Select.types";
+export type {
+  FilterSelectFilterOption,
+  FilterSelectMultipleProps,
+  FilterSelectOption,
+  FilterSelectProps,
+  FilterSelectSingleProps,
+  FilterSelectValue,
+} from "./select/FilterSelect.types";
 export { Typography } from "./typography/Typography";
 export type {
   TypographyClassName,
