@@ -13,7 +13,7 @@
 }
 #component-filter-select .codebox-wrapper > .demo { margin-bottom: 12px; }
 #component-filter-select .component-example-actions { padding-right: 0; }
-#component-filter-select .qizhi-filter-select { width: 345px; }
+#component-filter-select .qizhi-filter-select { width: 220px; }
 .filter-select-docs-stack { display: grid; gap: 24px; justify-items: start; }
 @media (max-width: 767.98px) {
   #component-filter-select .qizhi-filter-select,
