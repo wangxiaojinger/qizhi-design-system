@@ -11,7 +11,8 @@
       "import": "./dist/index.js"
     },
     "./style.css": "./dist/style.css",
-    "./tokens.json": "./dist/tokens.json"
+    "./tokens.json": "./dist/tokens.json",
+    "./migration-map.json": "./dist/migration-map.json"
   },
   "files": [
     "dist"

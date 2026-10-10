@@ -166,3 +166,66 @@ test("Dropdown API follows the shared documentation visual baseline", async ({ p
     typeColor: "rgb(245, 49, 157)",
   });
 });
+
+test("Dropdown component tokens override owned visuals without changing cascade geometry", async ({ page }) => {
+  await page.goto("/#component-dropdown");
+  await page.evaluate(() => {
+    const style = document.documentElement.style;
+    const values = {
+      "--component-dropdown-popup-background": "rgb(240, 245, 255)",
+      "--component-dropdown-popup-border": "rgb(82, 196, 26)",
+      "--component-dropdown-popup-min-width": "120px",
+      "--component-dropdown-item-min-height": "36px",
+      "--component-dropdown-item-padding-block": "7px",
+      "--component-dropdown-item-padding-inline": "15px",
+      "--component-dropdown-item-hover-background": "rgb(255, 247, 232)",
+      "--component-dropdown-item-hover-text": "rgb(245, 63, 63)",
+      "--component-dropdown-trigger-gap": "9px",
+      "--component-dropdown-icon-size": "18px",
+      "--component-dropdown-button-divider": "rgb(255, 0, 0)",
+      "--component-dropdown-button-secondary-divider": "rgb(0, 0, 255)",
+      "--component-dropdown-button-loading-background": "rgb(1, 2, 3)",
+      "--component-dropdown-button-loading-motion-duration": "1200ms",
+      "--component-dropdown-button-loading-motion-easing": "ease-in",
+    };
+    for (const [name, value] of Object.entries(values)) style.setProperty(name, value);
+  });
+
+  const basic = page.locator("#下拉菜单-基础用法 .qizhi-dropdown");
+  await basic.hover();
+  const popup = basic.locator(":scope > .qizhi-dropdown__popup");
+  const item = popup.getByRole("menuitem").first();
+  await expect(popup).toHaveCSS("background-color", "rgb(240, 245, 255)");
+  await expect(popup).toHaveCSS("border-color", "rgb(82, 196, 26)");
+  await expect(popup).toHaveCSS("min-width", "120px");
+  await expect(item).toHaveCSS("min-height", "36px");
+  await expect(item).toHaveCSS("padding", "7px 15px");
+  await item.focus();
+  await expect(item).toHaveCSS("background-color", "rgb(255, 247, 232)");
+  await expect(item).toHaveCSS("color", "rgb(245, 63, 63)");
+
+  const buttons = page.locator("#下拉菜单-按钮下拉框 .qizhi-dropdown-button");
+  await expect(buttons.nth(0).locator(".qizhi-dropdown-button__toggle")).toHaveCSS("border-left-color", "rgb(0, 0, 255)");
+  await expect(buttons.nth(2).locator(".qizhi-dropdown-button__toggle")).toHaveCSS("border-left-color", "rgb(255, 0, 0)");
+  const loadingToggle = buttons.nth(3).locator(".qizhi-dropdown-button__loading-toggle");
+  await expect(loadingToggle).toHaveCSS("background-color", "rgb(1, 2, 3)");
+  await expect(loadingToggle.locator(".qizhi-dropdown-button__loading-icon")).toHaveCSS("animation-duration", "1.2s");
+
+  const cascade = page.locator("#下拉菜单-多级菜单 .demo");
+  await cascade.getByRole("button", { name: "Click" }).click();
+  const submenuTrigger = cascade.locator(".qizhi-dropdown__submenu-trigger").first();
+  await submenuTrigger.hover();
+  const submenu = cascade.locator(".qizhi-dropdown__submenu-popup").first();
+  await expect(submenu).toBeVisible();
+  const geometry = await submenu.evaluate((node) => {
+    const parent = node.parentElement!;
+    const popupRect = node.getBoundingClientRect();
+    const parentRect = parent.getBoundingClientRect();
+    const opensLeft = parent.classList.contains("qizhi-dropdown__submenu--left");
+    const gap = opensLeft ? parentRect.left - popupRect.right : popupRect.left - parentRect.right;
+    return { gap: Math.round(gap), left: popupRect.left, right: popupRect.right, viewport: innerWidth };
+  });
+  expect(geometry.gap).toBe(4);
+  expect(geometry.left).toBeGreaterThanOrEqual(0);
+  expect(geometry.right).toBeLessThanOrEqual(geometry.viewport);
+});

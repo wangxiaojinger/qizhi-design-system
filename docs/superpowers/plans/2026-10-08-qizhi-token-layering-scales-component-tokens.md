@@ -1,6 +1,6 @@
 # QIZHI Token Layering, Scales, and Component Tokens Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Add a backward-compatible four-tier token model, shared design scales, and real Button/Input/Select/Modal component tokens without changing existing computed visuals or breaking legacy variable overrides.
 
@@ -58,27 +58,27 @@
 - Consumes: the current 362-token manifest before new tokens are added.
 - Produces: a baseline object keyed by token name with `cssVariable`, `value`, and `valueType`; later tasks rely on it to detect compatibility breaks.
 
-- [ ] **Step 1: Add a failing compatibility test**
+- [x] **Step 1: Add a failing compatibility test**
 
 Add `test("legacy public token names, values, and value types stay compatible", ...)`. It must load `src/legacy-contract.json`, assert it contains exactly 362 entries, and compare each baseline entry against the current manifest. Classify values as `rgb-channel`, `color`, `length`, `number`, `percentage`, `font-family`, `shadow`, or `reference` using an exported `classifyTokenValue(value: string)` helper that does not exist yet.
 
-- [ ] **Step 2: Run the token test and verify RED**
+- [x] **Step 2: Run the token test and verify RED**
 
 Run: `pnpm --filter @wangxiaojinger/qizhi-tokens test`
 
 Expected: FAIL because `legacy-contract.json` and `classifyTokenValue` do not exist.
 
-- [ ] **Step 3: Add the baseline and minimal classifier**
+- [x] **Step 3: Add the baseline and minimal classifier**
 
 Create `legacy-contract.json` from the current manifest without modifying the manifest. Export `classifyTokenValue(value: string): string` from `scripts/token-utils.mjs`; references are classified before their resolved target so the raw public representation is protected.
 
-- [ ] **Step 4: Run the token tests and verify GREEN**
+- [x] **Step 4: Run the token tests and verify GREEN**
 
 Run: `pnpm --filter @wangxiaojinger/qizhi-tokens test`
 
 Expected: all token tests pass and the baseline contains 362 entries.
 
-- [ ] **Step 5: Commit the compatibility baseline**
+- [x] **Step 5: Commit the compatibility baseline**
 
 ```bash
 git add packages/qizhi-tokens/src/legacy-contract.json packages/qizhi-tokens/scripts/token-utils.mjs packages/qizhi-tokens/tests/tokens.node.mjs
@@ -96,7 +96,7 @@ git commit -m "test(tokens): freeze legacy public contract"
 - Consumes: `classifyTokenValue` and the baseline from Task 1.
 - Produces: `validateManifest(manifest)` rules for `tier`, `status`, `replacedBy`, cycles, and allowed dependency direction; `QizhiTokenTier` and `QizhiTokenStatus` concepts used by Task 3.
 
-- [ ] **Step 1: Add failing metadata and dependency tests**
+- [x] **Step 1: Add failing metadata and dependency tests**
 
 Add separate tests asserting:
 
@@ -107,27 +107,27 @@ Add separate tests asserting:
 - a Map token referencing an Alias or Component token is rejected;
 - a Component token referencing another Component token is rejected.
 
-- [ ] **Step 2: Run the token tests and verify RED**
+- [x] **Step 2: Run the token tests and verify RED**
 
 Run: `pnpm --filter @wangxiaojinger/qizhi-tokens test`
 
 Expected: FAIL because existing tokens have no tier/status and dependency validation does not exist.
 
-- [ ] **Step 3: Classify all existing tokens without changing their values**
+- [x] **Step 3: Classify all existing tokens without changing their values**
 
 Add `tier` and `status: "stable"` to every existing manifest entry. Classify palette ramps and numerical scales as Map, usage-oriented colors and compatibility names as Alias, foundational anchors as Seed, and existing form/chart-specific entries as Component only when their scope is truly component-specific. Do not add deprecations in this task unless the replacement is unambiguous and value-compatible.
 
-- [ ] **Step 4: Implement dependency and lifecycle validation**
+- [x] **Step 4: Implement dependency and lifecycle validation**
 
 Extend `validateManifest(manifest)` to validate enums, replacement targets, graph cycles, and tier direction. Return stable, token-specific error messages suitable for assertions; do not resolve or rewrite values during validation.
 
-- [ ] **Step 5: Run the token tests and verify GREEN**
+- [x] **Step 5: Run the token tests and verify GREEN**
 
 Run: `pnpm --filter @wangxiaojinger/qizhi-tokens test`
 
 Expected: all tests pass, including the legacy baseline proving no old value changed.
 
-- [ ] **Step 6: Commit metadata classification**
+- [x] **Step 6: Commit metadata classification**
 
 ```bash
 git add packages/qizhi-tokens/src/tokens.json packages/qizhi-tokens/scripts/token-utils.mjs packages/qizhi-tokens/tests/tokens.node.mjs
@@ -150,23 +150,23 @@ git commit -m "feat(tokens): classify public token tiers"
 
 **Interfaces:**
 - Consumes: validated `tier`, `status`, and optional `replacedBy` fields from Task 2.
-- Produces: `renderMigrationMap(manifest): string`; generated `QizhiToken` fields `tier`, `status`, and optional `replacedBy`; package export `@wangxiaojinger/qizhi-tokens/migration-map.json`.
+- Produces: `renderMigrationMap(manifest, legacyContract): string`; generated `QizhiToken` fields `tier`, `status`, and optional `replacedBy`; package export `@wangxiaojinger/qizhi-tokens/migration-map.json` and the repository-readable `packages/qizhi-tokens/MIGRATION.md`.
 
-- [ ] **Step 1: Add failing generated-contract tests**
+- [x] **Step 1: Add failing generated-contract tests**
 
-Assert that `publicTokenValues()` includes the three metadata fields, `renderTypes()` declares exact tier/status unions, the migration map includes every token with `action: "keep" | "alias" | "deprecated"`, and package exports expose `./migration-map.json`. Extend the stale-artifact test so changing source metadata makes validation fail for the relevant generated artifact.
+Assert that `publicTokenValues()` includes the three metadata fields, `renderTypes()` declares exact tier/status unions, the migration map includes every token with `action: "keep" | "compat-alias" | "add" | "deprecated"` and a recommended Token, and package exports expose `./migration-map.json`. Extend the stale-artifact test so changing source metadata makes validation fail for the relevant generated artifact.
 
-- [ ] **Step 2: Run the token tests and verify RED**
+- [x] **Step 2: Run the token tests and verify RED**
 
 Run: `pnpm --filter @wangxiaojinger/qizhi-tokens test`
 
 Expected: FAIL because generated metadata, migration-map rendering, and the export do not exist.
 
-- [ ] **Step 3: Implement metadata and migration-map generation**
+- [x] **Step 3: Implement metadata and migration-map generation**
 
-Add `renderMigrationMap(manifest): string` to `token-utils.mjs`. Derive actions from source metadata: stable canonical tokens are `keep`, stable compatibility references are `alias`, and deprecated tokens are `deprecated`; include `token`, `cssVariable`, `valueType`, `replacement`, and `note`. Update build and validation scripts and add the package export.
+Add `renderMigrationMap(manifest, legacyContract): string` to `token-utils.mjs`. Derive actions from source metadata and the frozen legacy boundary: stable canonical tokens are `keep`, stable legacy references are `compat-alias`, phase-one additions are `add`, and deprecated tokens are `deprecated`; include `token`, `cssVariable`, `recommendedToken`, `valueType`, `replacement`, and `note`. Update build and validation scripts, generate `MIGRATION.md`, and add the package export.
 
-- [ ] **Step 4: Rebuild and verify GREEN**
+- [x] **Step 4: Rebuild and verify GREEN**
 
 Run:
 
@@ -178,7 +178,7 @@ pnpm --filter @wangxiaojinger/qizhi-tokens validate
 
 Expected: build succeeds, token tests pass, and validation reports the current token count.
 
-- [ ] **Step 5: Commit generated public metadata**
+- [x] **Step 5: Commit generated public metadata**
 
 ```bash
 git add packages/qizhi-tokens/package.json packages/qizhi-tokens/scripts packages/qizhi-tokens/tests/tokens.node.mjs packages/qizhi-tokens/dist
@@ -196,7 +196,7 @@ git commit -m "feat(tokens): publish token migration metadata"
 - Consumes: metadata schema and generators from Tasks 2-3.
 - Produces: Map tokens for typography, spacing, control heights, borders, shadows, motion, and z-index; Task 5 component tokens reference them.
 
-- [ ] **Step 1: Add failing exact-value scale tests**
+- [x] **Step 1: Add failing exact-value scale tests**
 
 Add one test per scale family asserting the approved values:
 
@@ -209,17 +209,17 @@ Add one test per scale family asserting the approved values:
 - z-index: sticky 100, dropdown 60, modal 999, message/tooltip 1200, matching the currently rendered layer values;
 - three shadow tokens and standard/enter/exit easing tokens with values copied from existing component CSS.
 
-- [ ] **Step 2: Run the token tests and verify RED**
+- [x] **Step 2: Run the token tests and verify RED**
 
 Run: `pnpm --filter @wangxiaojinger/qizhi-tokens test`
 
 Expected: FAIL listing the missing scale tokens.
 
-- [ ] **Step 3: Add the minimal Map tokens**
+- [x] **Step 3: Add the minimal Map tokens**
 
 Append the scale entries to `tokens.json` with `tier: "map"`, `status: "stable"`, descriptive usage text, and no component-specific names. Preserve all legacy entries byte-for-value.
 
-- [ ] **Step 4: Build and verify GREEN**
+- [x] **Step 4: Build and verify GREEN**
 
 Run:
 
@@ -231,7 +231,7 @@ pnpm --filter @wangxiaojinger/qizhi-tokens validate
 
 Expected: all commands pass; the legacy compatibility test remains green.
 
-- [ ] **Step 5: Commit the scales**
+- [x] **Step 5: Commit the scales**
 
 ```bash
 git add packages/qizhi-tokens/src/tokens.json packages/qizhi-tokens/tests/tokens.node.mjs packages/qizhi-tokens/dist
@@ -251,11 +251,11 @@ git commit -m "feat(tokens): add shared design scales"
 - Consumes: shared scale and semantic tokens from Task 4.
 - Produces: `component.button.*` tokens for heights, padding, gap, radius, typography, borders, colors, focus, and motion.
 
-- [ ] **Step 1: Add failing Button token and fallback-chain tests**
+- [x] **Step 1: Add failing Button token and fallback-chain tests**
 
 Assert the complete `component.button.*` set exists with `tier: "component"`; its primary background references `--primary-6`; its four heights resolve through the shared control-height Map tokens; and `button.css` contains no literal `24px`, `28px`, `32px`, `36px`, `14px`, `0.2s`, or `2px` for the migrated properties.
 
-- [ ] **Step 2: Run the focused tests and verify RED**
+- [x] **Step 2: Run the focused tests and verify RED**
 
 Run:
 
@@ -266,11 +266,11 @@ pnpm exec vitest run packages/qizhi-react/src/button/Button.test.tsx
 
 Expected: token test fails because Button component tokens are missing; existing Button behavior test remains green.
 
-- [ ] **Step 3: Add Button tokens and migrate CSS**
+- [x] **Step 3: Add Button tokens and migrate CSS**
 
 Add component tokens whose defaults reproduce the current CSS and preserve old variable overrides. Replace only the corresponding declarations in `button.css`; retain runtime status custom properties such as `--qizhi-status-*`.
 
-- [ ] **Step 4: Build and verify GREEN**
+- [x] **Step 4: Build and verify GREEN**
 
 Run:
 
@@ -282,7 +282,7 @@ pnpm exec vitest run packages/qizhi-react/src/button/Button.test.tsx packages/qi
 
 Expected: all commands pass.
 
-- [ ] **Step 5: Commit Button migration**
+- [x] **Step 5: Commit Button migration**
 
 ```bash
 git add packages/qizhi-tokens/src/tokens.json packages/qizhi-tokens/tests/tokens.node.mjs packages/qizhi-tokens/dist packages/qizhi-react/src/button/button.css
@@ -304,13 +304,13 @@ git commit -m "feat(button): consume component design tokens"
 
 **Interfaces:**
 - Consumes: shared scales and semantic aliases from Task 4.
-- Produces: `component.input.*` and `component.select.*` tokens for sizing, spacing, radius, typography, borders, backgrounds, disabled states, focus ring, popup shadow, option height, icon size, and motion.
+- Produces: `component.input.*` and `component.select.*` tokens for sizing, spacing, radius, typography, default/hover/focus/error/warning borders, backgrounds, disabled states, focus rings already present in the baseline, popup shadow, option height, icon size, and motion.
 
-- [ ] **Step 1: Add failing Input and Select token tests**
+- [x] **Step 1: Add failing Input and Select token tests**
 
-Assert both component families exist, use shared control-height tokens, preserve `--primary-6`, `--color-border-*`, `--color-text-*`, and `--color-fill-*` fallback chains, and do not publish runtime values such as input content width as design tokens.
+Assert both component families exist, use shared control-height tokens, preserve `--primary-6`, `--color-border-*`, `--color-text-*`, `--color-fill-*`, `--color-danger`, and `--color-warning` fallback chains, and do not publish runtime values such as input content width as design tokens. Input's existing error/warning focus rings are componentized; Select does not add state-specific focus rings because they were absent from the pre-migration baseline.
 
-- [ ] **Step 2: Run focused tests and verify RED**
+- [x] **Step 2: Run focused tests and verify RED**
 
 Run:
 
@@ -321,11 +321,11 @@ pnpm exec vitest run packages/qizhi-react/src/input/Input.test.tsx packages/qizh
 
 Expected: token test fails for missing component tokens; existing behavior tests remain green.
 
-- [ ] **Step 3: Add Input tokens and migrate `input.css`**
+- [x] **Step 3: Add Input tokens and migrate `input.css`**
 
 Replace only declarations covered by approved component tokens. Keep `--qizhi-input-height` as the internal size switch, but set its values from public `component.input.control.height.*` tokens so grouped and standalone inputs remain synchronized.
 
-- [ ] **Step 4: Run Input tests and verify GREEN**
+- [x] **Step 4: Run Input tests and verify GREEN**
 
 Run:
 
@@ -337,11 +337,11 @@ pnpm exec vitest run packages/qizhi-react/src/input/Input.test.tsx packages/qizh
 
 Expected: all Input-focused checks pass.
 
-- [ ] **Step 5: Add Select tokens and migrate `select.css`**
+- [x] **Step 5: Add Select tokens and migrate `select.css`**
 
 Use the shared control-height scale and Select-specific aliases. Preserve the current popup shadow, option minimum height, focus ring, disabled state, and old public color override paths.
 
-- [ ] **Step 6: Run Select tests and verify GREEN**
+- [x] **Step 6: Run Select tests and verify GREEN**
 
 Run:
 
@@ -353,7 +353,7 @@ pnpm exec vitest run packages/qizhi-react/src/select/Select.test.tsx packages/qi
 
 Expected: all Select-focused checks pass.
 
-- [ ] **Step 7: Commit Input and Select migration**
+- [x] **Step 7: Commit Input and Select migration**
 
 ```bash
 git add packages/qizhi-tokens/src/tokens.json packages/qizhi-tokens/tests/tokens.node.mjs packages/qizhi-tokens/dist packages/qizhi-react/src/input/input.css packages/qizhi-react/src/select/select.css
@@ -373,11 +373,11 @@ git commit -m "feat(forms): consume input and select tokens"
 - Consumes: shadow, motion, z-index, spacing, radius, and typography scales from Task 4.
 - Produces: `component.modal.*` tokens for z-index, mask, radius, shadow, header height, typography, padding, footer gap, and enter motion.
 
-- [ ] **Step 1: Add failing Modal token tests**
+- [x] **Step 1: Add failing Modal token tests**
 
 Assert the Modal component token set exists and preserves current values: mask `rgba(0, 0, 0, 0.45)`, header height `56px`, content padding `16px 24px`, footer gap `12px`, entry duration `180ms`, and current modal shadow. Assert old text/background/border variables remain in each fallback chain.
 
-- [ ] **Step 2: Run focused tests and verify RED**
+- [x] **Step 2: Run focused tests and verify RED**
 
 Run:
 
@@ -388,11 +388,11 @@ pnpm exec vitest run packages/qizhi-react/src/modal/Modal.test.tsx
 
 Expected: token test fails for missing Modal component tokens; existing Modal behavior tests remain green.
 
-- [ ] **Step 3: Add Modal tokens and migrate CSS**
+- [x] **Step 3: Add Modal tokens and migrate CSS**
 
 Replace only approved visual constants in `modal.css`. Preserve the existing keyframe geometry and reduced-motion behavior; expose duration and easing without turning dynamic viewport calculations into public tokens.
 
-- [ ] **Step 4: Build and verify GREEN**
+- [x] **Step 4: Build and verify GREEN**
 
 Run:
 
@@ -404,7 +404,7 @@ pnpm exec vitest run packages/qizhi-react/src/modal/Modal.test.tsx
 
 Expected: all commands pass.
 
-- [ ] **Step 5: Commit Modal migration**
+- [x] **Step 5: Commit Modal migration**
 
 ```bash
 git add packages/qizhi-tokens/src/tokens.json packages/qizhi-tokens/tests/tokens.node.mjs packages/qizhi-tokens/dist packages/qizhi-react/src/modal/modal.css
@@ -422,21 +422,21 @@ git commit -m "feat(modal): consume component design tokens"
 - Consumes: shared scales and Alias tokens from Task 4.
 - Produces: documented `component.table.*` candidate tokens that are published but explicitly marked as not yet consumed by Table CSS.
 
-- [ ] **Step 1: Add a failing Table mapping test**
+- [x] **Step 1: Add a failing Table mapping test**
 
 Assert the candidate set covers header background, cell block/inline padding, font size, line height, border, fixed-column z-index, row hover background, and selected-row background.
 
-- [ ] **Step 2: Run the token test and verify RED**
+- [x] **Step 2: Run the token test and verify RED**
 
 Run: `pnpm --filter @wangxiaojinger/qizhi-tokens test`
 
 Expected: FAIL because the Table mapping tokens do not exist.
 
-- [ ] **Step 3: Add deferred Table component tokens**
+- [x] **Step 3: Add deferred Table component tokens**
 
 Add `component.table.*` entries with descriptions explicitly stating that consumption is deferred while the Table implementation has unrelated in-progress changes. Defaults must match the current Table values without editing its CSS.
 
-- [ ] **Step 4: Build and verify GREEN**
+- [x] **Step 4: Build and verify GREEN**
 
 Run:
 
@@ -448,7 +448,7 @@ pnpm --filter @wangxiaojinger/qizhi-tokens validate
 
 Expected: all commands pass and `git diff -- packages/qizhi-react/src/table/table.css` still contains only the user's pre-existing changes.
 
-- [ ] **Step 5: Commit the deferred mapping**
+- [x] **Step 5: Commit the deferred mapping**
 
 ```bash
 git add packages/qizhi-tokens/src/tokens.json packages/qizhi-tokens/tests/tokens.node.mjs packages/qizhi-tokens/dist
@@ -463,12 +463,13 @@ git commit -m "feat(tokens): add deferred table token map"
 - Verify only: `tests/e2e/input-react-island.spec.ts`
 - Verify only: `tests/e2e/select-react-island.spec.ts`
 - Verify only: `tests/e2e/modal-react-island.spec.ts`
+- Verify only: `tests/e2e/token-phase1-visual-baseline.spec.ts` and its snapshots generated from baseline commit `c42a916`
 
 **Interfaces:**
 - Consumes: completed token architecture and component migrations.
 - Produces: final candidate evidence; no new product behavior.
 
-- [ ] **Step 1: Check scope and compatibility diff**
+- [x] **Step 1: Check scope and compatibility diff**
 
 Run:
 
@@ -480,7 +481,7 @@ git diff -- packages/qizhi-react/src/table/table.css packages/qizhi-react/src/po
 
 Expected: no task-created changes in excluded files; pre-existing changes remain preserved.
 
-- [ ] **Step 2: Run package and workspace verification**
+- [x] **Step 2: Run package and workspace verification**
 
 Run:
 
@@ -494,20 +495,21 @@ pnpm build
 
 Expected: every command passes. If a pre-existing unrelated failure appears, record the exact command, test, and output without changing unrelated code.
 
-- [ ] **Step 3: Run focused Playwright regressions**
+- [x] **Step 3: Run focused Playwright regressions**
 
 Run:
 
 ```bash
-pnpm exec playwright test tests/e2e/button-react-island.spec.ts tests/e2e/input-react-island.spec.ts tests/e2e/select-react-island.spec.ts tests/e2e/modal-react-island.spec.ts
+QIZHI_DOCS_BASE_URL=<current-preview> pnpm exec playwright test tests/e2e/button-react-island.spec.ts tests/e2e/input-react-island.spec.ts tests/e2e/select-react-island.spec.ts tests/e2e/modal-react-island.spec.ts
+QIZHI_DOCS_BASE_URL=<current-preview> pnpm exec playwright test tests/e2e/token-phase1-visual-baseline.spec.ts --workers=1
 ```
 
 Expected: all configured 1440/1024/375 projects pass with no new console errors or horizontal overflow.
 
-- [ ] **Step 4: Inspect rendered screenshots and computed styles**
+- [x] **Step 4: Inspect rendered screenshots and computed styles**
 
-Open the generated target screenshots for Button, Input, Select, and Modal. Compare default, hover/active where captured, focus-visible, disabled, error/warning, all sizes, and open overlays. Confirm computed heights remain 24/28/32/36px and the legacy `--primary-6` override probe affects the primary Button.
+Generate the checked-in Playwright snapshots from pre-migration commit `c42a916`, then compare the current branch against the same Button, Input, Select, and Modal regions at 1440/1024/375. Also inspect default, hover/active where captured, focus-visible, disabled, error/warning, all sizes, and open overlays. Confirm computed heights remain 24/28/32/36px and the legacy `--primary-6` override probe affects the primary Button.
 
-- [ ] **Step 5: Record final candidate status**
+- [x] **Step 5: Record final candidate status**
 
 Report changed files, commands and results, preserved unrelated modifications, any pre-existing failures, and `independent_verification: pending`. Do not publish or deploy.

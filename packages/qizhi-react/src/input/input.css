@@ -1,16 +1,16 @@
-.qizhi-input { --qizhi-input-height: 32px; box-sizing: border-box; position: relative; display: inline-flex; align-items: center; width: 240px; max-width: 100%; height: var(--qizhi-input-height); border: 1px solid var(--color-border-2, #e5e6eb); border-radius: 2px; background: var(--color-bg-2, #fff); transition: border-color .16s ease, box-shadow .16s ease; }
-.qizhi-input:hover { border-color: var(--color-border-3, #c9cdd4); }
-.qizhi-input:focus-within { border-color: rgb(var(--primary-6, 51, 102, 255)); box-shadow: 0 0 0 2px var(--color-primary-light-1, #e8f0ff); }
-.qizhi-input--size-mini { --qizhi-input-height: 24px; }
-.qizhi-input--size-small { --qizhi-input-height: 28px; }
-.qizhi-input--size-large { --qizhi-input-height: 36px; }
-.qizhi-input--error { border-color: var(--color-danger, #f53f3f); }
-.qizhi-input--error:focus-within { box-shadow: 0 0 0 2px var(--color-danger-light-1, #ffece8); }
-.qizhi-input--warning { border-color: var(--color-warning, #ff7d00); }
-.qizhi-input--warning:focus-within { box-shadow: 0 0 0 2px var(--color-warning-light-1, #fff3e8); }
-.qizhi-input--disabled { background: var(--color-fill-1, #f7f8fa); color: var(--color-text-4, #c9cdd4); cursor: not-allowed; }
-.qizhi-input__field { box-sizing: border-box; width: 100%; min-width: 0; height: 100%; padding: 0 12px; border: 0; outline: 0; background: transparent; color: var(--color-text-1, #1d2129); font: inherit; font-size: 14px; }
-.qizhi-input__field::placeholder { color: var(--color-text-4, #c9cdd4); }
+.qizhi-input { --qizhi-input-height: var(--component-input-control-height-medium); box-sizing: border-box; position: relative; display: inline-flex; align-items: center; width: 240px; max-width: 100%; height: var(--qizhi-input-height); border: var(--component-input-border-width) solid var(--component-input-border-default); border-radius: var(--component-input-radius); background: var(--component-input-background-default); transition: border-color var(--component-input-motion-duration) var(--component-input-motion-easing), box-shadow var(--component-input-motion-duration) var(--component-input-motion-easing); }
+.qizhi-input:hover { border-color: var(--component-input-border-hover); }
+.qizhi-input:focus-within { border-color: var(--component-input-border-focus); box-shadow: 0 0 0 var(--component-input-focus-width) var(--component-input-focus-ring); }
+.qizhi-input--size-mini { --qizhi-input-height: var(--component-input-control-height-mini); }
+.qizhi-input--size-small { --qizhi-input-height: var(--component-input-control-height-small); }
+.qizhi-input--size-large { --qizhi-input-height: var(--component-input-control-height-large); }
+.qizhi-input--error { border-color: var(--component-input-border-error); }
+.qizhi-input--error:focus-within { box-shadow: 0 0 0 var(--component-input-focus-width) var(--component-input-focus-error-ring); }
+.qizhi-input--warning { border-color: var(--component-input-border-warning); }
+.qizhi-input--warning:focus-within { box-shadow: 0 0 0 var(--component-input-focus-width) var(--component-input-focus-warning-ring); }
+.qizhi-input--disabled { background: var(--component-input-background-disabled); color: var(--component-input-text-disabled); cursor: not-allowed; }
+.qizhi-input__field { box-sizing: border-box; width: 100%; min-width: 0; height: 100%; padding: 0 var(--component-input-padding-inline); border: 0; outline: 0; background: transparent; color: var(--component-input-text-default); font: inherit; font-size: var(--component-input-font-size); }
+.qizhi-input__field::placeholder { color: var(--component-input-text-placeholder); }
 .qizhi-input__field:-webkit-autofill,
 .qizhi-input__field:-webkit-autofill:hover,
 .qizhi-input__field:-webkit-autofill:focus {
@@ -18,12 +18,12 @@
   -webkit-text-fill-color: var(--color-text-1, #1d2129);
   caret-color: var(--color-text-1, #1d2129);
 }
-.qizhi-input__field:disabled { color: var(--color-text-4, #c9cdd4); cursor: not-allowed; }
+.qizhi-input__field:disabled { color: var(--component-input-text-disabled); cursor: not-allowed; }
 .qizhi-input__prefix, .qizhi-input__suffix { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; color: var(--color-text-3, #86909c); font-size: 14px; }
 .qizhi-input__prefix { margin-left: 12px; }
 .qizhi-input__suffix { margin-right: 12px; }
-.qizhi-input__prefix svg, .qizhi-input__suffix svg, .qizhi-input__addon svg, .qizhi-input-search__button svg, .qizhi-input-password__toggle svg { width: 16px; height: 16px; }
-.qizhi-input__addon svg { flex: 0 0 16px; }
+.qizhi-input__prefix svg, .qizhi-input__suffix svg, .qizhi-input__addon svg, .qizhi-input-search__button svg, .qizhi-input-password__toggle svg { width: var(--component-input-icon-size); height: var(--component-input-icon-size); }
+.qizhi-input__addon svg { flex: 0 0 var(--component-input-icon-size); }
 .qizhi-input--with-prefix .qizhi-input__field { padding-left: 8px; }
 .qizhi-input--with-suffix .qizhi-input__field { padding-right: 8px; }
 .qizhi-input__clear, .qizhi-input-password__toggle { display: inline-flex; flex: 0 0 auto; align-items: center; justify-content: center; width: 20px; height: 20px; padding: 0; border: 0; background: transparent; cursor: pointer; }
@@ -36,10 +36,10 @@
 .qizhi-input-password__toggle:hover { color: var(--color-text-3, #86909c); }
 .qizhi-input__word-limit { flex: 0 0 auto; margin-right: 8px; color: var(--color-text-3, #86909c); font-size: 12px; white-space: nowrap; }
 .qizhi-input__word-limit--error { color: var(--color-danger, #f53f3f); }
-.qizhi-input__group { --qizhi-input-height: 32px; display: inline-flex; max-width: 100%; }
-.qizhi-input__group--size-mini { --qizhi-input-height: 24px; }
-.qizhi-input__group--size-small { --qizhi-input-height: 28px; }
-.qizhi-input__group--size-large { --qizhi-input-height: 36px; }
+.qizhi-input__group { --qizhi-input-height: var(--component-input-control-height-medium); display: inline-flex; max-width: 100%; }
+.qizhi-input__group--size-mini { --qizhi-input-height: var(--component-input-control-height-mini); }
+.qizhi-input__group--size-small { --qizhi-input-height: var(--component-input-control-height-small); }
+.qizhi-input__group--size-large { --qizhi-input-height: var(--component-input-control-height-large); }
 .qizhi-input__group > .qizhi-input { flex: 1 1 auto; width: auto; min-width: 0; border-radius: 0; }
 .qizhi-input__addon { display: inline-flex; align-items: center; min-width: 36px; height: var(--qizhi-input-height, 32px); padding: 0 12px; border: 1px solid var(--color-border-2, #e5e6eb); background: var(--color-fill-1, #f7f8fa); color: var(--color-text-2, #4e5969); font-size: 14px; white-space: nowrap; }
 .qizhi-input__addon--before { border-right: 0; border-radius: 2px 0 0 2px; }

@@ -215,3 +215,33 @@ test("Tooltip 锁定五组旧站 Demo 与三档视觉交互契约", async ({
     path: testInfo.outputPath(`tooltip-${testInfo.project.name}.png`),
   });
 });
+
+test("Tooltip keeps legacy, component, and instance background precedence synchronized with its arrow", async ({ page }) => {
+  await page.goto("/#component-tooltip");
+  const basicTrigger = page.locator("#文字气泡-基础用法 .qizhi-typography-text").first();
+  const open = async (trigger: typeof basicTrigger) => {
+    await page.mouse.move(0, 0);
+    await trigger.hover();
+  };
+  const readColors = async (name: string) => {
+    const tooltip = page.getByRole("tooltip", { name, exact: true });
+    await expect(tooltip).toBeVisible();
+    return tooltip.evaluate((node) => ({
+      body: getComputedStyle(node).backgroundColor,
+      arrow: getComputedStyle(node.querySelector(".qizhi-tooltip__arrow")!).backgroundColor,
+    }));
+  };
+
+  await page.evaluate(() => document.documentElement.style.setProperty("--color-neutral-10", "rgb(17, 34, 51)"));
+  await open(basicTrigger);
+  expect(await readColors("这是一段文字气泡内容")).toEqual({ body: "rgb(17, 34, 51)", arrow: "rgb(17, 34, 51)" });
+  await page.keyboard.press("Escape");
+
+  await page.evaluate(() => document.documentElement.style.setProperty("--component-tooltip-background", "rgb(68, 85, 102)"));
+  await open(basicTrigger);
+  expect(await readColors("这是一段文字气泡内容")).toEqual({ body: "rgb(68, 85, 102)", arrow: "rgb(68, 85, 102)" });
+  await page.keyboard.press("Escape");
+
+  await open(page.locator("#文字气泡-不同颜色 .tooltip-docs-color-trigger").first());
+  expect(await readColors("蓝色")).toEqual({ body: "rgb(51, 102, 255)", arrow: "rgb(51, 102, 255)" });
+});

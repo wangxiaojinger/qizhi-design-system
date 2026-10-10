@@ -155,12 +155,16 @@ test("Modal preserves seven demos and nine trigger contracts", async ({ context,
     .toBe(await displayed.innerText());
   await expect(section.getByRole("button", { name: "复制样式" })).toHaveCount(0);
 
-  for (const article of await section.locator("article.codebox-wrapper").all()) {
-    const articleBox = await article.boundingBox();
-    expect(articleBox!.x).toBeGreaterThanOrEqual(0);
-    expect(articleBox!.x + articleBox!.width).toBeLessThanOrEqual(viewport.width);
-    expect(await article.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
-  }
+  const overflowingArticles = await section.locator("article.codebox-wrapper").evaluateAll((articles) => articles
+    .map((article) => ({
+      id: article.id,
+      clientWidth: article.clientWidth,
+      scrollWidth: article.scrollWidth,
+      left: article.getBoundingClientRect().left,
+      right: article.getBoundingClientRect().right,
+    }))
+    .filter((article) => article.left < 0 || article.right > window.innerWidth || article.scrollWidth > article.clientWidth));
+  expect(overflowingArticles).toEqual([]);
   expect(await page.evaluate(() => (
     document.documentElement.scrollWidth <= document.documentElement.clientWidth
   ))).toBe(true);

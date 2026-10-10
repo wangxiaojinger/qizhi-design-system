@@ -2,7 +2,7 @@
 #component-modal .codebox-wrapper, #component-modal .demo, #component-modal .qz-description, #component-modal .qz-description-children, #component-modal .code-preview { box-sizing: border-box; width: 100%; max-width: 100%; min-width: 0; }
 #component-modal .codebox-wrapper, #component-modal .demo { overflow: visible; }
 #component-modal .qz-description p { overflow-wrap: anywhere; }
-#component-modal .qizhi-space { max-width: 100%; flex-wrap: wrap; row-gap: 16px; }
+#component-modal .qizhi-space { box-sizing: border-box; max-width: 100%; flex-wrap: wrap; row-gap: 16px; }
 .qizhi-modal-form { display: grid; gap: 18px; }
 .qizhi-modal-form__item { display: grid; gap: 8px; }
 .qizhi-modal-form__label { color: var(--color-text-2); }

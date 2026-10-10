@@ -131,3 +131,44 @@ test("Popover 文档代码与预览同源", async ({ page }, testInfo) => {
   await expect(demo.getByRole("button", { name: "复制代码" })).toHaveClass(/qizhi-btn/);
   await demo.screenshot({ path: testInfo.outputPath(`popover-code-${testInfo.project.name}.png`) });
 });
+
+test("Popover component overrides keep body and four directional arrows synchronized", async ({ page }) => {
+  await page.goto("/#component-popover");
+  await page.evaluate(() => {
+    const style = document.documentElement.style;
+    style.setProperty("--component-popover-background", "rgb(240, 245, 255)");
+    style.setProperty("--component-popover-border", "rgb(82, 196, 26)");
+    style.setProperty("--component-popover-width", "280px");
+    style.setProperty("--component-popover-arrow-size", "14px");
+    style.setProperty("--component-popover-z-index", "1301");
+  });
+
+  for (const [label, side] of [["上", "top"], ["下", "bottom"], ["左", "left"], ["右", "right"]] as const) {
+    const trigger = page.locator("#popover-position").getByRole("button", { name: label, exact: true });
+    await trigger.focus();
+    const popup = page.locator(`#${await trigger.getAttribute("aria-controls")}`);
+    await expect(popup).toBeVisible();
+    await expect(popup).toHaveCSS("width", "280px");
+    await expect(popup).toHaveCSS("z-index", "1301");
+    const metrics = await popup.evaluate((node, placement) => {
+      const arrow = node.querySelector<HTMLElement>(".qizhi-popover__arrow")!;
+      const bodyStyle = getComputedStyle(node);
+      const arrowStyle = getComputedStyle(arrow);
+      const body = node.getBoundingClientRect();
+      const arrowRect = arrow.getBoundingClientRect();
+      const arrowCenter = { x: arrowRect.left + arrowRect.width / 2, y: arrowRect.top + arrowRect.height / 2 };
+      const connection = placement === "top" ? Math.abs(arrowCenter.y - (body.bottom - 1))
+        : placement === "bottom" ? Math.abs(arrowCenter.y - (body.top + 1))
+        : placement === "left" ? Math.abs(arrowCenter.x - (body.right - 1))
+        : Math.abs(arrowCenter.x - (body.left + 1));
+      return { bodyBackground: bodyStyle.backgroundColor, arrowBackground: arrowStyle.backgroundColor, arrowBorder: arrowStyle.borderTopColor, connection };
+    }, side);
+    expect(metrics).toEqual({
+      bodyBackground: "rgb(240, 245, 255)",
+      arrowBackground: "rgb(240, 245, 255)",
+      arrowBorder: "rgb(82, 196, 26)",
+      connection: expect.any(Number),
+    });
+    expect(metrics.connection).toBeLessThanOrEqual(1.5);
+  }
+});
