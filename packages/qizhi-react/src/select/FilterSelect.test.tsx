@@ -125,3 +125,137 @@ describe("FilterSelect single", () => {
     expect(screen.getByText("所有者：不限")).toBeInTheDocument();
   });
 });
+
+describe("FilterSelect multiple and search", () => {
+  const tagOptions: FilterSelectOption[] = [
+    { label: "research", value: "research" },
+    { label: "标签A", value: "a" },
+    { label: "标签B", value: "b" },
+    { label: "标签C", value: "c" },
+    { label: "标签D", value: "d" },
+    { label: "标签E", value: "e" },
+  ];
+
+  it.each([
+    [[], "标签：全部标签"],
+    [["research"], "标签：research"],
+    [["a", "b"], "标签：标签A、标签B"],
+    [["a", "b", "c", "d", "e"], "标签：标签A、标签B +3个更多"],
+  ])("formats selected values %j as %s", (defaultValue, expected) => {
+    const { container } = render(<FilterSelect mode="multiple" label="标签" options={tagOptions} defaultValue={defaultValue} aria-label="标签筛选" />);
+    expect(container.querySelector(".qizhi-filter-select__summary")).toHaveTextContent(expected);
+    expect(screen.queryByRole("button", { name: /删除/ })).not.toBeInTheDocument();
+  });
+
+  it.each([
+    [-1, "标签： +3个更多"],
+    [0, "标签： +3个更多"],
+    [8, "标签：标签A、标签B、标签C"],
+  ])("normalizes maxDisplayCount=%s", (maxDisplayCount, expected) => {
+    const { container } = render(<FilterSelect mode="multiple" label="标签" options={tagOptions} defaultValue={["a", "b", "c"]} maxDisplayCount={maxDisplayCount} aria-label="标签筛选" />);
+    expect(container.querySelector(".qizhi-filter-select__summary")).toHaveTextContent(expected);
+  });
+
+  it("supports custom separators and more summaries", () => {
+    render(<FilterSelect
+      mode="multiple"
+      label="标签"
+      options={tagOptions}
+      defaultValue={["a", "b", "c"]}
+      maxDisplayCount={1}
+      separator=" / "
+      renderMore={(count) => <strong>plus {count}</strong>}
+      aria-label="标签筛选"
+    />);
+    expect(screen.getByText("标签：标签A")).toBeInTheDocument();
+    expect(screen.getByText("plus 2")).toBeInTheDocument();
+  });
+
+  it("toggles multiple options immediately and keeps the QIZHI check indicator", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<FilterSelect mode="multiple" label="标签" options={tagOptions} onChange={onChange} aria-label="标签筛选" />);
+    await user.click(screen.getByRole("combobox", { name: "标签筛选" }));
+    const option = screen.getByRole("option", { name: "research" });
+    expect(option.querySelector(".qizhi-select-popup__check .qizhi-checkbox-mask")).not.toBeNull();
+    await user.click(option);
+    expect(onChange).toHaveBeenLastCalledWith(["research"], [tagOptions[0]]);
+    expect(screen.getByText("标签：research")).toBeInTheDocument();
+  });
+
+  it("reuses Select keyboard navigation, selected ARIA, and focus restoration", async () => {
+    const user = userEvent.setup();
+    render(<FilterSelect mode="multiple" label="标签" options={tagOptions} defaultValue={["research"]} aria-label="标签筛选" />);
+    const input = screen.getByRole("combobox", { name: "标签筛选" });
+    await user.click(input);
+    const listbox = screen.getByRole("listbox");
+    expect(listbox).toHaveAttribute("aria-multiselectable", "true");
+    expect(screen.getByRole("option", { name: "research" })).toHaveAttribute("aria-selected", "true");
+    await user.keyboard("{ArrowDown}{Enter}{Escape}");
+    expect(input).toHaveFocus();
+    expect(input).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("keeps the selected summary while loading", () => {
+    render(<FilterSelect searchable loading label="所有者" defaultValue="enterprise" options={ownerOptions} aria-label="所有者筛选" />);
+    expect(screen.getByText("所有者：企业管理员")).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "所有者筛选" })).toHaveAccessibleDescription("所有者：企业管理员");
+  });
+
+  it("filters locally and supports a custom filter predicate", async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(<FilterSelect searchable label="所有者" options={ownerOptions} aria-label="所有者筛选" />);
+    const input = screen.getByRole("combobox", { name: "所有者筛选" });
+    await user.click(input);
+    await user.type(input, "enterprise");
+    expect(screen.getByRole("option", { name: "企业管理员" })).toBeInTheDocument();
+    expect(screen.queryByRole("option", { name: "研究团队管理员" })).not.toBeInTheDocument();
+
+    rerender(<FilterSelect searchable label="所有者" options={ownerOptions} filterOption={(_, option) => option.value === "research"} aria-label="所有者筛选" />);
+    expect(screen.queryByRole("option", { name: "企业管理员" })).not.toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "研究团队管理员" })).toBeInTheDocument();
+  });
+
+  it("keeps all remote options and retains the selected summary while searching", async () => {
+    const user = userEvent.setup();
+    const onSearch = vi.fn();
+    render(<FilterSelect
+      searchable
+      label="所有者"
+      defaultValue="enterprise"
+      options={ownerOptions}
+      filterOption={false}
+      onSearch={onSearch}
+      aria-label="所有者筛选"
+    />);
+    const input = screen.getByRole("combobox", { name: "所有者筛选" });
+    await user.click(input);
+    await user.type(input, "xyz");
+    expect(onSearch).toHaveBeenLastCalledWith("xyz");
+    expect(screen.getAllByRole("option")).toHaveLength(2);
+    expect(screen.getByText("所有者：企业管理员")).toBeInTheDocument();
+    expect(input).toHaveAccessibleDescription("所有者：企业管理员");
+  });
+
+  it("allows search text to replace the summary only when retention is disabled", async () => {
+    const user = userEvent.setup();
+    render(<FilterSelect searchable retainDisplayValueWhenOpen={false} label="所有者" defaultValue="enterprise" options={ownerOptions} aria-label="所有者筛选" />);
+    const input = screen.getByRole("combobox", { name: "所有者筛选" });
+    await user.click(input);
+    await user.type(input, "研究");
+    expect(screen.queryByText("所有者：企业管理员")).not.toBeInTheDocument();
+    expect(input).toHaveValue("研究");
+  });
+
+  it("warns for a non-text label without an explicit accessible name", () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    const { rerender } = render(<FilterSelect label={<span>所有者</span>} options={ownerOptions} />);
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining("aria-label"));
+
+    warn.mockClear();
+    rerender(<FilterSelect label={<span>所有者</span>} options={ownerOptions} aria-label="所有者筛选" />);
+    expect(screen.getByRole("combobox", { name: "所有者筛选" })).toBeInTheDocument();
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
+});
