@@ -202,9 +202,10 @@ async function auditTooltip(page) {
   await section.locator(".qizhi-typography-text").first().hover();
   const popup = page.getByRole("tooltip");
   await popup.waitFor({ state: "visible" });
-  const local = await css(popup, "background-color");
+  const container = popup.locator(".qizhi-tooltip__container");
+  const local = await css(container, "background-color");
   await setVars(page.locator("html"), { "--component-tooltip-background": "rgb(4, 5, 6)", "--component-tooltip-padding-inline": "7px" });
-  return { brand: [], localTheme: [check("portal-local-boundary", local, "rgb(1, 2, 3)", local !== "rgb(1, 2, 3)"), check("portal-root-token", await css(popup, "background-color"), "rgb(4, 5, 6)")], density: [check("portal-density", await css(popup, "padding-left"), "7px")] };
+  return { brand: [], localTheme: [check("portal-local-boundary", local, "rgb(1, 2, 3)", local !== "rgb(1, 2, 3)"), check("portal-root-token", await css(container, "background-color"), "rgb(4, 5, 6)")], density: [check("portal-density", await css(container, "padding-left"), "7px")] };
 }
 
 async function auditPopover(page) {
@@ -224,10 +225,10 @@ async function auditDropdown(page) {
   await page.locator("#component-dropdown .qz-nav-intro").waitFor({ state: "visible" });
   const section = page.locator("#下拉菜单-基础用法");
   const dropdown = section.locator(".qizhi-dropdown").first();
-  await setVars(dropdown, { "--component-dropdown-popup-background": "rgb(1, 2, 3)", "--component-dropdown-item-min-height": "28px" });
-  await dropdown.locator(".qizhi-dropdown__trigger").hover();
+  await dropdown.locator(".qizhi-dropdown__trigger").focus();
   const popup = dropdown.locator(".qizhi-dropdown__popup").first();
   await popup.waitFor({ state: "visible" });
+  await setVars(popup, { "--component-dropdown-popup-background": "rgb(1, 2, 3)", "--component-dropdown-item-min-height": "28px" });
   const item = popup.getByRole("menuitem").first();
   await setVars(page.locator("html"), { "--primary-6": "80, 120, 255" });
   const loading = page.locator(".qizhi-dropdown-button--loading .qizhi-dropdown-button__loading-toggle.qizhi-btn-primary").first();
