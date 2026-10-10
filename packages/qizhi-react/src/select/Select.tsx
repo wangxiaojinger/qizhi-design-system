@@ -12,8 +12,10 @@ import "./select.css";
 
 const join = (...values: Array<string | false | null | undefined>) => values.filter(Boolean).join(" ");
 const textOf = (value: ReactNode) => typeof value === "string" || typeof value === "number" ? String(value) : "";
-const same = (a: SelectRawValue, b: SelectRawValue) => String(a) === String(b);
+const same = (a: SelectRawValue, b: SelectRawValue) => Object.is(a, b);
+const keyOf = (value: SelectRawValue) => `${typeof value}:${String(value)}`;
 const isOptionGroup = (item: SelectOption | SelectOptionGroup): item is SelectOptionGroup => "options" in item;
+const resolveOption = (options: SelectOption[], value: SelectRawValue, allowCreate: SelectProps["allowCreate"]) => options.find((option) => same(option.value, value)) ?? (allowCreate ? { label: String(value), value } : undefined);
 
 interface SelectOptionEntry {
   option: SelectOption;
@@ -103,12 +105,12 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(prop
   const inputEditable = searchEnabled || !!allowCreate || tokenSeparators.length > 0;
   const retainInput = typeof showSearch === "object" && !!showSearch.retainInputValue;
   const selectedValues = multiple ? multipleValue : singleValue === undefined ? [] : [singleValue];
-  const selectedOptions = useMemo(() => selectedValues.map((value) => options.find((option) => same(option.value, value)) ?? (allowCreate ? { label: String(value), value } : undefined)).filter(Boolean) as SelectOption[], [allowCreate, options, selectedValues]);
+  const selectedOptions = useMemo(() => selectedValues.map((value) => resolveOption(options, value, allowCreate)).filter(Boolean) as SelectOption[], [allowCreate, options, selectedValues]);
   const selectedSingle = selectedOptions[0];
   const hasValue = selectedOptions.length > 0;
   const [responsiveTagCount, setResponsiveTagCount] = useState(selectedOptions.length);
   const tagMeasureRefs = useRef(new Map<string, HTMLElement>());
-  const moreMeasureRefs = useRef(new Map<number, HTMLSpanElement>());
+  const moreMeasureRefs = useRef(new Map<number, HTMLElement>());
 
   useImperativeHandle(forwardedRef, () => (triggerRef.current ?? inputRef.current) as SelectHandle);
 
@@ -127,7 +129,7 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(prop
     const width = typeof popupWidth === "number" ? popupWidth : popupWidth === "content" ? undefined : rect.width;
     const estimatedHeight = Math.min(popupRef.current?.scrollHeight || 220, 320);
     const top = window.innerHeight - rect.bottom >= estimatedHeight ? rect.bottom + 4 : Math.max(4, rect.top - estimatedHeight - 4);
-    setPopupStyle({ position: "fixed", left: Math.max(4, Math.min(rect.left, window.innerWidth - (width ?? rect.width) - 4)), top, width, minWidth: popupWidth === "content" ? rect.width : undefined, maxHeight: Math.min(320, window.innerHeight - top - 4), overflowY: "auto", zIndex: 1000 });
+    setPopupStyle({ position: "fixed", left: Math.max(4, Math.min(rect.left, window.innerWidth - (width ?? rect.width) - 4)), top, width, minWidth: popupWidth === "content" ? rect.width : undefined, maxHeight: Math.max(0, Math.min(320, window.innerHeight - top - 4)), overflowY: "auto", zIndex: 1000 });
   }, [popupWidth]);
 
   useEffect(() => {
@@ -216,7 +218,7 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(prop
 
   const emitMultiple = (next: SelectRawValue[]) => {
     setMultipleValue(next);
-    multipleProps.onChange?.(next, next.map((value) => options.find((option) => same(option.value, value))).filter(Boolean) as SelectOption[]);
+    multipleProps.onChange?.(next, next.map((value) => resolveOption(options, value, allowCreate)).filter(Boolean) as SelectOption[]);
   };
 
   const choose = (option: SelectOption, created = false) => {
@@ -333,7 +335,7 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(prop
     let visible = selectedOptions.length;
     while (visible > 0) {
       const hidden = selectedOptions.length - visible;
-      const tagWidth = selectedOptions.slice(0, visible).reduce((total, option) => total + (tagMeasureRefs.current.get(String(option.value))?.getBoundingClientRect().width ?? 0), 0);
+      const tagWidth = selectedOptions.slice(0, visible).reduce((total, option) => total + (tagMeasureRefs.current.get(keyOf(option.value))?.getBoundingClientRect().width ?? 0), 0);
       const summaryWidth = hidden ? (moreMeasureRefs.current.get(hidden)?.getBoundingClientRect().width ?? 0) : 0;
       const count = visible + (hidden ? 1 : 0);
       if (tagWidth + summaryWidth + Math.max(0, count - 1) * 4 <= available) break;
@@ -358,6 +360,9 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(prop
   const visibleTagCount = maxTagCount === "responsive" ? responsiveTagCount : typeof maxTagCount === "number" ? Math.max(0, maxTagCount) : selectedOptions.length;
   const shownTags = selectedOptions.slice(0, visibleTagCount);
   const hiddenCount = selectedOptions.length - shownTags.length;
+  const popupMaxHeight = virtualEnabled && typeof popupStyle.maxHeight === "number"
+    ? Math.min(normalizedListHeight, popupStyle.maxHeight)
+    : popupStyle.maxHeight;
   const isFocusWithin = (target: EventTarget | null) => target instanceof Node && (
     !!rootRef.current?.contains(target)
     || !!popupRef.current?.contains(target)
@@ -388,6 +393,7 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(prop
     "aria-haspopup": "listbox" as const,
     "aria-expanded": isOpen,
     "aria-controls": popupId,
+    "aria-activedescendant": activeDescendant,
     "aria-label": props["aria-label"] ?? placeholder,
     valueText: selectedOptions.map((option) => textOf(option.label)).join("，"),
     onClick: () => setVisible(!isOpen),
@@ -402,7 +408,7 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(prop
     const description = renderOptionDescription?.(option);
     const descriptionVisible = !optionDisabled && (keyboardFocused ? navigable[activeIndex]?.value === option.value : hoveredOption === option.value);
     const content = <span className="qizhi-select-popup__option-content">{renderOption ? renderOption(option) : option.label}</span>;
-    return <Dropdown.Item key={String(option.value)} id={`${popupId}-option-${index}`} itemKey={String(option.value)} role="option" className={join("qizhi-select-popup__option", selected && "is-selected", activeVisibleIndex === index && "is-active")} style={virtualStyle} aria-setsize={virtualEnabled ? visibleEntries.length : undefined} aria-posinset={virtualEnabled ? index + 1 : undefined} aria-selected={selected} aria-describedby={description != null && descriptionVisible ? `${popupId}-description-${index}` : undefined} aria-disabled={optionDisabled || undefined} disabled={optionDisabled} onMouseEnter={() => { setKeyboardFocused(false); setHoveredOption(option.value); }} onMouseLeave={() => setHoveredOption(undefined)} onPointerDown={(event) => { event.preventDefault(); setKeyboardFocused(false); }} onClick={() => choose(option)}>{description == null ? content : <Popover role="tooltip" position={Number(popupStyle.left) >= 268 ? "left" : "top"} popupVisible={descriptionVisible} content={<span id={`${popupId}-description-${index}`}>{description}</span>}>{content}</Popover>}{multiple ? <CheckboxIndicator checked={selected} disabled={optionDisabled} className="qizhi-select-popup__check" /> : null}</Dropdown.Item>;
+    return <Dropdown.Item key={keyOf(option.value)} id={`${popupId}-option-${index}`} itemKey={keyOf(option.value)} role="option" className={join("qizhi-select-popup__option", selected && "is-selected", activeVisibleIndex === index && "is-active")} style={virtualStyle} aria-setsize={virtualEnabled ? visibleEntries.length : undefined} aria-posinset={virtualEnabled ? index + 1 : undefined} aria-selected={selected} aria-describedby={description != null && descriptionVisible ? `${popupId}-description-${index}` : undefined} aria-disabled={optionDisabled || undefined} disabled={optionDisabled} onMouseEnter={() => { setKeyboardFocused(false); setHoveredOption(option.value); }} onMouseLeave={() => setHoveredOption(undefined)} onPointerDown={(event) => { event.preventDefault(); setKeyboardFocused(false); }} onClick={() => choose(option)}>{description == null ? content : <Popover role="tooltip" position={Number(popupStyle.left) >= 268 ? "left" : "top"} popupVisible={descriptionVisible} content={<span id={`${popupId}-description-${index}`}>{description}</span>}>{content}</Popover>}{multiple ? <CheckboxIndicator checked={selected} disabled={optionDisabled} className="qizhi-select-popup__check" /> : null}</Dropdown.Item>;
   };
   const visibleSections: Array<{ groupIndex?: number; groupLabel?: ReactNode; entries: Array<{ entry: SelectOptionEntry; index: number }> }> = [];
   visibleEntries.forEach((entry, index) => {
@@ -436,12 +442,12 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(prop
   return <div ref={rootRef} className={join("qizhi-select", `qizhi-select--${size}`, status !== "default" && `qizhi-select--${status}`, disabled && "qizhi-select--disabled", multiple && "qizhi-select--multiple", isOpen && "is-open", keyboardFocused && "is-keyboard-focused", hasValue && "has-value", autoWidth && "qizhi-select--auto-width", addBefore != null && "qizhi-select--grouped", className)} style={{ ...style, ...autoWidthStyle }} onFocus={handleFocus}>
     {addBefore != null ? <span className="qizhi-select__before">{addBefore}</span> : null}
     {trigger ? trigger(commonTriggerProps) : <div ref={controlRef} className={`${CONTROL_CONTAINER_CLASS_NAME} qizhi-select__control`} style={autoWidth ? { width: "max-content" } : undefined}>
-      {multiple ? <div className="qizhi-select__tags" aria-label="已选项">{shownTags.map((option, index) => <Tag key={String(option.value)} className={join("qizhi-select__tag", !renderTag && "qizhi-tag-closable")} draggable={dragToSort} onMouseDown={(event) => event.preventDefault()} onDragStart={(event: DragEvent<HTMLSpanElement>) => event.dataTransfer.setData("text/qizhi-select-index", String(index))} onDragOver={dragToSort ? (event) => event.preventDefault() : undefined} onDrop={dragToSort ? (event) => { event.preventDefault(); const from = Number(event.dataTransfer.getData("text/qizhi-select-index")); if (Number.isInteger(from) && from !== index) { const next = [...multipleValue]; const [item] = next.splice(from, 1); next.splice(index, 0, item); emitMultiple(next); } } : undefined}>{renderTag ? renderTag(option, true) : <>{option.label}<button className="qizhi-tag-close-btn" type="button" aria-label={`删除 ${textOf(option.label)}`} onClick={(event) => { event.stopPropagation(); remove(option.value); }}><CloseIcon /></button></>}</Tag>)}{hiddenCount > 0 ? <Tag className="qizhi-select__tag qizhi-select__tag--more">{renderMore ? renderMore(hiddenCount) : `+${hiddenCount} 个更多`}</Tag> : null}</div> : null}
-      {multiple && maxTagCount === "responsive" ? <div className="qizhi-select__measure" aria-hidden="true">{selectedOptions.map((option) => <Tag key={String(option.value)} ref={(node) => { if (node) tagMeasureRefs.current.set(String(option.value), node); else tagMeasureRefs.current.delete(String(option.value)); }}>{renderTag ? renderTag(option, true) : <>{option.label}<CloseIcon /></>}</Tag>)}{selectedOptions.map((_, index) => { const count = index + 1; return <span key={count} ref={(node) => { if (node) moreMeasureRefs.current.set(count, node); else moreMeasureRefs.current.delete(count); }}>{renderMore ? renderMore(count) : `+${count} 个更多`}</span>; })}</div> : null}
+      {multiple ? <div className="qizhi-select__tags" aria-label="已选项">{shownTags.map((option, index) => <Tag key={keyOf(option.value)} className={join("qizhi-select__tag", !renderTag && "qizhi-tag-closable")} draggable={dragToSort} onMouseDown={(event) => event.preventDefault()} onDragStart={(event: DragEvent<HTMLSpanElement>) => event.dataTransfer.setData("text/qizhi-select-index", String(index))} onDragOver={dragToSort ? (event) => event.preventDefault() : undefined} onDrop={dragToSort ? (event) => { event.preventDefault(); const from = Number(event.dataTransfer.getData("text/qizhi-select-index")); if (Number.isInteger(from) && from !== index) { const next = [...multipleValue]; const [item] = next.splice(from, 1); next.splice(index, 0, item); emitMultiple(next); } } : undefined}>{renderTag ? renderTag(option, true) : <>{option.label}<button className="qizhi-tag-close-btn" type="button" aria-label={`删除 ${textOf(option.label)}`} onClick={(event) => { event.stopPropagation(); remove(option.value); }}><CloseIcon /></button></>}</Tag>)}{hiddenCount > 0 ? <Tag className="qizhi-select__tag qizhi-select__tag--more">{renderMore ? renderMore(hiddenCount) : `+${hiddenCount} 个更多`}</Tag> : null}</div> : null}
+      {multiple && maxTagCount === "responsive" ? <div className="qizhi-select__measure" aria-hidden="true">{selectedOptions.map((option) => <Tag key={keyOf(option.value)} ref={(node) => { if (node) tagMeasureRefs.current.set(keyOf(option.value), node); else tagMeasureRefs.current.delete(keyOf(option.value)); }}>{renderTag ? renderTag(option, true) : <>{option.label}<CloseIcon /></>}</Tag>)}{selectedOptions.map((_, index) => { const count = index + 1; return <Tag key={count} className="qizhi-select__tag qizhi-select__tag--more" ref={(node) => { if (node) moreMeasureRefs.current.set(count, node); else moreMeasureRefs.current.delete(count); }}>{renderMore ? renderMore(count) : `+${count} 个更多`}</Tag>; })}</div> : null}
       <input ref={inputRef} id={id} name={name} className="qizhi-select__input" role="combobox" aria-haspopup="listbox" aria-expanded={isOpen} aria-controls={popupId} aria-activedescendant={activeDescendant} aria-autocomplete={searchEnabled ? "list" : undefined} aria-label={props["aria-label"] ?? placeholder} aria-labelledby={props["aria-labelledby"]} aria-describedby={props["aria-describedby"]} aria-invalid={props["aria-invalid"]} disabled={disabled} readOnly={!inputEditable} placeholder={hasValue ? "" : placeholder} value={isOpen && inputEditable ? query : multiple ? query : selectedSingle ? textOf(selectedSingle.label) : query} onChange={(event) => handleInput(event.target.value)} onPointerDown={() => setKeyboardFocused(false)} onBlur={handleBlur} onClick={() => setVisible(!isOpen)} onKeyDown={handleKeyDown} />
       {allowClear && hasValue && !disabled ? <button type="button" className="qizhi-select__clear" aria-label="清除选择" onMouseDown={(event) => event.preventDefault()} onBlur={handleBlur} onClick={clear}><CloseIcon /></button> : null}
       <span className="qizhi-select__arrow" aria-hidden="true"><ArrowDownIcon viewBox="1.6 1.6 12.8 12.8" /></span>
     </div>}
-    {isOpen ? createPortal(<div ref={popupRef} id={popupId} className="qizhi-select-popup" style={{ ...popupStyle, maxHeight: virtualEnabled ? normalizedListHeight : popupStyle.maxHeight }} aria-busy={loading || undefined} onBlur={handleBlur} onScroll={(event) => { if (virtualEnabled) setVirtualScrollTop(event.currentTarget.scrollTop); onPopupScroll?.(event); }} onPointerDown={(event) => event.stopPropagation()}>{dropdownRender ? dropdownRender(menu) : menu}</div>, document.body) : null}
+    {isOpen ? createPortal(<div ref={popupRef} id={popupId} className="qizhi-select-popup" style={{ ...popupStyle, maxHeight: popupMaxHeight }} aria-busy={loading || undefined} onBlur={handleBlur} onScroll={(event) => { if (virtualEnabled) setVirtualScrollTop(event.currentTarget.scrollTop); onPopupScroll?.(event); }} onPointerDown={(event) => event.stopPropagation()}>{dropdownRender ? dropdownRender(menu) : menu}</div>, document.body) : null}
   </div>;
 });

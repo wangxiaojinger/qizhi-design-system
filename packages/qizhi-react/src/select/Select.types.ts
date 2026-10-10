@@ -26,6 +26,7 @@ export interface SelectTriggerProps {
   "aria-haspopup": "listbox";
   "aria-expanded": boolean;
   "aria-controls": string;
+  "aria-activedescendant": string | undefined;
   "aria-label": string;
   valueText: string;
   onClick: MouseEventHandler<HTMLElement>;

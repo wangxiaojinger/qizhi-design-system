@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { act } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { Select } from "./Select";
 
 const options = [
@@ -9,6 +9,10 @@ const options = [
   { label: "上海", value: "shanghai" },
   { label: "广州", value: "guangzhou", disabled: true },
 ];
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 describe("Select", () => {
   it("用 combobox/listbox 语义打开并选择单选项", async () => {
@@ -130,6 +134,35 @@ describe("Select", () => {
       label: "项目10",
       value: "项目10",
     });
+  });
+
+  it("删除 allowCreate 合成值后为剩余未知值保留 onChange 选项映射", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<Select
+      mode="multiple"
+      options={options}
+      allowCreate
+      defaultValue={["项目10", "项目11"]}
+      onChange={onChange}
+    />);
+
+    await user.click(screen.getByRole("button", { name: "删除 项目10" }));
+
+    expect(onChange).toHaveBeenCalledWith(["项目11"], [{
+      label: "项目11",
+      value: "项目11",
+    }]);
+  });
+
+  it("区分数字值与同文本的字符串值", () => {
+    render(<Select mode="multiple" options={[
+      { label: "数字1", value: 1 },
+      { label: "字符串1", value: "1" },
+    ]} defaultValue={[1]} defaultOpen />);
+
+    expect(screen.getByRole("option", { name: "数字1" })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("option", { name: "字符串1" })).toHaveAttribute("aria-selected", "false");
   });
 
   it("通过 Escape 关闭并恢复触发器焦点", async () => {
@@ -268,6 +301,20 @@ describe("Select", () => {
     expect(trigger).toHaveTextContent("北京");
   });
 
+  it("向自定义触发器提供键盘活动选项关联", () => {
+    render(<Select
+      options={options}
+      trigger={({ valueText, ...triggerProps }) => <button {...triggerProps} type="button">{valueText || "无"}</button>}
+    />);
+    const trigger = screen.getByRole("combobox");
+
+    fireEvent.keyDown(trigger, { key: "ArrowDown" });
+
+    const activeId = trigger.getAttribute("aria-activedescendant");
+    expect(activeId).not.toBeNull();
+    expect(document.getElementById(activeId!)).toHaveTextContent("北京");
+  });
+
   it("支持受控 searchValue 并只通过 onSearch 请求更新", async () => {
     const user = userEvent.setup();
     const onSearch = vi.fn();
@@ -339,14 +386,12 @@ describe("Select", () => {
     expect(observe).toHaveBeenCalledWith(screen.getByRole("listbox").parentElement);
 
     Object.defineProperty(control, "clientWidth", { configurable: true, value: 170 });
-    container.querySelectorAll<HTMLElement>(".qizhi-select__measure .qizhi-tag")
+    container.querySelectorAll<HTMLElement>(".qizhi-select__measure > .qizhi-tag:not(.qizhi-select__tag--more)")
       .forEach((tag) => vi.spyOn(tag, "getBoundingClientRect")
         .mockReturnValue({ width: 60 } as DOMRect));
-    const moreMeasure = container.querySelector<HTMLElement>(
-      ".qizhi-select__measure > span:last-child",
-    );
-    vi.spyOn(moreMeasure!, "getBoundingClientRect")
-      .mockReturnValue({ width: 40 } as DOMRect);
+    container.querySelectorAll<HTMLElement>(".qizhi-select__measure > .qizhi-select__tag--more")
+      .forEach((tag) => vi.spyOn(tag, "getBoundingClientRect")
+        .mockReturnValue({ width: 40 } as DOMRect));
 
     act(() => resizeCallbacks.forEach((resize) => resize([], {} as ResizeObserver)));
     expect(screen.getByRole("button", { name: "删除 北京" })).toBeInTheDocument();
@@ -420,6 +465,18 @@ describe("Select", () => {
       .not.toBeInTheDocument();
   });
 
+  it("虚拟列表的 listHeight 不超过当前视口可用高度", () => {
+    vi.stubGlobal("innerHeight", 200);
+    const manyOptions = Array.from({ length: 100 }, (_, index) => ({
+      label: `选项 ${index + 1}`,
+      value: index + 1,
+    }));
+
+    render(<Select options={manyOptions} defaultOpen listHeight={600} />);
+
+    expect(screen.getByRole("listbox").parentElement).toHaveStyle({ maxHeight: "192px" });
+  });
+
   it("允许关闭大数据列表虚拟滚动", () => {
     const manyOptions = Array.from({ length: 100 }, (_, index) => ({
       label: `选项 ${index + 1}`,
@@ -459,6 +516,7 @@ describe("Select", () => {
     expect(screen.getAllByTestId("more-summary")).toHaveLength(2);
     screen.getAllByTestId("more-summary").forEach((summary) => {
       expect(container.querySelector(".qizhi-select__measure")).toContainElement(summary);
+      expect(summary.closest(".qizhi-tag")).not.toBeNull();
     });
   });
 
