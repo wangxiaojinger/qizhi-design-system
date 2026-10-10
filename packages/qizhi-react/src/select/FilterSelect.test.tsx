@@ -172,6 +172,26 @@ describe("FilterSelect single", () => {
     expect(screen.getByRole("option", { name: "企业管理员" }))
       .toHaveAttribute("aria-selected", "false");
   });
+
+  it("stays empty after selecting and clearing an initially empty filter", async () => {
+    const user = userEvent.setup();
+    render(<FilterSelect
+      label="所有者"
+      options={ownerOptions}
+      allowClear
+      aria-label="所有者筛选"
+    />);
+
+    await user.click(screen.getByText("所有者：全部"));
+    await user.click(screen.getByRole("option", { name: "企业管理员" }));
+    await user.click(screen.getByRole("button", { name: "清除选择" }));
+    expect(screen.getByText("所有者：全部")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "清除选择" }))
+      .not.toBeInTheDocument();
+    await user.click(screen.getByText("所有者：全部"));
+    expect(screen.getByRole("option", { name: "企业管理员" }))
+      .toHaveAttribute("aria-selected", "false");
+  });
 });
 
 describe("FilterSelect multiple and search", () => {

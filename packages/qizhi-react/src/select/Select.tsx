@@ -93,8 +93,8 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(prop
   const optionEntries = useMemo<SelectOptionEntry[]>(() => [...sourceEntries, ...createdOptions.map((option) => ({ option }))], [createdOptions, sourceEntries]);
   const options = useMemo(() => optionEntries.map((entry) => entry.option), [optionEntries]);
   const [isOpen, setOpen] = useControlled(open, defaultOpen, onOpenChange);
-  const [singleValue, setSingleValue] = useControlled<SelectRawValue | undefined>(multiple ? undefined : singleProps.value, multiple ? undefined : singleProps.defaultValue, undefined, !multiple && Object.hasOwn(singleProps, "value"));
-  const [multipleValue, setMultipleValue] = useControlled<SelectRawValue[]>(multiple ? multipleProps.value : undefined, multiple ? multipleProps.defaultValue ?? [] : [], undefined, multiple && Object.hasOwn(multipleProps, "value"));
+  const [singleValue, setSingleValue] = useControlled<SelectRawValue | undefined>(multiple ? undefined : singleProps.value, multiple ? undefined : singleProps.defaultValue, undefined, !multiple && (valueRender ? Object.hasOwn(singleProps, "value") : singleProps.value !== undefined));
+  const [multipleValue, setMultipleValue] = useControlled<SelectRawValue[]>(multiple ? multipleProps.value : undefined, multiple ? multipleProps.defaultValue ?? [] : [], undefined, multiple && (valueRender ? Object.hasOwn(multipleProps, "value") : multipleProps.value !== undefined));
   const [innerQuery, setInnerQuery] = useState("");
   const query = searchValue === undefined ? innerQuery : searchValue;
   const [activeIndex, setActiveIndex] = useState(-1);

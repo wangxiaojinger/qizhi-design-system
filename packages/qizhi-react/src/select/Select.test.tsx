@@ -565,6 +565,20 @@ describe("Select", () => {
     expect(document.querySelector(".qizhi-select__value-display")).toBeNull();
   });
 
+  it("keeps undefined multiple value on the legacy uncontrolled path", () => {
+    render(<Select
+      mode="multiple"
+      value={undefined}
+      options={options}
+      aria-label="多选城市"
+    />);
+
+    expect(screen.getByRole("combobox", { name: "多选城市" }))
+      .toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /删除/ }))
+      .not.toBeInTheDocument();
+  });
+
   it("renders an opt-in value display while retaining the real combobox input", async () => {
     const user = userEvent.setup();
     const contexts: Array<{ open: boolean; searching: boolean; query: string; valueText: string }> = [];
