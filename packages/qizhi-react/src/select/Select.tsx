@@ -108,7 +108,7 @@ export const Select = forwardRef<SelectHandle, SelectProps>(function Select(prop
   const selectedValues = multiple ? multipleValue : singleValue === undefined ? [] : [singleValue];
   const selectedOptions = useMemo(() => selectedValues.map((value) => resolveOption(options, value, allowCreate)).filter(Boolean) as SelectOption[], [allowCreate, options, selectedValues]);
   const selectedSingle = selectedOptions[0];
-  const hasValue = selectedValues.length > 0;
+  const hasValue = valueRender ? selectedValues.length > 0 : selectedOptions.length > 0;
   const selectedValueText = selectedOptions.map((option) => textOf(option.label)).join("，");
   const [responsiveTagCount, setResponsiveTagCount] = useState(selectedOptions.length);
   const tagMeasureRefs = useRef(new Map<string, HTMLElement>());
