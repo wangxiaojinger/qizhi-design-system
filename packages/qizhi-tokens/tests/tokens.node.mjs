@@ -425,7 +425,7 @@ test("Modal component tokens preserve current geometry and legacy semantic color
     "component.modal.header.height": "56px",
     "component.modal.title.font.size": "var(--font-size-16)",
     "component.modal.title.line.height": "var(--line-height-24)",
-    "component.modal.content.padding.block": "var(--space-16)",
+    "component.modal.content.padding.block": "var(--space-24)",
     "component.modal.content.padding.inline": "var(--space-24)",
     "component.modal.footer.gap": "var(--space-12)",
     "component.modal.motion.duration": "180ms",

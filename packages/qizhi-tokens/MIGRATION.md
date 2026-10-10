@@ -510,7 +510,7 @@
 | `component.modal.header.height` | `--component-modal-header-height` | 新增 | `component.modal.header.height` | length | Modal header height |
 | `component.modal.title.font.size` | `--component-modal-title-font-size` | 新增 | `font.size.16` | reference | Modal title font size |
 | `component.modal.title.line.height` | `--component-modal-title-line-height` | 新增 | `line.height.24` | reference | Modal title line height |
-| `component.modal.content.padding.block` | `--component-modal-content-padding-block` | 新增 | `space.16` | reference | Modal content padding block |
+| `component.modal.content.padding.block` | `--component-modal-content-padding-block` | 新增 | `space.24` | reference | Modal content padding block |
 | `component.modal.content.padding.inline` | `--component-modal-content-padding-inline` | 新增 | `space.24` | reference | Modal content padding inline |
 | `component.modal.footer.gap` | `--component-modal-footer-gap` | 新增 | `space.12` | reference | Modal footer gap |
 | `component.modal.motion.duration` | `--component-modal-motion-duration` | 新增 | `component.modal.motion.duration` | length | Modal motion duration |
