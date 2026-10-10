@@ -5,6 +5,10 @@
   "type": "module",
   "packageManager": "pnpm@11.19.0",
   "scripts": {
+    "audit:theme": "node scripts/audit-theme-gaps.mjs --output docs/superpowers/specs/2026-10-09-qizhi-theme-gap-audit-data.json",
+    "audit:theme:runtime": "node scripts/audit-theme-runtime.mjs --output docs/superpowers/specs/2026-10-09-qizhi-theme-runtime-audit-data.json",
+    "audit:theme:test": "node --test tests/theme-gap-audit.node.mjs tests/theme-runtime-audit-matrix.node.mjs tests/theme-audit-provenance.node.mjs",
+    "audit:theme:check": "node scripts/check-theme-audit-artifacts.mjs",
     "api:build": "node scripts/build-component-api.mjs",
     "api:validate": "node scripts/build-component-api.mjs --check",
     "dev": "vite --host 127.0.0.1",
@@ -13,7 +17,7 @@
     "test": "pnpm --filter @wangxiaojinger/qizhi-tokens test && vitest run",
     "test:exports": "pnpm --filter @wangxiaojinger/qizhi-react test:exports",
     "e2e": "playwright test",
-    "verify": "pnpm api:validate && pnpm --filter @wangxiaojinger/qizhi-tokens build && pnpm --filter @wangxiaojinger/qizhi-tokens validate && pnpm typecheck && pnpm test && pnpm build"
+    "verify": "pnpm audit:theme:test && pnpm audit:theme:check && pnpm api:validate && pnpm --filter @wangxiaojinger/qizhi-tokens build && pnpm --filter @wangxiaojinger/qizhi-tokens validate && pnpm typecheck && pnpm test && pnpm build"
   },
   "dependencies": {
     "prismjs": "^1.30.0",
