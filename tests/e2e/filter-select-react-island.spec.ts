@@ -15,7 +15,7 @@ test("FilterSelect 摘要、搜索、键盘与响应式布局", async ({
   const single = section.locator('[id="筛选选择器-单选筛选"]');
   const singleInput = single.getByRole("combobox");
   await expect(single.getByText("所有者：全部")).toBeVisible();
-  await singleInput.click();
+  await single.getByText("所有者：全部").click();
   await expect(single.getByText("所有者：全部")).toBeVisible();
   const singlePopup = page.locator(".qizhi-select-popup").last();
   await expect(singlePopup.getByRole("option")).toHaveText([

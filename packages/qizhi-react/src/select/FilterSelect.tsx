@@ -31,10 +31,12 @@ export function FilterSelect(props: FilterSelectProps) {
   const multiple = props.mode === "multiple";
   const singleProps = props as FilterSelectSingleProps;
   const multipleProps = props as FilterSelectMultipleProps;
+  const singleControlled = !multiple && Object.hasOwn(singleProps, "value");
+  const multipleControlled = multiple && Object.hasOwn(multipleProps, "value");
   const [innerSingle, setInnerSingle] = useState<FilterSelectSingleProps["defaultValue"]>(singleProps.defaultValue);
   const [innerMultiple, setInnerMultiple] = useState<SelectRawValue[]>(multiple ? multipleProps.defaultValue ?? [] : []);
-  const singleValue = multiple ? undefined : singleProps.value === undefined ? innerSingle : singleProps.value;
-  const multipleValue = multiple ? multipleProps.value === undefined ? innerMultiple : multipleProps.value : innerMultiple;
+  const singleValue = multiple ? undefined : singleControlled ? singleProps.value : innerSingle;
+  const multipleValue = multiple ? multipleControlled ? multipleProps.value ?? [] : innerMultiple : innerMultiple;
   const duplicateAll = !multiple && !!singleProps.allOption && options.some((option) => same(option.value, singleProps.allOption!.value));
   const mergedOptions = useMemo(() => {
     if (multiple || !singleProps.allOption) return options;
@@ -93,7 +95,7 @@ export function FilterSelect(props: FilterSelectProps) {
       renderOption={renderOption}
       valueRender={renderDisplay}
       onChange={(values, selectedOptions) => {
-        if (multipleProps.value === undefined) setInnerMultiple(values);
+        if (!multipleControlled) setInnerMultiple(values);
         multipleProps.onChange?.(values, selectedOptions);
       }}
       className={join("qizhi-filter-select", className)}
@@ -118,7 +120,7 @@ export function FilterSelect(props: FilterSelectProps) {
     renderOption={renderOption}
     valueRender={renderDisplay}
     onChange={(value, option) => {
-      if (singleProps.value === undefined) setInnerSingle(value);
+      if (!singleControlled) setInnerSingle(value);
       singleProps.onChange?.(value, option as FilterSelectOption | undefined);
     }}
     className={join("qizhi-filter-select", className)}

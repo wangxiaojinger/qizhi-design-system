@@ -29,6 +29,36 @@ describe("FilterSelect single", () => {
     expect(screen.getByText("所有者：全部")).toBeInTheDocument();
   });
 
+  it("opens when the visible summary is clicked", async () => {
+    const user = userEvent.setup();
+    render(<FilterSelect
+      label="所有者"
+      options={ownerOptions}
+      aria-label="所有者筛选"
+    />);
+
+    await user.click(screen.getByText("所有者：全部"));
+    const input = screen.getByRole("combobox", { name: "所有者筛选" });
+    expect(input)
+      .toHaveAttribute("aria-expanded", "true");
+    await user.click(screen.getByText("所有者：全部"));
+    expect(input).toHaveAttribute("aria-expanded", "false");
+  });
+
+  it("does not open a disabled filter when its summary is clicked", async () => {
+    const user = userEvent.setup();
+    render(<FilterSelect
+      label="所有者"
+      options={ownerOptions}
+      disabled
+      aria-label="所有者筛选"
+    />);
+
+    await user.click(screen.getByText("所有者：全部"));
+    expect(screen.getByRole("combobox", { name: "所有者筛选" }))
+      .toHaveAttribute("aria-expanded", "false");
+  });
+
   it("changes immediately while popup options keep plain labels", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
@@ -89,6 +119,19 @@ describe("FilterSelect single", () => {
     expect(screen.getByText("所有者：企业管理员")).toBeInTheDocument();
   });
 
+  it("keeps clear available when a selected remote option is absent", () => {
+    render(<FilterSelect
+      label="所有者"
+      value="enterprise"
+      options={[{ label: "其他结果", value: "other" }]}
+      allowClear
+      aria-label="所有者筛选"
+    />);
+
+    expect(screen.getByRole("button", { name: "清除选择" }))
+      .toBeInTheDocument();
+  });
+
   it("shows an unknown controlled value without synthesizing an option", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
@@ -123,6 +166,11 @@ describe("FilterSelect single", () => {
     await user.click(screen.getByRole("button", { name: "清除选择" }));
     expect(onChange).toHaveBeenCalledWith(undefined, undefined);
     expect(screen.getByText("所有者：不限")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "清除选择" }))
+      .not.toBeInTheDocument();
+    await user.click(screen.getByText("所有者：不限"));
+    expect(screen.getByRole("option", { name: "企业管理员" }))
+      .toHaveAttribute("aria-selected", "false");
   });
 });
 
@@ -169,6 +217,20 @@ describe("FilterSelect multiple and search", () => {
     />);
     expect(screen.getByText("标签：标签A")).toBeInTheDocument();
     expect(screen.getByText("plus 2")).toBeInTheDocument();
+  });
+
+  it("keeps clear available when remote results omit selected values", () => {
+    render(<FilterSelect
+      mode="multiple"
+      label="标签"
+      value={["a", "b"]}
+      options={[tagOptions[3]]}
+      allowClear
+      aria-label="标签筛选"
+    />);
+
+    expect(screen.getByRole("button", { name: "清除选择" }))
+      .toBeInTheDocument();
   });
 
   it("toggles multiple options immediately and keeps the QIZHI check indicator", async () => {
