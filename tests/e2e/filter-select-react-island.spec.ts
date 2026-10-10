@@ -68,6 +68,7 @@ test("FilterSelect 摘要、搜索、键盘与响应式布局", async ({
 
   const local = section.locator('[id="筛选选择器-本地搜索"]');
   const localInput = local.getByRole("combobox");
+  await expect(localInput).not.toHaveAttribute("placeholder");
   await localInput.click();
   await localInput.fill("研究");
   await expect(local.getByText("所有者：全部")).toBeVisible();

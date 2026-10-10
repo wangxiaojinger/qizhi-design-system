@@ -284,6 +284,19 @@ describe("FilterSelect multiple and search", () => {
     expect(screen.getByRole("combobox", { name: "所有者筛选" })).toHaveAccessibleDescription("所有者：企业管理员");
   });
 
+  it("does not render a search placeholder beside the retained summary", async () => {
+    const user = userEvent.setup();
+    render(<FilterSelect searchable label="所有者" options={ownerOptions} placeholder="搜索所有者" aria-label="所有者筛选" />);
+    const input = screen.getByRole("combobox", { name: "所有者筛选" });
+
+    expect(screen.getByText("所有者：全部")).toBeInTheDocument();
+    expect(input).not.toHaveAttribute("placeholder");
+
+    await user.click(input);
+    expect(screen.getByText("所有者：全部")).toBeInTheDocument();
+    expect(input).not.toHaveAttribute("placeholder");
+  });
+
   it("filters locally and supports a custom filter predicate", async () => {
     const user = userEvent.setup();
     const { rerender } = render(<FilterSelect searchable label="所有者" options={ownerOptions} aria-label="所有者筛选" />);
