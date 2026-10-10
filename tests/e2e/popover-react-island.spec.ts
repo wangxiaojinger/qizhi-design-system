@@ -152,7 +152,7 @@ test("Popover component overrides keep body and four directional arrows synchron
     await expect(popup).toHaveCSS("z-index", "1301");
     const metrics = await popup.evaluate((node) => {
       const arrow = node.querySelector<HTMLElement>(".qizhi-popover__arrow")!;
-      const placement = node.dataset.popoverPosition!;
+      const placement = node.dataset.popoverPosition?.replace(/(Left|Right)$/, "") ?? "";
       const bodyStyle = getComputedStyle(node);
       const arrowStyle = getComputedStyle(arrow);
       const body = node.getBoundingClientRect();
