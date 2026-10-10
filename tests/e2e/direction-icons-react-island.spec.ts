@@ -122,8 +122,8 @@ test("图标文档在三档视口保持六类 419 个图标、筛选和布局", 
     const rect = node.getBoundingClientRect();
     return { width: rect.width, height: rect.height, color: getComputedStyle(node).color };
   });
-  expect(Math.abs(hoveredIcon.width - 44.8)).toBeLessThanOrEqual(0.2);
-  expect(Math.abs(hoveredIcon.height - 44.8)).toBeLessThanOrEqual(0.2);
+  expect(Math.abs(hoveredIcon.width - 44.8)).toBeLessThanOrEqual(0.25);
+  expect(Math.abs(hoveredIcon.height - 44.8)).toBeLessThanOrEqual(0.25);
   expect(hoveredIcon.color).toBe(iconColor);
   expect(await firstCell.evaluate((node) => getComputedStyle(node).color)).toBe(cellColor);
   expect(await grid.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);

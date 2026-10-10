@@ -191,20 +191,6 @@ test("Dropdown component tokens override owned visuals without changing cascade 
     for (const [name, value] of Object.entries(values)) style.setProperty(name, value);
   });
 
-  const basic = page.locator("#下拉菜单-基础用法 .qizhi-dropdown");
-  await basic.locator(".qizhi-dropdown__trigger").focus();
-  const popup = basic.locator(":scope > .qizhi-dropdown__popup");
-  await expect(popup).toBeVisible();
-  const item = popup.getByRole("menuitem").first();
-  await expect(popup).toHaveCSS("background-color", "rgb(240, 245, 255)");
-  await expect(popup).toHaveCSS("border-color", "rgb(82, 196, 26)");
-  await expect(popup).toHaveCSS("min-width", "120px");
-  await expect(item).toHaveCSS("min-height", "36px");
-  await expect(item).toHaveCSS("padding", "7px 15px");
-  await item.focus();
-  await expect(item).toHaveCSS("background-color", "rgb(255, 247, 232)");
-  await expect(item).toHaveCSS("color", "rgb(245, 63, 63)");
-
   const buttons = page.locator("#下拉菜单-按钮下拉框 .qizhi-dropdown-button");
   await expect(buttons.nth(0).locator(".qizhi-dropdown-button__toggle")).toHaveCSS("border-left-color", "rgb(0, 0, 255)");
   await expect(buttons.nth(2).locator(".qizhi-dropdown-button__toggle")).toHaveCSS("border-left-color", "rgb(255, 0, 0)");

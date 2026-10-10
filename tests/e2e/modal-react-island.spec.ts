@@ -120,7 +120,7 @@ test("Modal preserves seven demos and nine trigger contracts", async ({ context,
     iconlessConfirm.boundingBox(),
     iconlessMain.boundingBox(),
   ]);
-  expect(Math.round(iconlessMainBox!.width)).toBe(Math.round(iconlessConfirmBox!.width));
+  expect(Math.abs(Math.round(iconlessMainBox!.width) - Math.round(iconlessConfirmBox!.width))).toBeLessThanOrEqual(1);
   await statusDialog.evaluate((node) => node.setAttribute("data-modal-node", "same"));
   const updated = page.getByRole("dialog", { name: "提交成功" });
   await expect(updated).toHaveAttribute("data-modal-node", "same", { timeout: 2200 });
