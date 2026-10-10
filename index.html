@@ -108,6 +108,7 @@
                         <div tabindex="0" role="menuitem" class="qz-menu-item qz-menu-item-indented"><span><span class="qz-menu-indent"></span></span><span class="qz-menu-item-inner" style="display: block;"><a href="#component-verification-code" tabindex="-1" class="menu-link nav-link nav-link-sub"><span>验证码输入框 VerificationCode</span></a></span></div>
                         <div tabindex="0" role="menuitem" class="qz-menu-item qz-menu-item-indented"><span><span class="qz-menu-indent"></span></span><span class="qz-menu-item-inner" style="display: block;"><a href="#component-radio" tabindex="-1" class="menu-link nav-link nav-link-sub"><span>单选框 Radio</span></a></span></div>
                         <div tabindex="0" role="menuitem" class="qz-menu-item qz-menu-item-indented"><span><span class="qz-menu-indent"></span></span><span class="qz-menu-item-inner" style="display: block;"><a href="#component-select" tabindex="-1" class="menu-link nav-link nav-link-sub"><span>选择器 Select</span></a></span></div>
+                        <div tabindex="0" role="menuitem" class="qz-menu-item qz-menu-item-indented"><span><span class="qz-menu-indent"></span></span><span class="qz-menu-item-inner" style="display: block;"><a href="#component-filter-select" tabindex="-1" class="menu-link nav-link nav-link-sub"><span>筛选选择器 FilterSelect</span></a></span></div>
                         <div tabindex="0" role="menuitem" class="qz-menu-item qz-menu-item-indented"><span><span class="qz-menu-indent"></span></span><span class="qz-menu-item-inner" style="display: block;"><a href="#component-slider" tabindex="-1" class="menu-link nav-link nav-link-sub"><span>滑动输入条 Slider</span></a></span></div>
                         <div tabindex="0" role="menuitem" class="qz-menu-item qz-menu-item-indented"><span><span class="qz-menu-indent"></span></span><span class="qz-menu-item-inner" style="display: block;"><a href="#component-switch" tabindex="-1" class="menu-link nav-link nav-link-sub"><span>开关 Switch</span></a></span></div>
                         <div tabindex="0" role="menuitem" class="qz-menu-item qz-menu-item-indented"><span><span class="qz-menu-indent"></span></span><span class="qz-menu-item-inner" style="display: block;"><a href="#component-time-picker" tabindex="-1" class="menu-link nav-link nav-link-sub"><span>时间选择器 TimePicker</span></a></span></div>
@@ -522,8 +523,22 @@
               <section class="qizhi-changelog__day" id="changelog-2026-10-10" data-toc-label="2026-10-10">
                 <header class="qizhi-changelog__day-head">
                   <h2><time datetime="2026-10-10">2026-10-10</time></h2>
-                  <span class="qizhi-changelog__count">3 次更新</span>
+                  <span class="qizhi-changelog__count">4 次更新</span>
                 </header>
+
+                <article class="qizhi-changelog__entry">
+                  <header class="qizhi-changelog__entry-head">
+                    <div>
+                      <h3>FilterSelect 文档与交互示例</h3>
+                      <div class="qizhi-changelog__meta">
+                        <span class="qizhi-changelog__commit">待提交</span>
+                      </div>
+                    </div>
+                  </header>
+                  <ul>
+                    <li>新增单选、多选、本地搜索、远程搜索和状态示例，并补齐独立 API 文档。</li>
+                  </ul>
+                </article>
 
                 <article class="qizhi-changelog__entry">
                   <header class="qizhi-changelog__entry-head">
@@ -11298,6 +11313,8 @@ export default function App() {
             </div>
           </section>
 
+          <section class="doc-section" id="component-filter-select"></section>
+
           <section class="doc-section" id="component-input-tag">
             <div class="qz-nav-intro">
               <p>组件 <span class="separator">/</span> <strong>输入</strong></p>
@@ -15761,6 +15778,7 @@ export default function App() {
     <script type="module" src="/apps/qizhi-docs/src/tree-select/main.tsx"></script>
     <script type="module" src="/apps/qizhi-docs/src/dropdown/main.tsx"></script>
     <script type="module" src="/apps/qizhi-docs/src/select/main.tsx"></script>
+    <script type="module" src="/apps/qizhi-docs/src/filter-select/main.tsx"></script>
     <script type="module" src="/apps/qizhi-docs/src/form/main.tsx"></script>
     <script type="module" src="/apps/qizhi-docs/src/tag/main.tsx"></script>
     <script type="module" src="/apps/qizhi-docs/src/radio/main.tsx"></script>
