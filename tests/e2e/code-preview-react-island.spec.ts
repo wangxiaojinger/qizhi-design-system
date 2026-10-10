@@ -15,6 +15,7 @@ test("CodePreview 代码预览在三档视口保持可用", async ({ page }, tes
   const languageSelect = languageDemo.getByRole("combobox", { name: "代码语言" });
   await languageSelect.focus();
   await languageSelect.press("ArrowUp");
+  await languageSelect.press("ArrowUp");
   await languageSelect.press("Enter");
   await expect(languageSelect).toHaveValue("python");
   await expect(languageDemo.locator(".qizhi-code-preview__line-content").nth(0)).toContainText('platform = "QIZHI"');

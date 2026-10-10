@@ -118,6 +118,24 @@ describe("Business objects", () => {
       .toBe(markdown);
   });
 
+  it("reveals the full Skill summary on keyboard focus", async () => {
+    const markdown = "第一行\n第二行\n第三行\n第四行";
+    const { container } = render(
+      <SkillServiceCard
+        name="Markdown Skill"
+        version="V1"
+        updatedAt="2026-09-09"
+        project="基础-启智"
+        summary={markdown}
+      />,
+    );
+
+    const preview = container.querySelector<HTMLElement>(".qizhi-skill-service-card__summary")!;
+    fireEvent.focus(preview);
+    expect((await screen.findByRole("tooltip")).querySelector("pre")?.textContent)
+      .toBe(markdown);
+  });
+
   it("renders all confirmation summary variants", () => {
     render(
       <>

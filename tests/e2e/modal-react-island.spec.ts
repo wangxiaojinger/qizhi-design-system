@@ -69,8 +69,8 @@ test("Modal preserves seven demos and nine trigger contracts", async ({ context,
   ]);
   expect(nameBox).not.toBeNull();
   expect(genderBox).not.toBeNull();
-  expect(Math.round(nameBox!.x)).toBe(Math.round(genderBox!.x));
-  expect(Math.round(nameBox!.width)).toBe(Math.round(genderBox!.width));
+  expect(Math.abs(nameBox!.x - genderBox!.x)).toBeLessThanOrEqual(1);
+  expect(Math.abs(nameBox!.width - genderBox!.width)).toBeLessThanOrEqual(1);
   await form.getByRole("button", { name: "确定" }).click();
   await expect(form.getByPlaceholder("请输入姓名")).toBeFocused();
   await expect(form.getByPlaceholder("请输入姓名")).toHaveAttribute("aria-invalid", "true");

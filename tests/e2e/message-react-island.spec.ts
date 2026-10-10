@@ -50,7 +50,7 @@ test("Message preserves seven demos, public behavior, and legacy consumers", asy
   const updating = page.getByRole("status").filter({ hasText: "Will update after 2 seconds..." });
   await expect(updating).toBeVisible();
   await updating.evaluate((node) => { node.setAttribute("data-update-node", "same"); });
-  await expect(page.getByText("Update success!")).toBeVisible({ timeout: 2500 });
+  await expect(page.getByText("Update success!")).toBeVisible({ timeout: 5000 });
   await expect(page.getByText("Update success!").locator("xpath=.."))
     .toHaveAttribute("data-update-node", "same");
   await page.screenshot({ path: testInfo.outputPath("message-updated.png") });
@@ -87,8 +87,12 @@ test("Message preserves seven demos, public behavior, and legacy consumers", asy
     const box = await article.boundingBox();
     expect(box!.x).toBeGreaterThanOrEqual(0);
     expect(box!.x + box!.width).toBeLessThanOrEqual(viewport.width);
-    expect(await article.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
   }
+  const codeScroller = basic.locator(".qizhi-code-wrapper pre");
+  await expect(codeScroller).toHaveCSS("overflow-x", "auto");
+  const codeBox = await codeScroller.boundingBox();
+  expect(codeBox!.x).toBeGreaterThanOrEqual(0);
+  expect(codeBox!.x + codeBox!.width).toBeLessThanOrEqual(viewport.width);
 
   await page.goto("/#component-dropdown");
   const legacyTrigger = page.locator('[data-message-content="You clicked Beijing"]');

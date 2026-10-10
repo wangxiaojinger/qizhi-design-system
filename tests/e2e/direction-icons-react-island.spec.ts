@@ -1,14 +1,15 @@
 import { expect, test } from "@playwright/test";
 
-test("图标文档在三档视口保持六类 418 个图标、筛选和布局", async ({ page }, testInfo) => {
+test("图标文档在三档视口保持六类 419 个图标、筛选和布局", async ({ page }, testInfo) => {
   test.setTimeout(90_000);
   const errors: string[] = [];
   page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
   await page.goto("/#components-icon");
 
   const section = page.locator("#components-icon");
+  await expect(section.locator(".qizhi-icon-docs")).toBeVisible();
   await expect(section.getByRole("heading", { name: "图标 Icon" })).toBeVisible();
-  await expect(section.getByRole("button", { name: /复制.+组件代码/ })).toHaveCount(418);
+  await expect(section.getByRole("button", { name: /复制.+组件代码/ })).toHaveCount(419);
   await expect(section.getByRole("radio", { name: "多色图标" })).toHaveCount(1);
 
   await section.getByRole("radio", { name: "线性图标" }).click();
@@ -16,7 +17,7 @@ test("图标文档在三档视口保持六类 418 个图标、筛选和布局", 
   await section.getByRole("radio", { name: "面性图标" }).click();
   await expect(section.getByRole("button", { name: /复制.+组件代码/ })).toHaveCount(149);
   await section.getByRole("radio", { name: "多色图标" }).click();
-  await expect(section.getByRole("button", { name: /复制.+组件代码/ })).toHaveCount(10);
+  await expect(section.getByRole("button", { name: /复制.+组件代码/ })).toHaveCount(11);
   await expect(section.getByRole("button", { name: "复制Skill 服务组件代码" }))
     .toBeVisible();
   await expect(section.getByRole("button", { name: "复制状态-完成组件代码" }).locator("path")).toHaveAttribute("fill", "#52C41A");
@@ -25,7 +26,7 @@ test("图标文档在三档视口保持六类 418 个图标、筛选和布局", 
     path: testInfo.outputPath(`prompt-fixed-palette-icons-${testInfo.project.name}.png`),
   });
   await section.getByRole("radio", { name: "全部" }).click();
-  await expect(section.getByRole("heading", { name: /提示建议类图标 43 个 React 组件/ })).toBeVisible();
+  await expect(section.getByRole("heading", { name: /提示建议类图标 44 个 React 组件/ })).toBeVisible();
   await expect(section.getByRole("heading", { name: /交互按钮类图标 71 个 React 组件/ })).toBeVisible();
   await expect(section.getByRole("heading", { name: /编辑类图标 53 个 React 组件/ })).toBeVisible();
   await expect(section.getByRole("heading", { name: /商标类图标 28 个 React 组件/ })).toBeVisible();
@@ -79,7 +80,7 @@ test("图标文档在三档视口保持六类 418 个图标、筛选和布局", 
       return { width: rect.width, height: rect.height };
     }),
   );
-  expect(promptCellMetrics).toHaveLength(43);
+  expect(promptCellMetrics).toHaveLength(44);
   expect(promptCellMetrics.every(({ width, height }) => Math.abs(width - height) <= 1)).toBe(true);
   for (const [index, count] of [[2, 71], [3, 53]] as const) {
     const metrics = await grids.nth(index).locator(".qizhi-icon-docs__cell").evaluateAll((cells) => cells.map((cell) => {
@@ -139,6 +140,7 @@ test("商标类与通用类支持语义检索、复制和局部截图", async ({
   await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.goto("/#components-icon");
   const section = page.locator("#components-icon");
+  await expect(section.locator(".qizhi-icon-docs")).toBeVisible();
   const search = section.getByRole("searchbox", { name: "搜索图标" });
 
   await search.fill("RobotType");
@@ -166,6 +168,7 @@ test("交互按钮与编辑类支持检索、复制和局部截图", async ({ pa
   await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.goto("/#components-icon");
   const section = page.locator("#components-icon");
+  await expect(section.locator(".qizhi-icon-docs")).toBeVisible();
   const search = section.getByRole("searchbox", { name: "搜索图标" });
 
   await search.fill("UploadIcon");
@@ -207,13 +210,14 @@ test("方向图标支持中英文搜索、无结果恢复和复制", async ({ pa
   await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.goto("/#components-icon");
   const section = page.locator("#components-icon");
+  await expect(section.locator(".qizhi-icon-docs")).toBeVisible();
   const search = section.getByRole("searchbox", { name: "搜索图标" });
 
   await search.fill("向下实心箭头");
   await expect(section.getByRole("button", { name: "复制向下箭头（填充）组件代码" })).toBeVisible();
   await expect(section.getByRole("button", { name: /复制.+组件代码/ })).toHaveCount(1);
   await search.fill("不存在的旋转火箭图标");
-  await expect(section.getByText("没有匹配的方向图标")).toBeVisible();
+  await expect(section.getByText("没有匹配的图标", { exact: true })).toBeVisible();
   await search.fill("ArrowRightAltIcon");
   const result = section.getByRole("button", { name: "复制向右箭头（样式二）组件代码" });
   await result.click();

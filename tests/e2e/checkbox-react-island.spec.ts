@@ -5,6 +5,7 @@ test("Checkbox 保持五组 Demo、API、尺寸和响应式布局", async ({ pag
   page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/#component-checkbox");
+  await expect(page.getByRole("button", { name: "查看代码" })).toHaveCount(5);
 
   await expect(page.locator("#component-checkbox .codebox-wrapper")).toHaveCount(5);
   await expect(page.getByRole("table", { name: "Checkbox API" })).toBeVisible();
@@ -37,6 +38,7 @@ test("Checkbox 保持五组 Demo、API、尺寸和响应式布局", async ({ pag
 
 test("Checkbox 支持鼠标、键盘、禁用、受控和全选半选联动", async ({ page }, testInfo) => {
   await page.goto("/#component-checkbox");
+  await expect(page.getByRole("button", { name: "查看代码" })).toHaveCount(5);
   const basic = page.locator("#复选框-基础用法");
   const unchecked = basic.getByRole("checkbox", { name: "复选框", exact: true });
   const uncheckedMask = unchecked.locator("xpath=../span[contains(@class, 'qizhi-checkbox-mask-wrapper')]/span");

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "status": "passed",
-  "sourceFingerprint": "sha256:077c027dd3aec67a18a6fa27dbd281cad1745ba401abb94105fe1a5991034adb",
+  "sourceFingerprint": "sha256:376bfa0e14f0e7aaa93af8bfa0344f3a1937fe91c0dea0dac272e6c30b3fbe53",
   "root": ".",
   "exclusions": [
     ".git/**",
@@ -12,22 +12,22 @@
   "summary": {
     "files": 136,
     "unreferencedFiles": 1,
-    "findings": 3000,
+    "findings": 3001,
     "byScope": {
       "docs-runtime": 500,
       "smoke-runtime": 9,
       "generated-runtime": 81,
-      "component-runtime": 812,
+      "component-runtime": 813,
       "legacy-runtime": 1598
     },
     "byCategory": {
-      "spacing": 2345,
+      "spacing": 2346,
       "color": 438,
       "layer": 92,
       "shadow": 125
     },
     "byClassification": {
-      "review-required": 1028,
+      "review-required": 1029,
       "theme-token-candidate": 1523,
       "structural-constant": 449
     }
@@ -1411,10 +1411,10 @@
       "reason": "non-component surface or ambiguous design responsibility"
     },
     {
-      "id": "spacing:apps/qizhi-docs/src/demo-controls/demoSegmented.css:27:3:margin",
+      "id": "spacing:apps/qizhi-docs/src/demo-controls/demoSegmented.css:28:3:margin",
       "scope": "docs-runtime",
       "file": "apps/qizhi-docs/src/demo-controls/demoSegmented.css",
-      "line": 27,
+      "line": 28,
       "column": 3,
       "category": "spacing",
       "property": "margin",
@@ -1423,10 +1423,10 @@
       "reason": "non-component surface or ambiguous design responsibility"
     },
     {
-      "id": "spacing:apps/qizhi-docs/src/demo-controls/demoSegmented.css:28:3:padding",
+      "id": "spacing:apps/qizhi-docs/src/demo-controls/demoSegmented.css:29:3:padding",
       "scope": "docs-runtime",
       "file": "apps/qizhi-docs/src/demo-controls/demoSegmented.css",
-      "line": 28,
+      "line": 29,
       "column": 3,
       "category": "spacing",
       "property": "padding",
@@ -1435,10 +1435,10 @@
       "reason": "non-component surface or ambiguous design responsibility"
     },
     {
-      "id": "layer:apps/qizhi-docs/src/demo-controls/demoSegmented.css:46:3:z-index",
+      "id": "layer:apps/qizhi-docs/src/demo-controls/demoSegmented.css:47:3:z-index",
       "scope": "docs-runtime",
       "file": "apps/qizhi-docs/src/demo-controls/demoSegmented.css",
-      "line": 46,
+      "line": 47,
       "column": 3,
       "category": "layer",
       "property": "z-index",
@@ -1447,10 +1447,10 @@
       "reason": "non-component surface or ambiguous design responsibility"
     },
     {
-      "id": "shadow:apps/qizhi-docs/src/demo-controls/demoSegmented.css:51:3:box-shadow",
+      "id": "shadow:apps/qizhi-docs/src/demo-controls/demoSegmented.css:52:3:box-shadow",
       "scope": "docs-runtime",
       "file": "apps/qizhi-docs/src/demo-controls/demoSegmented.css",
-      "line": 51,
+      "line": 52,
       "column": 3,
       "category": "shadow",
       "property": "box-shadow",
@@ -1459,10 +1459,10 @@
       "reason": "non-component surface or ambiguous design responsibility"
     },
     {
-      "id": "color:apps/qizhi-docs/src/demo-controls/demoSegmented.css:61:3:outline",
+      "id": "color:apps/qizhi-docs/src/demo-controls/demoSegmented.css:62:3:outline",
       "scope": "docs-runtime",
       "file": "apps/qizhi-docs/src/demo-controls/demoSegmented.css",
-      "line": 61,
+      "line": 62,
       "column": 3,
       "category": "color",
       "property": "outline",
@@ -10097,6 +10097,18 @@
       "value": "8px",
       "classification": "theme-token-candidate",
       "reason": "gap participates in component density"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/detail-header/detailHeader.css:20:30:margin-top",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/detail-header/detailHeader.css",
+      "line": 20,
+      "column": 30,
+      "category": "spacing",
+      "property": "margin-top",
+      "value": "16px",
+      "classification": "review-required",
+      "reason": "non-component surface or ambiguous design responsibility"
     },
     {
       "id": "spacing:packages/qizhi-react/src/detail-header/detailHeader.css:20:47:padding",

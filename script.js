@@ -78,13 +78,17 @@ const restoreReadingPosition = (saved, pane) => {
   observer.observe(pane);
   const mutations = new MutationObserver(apply);
   mutations.observe(pane, { childList: true, subtree: true });
+  // React islands can finish a layout pass after the initial frame without
+  // changing the pane's measured size. Re-apply once after that pass so the
+  // stored viewport offset remains stable; user input still cancels this work.
+  const settleTimer = window.setTimeout(apply, 160);
   const timer = window.setTimeout(() => { stopReadingRestore(); saveReadingPosition(); }, 2500);
   const frame = requestAnimationFrame(apply);
   readingRestoreCleanup = () => {
     observer.disconnect(); mutations.disconnect();
     root.style.overflowAnchor = previousOverflowAnchor;
     root.style.scrollBehavior = previousScrollBehavior;
-    clearTimeout(timer); cancelAnimationFrame(frame);
+    clearTimeout(settleTimer); clearTimeout(timer); cancelAnimationFrame(frame);
   };
   apply();
 };

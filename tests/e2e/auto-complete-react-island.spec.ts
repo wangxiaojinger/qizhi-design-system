@@ -18,7 +18,8 @@ test("AutoComplete 保持 8 组旧站 Demo 并支持完整交互", async ({ page
 
   const strict = page.locator("#自动补全-区分大小写 [role=combobox]");
   await strict.fill("B");
-  await expect(page.locator("#自动补全-区分大小写 [role=listbox]")).toHaveCount(0);
+  await expect(page.locator("#自动补全-区分大小写 .qizhi-auto-complete__state[role=status]")).toHaveText("暂无匹配结果");
+  await expect(page.locator("#自动补全-区分大小写 [role=option]")).toHaveCount(0);
   await strict.fill("b");
   await expect(page.locator("#自动补全-区分大小写 [role=option]")).toHaveCount(3);
 

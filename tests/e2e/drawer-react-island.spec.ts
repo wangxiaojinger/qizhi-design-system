@@ -11,6 +11,7 @@ test("Drawer React Island preserves both complete contracts", async ({ context, 
 
   await page.goto("/#component-drawer");
   const section = page.locator("#component-drawer");
+  await expect(section.getByRole("button", { name: "查看代码" })).toHaveCount(2);
   await expect(page.getByRole("heading", { name: "抽屉 Drawer" })).toBeVisible();
   await expect(section.locator("article.codebox-wrapper")).toHaveCount(2);
   await expect(section.getByRole("table", { name: "Drawer API" })).toBeVisible();
@@ -154,11 +155,12 @@ test("Drawer React Island preserves both complete contracts", async ({ context, 
   }
 
   await page.goto("/#business-detail-header");
-  const versionTrigger = page.locator('[data-drawer-open="qizhi-detail-version-drawer"]');
+  const versionTrigger = page.getByRole("button", { name: /查看部署版本/ });
+  await expect(versionTrigger).toBeVisible();
   await versionTrigger.click();
   const versionDrawer = page.getByRole("dialog", { name: "版本列表" });
   await expect(versionDrawer).toBeVisible();
-  await expect(versionDrawer.locator(".qizhi-detail-version-table")).toBeVisible();
+  await expect(versionDrawer.getByRole("table", { name: "版本信息" })).toBeVisible();
   await versionDrawer.screenshot({ path: testInfo.outputPath("drawer-legacy-version.png") });
   await page.keyboard.press("Escape");
   await expect(versionDrawer).toBeHidden();

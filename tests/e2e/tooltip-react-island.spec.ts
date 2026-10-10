@@ -227,7 +227,7 @@ test("Tooltip keeps legacy, component, and instance background precedence synchr
     const tooltip = page.getByRole("tooltip", { name, exact: true });
     await expect(tooltip).toBeVisible();
     return tooltip.evaluate((node) => ({
-      body: getComputedStyle(node).backgroundColor,
+      body: getComputedStyle(node.querySelector(".qizhi-tooltip__container")!).backgroundColor,
       arrow: getComputedStyle(node.querySelector(".qizhi-tooltip__arrow")!).backgroundColor,
     }));
   };

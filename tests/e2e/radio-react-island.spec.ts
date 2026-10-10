@@ -4,6 +4,7 @@ test("Radio 保持三组 Demo、三档尺寸和响应式几何", async ({ page }
   const errors: string[] = [];
   page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
   await page.goto("/#component-radio");
+  await expect(page.getByRole("button", { name: "查看代码" })).toHaveCount(3);
 
   await expect(page.locator("#component-radio .codebox-wrapper")).toHaveCount(3);
   await expect(page.locator("#radio-API")).toBeVisible();
@@ -44,6 +45,7 @@ test("Radio 保持三组 Demo、三档尺寸和响应式几何", async ({ page }
 
 test("Radio 鼠标、键盘、禁用、数量回退和尺寸控制", async ({ page }, testInfo) => {
   await page.goto("/#component-radio");
+  await expect(page.getByRole("button", { name: "查看代码" })).toHaveCount(3);
   await expect(page.locator("#radio-API")).toBeVisible();
 
   const basic = page.getByRole("radio", { name: "单选框", exact: true });

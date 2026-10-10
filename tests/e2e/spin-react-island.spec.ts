@@ -95,7 +95,7 @@ test("Spin React Island preserves all five contracts", async ({
   await expect(custom.locator(".qizhi-spin__indicator"))
     .toHaveCSS("width", "30px");
   await expect(custom.locator(
-    '.qizhi-spin__indicator svg path[fill-opacity="0.45"]',
+    '.qizhi-spin__indicator svg path[fill="currentColor"]',
   )).toBeVisible();
   await tip.screenshot({ path: testInfo.outputPath("spin-tip.png") });
   await custom.screenshot({ path: testInfo.outputPath("spin-custom-icon.png") });

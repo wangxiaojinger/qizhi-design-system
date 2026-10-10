@@ -124,4 +124,27 @@ describe("ObjectSelector", () => {
     expect(within(selectedObject).getByText("INF-v2-8k")).toBeInTheDocument();
     await waitFor(() => expect(switchButton).toHaveFocus());
   });
+
+  it("accepts a complete new draft after a canceled selection", async () => {
+    const onChange = renderSelector();
+    const switchButton = screen.getByRole("button", { name: /切换/ });
+
+    fireEvent.click(switchButton);
+    fireEvent.click(screen.getByRole("option", { name: /INF-v1-128k/ }));
+    fireEvent.click(screen.getByRole("radio", { name: /V3/ }));
+    fireEvent.click(screen.getByRole("button", { name: "取消" }));
+    await waitFor(() => expect(switchButton).toHaveFocus());
+
+    fireEvent.click(switchButton);
+    fireEvent.click(screen.getByRole("option", { name: /INF-v1-128k/ }));
+    fireEvent.click(screen.getByRole("radio", { name: /V3/ }));
+    const confirm = screen.getByRole("button", { name: "确认" });
+    expect(confirm).toBeEnabled();
+    fireEvent.click(confirm);
+
+    expect(onChange).toHaveBeenCalledWith(
+      { object: "inf-128k", version: "V3" },
+      items[1],
+    );
+  });
 });

@@ -100,7 +100,10 @@ test("Form 保留旧站契约并覆盖复杂字段、远程状态与响应式几
   await expect(complex.getByRole("button", { name: /上移|下移/ })).toHaveCount(0);
   await complex.getByRole("button", { name: "删除成员 2" }).focus();
   await expect(page.getByRole("tooltip", { name: "删除" })).toBeVisible();
-  await expect(page.getByRole("tooltip", { name: "删除" })).toHaveAttribute("data-tooltip-position", "right");
+  await expect(page.getByRole("tooltip", { name: "删除" })).toHaveAttribute(
+    "data-tooltip-position",
+    testInfo.project.name === "mobile-375" ? "left" : "right",
+  );
   await complex.getByRole("button", { name: "删除成员 3" }).click();
   await expect(complex.getByRole("textbox", { name: /成员 \d+ 名称/ })).toHaveCount(2);
 

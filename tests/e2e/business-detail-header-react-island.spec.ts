@@ -67,7 +67,7 @@ test("Business detail header preserves the legacy contract", async ({ page }, te
   const maintainer = section.locator(".qizhi-service-detail-header__audit-icon").nth(1);
   const createdAt = section.locator(".qizhi-service-detail-header__audit-icon").nth(2);
   for (const icon of [creator, maintainer, createdAt]) {
-    await expect(icon.locator("path").first()).toHaveAttribute("fill-opacity", "1");
+    await expect(icon.locator("path").first()).toHaveCSS("fill-opacity", "1");
   }
   const auditIconColors = await Promise.all([creator, createdAt].map((icon) => icon.evaluate((node) => ({
     color: getComputedStyle(node).color,
@@ -82,6 +82,8 @@ test("Business detail header preserves the legacy contract", async ({ page }, te
     });
   }
   await creator.focus();
+  await expect(page.getByRole("tooltip", { name: "创建人" })).toBeVisible();
+  await page.mouse.move(0, 0);
   await expect(page.getByRole("tooltip", { name: "创建人" })).toBeVisible();
   await page.keyboard.press("Tab");
   await expect(page.getByRole("tooltip", { name: "创建人" })).toBeHidden();
@@ -105,7 +107,7 @@ test("Business detail header preserves the legacy contract", async ({ page }, te
   const versionColors = await version.evaluate((node) => ({
     text: getComputedStyle(node).color,
     icon: getComputedStyle(node.querySelector("svg")!).color,
-    opacity: node.querySelector("path")?.getAttribute("fill-opacity"),
+    opacity: getComputedStyle(node.querySelector("path")!).fillOpacity,
   }));
   expect(versionColors.icon).toBe(versionColors.text);
   expect(versionColors.opacity).toBe("1");

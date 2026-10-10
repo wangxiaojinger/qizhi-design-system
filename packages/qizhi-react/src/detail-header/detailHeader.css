@@ -17,6 +17,6 @@
 .qizhi-detail-header__property--plain dd { padding:0; background:transparent; }
 .qizhi-detail-header__audit { display:flex; align-items:center; flex-wrap:wrap; gap:8px 32px; color:var(--color-text-2); font-size:14px; line-height:22px; }
 .qizhi-detail-header__audit > span { display:inline-flex; align-items:center; gap:8px; }
-.qizhi-detail-header__tabs { margin-top:auto; padding:0 80px; }
+.qizhi-detail-header__tabs { margin-top:16px; padding:0 80px; }
 @container (max-width:720px) { .qizhi-detail-header__main { gap:16px; padding:16px; } .qizhi-detail-header__title-row { align-items:flex-start; flex-wrap:wrap; } .qizhi-detail-header__title-row h2 { flex-basis:calc(100% - 76px); } .qizhi-detail-header__action { margin-left:0; } .qizhi-detail-header__properties,.qizhi-detail-header__audit { align-items:flex-start; flex-direction:column; } .qizhi-detail-header__tabs { padding:0 24px; } }
 @container (max-width:480px) { .qizhi-detail-header__main { display:grid; grid-template-columns:minmax(0,1fr); } .qizhi-detail-header__title-row h2 { flex-basis:100%; } .qizhi-detail-header__properties > div { align-items:flex-start; flex-direction:column; width:100%; } .qizhi-detail-header__properties dd { max-width:100%; overflow:hidden; text-overflow:ellipsis; } .qizhi-detail-header__tabs { padding:0 16px; } }

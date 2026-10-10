@@ -192,8 +192,9 @@ test("Dropdown component tokens override owned visuals without changing cascade 
   });
 
   const basic = page.locator("#下拉菜单-基础用法 .qizhi-dropdown");
-  await basic.hover();
+  await basic.locator(".qizhi-dropdown__trigger").focus();
   const popup = basic.locator(":scope > .qizhi-dropdown__popup");
+  await expect(popup).toBeVisible();
   const item = popup.getByRole("menuitem").first();
   await expect(popup).toHaveCSS("background-color", "rgb(240, 245, 255)");
   await expect(popup).toHaveCSS("border-color", "rgb(82, 196, 26)");

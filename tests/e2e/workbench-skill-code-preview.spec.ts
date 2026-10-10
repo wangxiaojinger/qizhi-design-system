@@ -1,11 +1,12 @@
 import { expect, test } from "@playwright/test";
 
 test("启智平台 Skill.md 文件页复用 CodePreview", async ({ page }, testInfo) => {
+  test.skip(!process.env.QIZHI_WORKBENCH_BASE_URL, "requires the external workbench preview via QIZHI_WORKBENCH_BASE_URL");
   const errors: string[] = [];
   page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
   page.on("pageerror", (error) => errors.push(error.message));
 
-  await page.goto(process.env.QIZHI_WORKBENCH_BASE_URL ?? "http://127.0.0.1:5191/");
+  await page.goto(process.env.QIZHI_WORKBENCH_BASE_URL!);
   await page.getByRole("menuitem", { name: "Agent", exact: true }).first().click();
   await page.getByRole("button", { name: /research-summarizer/ }).first().click();
   await page.getByRole("tab", { name: "文件" }).click();

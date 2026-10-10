@@ -198,6 +198,7 @@ export function ObjectSelector({
             <h4>版本选择</h4>
             {draftItem ? (
               <Radio.Group
+                key={draftItem.value}
                 aria-label="选择模型版本"
                 value={draftVersion}
                 onChange={(next) => setDraftVersion(String(next))}

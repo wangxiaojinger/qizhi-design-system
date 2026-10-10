@@ -6,6 +6,7 @@ test("Link React Island exposes the approved component contract", async ({ page 
   page.on("pageerror", (error) => errors.push(error.message));
 
   await page.goto("/#components-link");
+  await expect(page.getByRole("button", { name: "查看代码" })).toHaveCount(5);
   await expect(page.getByRole("heading", { name: "链接 Link" })).toBeVisible();
   await expect(page.locator("#components-link article")).toHaveCount(5);
   await expect(page.locator("#link-API")).toHaveCount(1);
@@ -41,7 +42,7 @@ test("Link React Island exposes the approved component contract", async ({ page 
 
   await page.getByRole("button", { name: "查看代码" }).first().click();
   await expect(page.locator("#link-code-基础用法 code")).toContainText('import { Link, Space } from "@wangxiaojinger/qizhi-react";');
-  await expect(page.locator("#link-code-基础用法 code")).toHaveCSS("font-size", "14px");
+  await expect(page.locator("#link-code-基础用法 code")).toHaveCSS("font-size", "13px");
 
   const apiType = page.getByRole("row", { name: /^disabled 是否禁用/ }).locator("code").nth(1);
   await expect(apiType).toHaveCSS("color", "rgb(245, 49, 157)");

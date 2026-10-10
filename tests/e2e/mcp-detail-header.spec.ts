@@ -1,7 +1,10 @@
 import { expect, test } from "@playwright/test";
 
+const workbenchBaseUrl = process.env.QIZHI_WORKBENCH_BASE_URL;
+
 test("Skill 使用完整业务头部", async ({ page }, testInfo) => {
-  await page.goto("http://127.0.0.1:5187/");
+  test.skip(!workbenchBaseUrl, "requires the external workbench preview via QIZHI_WORKBENCH_BASE_URL");
+  await page.goto(workbenchBaseUrl!);
   await page.getByRole("menuitem", { name: "Agent", exact: true }).click();
   await page.getByRole("button", { name: "查看 research-summarizer 详情", exact: true }).click();
   await page.getByLabel("创建人", { exact: true }).hover();
@@ -26,9 +29,10 @@ test("Skill 使用完整业务头部", async ({ page }, testInfo) => {
 });
 
 test("MCP 审计提示及只读版本抽屉", async ({ page }, testInfo) => {
+  test.skip(!workbenchBaseUrl, "requires the external workbench preview via QIZHI_WORKBENCH_BASE_URL");
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  await page.goto("http://127.0.0.1:5187/");
+  await page.goto(workbenchBaseUrl!);
   await page.getByRole("menuitem", { name: "Agent", exact: true }).click();
   await page.getByRole("menuitem", { name: "MCP 托管", exact: true }).click();
   await page.getByRole("row", { name: /科研公告监控/ }).getByRole("button", { name: "详情", exact: true }).click();
@@ -66,7 +70,7 @@ test("MCP 审计提示及只读版本抽屉", async ({ page }, testInfo) => {
 });
 
 test("公共头部 Demo 保留版本抽屉与回滚交互", async ({ page }, testInfo) => {
-  await page.goto("http://127.0.0.1:5188/#business-detail-header");
+  await page.goto("/#business-detail-header");
   const section = page.locator("#business-detail-header");
   await section.getByLabel("创建人", { exact: true }).hover();
   await expect(page.getByRole("tooltip", { name: "创建人", exact: true })).toBeVisible();

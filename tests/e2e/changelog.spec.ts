@@ -14,13 +14,22 @@ test("更新日志入口、内容与布局可正常使用", async ({ page }, tes
   await expect(section).toBeVisible();
   await expect(section.getByRole("heading", { name: "更新日志", level: 2 })).toBeVisible();
   await expect(navLink).toHaveClass(/is-active/);
-  await expect(section.locator(".qizhi-changelog__entry")).toHaveCount(13);
-  await expect(section.locator(".qizhi-changelog__day")).toHaveCount(3);
-  await expect(section.locator(".qizhi-changelog__day").first()).toContainText("2 次更新");
-  await expect(section.locator("#changelog-2026-09-21")).toContainText("10 次更新");
-  await expect(section.locator("#changelog-2026-09-17")).toContainText("1 次更新");
-  await expect(section.locator(".qizhi-changelog__entry").first()).toContainText("新增更新日志模块");
-  await expect(section.locator(".qizhi-changelog__entry").nth(1)).toContainText("c290d94");
+  const dailyRecords = await section.locator(".qizhi-changelog__day").evaluateAll((days) => days.map((day) => ({
+    id: day.id,
+    date: day.querySelector("time")?.getAttribute("datetime") ?? "",
+    countText: day.querySelector(".qizhi-changelog__count")?.textContent?.trim() ?? "",
+    entryCount: day.querySelectorAll(".qizhi-changelog__entry").length,
+    titles: [...day.querySelectorAll(".qizhi-changelog__entry h3")].map((title) => title.textContent?.trim() ?? ""),
+  })));
+  expect(dailyRecords.length).toBeGreaterThan(0);
+  expect(new Set(dailyRecords.map(({ date }) => date)).size).toBe(dailyRecords.length);
+  expect(dailyRecords.map(({ date }) => date)).toEqual([...dailyRecords.map(({ date }) => date)].sort().reverse());
+  for (const record of dailyRecords) {
+    expect(record.id).toBe(`changelog-${record.date}`);
+    expect(record.countText).toBe(`${record.entryCount} 次更新`);
+    expect(record.entryCount).toBeGreaterThan(0);
+    expect(record.titles.every(Boolean)).toBe(true);
+  }
   const bodyTypography = await section.locator(".qizhi-changelog__entry").first().evaluate((entry) => {
     const titleStyle = getComputedStyle(entry.querySelector("h3")!);
     const bodyStyle = getComputedStyle(entry.querySelector("li")!);
@@ -71,14 +80,15 @@ test("更新日志入口、内容与布局可正常使用", async ({ page }, tes
   if (testInfo.project.name === "desktop-1440") {
     const toc = page.locator(".toc");
     await expect(toc).toBeVisible();
-    await expect(toc.locator(".toc-link")).toHaveText([
-      "2026-09-22",
-      "2026-09-21",
-      "2026-09-17",
-    ]);
-    await toc.getByRole("link", { name: "2026-09-21" }).click();
-    await expect(page).toHaveURL(/#changelog-2026-09-21$/);
-    await expect(section.locator("#changelog-2026-09-21")).toBeVisible();
+    const tocTargets = await toc.locator(".toc-link").evaluateAll((links) => links.map((link) => ({
+      href: link.getAttribute("href"),
+      text: link.textContent?.trim(),
+    })));
+    expect(tocTargets).toEqual(dailyRecords.map(({ id, date }) => ({ href: `#${id}`, text: date })));
+    const target = dailyRecords.at(Math.min(1, dailyRecords.length - 1))!;
+    await toc.getByRole("link", { name: target.date }).click();
+    await expect(page).toHaveURL(new RegExp(`#${target.id}$`));
+    await expect(section.locator(`#${target.id}`)).toBeVisible();
   }
 
   const ids = await section.locator("[id]").evaluateAll((nodes) => nodes.map((node) => node.id));

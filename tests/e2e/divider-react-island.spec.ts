@@ -6,6 +6,7 @@ test("Divider React Island exposes the approved component contract", async ({ pa
   page.on("pageerror", (error) => errors.push(error.message));
 
   await page.goto("/#components-divider");
+  await expect(page.getByRole("button", { name: "查看代码" })).toHaveCount(3);
   await expect(page.getByRole("heading", { name: "分割线 Divider" })).toBeVisible();
   await expect(page.locator("#components-divider article.codebox-wrapper")).toHaveCount(3);
   await expect(page.locator("#divider-API")).toHaveCount(1);
@@ -36,7 +37,7 @@ test("Divider React Island exposes the approved component contract", async ({ pa
 
   await page.getByRole("button", { name: "查看代码" }).first().click();
   await expect(page.locator("#divider-code-divider-basic code")).toContainText('import { Divider } from "@wangxiaojinger/qizhi-react";');
-  await expect(page.locator("#divider-code-divider-basic code")).toHaveCSS("font-size", "14px");
+  await expect(page.locator("#divider-code-divider-basic code")).toHaveCSS("font-size", "13px");
 
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth)).toBe(true);
   await page.screenshot({ path: `test-results/divider-react-island-${testInfo.project.name}.png`, fullPage: true });
