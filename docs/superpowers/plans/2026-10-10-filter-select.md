@@ -362,4 +362,3 @@ Run `git status --short`, `git diff --check`, and an explicit path diff. Confirm
 - [ ] **Step 8: Commit final explicit paths only if commit-safe**
 
 Do not use `git add .`. If the dirty shared `index.html` still prevents an isolated commit, leave the verified candidate uncommitted and state why; do not claim it is submitted, merged, released, or independently accepted.
-
