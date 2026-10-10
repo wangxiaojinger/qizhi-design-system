@@ -7,7 +7,7 @@
   z-index: var(--component-popover-z-index, var(--z-index-popover, 1200));
   box-sizing: border-box;
   width: max-content;
-  max-width: min(360px, calc(100vw - 16px));
+  max-width: min(var(--component-popover-width, 360px), calc(100vw - 16px));
   padding: var(--component-popover-padding-block, 14px) var(--component-popover-padding-inline, var(--space-16, 16px));
   color: var(--qizhi-popover-title);
   background: var(--qizhi-popover-bg);

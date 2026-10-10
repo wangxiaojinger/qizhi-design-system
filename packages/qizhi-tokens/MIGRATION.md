@@ -553,7 +553,7 @@
 | `component.popover.content.text` | `--component-popover-content-text` | 新增 | `color.text.2` | reference | popover content text responsibility |
 | `component.popover.border` | `--component-popover-border` | 新增 | `color.border.2` | reference | popover border responsibility |
 | `component.popover.z.index` | `--component-popover-z-index` | 新增 | `z.index.popover` | reference | popover z index responsibility |
-| `component.popover.width` | `--component-popover-width` | 新增 | `component.popover.width` | length | popover width responsibility |
+| `component.popover.width` | `--component-popover-width` | 新增 | `component.popover.width` | length | popover maximum width responsibility |
 | `component.popover.padding.block` | `--component-popover-padding-block` | 新增 | `component.popover.padding.block` | length | popover padding block responsibility |
 | `component.popover.padding.inline` | `--component-popover-padding-inline` | 新增 | `space.16` | reference | popover padding inline responsibility |
 | `component.popover.radius` | `--component-popover-radius` | 新增 | `border.radius.medium` | reference | popover radius responsibility |

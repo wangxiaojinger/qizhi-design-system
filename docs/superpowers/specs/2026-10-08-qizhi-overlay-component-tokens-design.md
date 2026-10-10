@@ -69,7 +69,7 @@ Tooltip 根节点将 `--qizhi-tooltip-bg` 的默认值改为 `var(--component-to
 | `component.popover.content.text` | `var(--color-text-2)` | 内容文字颜色 |
 | `component.popover.border` | `var(--color-border-2)` | 主体和箭头边框 |
 | `component.popover.z.index` | `var(--z-index-popover)` | Portal 层级 |
-| `component.popover.width` | `248px` | 默认宽度 |
+| `component.popover.width` | `360px` | 内容驱动宽度的最大值 |
 | `component.popover.padding.block` | `14px` | 纵向内边距 |
 | `component.popover.padding.inline` | `var(--space-16)` | 横向内边距 |
 | `component.popover.radius` | `var(--border-radius-medium)` | 圆角 |
@@ -122,10 +122,10 @@ Popover 箭头的中心偏移由 `component.popover.arrow.size / 2` 计算，外
 1. `packages/qizhi-tokens/src/tokens.json` 是唯一可编辑 Token 源；CSS、JSON、JavaScript、类型和迁移映射继续由脚本生成。
 2. 通用层级新增 `z.index.popover = 1200` / `--z-index-popover`，与 `z.index.tooltip` 数值相同但职责独立；两个变量互不引用。
 3. 有旧公共变量时使用 `Component Token → 旧变量 → 字面量`，例如 Dropdown 背景、边框、阴影及通用尺度。
-4. 没有旧公共变量时使用 `Component Token → 字面量`，例如 Dropdown 当前局部层级 20、Popover 248px 宽度和两个独有阴影。
+4. 没有旧公共变量时使用 `Component Token → 字面量`，例如 Dropdown 当前局部层级 20、Popover 360px 最大宽度和两个独有阴影。
 5. 不删除、不改名旧变量，不改变旧值和值类型。
 6. 不将 Tooltip、Popover、Dropdown 的组件 Token 互相引用。
-7. 不用新 Token 改写定位算法产生的 `top/right/bottom/left/transform`，也不改变 Portal 容器选择。
+7. 不用新 Token 改写定位算法产生的 `top/right/bottom/left/transform`；箭头尺寸 Token 只参与半尺寸偏移，运行时箭头对齐变量继续决定最终位置，也不改变 Portal 容器选择。
 8. `prefers-reduced-motion` 现有行为保持不变。
 
 ## 组件边界
