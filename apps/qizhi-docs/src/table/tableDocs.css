@@ -1,3 +1,14 @@
+#component-table .qizhi-components-wrapper {
+  grid-template-columns: minmax(0, 1fr);
+  width: 100%;
+  min-width: 0;
+}
+
+#component-table .codebox-wrapper {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .table-docs-demo {
   overflow: visible;
 }

@@ -104,6 +104,8 @@ export default function BasicDemo() {
       key: "name",
       title: "姓名",
       dataIndex: "name",
+      minWidth: 128,
+      grow: 1,
       render: (value, record) => (
         <Link
           hoverable={false}
@@ -114,8 +116,8 @@ export default function BasicDemo() {
         </Link>
       ),
     },
-    { key: "age", title: "年龄", dataIndex: "age" },
-    { key: "address", title: "地址", dataIndex: "address" },
+    { key: "age", title: "年龄", dataIndex: "age", width: 72 },
+    { key: "address", title: "地址", dataIndex: "address", width: 160 },
     {
       key: "tags",
       title: "标签",
@@ -126,6 +128,7 @@ export default function BasicDemo() {
     {
       key: "action",
       title: "操作",
+      width: 120,
       render: (_, record) => (
         <Space size="medium">
           <Link

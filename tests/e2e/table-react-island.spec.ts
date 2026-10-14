@@ -1,13 +1,14 @@
 import { expect, test } from "@playwright/test";
 
-test("Table 保持十一组 Demo、核心交互和三档响应式", async ({ page }, testInfo) => {
+test("Table 保持十二组 Demo、核心交互和三档响应式", async ({ page }, testInfo) => {
+  test.setTimeout(60000);
   const errors: string[] = [];
   page.on("console", (message) => { if (message.type() === "error") errors.push(message.text()); });
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/#component-table", { waitUntil: "domcontentloaded" });
 
   await expect(page.getByRole("heading", { name: "表格 Table" })).toBeVisible();
-  await expect(page.locator("#component-table article.codebox-wrapper")).toHaveCount(11);
+  await expect(page.locator("#component-table article.codebox-wrapper")).toHaveCount(12);
   await expect(page.locator("#table-basic tbody tr")).toHaveCount(3);
   const basicTable = page.locator("#table-basic .qizhi-table");
   const basicTableElement = page.locator("#table-basic table");

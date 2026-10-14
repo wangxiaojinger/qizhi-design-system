@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { Checkbox } from "../checkbox/Checkbox";
 import { Empty } from "../empty/Empty";
@@ -11,6 +11,7 @@ import { Radio } from "../radio/Radio";
 import { Tooltip } from "../tooltip/Tooltip";
 import type { TableColumn, TableProps, TableRowKey, TableSortOrder } from "./Table.types";
 import "./table.css";
+import { allocateColumnWidths } from "./tableLayout";
 
 const cx = (...parts: Array<string | false | undefined>) => parts.filter(Boolean).join(" ");
 const defaultSortDirections = ["ascend", "descend"] as const;
@@ -30,7 +31,51 @@ const nextSortOrder = <RecordType extends object>(
 const sortAction = (order: TableSortOrder) =>
   order === "ascend" ? "升序" : order === "descend" ? "降序" : "取消";
 
-export function Table<RecordType extends object>({ columns, dataSource, rowKey, size = "default", border = false, borderCell = false, hover = true, stripe = false, showHeader = true, loading = false, scrollX, rowSelection, expandable, childrenColumnName = "children" as keyof RecordType, pagination = false, empty, draggable = false, showSorterTooltip = true, onSortChange, onRowOrderChange, className, style, "aria-label": ariaLabel = "表格", ...rest }: TableProps<RecordType>) {
+export function Table<RecordType extends object>({ columns, dataSource, rowKey, size = "default", border = false, borderCell = false, hover = true, stripe = false, showHeader = true, loading = false, scrollX, rowSelection, expandable, childrenColumnName = "children" as keyof RecordType, pagination = false, empty, draggable = false, showSorterTooltip = true, tableLayout, layoutMode = "fill", onSortChange, onRowOrderChange, className, style, "aria-label": ariaLabel = "表格", ...rest }: TableProps<RecordType>) {
+  const effectiveLayout = tableLayout ?? (layoutMode === "compact" ? "auto" : "fixed");
+  const extraColumns = (rowSelection ? 1 : 0) + (expandable ? 1 : 0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const tableRef = useRef<HTMLTableElement>(null);
+  const [containerWidth, setContainerWidth] = useState(0);
+  const [renderedWidths, setRenderedWidths] = useState<number[]>([]);
+  const constrained = effectiveLayout === "fixed" && columns.every((column) => typeof column.width !== "string") && columns.some((column) => column.minWidth != null || column.maxWidth != null || column.grow != null);
+  const allocatedWidths = constrained ? allocateColumnWidths(columns, Math.max(containerWidth, typeof scrollX === "number" ? scrollX : 0) - extraColumns * 48, layoutMode === "compact") : undefined;
+  const columnWidth = (index: number) => allocatedWidths?.[index] ?? columns[index].width;
+  const fixedOffsets: number[] = columns.map(() => 0);
+  const renderedColumnWidth = (index: number) => renderedWidths[index + extraColumns] ?? (typeof columnWidth(index) === "number" ? columnWidth(index) as number : 0);
+  let leftOffset = 0;
+  let rightOffset = 0;
+  columns.forEach((column, index) => {
+    if (column.fixed === "left") { fixedOffsets[index] = leftOffset; leftOffset += renderedColumnWidth(index); }
+  });
+  for (let index = columns.length - 1; index >= 0; index -= 1) {
+    if (columns[index].fixed === "right") { fixedOffsets[index] = rightOffset; rightOffset += renderedColumnWidth(index); }
+  }
+  const columnStyle = (index: number): CSSProperties => {
+    const column = columns[index];
+    return { textAlign: column.align, ...(column.fixed ? { [column.fixed]: fixedOffsets[index] } : {}) };
+  };
+  useLayoutEffect(() => {
+    const scroller = scrollRef.current;
+    const table = tableRef.current;
+    const hasFixed = columns.some((column) => column.fixed);
+    if (!scroller || !table || (!constrained && !hasFixed)) return;
+    const measure = () => {
+      const available = scroller.clientWidth;
+      if (constrained) setContainerWidth((previous) => previous === available ? previous : available);
+      if (hasFixed) {
+        const widths = Array.from(table.querySelectorAll(":scope > colgroup > col"), (col) => col.getBoundingClientRect().width);
+        setRenderedWidths((previous) => previous.length === widths.length && widths.every((width, index) => Math.abs(width - previous[index]) < 0.1) ? previous : widths);
+      }
+    };
+    measure();
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(scroller);
+    observer.observe(table);
+    if (hasFixed) table.querySelectorAll(":scope > colgroup > col").forEach((col) => observer.observe(col));
+    return () => observer.disconnect();
+  }, [columns, extraColumns, effectiveLayout, layoutMode, scrollX, containerWidth, constrained, showHeader, dataSource]);
   const keyOf = (record: RecordType): TableRowKey => typeof rowKey === "function" ? rowKey(record) : record[rowKey] as TableRowKey;
   const defaultSort = columns.find((column) => column.defaultSortOrder);
   const [sort, setSort] = useState<{ key: string; order: TableSortOrder }>({ key: defaultSort?.key ?? "", order: defaultSort?.defaultSortOrder ?? null });
@@ -80,13 +125,14 @@ export function Table<RecordType extends object>({ columns, dataSource, rowKey, 
     setSort({ key: column.key, order: next }); onSortChange?.(next, column);
   };
   const rowLabel = (record: RecordType) => String(columns[0]?.dataIndex == null ? keyOf(record) : record[columns[0].dataIndex]);
-  const headerCells = columns.map((column) => {
+  const headerCells = columns.map((column, columnIndex) => {
     if (!column.sorter) {
       return (
         <th
           key={column.key}
           className={cx("qizhi-table__th", column.fixed && `is-fixed-${column.fixed}`)}
-          style={{ width: column.width }}
+          data-align={column.align}
+          style={columnStyle(columnIndex)}
         >
           {column.title}
         </th>
@@ -142,7 +188,8 @@ export function Table<RecordType extends object>({ columns, dataSource, rowKey, 
             ? "descending"
             : "none"}
         className={cx("qizhi-table__th", "is-sortable", column.fixed && `is-fixed-${column.fixed}`)}
-        style={{ width: column.width }}
+        data-align={column.align}
+        style={columnStyle(columnIndex)}
       >
         {headerContent}
       </th>
@@ -151,7 +198,6 @@ export function Table<RecordType extends object>({ columns, dataSource, rowKey, 
   const selectable = allRecords.filter((record) => !rowSelection?.getCheckboxProps?.(record).disabled);
   const allChecked = selectable.length > 0 && selectable.every((record) => selected.includes(keyOf(record)));
   const someChecked = selectable.some((record) => selected.includes(keyOf(record))) && !allChecked;
-  const extraColumns = (rowSelection ? 1 : 0) + (expandable ? 1 : 0);
   const renderRows = (records: RecordType[], level = 0): ReactNode[] => records.flatMap((record, index) => {
     const key = keyOf(record); const children = record[childrenColumnName] as RecordType[] | undefined;
     const selectionProps = rowSelection?.getCheckboxProps?.(record);
@@ -169,7 +215,7 @@ export function Table<RecordType extends object>({ columns, dataSource, rowKey, 
         const content = column.render ? column.render(value, record, index) : value as ReactNode;
         const showEllipsisTitle = column.ellipsis === true || (typeof column.ellipsis === "object" && column.ellipsis.showTitle !== false);
         const title = showEllipsisTitle && (typeof content === "string" || typeof content === "number") ? String(content) : undefined;
-        return <td key={column.key} rowSpan={cell.rowSpan} colSpan={cell.colSpan} className={cx("qizhi-table__td", column.fixed && `is-fixed-${column.fixed}`, cell.className)} style={cell.style}><div className={cx("qizhi-table__cell", column.ellipsis && "is-ellipsis")} title={title} style={columnIndex === 0 && level ? { paddingInlineStart: level * 24 } : undefined}>{columnIndex === 0 && children?.length && !expandable ? <button type="button" className="qizhi-table__tree-toggle" aria-label={`${isOpen ? "收起" : "展开"}${String(value)}`} aria-expanded={isOpen} onClick={() => toggleExpanded(record)}>{isOpen ? <MinusIcon size={14} /> : <AddIcon size={14} />}</button> : null}{content}</div></td>;
+        return <td key={column.key} rowSpan={cell.rowSpan} colSpan={cell.colSpan} data-align={cell.style?.textAlign ?? column.align} className={cx("qizhi-table__td", column.fixed && `is-fixed-${column.fixed}`, cell.className)} style={{ ...columnStyle(columnIndex), ...cell.style }}><div className={cx("qizhi-table__cell", column.ellipsis && "is-ellipsis")} title={title} style={columnIndex === 0 && level ? { paddingInlineStart: level * 24 } : undefined}>{columnIndex === 0 && children?.length && !expandable ? <button type="button" className="qizhi-table__tree-toggle" aria-label={`${isOpen ? "收起" : "展开"}${String(value)}`} aria-expanded={isOpen} onClick={() => toggleExpanded(record)}>{isOpen ? <MinusIcon size={14} /> : <AddIcon size={14} />}</button> : null}{content}</div></td>;
       })}
     </tr>;
     const details = isOpen && expandedContent != null ? <tr key={`${key}-expanded`} className="qizhi-table__expanded"><td colSpan={columns.length + extraColumns}>{expandedContent}</td></tr> : null;
@@ -177,9 +223,11 @@ export function Table<RecordType extends object>({ columns, dataSource, rowKey, 
     return [row, details, ...childRows].filter(Boolean);
   });
   const declaredWidth = columns.reduce((sum, column) => sum + (typeof column.width === "number" ? column.width : 0), 0) + extraColumns * 48;
-  const tableStyle: CSSProperties = { minWidth: scrollX ?? (declaredWidth > 0 ? declaredWidth : undefined), ...style };
+  const allocatedTotal = allocatedWidths ? allocatedWidths.reduce((sum, width) => sum + width, extraColumns * 48) : undefined;
+  const tableStyle: CSSProperties = { tableLayout: effectiveLayout, width: allocatedTotal ?? (layoutMode === "compact" ? "max-content" : "100%"), minWidth: allocatedTotal ?? scrollX ?? (declaredWidth > 0 ? declaredWidth : undefined), ...style };
   return <div {...rest} className={cx("qizhi-table", `qizhi-table--${size}`, border && "is-bordered", borderCell && "has-cell-border", hover && "is-hoverable", stripe && "is-striped", fixedShadows.left && "has-left-fixed-shadow", fixedShadows.right && "has-right-fixed-shadow", loading && "is-loading", className)} aria-busy={loading || undefined}>
-    <div className="qizhi-table__scroll" onScroll={(event) => { const node = event.currentTarget; const left = node.scrollLeft > 1; const right = left && node.scrollLeft + node.clientWidth < node.scrollWidth - 1; setFixedShadows({ left, right }); }}><table aria-label={ariaLabel} style={tableStyle}>
+    <div ref={scrollRef} className="qizhi-table__scroll" onScroll={(event) => { const node = event.currentTarget; const left = node.scrollLeft > 1; const right = left && node.scrollLeft + node.clientWidth < node.scrollWidth - 1; setFixedShadows({ left, right }); }}><table ref={tableRef} aria-label={ariaLabel} style={tableStyle}>
+      <colgroup>{rowSelection ? <col style={{ width: 48 }} /> : null}{expandable ? <col style={{ width: 48 }} /> : null}{columns.map((column, index) => <col key={column.key} style={{ width: columnWidth(index), minWidth: effectiveLayout === "auto" ? column.minWidth : undefined }} />)}</colgroup>
       {showHeader ? <thead><tr>{rowSelection ? <th className="qizhi-table__th qizhi-table__selection">{rowSelection.type !== "radio" ? <Checkbox aria-label="全选当前数据" checked={allChecked} indeterminate={someChecked} onChange={() => updateSelection(allChecked ? selected.filter((key) => !selectable.some((record) => keyOf(record) === key)) : Array.from(new Set([...selected, ...selectable.map(keyOf)])))} /> : null}</th> : null}{expandable ? <th className="qizhi-table__th qizhi-table__expand" aria-label="展开操作" /> : null}{headerCells}</tr></thead> : null}
       <tbody>{visible.length ? renderRows(visible) : <tr><td colSpan={columns.length + extraColumns}>{empty ?? <Empty />}</td></tr>}</tbody>
     </table>{loading ? <div className="qizhi-table__loading" role="status">加载中...</div> : null}</div>

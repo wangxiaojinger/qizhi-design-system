@@ -10,6 +10,9 @@ export type TableSorterTooltip = boolean | { target?: TableSorterTooltipTarget }
 export type TableFixed = "left" | "right";
 export type TablePaginationPosition = "bottomLeft" | "bottomCenter" | "bottomRight";
 export type TableColumnEllipsis = boolean | { showTitle?: boolean };
+export type TableLayout = "fixed" | "auto";
+export type TableLayoutMode = "fill" | "compact";
+export type TableColumnAlign = "left" | "center" | "right";
 
 export interface TableCellProps { rowSpan?: number; colSpan?: number; className?: string; style?: CSSProperties }
 export interface TableColumn<RecordType> {
@@ -17,6 +20,13 @@ export interface TableColumn<RecordType> {
   title: ReactNode;
   dataIndex?: keyof RecordType;
   width?: number | string;
+  /** fixed 数字分配的下限；auto 下由浏览器处理。 */
+  minWidth?: number;
+  /** fixed 数字分配的上限，不与 string width 或 auto 组合。 */
+  maxWidth?: number;
+  /** fixed 数字分配的正数权重；未指定最小宽度时基准为 120px。 */
+  grow?: number;
+  align?: TableColumnAlign;
   fixed?: TableFixed;
   ellipsis?: TableColumnEllipsis;
   render?: (value: unknown, record: RecordType, index: number) => ReactNode;
@@ -62,6 +72,10 @@ export interface TableProps<RecordType extends object> extends Omit<HTMLAttribut
   showHeader?: boolean;
   loading?: boolean;
   scrollX?: number | string;
+  /** 默认 fixed；compact 未显式指定时使用 auto。 */
+  tableLayout?: TableLayout;
+  /** 默认 fill；compact 按内容或数字预算收缩。 */
+  layoutMode?: TableLayoutMode;
   rowSelection?: TableRowSelection<RecordType>;
   expandable?: TableExpandable<RecordType>;
   childrenColumnName?: keyof RecordType;

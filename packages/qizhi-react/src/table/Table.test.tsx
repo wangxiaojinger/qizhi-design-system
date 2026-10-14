@@ -7,6 +7,36 @@ const data: Row[] = [{ id: 1, name: "乙", salary: 2 }, { id: 2, name: "甲", sa
 const columns: TableColumn<Row>[] = [{ key: "name", title: "姓名", dataIndex: "name" }, { key: "salary", title: "薪水", dataIndex: "salary", sorter: (a, b) => a.salary - b.salary }];
 
 describe("Table", () => {
+  it("honors explicit cell alignment independently of the column header", () => {
+    const { container } = render(<Table rowKey="id" dataSource={data} columns={[
+      { key: "name", title: "姓名", dataIndex: "name", align: "right", onCell: () => ({ style: { textAlign: "center" } }) },
+    ]} />);
+    expect(container.querySelector("th")).toHaveAttribute("data-align", "right");
+    expect(container.querySelector("td")).toHaveStyle({ textAlign: "center" });
+    expect(container.querySelector("td")).toHaveAttribute("data-align", "center");
+  });
+  it("keeps column declarations without headers and aligns sortable headers and cells", () => {
+    const layoutColumns: TableColumn<Row>[] = [
+      { key: "name", title: "姓名", dataIndex: "name", width: 180 },
+      { key: "salary", title: "薪水", dataIndex: "salary", width: 120, align: "right", sorter: (a, b) => a.salary - b.salary },
+    ];
+    const { container, rerender } = render(<Table rowKey="id" columns={layoutColumns} dataSource={data} />);
+    expect(container.querySelectorAll("col")).toHaveLength(2);
+    expect(container.querySelectorAll("col")[0]).toHaveStyle({ width: "180px" });
+    expect(container.querySelectorAll("th")[1]).toHaveStyle({ textAlign: "right" });
+    expect(container.querySelectorAll("td")[1]).toHaveStyle({ textAlign: "right" });
+    rerender(<Table rowKey="id" columns={layoutColumns} dataSource={data} showHeader={false} />);
+    expect(container.querySelectorAll("col")[0]).toHaveStyle({ width: "180px" });
+    expect(container.querySelector("thead")).toBeNull();
+  });
+  it("supports explicit auto and compact modes without changing legacy defaults", () => {
+    const { container, rerender } = render(<Table rowKey="id" columns={columns} dataSource={data} />);
+    expect(container.querySelector("table")).toHaveStyle({ tableLayout: "fixed" });
+    rerender(<Table rowKey="id" columns={columns} dataSource={data} layoutMode="compact" />);
+    expect(container.querySelector("table")).toHaveStyle({ tableLayout: "auto", width: "max-content" });
+    rerender(<Table rowKey="id" columns={[{ ...columns[0], minWidth: 200 }]} dataSource={data} tableLayout="auto" />);
+    expect(container.querySelector("col")).toHaveStyle({ minWidth: "200px" });
+  });
   it("keeps the default table outline-free like the legacy specification", () => {
     const { container } = render(<Table rowKey="id" columns={columns} dataSource={data} />);
     expect(container.querySelector(".qizhi-table")).not.toHaveClass("is-bordered");

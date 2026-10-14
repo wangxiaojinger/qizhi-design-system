@@ -10,6 +10,7 @@ import TreeDemo from "./demos/TreeDemo"; import treeSource from "./demos/TreeDem
 import PropsDemo from "./demos/PropsDemo"; import propsSource from "./demos/PropsDemo.tsx?raw";
 import MergeDemo from "./demos/MergeDemo"; import mergeSource from "./demos/MergeDemo.tsx?raw";
 import DragDemo from "./demos/DragDemo"; import dragSource from "./demos/DragDemo.tsx?raw";
+import LayoutDemo from "./demos/LayoutDemo"; import layoutSource from "./demos/LayoutDemo.tsx?raw";
 
 export interface TableDemoDefinition { id: string; title: string; description: string; component: ComponentType; source: string }
 export const tableDemos: readonly TableDemoDefinition[] = [
@@ -24,4 +25,5 @@ export const tableDemos: readonly TableDemoDefinition[] = [
   { id: "table-props", title: "表格属性", description: "在这里，可以统一查看表格常用属性。表格尺寸通过上下内边距控制：默认 16px、中等 12px、小 8px。", component: PropsDemo, source: propsSource },
   { id: "table-merge", title: "单元格合并", description: "用于单元格合并，表头可以进行列合并，内容区域可以通过 rowSpan 与 colSpan 合并单元格。", component: MergeDemo, source: mergeSource },
   { id: "table-drag", title: "拖拽排序", description: "拖动表格行可以调整数据顺序，适合手动编排优先级或展示顺序。", component: DragDemo, source: dragSource },
+  { id: "table-layout", title: "列宽与自适应", description: "通过列级最小/最大宽度、grow、对齐和布局模式控制剩余空间；支持紧凑布局、原生自动布局、隐藏表头和同侧多个固定列。", component: LayoutDemo, source: layoutSource },
 ];

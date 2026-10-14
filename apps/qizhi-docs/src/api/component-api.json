@@ -6405,9 +6405,21 @@
         },
         {
           "name": "scrollX",
-          "description": "横向滚动所需的表格最小宽度。",
+          "description": "表格内部横向滚动的最小宽度。使用 fixed 约束分配时仅支持数字，并作为 grow 的目标宽度；保留 string 以兼容既有非约束表格。",
           "type": "number | string",
           "defaultValue": "—"
+        },
+        {
+          "name": "tableLayout",
+          "description": "原生表格布局算法。fixed 下可使用数字列宽约束；auto 下由浏览器处理 minWidth，maxWidth 与 grow 不参与分配。显式设置会覆盖 layoutMode 推导的算法。",
+          "type": "\"fixed\" | \"auto\"",
+          "defaultValue": "\"fixed\""
+        },
+        {
+          "name": "layoutMode",
+          "description": "fill 占满容器；compact 按内容或数字预算收缩。compact 未显式 tableLayout 时使用 auto；显式 fixed 且有约束时不分配多余空间。",
+          "type": "\"fill\" | \"compact\"",
+          "defaultValue": "\"fill\""
         },
         {
           "name": "rowSelection",
@@ -6465,6 +6477,12 @@
         }
       ],
       "defaultBehaviors": [
+        "普通数据列表默认使用 layoutMode=\"fill\" 与 tableLayout=\"fixed\"，表格占满容器。稳定的状态、日期、数值和操作列应设置数字 width；名称、标题或描述等主内容列可用 minWidth 与 grow 承接剩余空间。不要等分短内容列，也不要通过增加 Padding 消耗空白。",
+        "fixed 模式中，只有所有 width 都是数字或未设置时，minWidth、maxWidth、grow 才启用确定性分配。数字 width 是基准；无 width 的列以 minWidth 或 120px 为基准；grow 为正数的列按权重分配剩余空间，并受 maxWidth 限制。所有 grow 列到达 maxWidth 后保留右侧留白。",
+        "当可用宽度不足时，grow 列先缩至其 minWidth 或 120px 下限；仍不足时由表格内部横向滚动处理。数字 scrollX 参与这一宽度预算并可作为 grow 的目标宽度；约束模式不支持 string scrollX，也不能混用 string width。列宽按业务合法内容、表头、排序图标、控件间距和正常 Padding 预算，不根据当前页数据测量。",
+        "tableLayout=\"auto\" 时，minWidth 交给浏览器的原生表格布局；maxWidth 与 grow 不参与数字分配，不应组合使用。layoutMode=\"compact\" 且未显式 tableLayout 时默认使用 auto 并按内容收缩；显式 tableLayout=\"fixed\" 且存在约束时，紧凑模式按数字预算收缩，不向 grow 列分配多余空间。",
+        "每个表格都通过 colgroup 表达列宽，因此 showHeader=false 仍保持列声明。固定列按实际渲染的列宽计算同侧累计偏移，支持同侧多个业务列；选择和展开辅助列纳入列结构与测量索引，但自身不固定，会随内容滚动。左右固定列加前置选择、展开等辅助列的实际总宽度应小于最小容器宽度，须在 scrollLeft=0、滚动中和末端分别验证，避免窄屏相撞。",
+        "列默认左对齐。使用 align=\"right\" 或 align=\"center\" 时，表头、排序控件和数据单元格同步对齐；组件不根据字段名推断金额、日期或状态语义。操作列按所有状态和语言中的最宽合法组合设置稳定 width，翻页、筛选或加载时不改变操作展示方式与列宽。",
         "表格数据单元格内的文字按钮（Button type=\"text\"）和链接（Link），左右内边距统一为 0，与同列普通文本对齐。此规则由 Table 默认提供，无需新增参数或业务 CSS；上下内边距、颜色、禁用状态和交互行为不变，普通按钮及表格外控件不受影响。",
         "数据单元格默认允许文本自然换行，行高随内容撑开。size 通过上下内边距控制密度：default 为 16px、middle 为 12px、small 为 8px，不把内容行锁定为固定高度。",
         "TableColumn.ellipsis 默认为 false；设为 true 或 { showTitle } 时，该列使用单行省略。showTitle 默认开启原生 title 提示，设为 false 可关闭。",
@@ -6494,13 +6512,37 @@
         },
         {
           "name": "width",
-          "description": "列宽度；数字按像素处理。",
+          "description": "列宽。数字 width 是 fixed 约束分配的基准；string 形式保留兼容，但不能与 minWidth、maxWidth、grow 的确定性分配混用。",
           "type": "number | string",
           "defaultValue": "—"
         },
         {
+          "name": "minWidth",
+          "description": "列最小宽度。fixed 约束分配中作为下限；tableLayout=auto 时交给原生表格处理。",
+          "type": "number",
+          "defaultValue": "—"
+        },
+        {
+          "name": "maxWidth",
+          "description": "fixed 数字分配的列宽上限，包含非 grow 列；显式 minWidth 大于 maxWidth 时最小值优先。tableLayout=auto 时不参与分配。",
+          "type": "number",
+          "defaultValue": "—"
+        },
+        {
+          "name": "grow",
+          "description": "fixed 约束分配的正数权重，用于按权重承接剩余空间；tableLayout=auto 时不参与分配。",
+          "type": "number",
+          "defaultValue": "—"
+        },
+        {
+          "name": "align",
+          "description": "列内容与表头的水平对齐方式；排序控件同步对齐。",
+          "type": "\"left\" | \"center\" | \"right\"",
+          "defaultValue": "\"left\""
+        },
+        {
           "name": "fixed",
-          "description": "将列固定在水平滚动区域的左侧或右侧。",
+          "description": "将业务列固定在水平滚动区域的左侧或右侧。支持同侧多个固定业务列并按实际渲染宽度累计偏移。",
           "type": "\"left\" | \"right\"",
           "defaultValue": "—"
         },
