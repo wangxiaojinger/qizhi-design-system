@@ -2,7 +2,7 @@
 
 ## 范围
 
-Table v1 提供 12 个当前业务需要的 Demo：基础用法、多行与省略、排序、固定列、开启选择、展开行、嵌套子表格、树形数据展示、表格属性、单元格合并、拖拽排序、列宽与自适应。表头吸顶和表头分组不纳入当前公共能力。
+Table v1 提供 13 个当前业务需要的 Demo：基础用法、多行与省略、排序、固定列、开启选择、展开行、嵌套子表格、树形数据展示、表格属性、单元格合并、拖拽排序、列宽与自适应、用户列定制。表头吸顶和表头分组不纳入当前公共能力。
 
 正式实现复用 `Pagination`、`Empty`、`Button`、`Link` 与 QIZHI 图标。选择控件和加载态属于 Table 内部结构，不对外新增 Checkbox、Radio 或 Spin 组件。
 
@@ -21,11 +21,11 @@ type TableLayoutMode = "fill" | "compact";
 type TableColumnAlign = "left" | "center" | "right";
 ```
 
-`TableProps<RecordType>` 实现：`columns`、`dataSource`、`rowKey`、`size`、`border`、`borderCell`、`hover`、`stripe`、`showHeader`、`loading`、`scrollX`、`tableLayout`、`layoutMode`、`rowSelection`、`expandable`、`childrenColumnName`、`pagination`、`empty`、`draggable`、`onSortChange`、`onRowOrderChange`、`className`、`style`、`aria-label`。
+`TableProps<RecordType>` 实现：`columns`、`dataSource`、`rowKey`、`size`、`border`、`borderCell`、`hover`、`stripe`、`showHeader`、`loading`、`fixedBreakpoint`、`scrollX`、`tableLayout`、`layoutMode`、`columnCustomization`、`columnLayout`、`defaultColumnLayout`、`onColumnLayoutChange`、`treeColumnKey`、`rowSelection`、`expandable`、`childrenColumnName`、`pagination`、`empty`、`emptyPadding`、`emptyCell`、`draggable`、`showSorterTooltip`、`onSortChange`、`onRowOrderChange`、`className`、`style`、`aria-label`。
 
 默认值：`size="default"`、`border=false`、`borderCell=false`、`hover=true`、`stripe=false`、`showHeader=true`、`loading=false`、`tableLayout="fixed"`、`layoutMode="fill"`、`pagination=false`、`childrenColumnName="children"`、`draggable=false`。数据单元格默认自然换行，行高随内容撑开。`size="default"` 使用 16px 上下内边距，`size="middle"` 使用 12px，`size="small"` 使用 8px，不将表头或内容行锁定为固定高度。
 
-`TableColumn<RecordType>` 实现：`key`、`title`、`dataIndex`、`width`、`minWidth`、`maxWidth`、`grow`、`align`、`fixed`、`ellipsis`、`render`、`sorter`、`defaultSortOrder`、`onCell`。`align` 默认为左对齐，排序表头与数据单元格同步对齐。`ellipsis` 默认为 `false`；设为 `true` 或 `{ showTitle }` 时该列单行省略，`showTitle` 默认为 `true`，仅在单元格内容是字符串或数字时输出原生 `title`。排序按未排序、升序、降序、未排序循环，并通过 `onSortChange` 回传。
+`TableColumn<RecordType>` 实现：`key`、`title`、`dataIndex`、`width`、`minWidth`、`maxWidth`、`grow`、`shrink`、`growPriority`、`shrinkPriority`、`align`、`fixed`、`movable`、`resizable`、`hideable`、`defaultVisible`、`settingsLabel`、`layoutRole`、`ellipsis`、`render`、`sorter`、`sortDirections`、`defaultSortOrder`、`showSorterTooltip`、`onCell`。`align` 默认为左对齐，排序表头与数据单元格同步对齐。`ellipsis` 默认为 `false`；设为 `true` 或 `{ showTitle }` 时该列单行省略，`showTitle` 默认为 `true`，仅在单元格内容是字符串或数字时输出原生 `title`。排序按未排序、升序、降序、未排序循环，并通过 `onSortChange` 回传。
 
 `TableRowSelection<RecordType>` 实现：`type`、`selectedRowKeys`、`defaultSelectedRowKeys`、`checkStrictly`、`getCheckboxProps`、`onChange`。复选框模式支持全选、半选、禁用项和树形父子联动；单选模式只保留一个值。
 
@@ -60,9 +60,22 @@ Table 是自研原生 HTML table，不依赖 AntD/rc-table。它提供显式列�
 - `emptyCell="-"` 仅替换未定义 render 的 null/undefined/空字符串。0、false、显式业务状态与 render 不变；缺失值占位不启用全文 Tooltip。默认不自动代填。
 - Qways 的每页 8 条、260/320px、游标、专用模型卡片、ID 复制及 secret 掩码不是组件默认值；业务接入按实际安装包能力核验。日期／时间列仍由业务显式左对齐。
 
+## 用户列定制
+
+完整可序列化状态为 `TableColumnLayoutState`：`{ schemaVersion: 1, columnOrder, columnWidths, columnVisibility }`。`columnOrder` 始终包含隐藏列；`columnWidths` 只保存用户显式提交的 CSS px；`columnVisibility` 是当前有效列的完整布尔映射。状态及回调元信息的类型和可访问文案配置见 [用户列定制契约](./qizhi-table-column-customization-v1.md)。
+
+- `columnCustomization` 的 `reorder`、`resize`、`visibility`、`settings` 分别开启交互，全部默认 `false`；状态本身可独立传入并以只读方式恢复。`renderSettings` 接收完整设置入口，可由业务放入已有工具栏，`locale` 可部分覆盖设置、恢复、全选、移动、调宽及必选提示文案。
+- `columnLayout` 为受控值：每次渲染按当前列定义规范化，组件不先假装提交成功。`defaultColumnLayout` 只作为非受控首轮初值；两者并存时受控值优先。合法用户操作才通过 `onColumnLayoutChange` 回传一次完整独立快照，`reason` 为 `order`、`width`、`visibility` 或 `reset`，可带 `columnKey`；取消、无变化、外部状态更新及内部规范化不回调。
+- 只接受 `schemaVersion: 1`。无效版本或损坏结构回退当前默认；过期、未知、重复或空键不持久化。列定义改变或权限导致列集合变化时，当前有效键以定义为准，删除旧键、把新键按其当前段定义顺序追加；核心不读写存储、网络或权限数据。
+- 顺序按当前源列连续段约束：`fixed` 从普通、`left`、`right` 任一变化即断段，`movable: false` 是单列屏障，移动不可跨越。`hideable: false`、树入口保护列强制可见；其余列的 `defaultVisible` 默认 `true`。`layoutRole` 默认为 `data`，`action` 不计入至少保留一列可见数据列的限制；纯 action 防御场景仍保留一列可见。
+- `resizable: false` 忽略保存值和新调宽。有效手动宽度必须为有限正数，并按当前 `minWidth`／`maxWidth` 钳制；没有明确下限时最小值为 64px，冲突时 `minWidth` 优先。用户手动宽度优先于自动预算；当手动总宽小于容器时允许在满宽卡片内出现表格内部留白，超过容器时仅表格内部横向滚动。百分比、字符串或自动宽度的未手动列在首次调宽前读取实际渲染像素作为本次基准，不把该基准写进保存状态。
+- 树形数据的 `treeColumnKey` 是稳定入口，布局移动不改变缩进或展开绑定，且该列不能隐藏。若当前可见数据中存在 `onCell().colSpan` 合并，移动和显隐临时关闭并回到源列完整顺序；仅 `rowSpan` 不触发此限制，调宽仍可用。
+- 键盘路径：表头移动按钮可用左右方向键逐列移动；调宽手柄可聚焦，左右方向键每次 8px、`Shift` 加方向键每次 1px、`Home` 到最小值、有限最大值时 `End` 到最大值，进行中的指针调宽可用 `Esc` 取消。设置面板复用可聚焦复选框、按钮和数字输入，数字宽度在 Enter 或失焦时提交。
+- 业务可将回调状态序列化到自己的作用域存储，但必须以用户、权限/租户、列表版本及列集合隔离，JSON 读取失败按默认处理；不得保存原始列定义、接口数据、凭据或其他敏感内容。恢复和当前定义规范化只是展示准备，不是用户修改。
+
 ## 当前能力排除范围
 
-服务端数据协议、筛选菜单、列配置/列宽调整、可编辑单元格、虚拟列表、汇总、导出、响应式隐藏、宽泛的 `onRow`/`onHeaderRow`，以及独立 Checkbox、Radio、Switch、Spin 组件。
+服务端数据协议、筛选菜单、可编辑单元格、虚拟列表、汇总、导出、响应式隐藏、宽泛的 `onRow`/`onHeaderRow`，以及独立 Checkbox、Radio、Switch、Spin 组件。用户列移动、调宽、显隐与设置面板仅以本契约的可选能力提供，不扩大为服务端保存、权限判断或通用响应式隐藏方案。
 
 ## 一致性与验收
 

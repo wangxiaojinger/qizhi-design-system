@@ -567,6 +567,11 @@ export type {
   TagSize,
 } from "./tag/Tag.types";
 export { Table } from "./table/Table";
+export { normalizeColumnLayout, defaultColumnLayout } from "./table/columnLayoutModel";
+export type {
+  TableColumnLayoutState, TableColumnLayoutMeta, TableColumnCustomization,
+  TableColumnCustomizationLocale, TableColumnLayoutOptions,
+} from "./table/TableColumnLayout.types";
 export type {
   TableCellProps,
   TableColumn,

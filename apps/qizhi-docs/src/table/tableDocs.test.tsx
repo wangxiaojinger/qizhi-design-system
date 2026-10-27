@@ -36,10 +36,10 @@ describe("Table docs", () => {
     expect(dateColumns).toBe(4);
   });
 
-  it("renders the twelve demos without unsupported sticky or grouped headers", () => {
+  it("preserves the twelve demos and adds the business column-layout demo", () => {
     render(<TableDocsIsland />);
-    expect(screen.getAllByRole("heading", { level: 2 }).map((node) => node.textContent)).toEqual(["基础用法", "多行与省略", "排序", "固定列", "开启选择", "展开行", "嵌套子表格", "树形数据展示", "表格属性", "单元格合并", "拖拽排序", "列宽与自适应", "API"]);
-    expect(document.querySelectorAll("article.codebox-wrapper")).toHaveLength(12);
+    expect(screen.getAllByRole("heading", { level: 2 }).map((node) => node.textContent)).toEqual(["基础用法", "多行与省略", "排序", "固定列", "开启选择", "展开行", "嵌套子表格", "树形数据展示", "表格属性", "单元格合并", "拖拽排序", "列宽与自适应", "Qways 模型目录与用户列布局", "API"]);
+    expect(document.querySelectorAll("article.codebox-wrapper")).toHaveLength(13);
     expect(screen.queryByRole("heading", { name: "表头吸顶" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "表头分组" })).not.toBeInTheDocument();
     expect(screen.queryByText(/Demo\.tsx|Demo\.css/)).not.toBeInTheDocument();
@@ -131,14 +131,14 @@ describe("Table docs", () => {
       ".component-example-actions .qizhi-btn",
     );
 
-    expect(actions).toHaveLength(24);
+    expect(actions).toHaveLength(26);
     expect([...actions].every((node) =>
       node.classList.contains("qizhi-code-action"))).toBe(true);
   });
 
   it("matches the Button docs spacing around code actions", () => {
     render(<TableDocsIsland />);
-    expect(document.querySelectorAll(".table-docs-actions")).toHaveLength(12);
+    expect(document.querySelectorAll(".table-docs-actions")).toHaveLength(13);
   });
 
   it("documents only the approved Table v1 API", () => {

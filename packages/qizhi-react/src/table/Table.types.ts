@@ -1,5 +1,6 @@
 import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
 import type { PaginationProps } from "../pagination/Pagination.types";
+import type { TableColumnCustomization, TableColumnLayoutMeta, TableColumnLayoutOptions, TableColumnLayoutState } from "./TableColumnLayout.types";
 
 export type TableSize = "default" | "middle" | "small";
 export type TableRowKey = string | number;
@@ -27,7 +28,7 @@ export type TableLayoutMode = "fill" | "compact";
 export type TableColumnAlign = "left" | "center" | "right";
 
 export interface TableCellProps { rowSpan?: number; colSpan?: number; className?: string; style?: CSSProperties }
-export interface TableColumn<RecordType> {
+export interface TableColumn<RecordType> extends TableColumnLayoutOptions {
   key: string;
   title: ReactNode;
   dataIndex?: keyof RecordType;
@@ -96,6 +97,13 @@ export interface TableProps<RecordType extends object> extends Omit<HTMLAttribut
   tableLayout?: TableLayout;
   /** 默认 fill；compact 按内容或数字预算收缩。 */
   layoutMode?: TableLayoutMode;
+  /** 三种交互默认关闭；状态可独立用于只读恢复布局。 */
+  columnCustomization?: TableColumnCustomization;
+  columnLayout?: TableColumnLayoutState;
+  defaultColumnLayout?: TableColumnLayoutState;
+  onColumnLayoutChange?: (layout: TableColumnLayoutState, meta: TableColumnLayoutMeta) => void;
+  /** 树入口锚定稳定列，不随物理列下标移动；树列不能被隐藏。 */
+  treeColumnKey?: string;
   rowSelection?: TableRowSelection<RecordType>;
   expandable?: TableExpandable<RecordType>;
   childrenColumnName?: keyof RecordType;

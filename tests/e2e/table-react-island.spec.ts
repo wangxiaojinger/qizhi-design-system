@@ -8,7 +8,7 @@ test("Table 保持十二组 Demo、核心交互和三档响应式", async ({ pag
   await page.goto("/#component-table", { waitUntil: "domcontentloaded" });
 
   await expect(page.getByRole("heading", { name: "表格 Table" })).toBeVisible();
-  await expect(page.locator("#component-table article.codebox-wrapper")).toHaveCount(12);
+  await expect(page.locator("#component-table article.codebox-wrapper")).toHaveCount(13);
   await expect(page.locator("#table-basic tbody tr")).toHaveCount(3);
   const basicTable = page.locator("#table-basic .qizhi-table");
   const basicTableElement = page.locator("#table-basic table");

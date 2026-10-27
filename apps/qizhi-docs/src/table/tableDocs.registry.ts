@@ -11,6 +11,8 @@ import PropsDemo from "./demos/PropsDemo"; import propsSource from "./demos/Prop
 import MergeDemo from "./demos/MergeDemo"; import mergeSource from "./demos/MergeDemo.tsx?raw";
 import DragDemo from "./demos/DragDemo"; import dragSource from "./demos/DragDemo.tsx?raw";
 import LayoutDemo from "./demos/LayoutDemo"; import layoutSource from "./demos/LayoutDemo.tsx?raw";
+import CustomizationDemo from "./demos/CustomizationDemo";
+import customizationSource from "./demos/CustomizationDemo.tsx?raw";
 
 export interface TableDemoDefinition { id: string; title: string; description: string; component: ComponentType; source: string }
 export const tableDemos: readonly TableDemoDefinition[] = [
@@ -26,4 +28,5 @@ export const tableDemos: readonly TableDemoDefinition[] = [
   { id: "table-merge", title: "单元格合并", description: "用于单元格合并，表头可以进行列合并，内容区域可以通过 rowSpan 与 colSpan 合并单元格。", component: MergeDemo, source: mergeSource },
   { id: "table-drag", title: "拖拽排序", description: "拖动表格行可以调整数据顺序，适合手动编排优先级或展示顺序。", component: DragDemo, source: dragSource },
   { id: "table-layout", title: "列宽与自适应", description: "通过列级宽度、伸缩权重与优先级分配空间；演示两行全文提示、数据区加载、空态留白、缺失值与容器固定列断点，并保留旧布局能力。", component: LayoutDemo, source: layoutSource },
+  { id: "table-customization", title: "Qways 模型目录与用户列布局", description: "以模型目录展示列移动、调宽、显隐和布局恢复，四个开关独立启用。手动尺寸优先，必要时保留留白或内部滚动；模拟账号与工作空间隔离保存。模型与价格均为演示数据。", component: CustomizationDemo, source: customizationSource },
 ];
