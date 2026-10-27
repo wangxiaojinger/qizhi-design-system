@@ -52,7 +52,7 @@ test("固定偏移和表头表体几何保持一致，窄容器内部滚动", as
 test("隐藏重现保留完整顺序及手动宽度，父重绘与容器变化不重置", async ({ page }) => {
   await resize(page, "b", 25);
   await cell(page, "b").getByRole("button", { name: "移动列 乙" }).press("ArrowLeft");
-  await main(page).getByRole("button", { name: "列设置" }).click();
+  await main(page).getByRole("button", { name: "列显隐" }).click();
   await page.getByRole("checkbox", { name: "乙", exact: true }).locator("..").click();
   await expect(cell(page, "b")).toHaveCount(0);
   await page.getByRole("checkbox", { name: "乙", exact: true }).locator("..").click();
@@ -80,8 +80,8 @@ test("受控拒绝保持表格和设置面板权威值", async ({ page }) => {
   const before = await width(cell(page, "a"));
   await resize(page, "a", 30);
   expect(await width(cell(page, "a"))).toBeCloseTo(before, 0);
-  await main(page).getByRole("button", { name: "列设置" }).click();
-  await expect(page.getByRole("dialog", { name: "列设置" }).getByRole("spinbutton")).toHaveCount(0);
+  await main(page).getByRole("button", { name: "列显隐" }).click();
+  await expect(page.getByRole("dialog", { name: "列显隐" }).getByRole("spinbutton")).toHaveCount(0);
   await page.keyboard.press("Escape");
   await cell(page, "a").getByRole("separator").press("ArrowRight");
   expect(await width(cell(page, "a"))).toBeCloseTo(before, 0);
@@ -111,12 +111,12 @@ for (const kind of ["弹窗", "抽屉"]) test(`${kind}中Escape先关列面板�
   await page.getByRole("button", { name: `打开${kind}` }).click();
   const table = page.getByRole("table", { name: `${kind}表格` });
   await expect(table).toBeVisible();
-  const trigger = table.locator("xpath=../..").getByRole("button", { name: "列设置" });
+  const trigger = table.locator("xpath=../..").getByRole("button", { name: "列显隐" });
   await trigger.click();
-  await expect(page.getByRole("dialog", { name: "列设置" })).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "列显隐" })).toBeVisible();
   await page.getByRole("checkbox", { name: "甲", exact: true }).focus();
   await page.keyboard.press("Escape");
-  await expect(page.getByRole("dialog", { name: "列设置" })).toBeHidden();
+  await expect(page.getByRole("dialog", { name: "列显隐" })).toBeHidden();
   await expect(table).toBeVisible();
   await expect(trigger).toBeFocused();
 });

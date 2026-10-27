@@ -27,7 +27,7 @@ export interface ColumnSettingsProps {
 
 export function ColumnSettings({ items, visibility, disabled = false, locale, renderTrigger,
   onVisibility, onVisibilityAll }: ColumnSettingsProps) {
-  const labels = useMemo(() => ({ settings: "列设置", selectAll: "全选", required: "必选",
+  const labels = useMemo(() => ({ settings: "列显隐", selectAll: "全选", required: "必选",
     ...locale }), [locale]);
   const [visible, setVisible] = useState(false);
   const triggerRef = useRef<ButtonHandle>(null);

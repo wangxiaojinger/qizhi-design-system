@@ -41,9 +41,21 @@ describe("Table column customization integration", () => {
 
   it("renders no customization controls when not enabled", () => {
     render(<Table columns={columns} dataSource={rows} rowKey="id" />);
-    expect(screen.queryByRole("button", { name: "列设置" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "列显隐" })).not.toBeInTheDocument();
     expect(screen.queryByRole("separator")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /移动列/ })).not.toBeInTheDocument();
+  });
+
+  it("ties the visibility entry to visibility regardless of the legacy settings flag", () => {
+    const { rerender } = render(<Table columns={columns} dataSource={rows} rowKey="id"
+      columnCustomization={{ visibility: true }} />);
+    expect(screen.getByRole("button", { name: "列显隐" })).toBeInTheDocument();
+    rerender(<Table columns={columns} dataSource={rows} rowKey="id"
+      columnCustomization={{ visibility: false, settings: true }} />);
+    expect(screen.queryByRole("button", { name: "列显隐" })).toBeNull();
+    rerender(<Table columns={columns} dataSource={rows} rowKey="id"
+      columnCustomization={{ visibility: true, settings: false }} />);
+    expect(screen.getByRole("button", { name: "列显隐" })).toBeInTheDocument();
   });
 
   it("keeps controlled layout authoritative and emits one immutable full snapshot", () => {
@@ -52,7 +64,7 @@ describe("Table column customization integration", () => {
     const { rerender } = render(<Table columns={columns} dataSource={rows} rowKey="id"
       columnLayout={initial} columnCustomization={{ visibility: true, settings: true }}
       onColumnLayoutChange={onChange} />);
-    fireEvent.click(screen.getByRole("button", { name: "列设置" }));
+    fireEvent.click(screen.getByRole("button", { name: "列显隐" }));
     fireEvent.click(screen.getByRole("checkbox", { name: "状态" }));
     expect(onChange).toHaveBeenCalledTimes(1);
     const [next, meta] = onChange.mock.calls[0];
@@ -70,9 +82,9 @@ describe("Table column customization integration", () => {
   it("allows explicit external reset without a user commit or a reset action in visibility settings", () => {
     const onChange = vi.fn();
     const { container, rerender } = render(<Table columns={columns} dataSource={rows} rowKey="id"
-      columnLayout={saved} columnCustomization={{ settings: true, resize: true }}
+      columnLayout={saved} columnCustomization={{ visibility: true, settings: false, resize: true }}
       onColumnLayoutChange={onChange} />);
-    fireEvent.click(screen.getByRole("button", { name: "列设置" }));
+    fireEvent.click(screen.getByRole("button", { name: "列显隐" }));
     expect(screen.queryByRole("button", { name: "恢复默认布局" })).toBeNull();
     rerender(<Table columns={columns} dataSource={rows} rowKey="id"
       columnLayout={defaultColumnLayout(columns)} onColumnLayoutChange={onChange} />);

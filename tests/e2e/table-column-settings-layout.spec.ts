@@ -2,8 +2,8 @@ import { expect, test } from "@playwright/test";
 
 test("列设置：宽度由最长列名自然撑开，短名称不预留固定空白", async ({ page }) => {
   await page.goto("/tests/e2e/fixtures/table-customization.html");
-  const trigger = page.locator("#main").getByRole("button", { name: "列设置", exact: true });
-  const popup = page.getByRole("dialog", { name: "列设置", exact: true });
+  const trigger = page.locator("#main").getByRole("button", { name: "列显隐", exact: true });
+  const popup = page.getByRole("dialog", { name: "列显隐", exact: true });
   await trigger.click();
   const width = () => popup.evaluate((node) => node.getBoundingClientRect().width);
   const short = await width();
@@ -23,8 +23,9 @@ test("列设置：宽度由最长列名自然撑开，短名称不预留固定�
 test("列设置：仅显隐、名称单行且无横向滚动", async ({ page }, testInfo) => {
   await page.goto("/#component-table");
   const demo = page.locator("#table-props");
-  await demo.getByRole("button", { name: "列设置", exact: true }).click();
-  const popup = page.getByRole("dialog", { name: "列设置", exact: true });
+  await demo.getByRole("switch", { name: "列显隐", exact: true }).click();
+  await demo.getByRole("button", { name: "列显隐", exact: true }).click();
+  const popup = page.getByRole("dialog", { name: "列显隐", exact: true });
   await expect(popup).toBeVisible();
   await expect(popup.getByRole("spinbutton")).toHaveCount(0);
   await expect(popup.getByRole("button", { name: /前移|后移|恢复默认/ })).toHaveCount(0);

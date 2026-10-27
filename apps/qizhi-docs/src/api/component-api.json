@@ -6596,7 +6596,7 @@
         },
         {
           "name": "columnCustomization",
-          "description": "列移动、调宽、显隐和设置面板的独立开关；全部默认关闭。设置面板只管理显隐，移动与调宽在表头操作。renderSettings 可将入口放入既有工具栏，locale 覆盖文案；仅传布局状态不自动开启交互。",
+          "description": "列移动、调宽、显隐三个独立开关，默认关闭。visibility 开启时显示列显隐按钮与面板，关闭时隐藏入口；旧 settings 字段保留兼容但不再控制入口。移动与调宽在表头操作。renderSettings 可将入口放入既有工具栏，locale 覆盖文案；仅传布局状态不自动开启交互。",
           "type": "TableColumnCustomization",
           "defaultValue": "—"
         },
@@ -6799,7 +6799,7 @@
         },
         {
           "name": "settingsLabel",
-          "description": "列设置面板使用的文本标签；默认使用字符串/数字 title，其他标题回退 key。",
+          "description": "列显隐面板使用的文本标签；默认使用字符串/数字 title，其他标题回退 key。",
           "type": "string",
           "defaultValue": "—"
         },

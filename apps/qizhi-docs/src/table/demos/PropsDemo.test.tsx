@@ -5,13 +5,20 @@ import PropsDemo from "./PropsDemo";
 const previewTable = () => screen.getByRole("table", { name: "属性预览表格" });
 
 const openSettings = () => {
-  fireEvent.click(screen.getByRole("button", { name: "列设置" }));
+  fireEvent.click(screen.getByRole("switch", { name: "列显隐" }));
+  fireEvent.click(screen.getByRole("button", { name: "列显隐" }));
 };
 
 describe("PropsDemo", () => {
   it("renders local model catalog data with the approved engineering defaults", () => {
     render(<PropsDemo />);
 
+    for (const label of ["边框", "悬浮高亮", "表头", "列调宽", "两行省略", "全文提示", "容器固定列断点"]) {
+      expect(screen.getByRole("switch", { name: label })).toBeChecked();
+    }
+    for (const label of ["单元格边框", "复选框", "加载中", "列移动", "列显隐", "自定义空态", "无数据"]) {
+      expect(screen.getByRole("switch", { name: label })).not.toBeChecked();
+    }
     const table = previewTable();
     expect(within(table).getByText("Qways-R1-Enterprise")).toBeInTheDocument();
     expect(within(table).getByText("0")).toBeInTheDocument();
@@ -22,22 +29,23 @@ describe("PropsDemo", () => {
     expect(screen.queryByText("试用")).not.toBeInTheDocument();
   });
 
-  it.each(["列移动", "列调宽", "列显隐"])(
+  it.each(["列移动", "列调宽"])(
     "allows %s to close without removing the visibility settings entry", (label) => {
     render(<PropsDemo />);
 
     openSettings();
+    if (label === "列移动") fireEvent.click(screen.getByRole("switch", { name: label }));
     fireEvent.click(screen.getByRole("switch", { name: label }));
     expect(screen.queryByRole("spinbutton")).toBeNull();
     if (label === "列移动") expect(screen.queryByRole("button", { name: /移动列/ })).toBeNull();
     if (label === "列调宽") expect(screen.queryByRole("separator")).toBeNull();
-    if (label === "列显隐") expect(screen.getByRole("checkbox", { name: "全选" })).toBeDisabled();
-    expect(screen.getByRole("button", { name: "列设置" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "列显隐" })).toBeInTheDocument();
   });
 
   it("keeps the controlled layout after the move capability is closed and restored", () => {
     render(<PropsDemo />);
 
+    fireEvent.click(screen.getByRole("switch", { name: "列移动" }));
     fireEvent.keyDown(screen.getByRole("button", { name: "移动列 说明" }), { key: "ArrowRight" });
     const headers = () => [...previewTable().querySelectorAll("th[data-column-key]")]
       .map((header) => header.getAttribute("data-column-key"));
@@ -48,12 +56,17 @@ describe("PropsDemo", () => {
     expect(headers().indexOf("status")).toBeLessThan(headers().indexOf("description"));
   });
 
-  it("allows the settings entry itself to close independently", () => {
+  it("shows the visibility entry only when visibility is enabled", () => {
     render(<PropsDemo />);
 
-    expect(screen.getByRole("button", { name: "列设置" })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("switch", { name: "列设置入口" }));
-    expect(screen.queryByRole("button", { name: "列设置" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "列显隐" })).toBeNull();
+    fireEvent.click(screen.getByRole("switch", { name: "列显隐" }));
+    expect(screen.getByRole("button", { name: "列显隐" })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("switch", { name: "列显隐" }));
+    expect(screen.queryByRole("button", { name: "列显隐" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("switch", { name: "列设置入口" })).toBeNull();
+    fireEvent.click(screen.getByRole("switch", { name: "列显隐" }));
+    expect(screen.getByRole("button", { name: "列显隐" })).toBeInTheDocument();
   });
 
   it("uses body loading without replacing the current model rows", () => {

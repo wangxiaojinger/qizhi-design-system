@@ -18,7 +18,7 @@ describe("ColumnSettings", () => {
     const callbacks = props();
     render(<ColumnSettings {...callbacks} />);
     const user = userEvent.setup();
-    await user.click(screen.getByRole("button", { name: "列设置" }));
+    await user.click(screen.getByRole("button", { name: "列显隐" }));
     expect(screen.queryByRole("spinbutton")).toBeNull();
     expect(screen.queryByRole("button", { name: /前移|后移|恢复默认/ })).toBeNull();
     expect(screen.getByRole("checkbox", { name: "全选" })).toHaveAttribute("aria-checked", "mixed");
@@ -31,7 +31,7 @@ describe("ColumnSettings", () => {
 
   it("shows read-only checkboxes when visibility changes are disabled", async () => {
     render(<ColumnSettings {...props()} visibility={false} />);
-    await userEvent.click(screen.getByRole("button", { name: "列设置" }));
+    await userEvent.click(screen.getByRole("button", { name: "列显隐" }));
     expect(screen.getAllByRole("checkbox").every((node) => (node as HTMLInputElement).disabled))
       .toBe(true);
   });
@@ -42,11 +42,11 @@ describe("ColumnSettings", () => {
       <ColumnSettings {...props()} />
     </Drawer>);
     const user = userEvent.setup();
-    const trigger = screen.getByRole("button", { name: "列设置" });
+    const trigger = screen.getByRole("button", { name: "列显隐" });
     await user.click(trigger);
     screen.getByRole("checkbox", { name: "状态" }).focus();
     await user.keyboard("{Escape}");
-    await waitFor(() => expect(screen.queryByRole("dialog", { name: "列设置" })).toBeNull());
+    await waitFor(() => expect(screen.queryByRole("dialog", { name: "列显隐" })).toBeNull());
     expect(onClose).not.toHaveBeenCalled();
     expect(trigger).toHaveFocus();
   });
@@ -54,9 +54,9 @@ describe("ColumnSettings", () => {
   it("supports an external toolbar slot", async () => {
     render(<ColumnSettings {...props()}
       renderTrigger={(trigger) => <div data-testid="toolbar">{trigger}</div>} />);
-    const trigger = screen.getByRole("button", { name: "列设置" });
+    const trigger = screen.getByRole("button", { name: "列显隐" });
     expect(screen.getByTestId("toolbar")).toContainElement(trigger);
     await userEvent.click(trigger);
-    expect(screen.getByRole("dialog", { name: "列设置" })).toBeVisible();
+    expect(screen.getByRole("dialog", { name: "列显隐" })).toBeVisible();
   });
 });

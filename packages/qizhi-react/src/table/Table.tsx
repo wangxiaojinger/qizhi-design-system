@@ -445,7 +445,7 @@ export function Table<RecordType extends object>({ columns: sourceColumns, dataS
       if (column.fixed) cell.style[column.fixed] = fixedEnabled ? `${fixedOffsets[index]}px` : "";
     });
   };
-  const settingsControl = custom.active && columnCustomization?.settings ? <ColumnSettings
+  const settingsControl = custom.active && columnCustomization?.visibility ? <ColumnSettings
     items={custom.state.columnOrder.map((key) => {
       const column = sourceColumns.find((item) => item.key === key)!;
       const cannotHide = column.hideable === false || protectedKeys.includes(key);

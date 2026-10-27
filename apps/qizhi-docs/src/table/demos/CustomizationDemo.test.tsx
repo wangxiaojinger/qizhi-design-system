@@ -82,7 +82,7 @@ describe("CustomizationDemo", () => {
       expect(screen.getByText("+1")).toBeVisible();
       expect(screen.queryByRole("switch")).not.toBeInTheDocument();
       expect(screen.queryByRole("button", { name: /试用/ })).not.toBeInTheDocument();
-      expect(screen.getByRole("button", { name: "列设置" })).toBeVisible();
+      expect(screen.getByRole("button", { name: "列显隐" })).toBeVisible();
       expect(setItem).not.toHaveBeenCalled();
       expect(removeItem).not.toHaveBeenCalled();
 

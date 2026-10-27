@@ -8,7 +8,7 @@ describe("Table docs", () => {
     render(<TableDocsIsland />);
     const props = document.querySelector<HTMLElement>("#table-props")!;
     const business = document.querySelector<HTMLElement>("#table-customization")!;
-    for (const label of ["列移动", "列调宽", "列显隐", "列设置入口"]) {
+    for (const label of ["边框", "悬浮高亮", "表头", "列调宽", "两行省略", "全文提示", "容器固定列断点"]) {
       expect(within(props).getByRole("switch", { name: label })).toBeChecked();
     }
     expect(within(props).queryByRole("switch", { name: "斑马纹" })).toBeNull();

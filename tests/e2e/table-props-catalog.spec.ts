@@ -5,6 +5,34 @@ test.beforeEach(async ({ page }) => {
   await expect(page.locator("#table-props").getByRole("table")).toBeVisible();
 });
 
+test("属性示例：推荐默认开关与列显隐入口联动", async ({ page }, testInfo) => {
+  const demo = page.locator("#table-props");
+  for (const label of ["边框", "悬浮高亮", "表头", "列调宽", "两行省略", "全文提示", "容器固定列断点"]) {
+    await expect(demo.getByRole("switch", { name: label, exact: true })).toBeChecked();
+  }
+  for (const label of ["单元格边框", "复选框", "加载中", "列移动", "列显隐", "自定义空态", "无数据"]) {
+    await expect(demo.getByRole("switch", { name: label, exact: true })).not.toBeChecked();
+  }
+  await expect(demo.getByRole("switch", { name: "列设置入口", exact: true })).toHaveCount(0);
+  const trigger = demo.getByRole("button", { name: "列显隐", exact: true });
+  const panel = page.getByRole("dialog", { name: "列显隐", exact: true });
+  await expect(trigger).toHaveCount(0);
+  await demo.screenshot({ path: testInfo.outputPath("recommended-defaults.png") });
+  const control = demo.getByRole("switch", { name: "列显隐", exact: true });
+  await control.click();
+  await trigger.click();
+  const description = panel.getByRole("checkbox", { name: "说明", exact: true });
+  await description.locator("xpath=ancestor::label").click();
+  await expect(description).not.toBeChecked();
+  await control.click();
+  await expect(trigger).toHaveCount(0);
+  await expect(panel).toHaveCount(0);
+  await expect(demo.getByRole("separator").first()).toBeVisible();
+  await control.click();
+  await trigger.click();
+  await expect(panel.getByRole("checkbox", { name: "说明", exact: true })).not.toBeChecked();
+});
+
 test("属性示例：排序表头在移动与调宽四组合下保持正确左内边距", async ({ page }, testInfo) => {
   const demo = page.locator("#table-props");
   const metrics = () => demo.getByRole("table").evaluate((table) => {
@@ -38,6 +66,8 @@ test("属性示例：排序表头在移动与调宽四组合下保持正确左�
 
 test("属性示例：模型目录、列能力组合、隐藏表头后保留手动布局", async ({ page }) => {
   const demo = page.locator("#table-props");
+  await demo.getByRole("switch", { name: "列移动", exact: true }).click();
+  await demo.getByRole("switch", { name: "列显隐", exact: true }).click();
   const table = demo.getByRole("table");
   await expect(table).toContainText("Qways");
   await expect(demo.getByRole("radiogroup", { name: "分页位置" })).toHaveCount(0);
@@ -53,8 +83,8 @@ test("属性示例：模型目录、列能力组合、隐藏表头后保留手�
   await expect(table.locator(".qizhi-table__text.is-rows-2").first()).toBeVisible();
   const header = table.locator("th[data-column-key]").first();
   const key = await header.getAttribute("data-column-key");
-  await demo.getByRole("button", { name: "列设置", exact: true }).click();
-  const panel = page.getByRole("dialog", { name: "列设置", exact: true });
+  await demo.getByRole("button", { name: "列显隐", exact: true }).click();
+  const panel = page.getByRole("dialog", { name: "列显隐", exact: true });
   await expect(panel.getByRole("spinbutton")).toHaveCount(0);
   await page.keyboard.press("Escape");
   const handle = header.getByRole("separator");
@@ -68,13 +98,13 @@ test("属性示例：模型目录、列能力组合、隐藏表头后保留手�
   expect(await actual()).toBeCloseTo(220, 0);
   await demo.getByRole("switch", { name: "表头", exact: true }).click();
   await expect(table.locator("thead")).toHaveCount(0);
-  await demo.getByRole("button", { name: "列设置", exact: true }).click();
+  await demo.getByRole("button", { name: "列显隐", exact: true }).click();
   await expect(panel).toBeVisible();
   await page.keyboard.press("Escape");
   await demo.getByRole("switch", { name: "表头", exact: true }).click();
   expect(await actual()).toBeCloseTo(220, 0);
-  await demo.getByRole("switch", { name: "列设置入口", exact: true }).click();
-  await expect(demo.getByRole("button", { name: "列设置", exact: true })).toHaveCount(0);
+  await demo.getByRole("switch", { name: "列显隐", exact: true }).click();
+  await expect(demo.getByRole("button", { name: "列显隐", exact: true })).toHaveCount(0);
   await expect(table.getByRole("button", { name: /移动列/ }).first()).toBeVisible();
   await demo.getByRole("switch", { name: "列移动", exact: true }).click();
   await expect(table.getByRole("button", { name: /移动列/ })).toHaveCount(0);

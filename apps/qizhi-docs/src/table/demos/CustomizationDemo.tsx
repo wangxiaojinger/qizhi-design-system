@@ -472,7 +472,6 @@ function ModelCatalogScopeDemo({ scope }: { scope: ModelCatalogScope }) {
           reorder: true,
           resize: true,
           visibility: true,
-          settings: true,
           renderSettings,
         }}
         columnLayout={layout}

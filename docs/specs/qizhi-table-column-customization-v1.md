@@ -25,13 +25,14 @@ interface TableColumnCustomization {
   reorder?: boolean;
   resize?: boolean;
   visibility?: boolean;
+  /** @deprecated 保留类型兼容，不再控制入口。 */
   settings?: boolean;
   renderSettings?: (trigger: ReactElement) => ReactNode;
   locale?: Partial<TableColumnCustomizationLocale>;
 }
 ```
 
-- `columnCustomization` 内四种交互均默认关闭，按需独立开启。`settings` 只提供显隐入口与面板，不重复提供移动／调宽操作；`visibility` 决定复选框是否可编辑。`renderSettings` 可通过 Portal 将完整入口放入已有工具栏。
+- `columnCustomization` 内 reorder、resize、visibility 三种交互默认关闭，按需独立开启。`visibility` 开启时显示“列显隐”按钮与面板，关闭时不显示入口。旧 `settings` 字段保留类型兼容，不再影响入口。`renderSettings` 可通过 Portal 将完整入口放入已有工具栏。
 - 传入 `columnLayout`、`defaultColumnLayout` 或 `columnCustomization` 中任一项才启用布局状态层。仅传状态时可以只读恢复布局，不会默认开启移动、调宽或显隐。
 - 所有源列 `key` 必须是唯一非空字符串；否则 Table 不启用列定制，按源列定义渲染。不得按下标生成或保存补充键。
 
@@ -52,7 +53,7 @@ interface TableColumnCustomization {
 
 ## 渲染与交互边界
 
-- 列设置面板只管理显隐：展示单行列名、复选框、全选及必需列说明，不提供列宽输入、前移／后移或整表恢复默认。不产生横向滚动；列数超出可用高度时仅纵向滚动。关闭 visibility 时复选框只读，不影响表头按 reorder／resize 启用移动和调宽。
+- 列设置面板只管理显隐：展示单行列名、复选框、全选及必需列说明，不提供列宽输入、前移／后移或整表恢复默认。不产生横向滚动；列数超出可用高度时仅纵向滚动。关闭 visibility 时隐藏整个入口，不影响表头按 reorder／resize 启用移动和调宽。
 - 面板使用内容固有宽度，按最长列名、复选框与必要间距自然撑开，不设置固定宽度或继承通用气泡标题的最小宽度。视口减去安全间距仅作为最大边界，不作为正常面板宽度。
 - 恢复整个布局由业务显式入口调用 defaultColumnLayout(columns) 并回传受控值；示例将入口放在开发配置区。切换显隐不能顺便重置列顺序或手动宽度。
 
@@ -79,7 +80,7 @@ const [layout, setLayout] = useState(() => defaultColumnLayout(columns));
   columns={columns}
   dataSource={rows}
   rowKey="id"
-  columnCustomization={{ reorder: true, resize: true, visibility: true, settings: true }}
+  columnCustomization={{ reorder: true, resize: true, visibility: true }}
   columnLayout={layout}
   onColumnLayoutChange={(next) => setLayout(next)}
 />

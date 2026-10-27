@@ -26,6 +26,7 @@ export interface TableColumnCustomization {
   reorder?: boolean;
   resize?: boolean;
   visibility?: boolean;
+  /** @deprecated 兼容旧配置；入口现在由 visibility 控制，此字段不再影响显示。 */
   settings?: boolean;
   /** 接收完整设置入口，可通过 Portal 放到业务已有工具栏。 */
   renderSettings?: (trigger: ReactElement) => ReactNode;

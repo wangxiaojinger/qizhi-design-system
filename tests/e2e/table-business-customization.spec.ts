@@ -14,8 +14,8 @@ test("模型目录：布局保存、刷新恢复、账号隔离与重置，业�
   const handle = table.locator('th[data-column-key="name"]').getByRole("separator");
   await handle.press("Home");
   for (let step = 0; step < 5; step++) await handle.press("ArrowRight");
-  await demo.getByRole("button", { name: "列设置", exact: true }).click();
-  const panel = page.getByRole("dialog", { name: "列设置", exact: true });
+  await demo.getByRole("button", { name: "列显隐", exact: true }).click();
+  const panel = page.getByRole("dialog", { name: "列显隐", exact: true });
   await expect(panel.getByRole("spinbutton")).toHaveCount(0);
   await panel.getByRole("checkbox", { name: "供应商", exact: true }).locator("xpath=ancestor::label").click();
   await page.keyboard.press("Escape");
@@ -55,8 +55,8 @@ test("模型目录：保存失败不撤销显示，损坏缓存安全回退", as
   });
   await page.goto("/#table-customization");
   const demo = page.locator("#table-customization");
-  await demo.getByRole("button", { name: "列设置", exact: true }).click();
-  await page.getByRole("dialog", { name: "列设置", exact: true })
+  await demo.getByRole("button", { name: "列显隐", exact: true }).click();
+  await page.getByRole("dialog", { name: "列显隐", exact: true })
     .getByRole("checkbox", { name: "供应商", exact: true }).locator("xpath=ancestor::label").click();
   await page.keyboard.press("Escape");
   await expect(demo.locator('th[data-column-key="provider"]')).toHaveCount(0);

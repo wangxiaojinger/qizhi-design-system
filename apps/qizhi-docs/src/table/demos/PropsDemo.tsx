@@ -39,14 +39,14 @@ const switches = [
   ["border", "边框"], ["borderCell", "单元格边框"], ["hover", "悬浮高亮"],
   ["checkbox", "复选框"], ["loading", "加载中"], ["showHeader", "表头"],
   ["reorder", "列移动"], ["resize", "列调宽"], ["visibility", "列显隐"],
-  ["settings", "列设置入口"], ["twoLines", "两行省略"], ["tooltip", "全文提示"],
+  ["twoLines", "两行省略"], ["tooltip", "全文提示"],
   ["breakpoint", "容器固定列断点"], ["customEmpty", "自定义空态"], ["empty", "无数据"],
 ] as const;
 
 export default function PropsDemo() {
   const [props, setProps] = useState({
-    border: true, borderCell: false, hover: true, checkbox: true, loading: false,
-    showHeader: true, reorder: true, resize: true, visibility: true, settings: true,
+    border: true, borderCell: false, hover: true, checkbox: false, loading: false,
+    showHeader: true, reorder: false, resize: true, visibility: false,
     twoLines: true, tooltip: true, breakpoint: true, customEmpty: false, empty: false,
   });
   const [size, setSize] = useState<TableSize>("default");
@@ -150,7 +150,7 @@ export default function PropsDemo() {
           fixedBreakpoint={props.breakpoint ? 640 : undefined}
           columnCustomization={{
             reorder: props.reorder, resize: props.resize,
-            visibility: props.visibility, settings: props.settings, renderSettings,
+            visibility: props.visibility, renderSettings,
           }}
           columnLayout={layout}
           onColumnLayoutChange={(next, meta) => {
