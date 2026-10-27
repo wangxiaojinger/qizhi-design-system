@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "status": "passed",
-  "sourceFingerprint": "sha256:51a63a4fd4ea2202d7f1aa395d7c1633c8f7a2a1282e0daca1422ab78f494264",
+  "sourceFingerprint": "sha256:f8f86f7ad3406e43a85177d388f891c89d4cc35eb7ed08d3328c0dd2bcfa2984",
   "root": ".",
   "exclusions": [
     ".git/**",
@@ -10,26 +10,26 @@
     "assets/remixicon/**"
   ],
   "summary": {
-    "files": 137,
+    "files": 140,
     "unreferencedFiles": 1,
-    "findings": 3004,
+    "findings": 3021,
     "byScope": {
-      "docs-runtime": 502,
+      "docs-runtime": 504,
       "smoke-runtime": 9,
       "generated-runtime": 81,
-      "component-runtime": 814,
+      "component-runtime": 829,
       "legacy-runtime": 1598
     },
     "byCategory": {
-      "spacing": 2349,
-      "color": 438,
-      "layer": 92,
-      "shadow": 125
+      "spacing": 2360,
+      "color": 440,
+      "layer": 94,
+      "shadow": 127
     },
     "byClassification": {
-      "review-required": 1031,
-      "theme-token-candidate": 1524,
-      "structural-constant": 449
+      "review-required": 1037,
+      "theme-token-candidate": 1534,
+      "structural-constant": 450
     }
   },
   "files": [
@@ -156,7 +156,10 @@
     "packages/qizhi-react/src/statistic/statistic.css",
     "packages/qizhi-react/src/steps/steps.css",
     "packages/qizhi-react/src/switch/switch.css",
+    "packages/qizhi-react/src/table/columnResizeHandle.css",
+    "packages/qizhi-react/src/table/columnSettings.css",
     "packages/qizhi-react/src/table/table.css",
+    "packages/qizhi-react/src/table/tableCellText.css",
     "packages/qizhi-react/src/tabs/tabs.css",
     "packages/qizhi-react/src/tag/tag.css",
     "packages/qizhi-react/src/task-overview/taskOverview.css",
@@ -4964,10 +4967,10 @@
       "reason": "non-component surface or ambiguous design responsibility"
     },
     {
-      "id": "spacing:apps/qizhi-docs/src/table/tableDocs.css:6:3:margin-bottom",
+      "id": "spacing:apps/qizhi-docs/src/table/tableDocs.css:17:3:margin-bottom",
       "scope": "docs-runtime",
       "file": "apps/qizhi-docs/src/table/tableDocs.css",
-      "line": 6,
+      "line": 17,
       "column": 3,
       "category": "spacing",
       "property": "margin-bottom",
@@ -4976,10 +4979,10 @@
       "reason": "non-component surface or ambiguous design responsibility"
     },
     {
-      "id": "spacing:apps/qizhi-docs/src/table/tableDocs.css:20:3:gap",
+      "id": "spacing:apps/qizhi-docs/src/table/tableDocs.css:31:3:gap",
       "scope": "docs-runtime",
       "file": "apps/qizhi-docs/src/table/tableDocs.css",
-      "line": 20,
+      "line": 31,
       "column": 3,
       "category": "spacing",
       "property": "gap",
@@ -4988,10 +4991,10 @@
       "reason": "non-component surface or ambiguous design responsibility"
     },
     {
-      "id": "spacing:apps/qizhi-docs/src/table/tableDocs.css:28:3:gap",
+      "id": "spacing:apps/qizhi-docs/src/table/tableDocs.css:39:3:gap",
       "scope": "docs-runtime",
       "file": "apps/qizhi-docs/src/table/tableDocs.css",
-      "line": 28,
+      "line": 39,
       "column": 3,
       "category": "spacing",
       "property": "gap",
@@ -5000,10 +5003,10 @@
       "reason": "non-component surface or ambiguous design responsibility"
     },
     {
-      "id": "spacing:apps/qizhi-docs/src/table/tableDocs.css:34:3:gap",
+      "id": "spacing:apps/qizhi-docs/src/table/tableDocs.css:45:3:gap",
       "scope": "docs-runtime",
       "file": "apps/qizhi-docs/src/table/tableDocs.css",
-      "line": 34,
+      "line": 45,
       "column": 3,
       "category": "spacing",
       "property": "gap",
@@ -5012,10 +5015,34 @@
       "reason": "non-component surface or ambiguous design responsibility"
     },
     {
-      "id": "spacing:apps/qizhi-docs/src/table/tableDocs.css:39:5:padding-inline",
+      "id": "spacing:apps/qizhi-docs/src/table/tableDocs.css:51:3:padding",
       "scope": "docs-runtime",
       "file": "apps/qizhi-docs/src/table/tableDocs.css",
-      "line": 39,
+      "line": 51,
+      "column": 3,
+      "category": "spacing",
+      "property": "padding",
+      "value": "12px",
+      "classification": "review-required",
+      "reason": "non-component surface or ambiguous design responsibility"
+    },
+    {
+      "id": "spacing:apps/qizhi-docs/src/table/tableDocs.css:56:3:padding-inline",
+      "scope": "docs-runtime",
+      "file": "apps/qizhi-docs/src/table/tableDocs.css",
+      "line": 56,
+      "column": 3,
+      "category": "spacing",
+      "property": "padding-inline",
+      "value": "4px",
+      "classification": "review-required",
+      "reason": "non-component surface or ambiguous design responsibility"
+    },
+    {
+      "id": "spacing:apps/qizhi-docs/src/table/tableDocs.css:63:5:padding-inline",
+      "scope": "docs-runtime",
+      "file": "apps/qizhi-docs/src/table/tableDocs.css",
+      "line": 63,
       "column": 5,
       "category": "spacing",
       "property": "padding-inline",
@@ -14456,6 +14483,102 @@
       "reason": "positional or geometric offset"
     },
     {
+      "id": "layer:packages/qizhi-react/src/table/columnResizeHandle.css:5:3:z-index",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/table/columnResizeHandle.css",
+      "line": 5,
+      "column": 3,
+      "category": "layer",
+      "property": "z-index",
+      "value": "1",
+      "classification": "structural-constant",
+      "reason": "local stacking order"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/table/columnSettings.css:9:3:padding",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/table/columnSettings.css",
+      "line": 9,
+      "column": 3,
+      "category": "spacing",
+      "property": "padding",
+      "value": "12px 16px",
+      "classification": "theme-token-candidate",
+      "reason": "padding participates in component density"
+    },
+    {
+      "id": "color:packages/qizhi-react/src/table/columnSettings.css:10:3:border-bottom",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/table/columnSettings.css",
+      "line": 10,
+      "column": 3,
+      "category": "color",
+      "property": "border-bottom",
+      "value": "1px solid var(--component-table-border, var(--color-border-1, #f2f3f5))",
+      "classification": "review-required",
+      "reason": "mixed color literal and CSS variable"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/table/columnSettings.css:14:3:gap",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/table/columnSettings.css",
+      "line": 14,
+      "column": 3,
+      "category": "spacing",
+      "property": "gap",
+      "value": "4px",
+      "classification": "theme-token-candidate",
+      "reason": "gap participates in component density"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/table/columnSettings.css:16:3:padding",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/table/columnSettings.css",
+      "line": 16,
+      "column": 3,
+      "category": "spacing",
+      "property": "padding",
+      "value": "8px 12px",
+      "classification": "theme-token-candidate",
+      "reason": "padding participates in component density"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/table/columnSettings.css:21:52:padding",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/table/columnSettings.css",
+      "line": 21,
+      "column": 52,
+      "category": "spacing",
+      "property": "padding",
+      "value": "8px 4px",
+      "classification": "theme-token-candidate",
+      "reason": "padding participates in component density"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/table/columnSettings.css:22:56:gap",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/table/columnSettings.css",
+      "line": 22,
+      "column": 56,
+      "category": "spacing",
+      "property": "gap",
+      "value": "2px",
+      "classification": "theme-token-candidate",
+      "reason": "gap participates in component density"
+    },
+    {
+      "id": "color:packages/qizhi-react/src/table/columnSettings.css:28:3:color",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/table/columnSettings.css",
+      "line": 28,
+      "column": 3,
+      "category": "color",
+      "property": "color",
+      "value": "var(--color-text-3, #86909c)",
+      "classification": "review-required",
+      "reason": "mixed color literal and CSS variable"
+    },
+    {
       "id": "color:packages/qizhi-react/src/table/table.css:3:99:background",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/table/table.css",
@@ -14708,10 +14831,10 @@
       "reason": "gap participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/table/table.css:29:31:padding",
+      "id": "spacing:packages/qizhi-react/src/table/table.css:33:31:padding",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/table/table.css",
-      "line": 29,
+      "line": 33,
       "column": 31,
       "category": "spacing",
       "property": "padding",
@@ -14720,10 +14843,10 @@
       "reason": "padding participates in component density"
     },
     {
-      "id": "layer:packages/qizhi-react/src/table/table.css:30:58:z-index",
+      "id": "layer:packages/qizhi-react/src/table/table.css:34:58:z-index",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/table/table.css",
-      "line": 30,
+      "line": 34,
       "column": 58,
       "category": "layer",
       "property": "z-index",
@@ -14732,10 +14855,10 @@
       "reason": "mixed layer literal and CSS variable"
     },
     {
-      "id": "layer:packages/qizhi-react/src/table/table.css:31:60:z-index",
+      "id": "layer:packages/qizhi-react/src/table/table.css:35:60:z-index",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/table/table.css",
-      "line": 31,
+      "line": 35,
       "column": 60,
       "category": "layer",
       "property": "z-index",
@@ -14744,10 +14867,10 @@
       "reason": "mixed layer literal and CSS variable"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/table/table.css:32:105:bottom",
+      "id": "spacing:packages/qizhi-react/src/table/table.css:36:105:bottom",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/table/table.css",
-      "line": 32,
+      "line": 36,
       "column": 105,
       "category": "spacing",
       "property": "bottom",
@@ -14756,10 +14879,10 @@
       "reason": "positional or geometric offset"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/table/table.css:33:61:right",
+      "id": "spacing:packages/qizhi-react/src/table/table.css:37:61:right",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/table/table.css",
-      "line": 33,
+      "line": 37,
       "column": 61,
       "category": "spacing",
       "property": "right",
@@ -14768,10 +14891,10 @@
       "reason": "positional or geometric offset"
     },
     {
-      "id": "shadow:packages/qizhi-react/src/table/table.css:33:75:box-shadow",
+      "id": "shadow:packages/qizhi-react/src/table/table.css:37:75:box-shadow",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/table/table.css",
-      "line": 33,
+      "line": 37,
       "column": 75,
       "category": "shadow",
       "property": "box-shadow",
@@ -14780,10 +14903,10 @@
       "reason": "unmediated shadow responsibility"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/table/table.css:34:63:left",
+      "id": "spacing:packages/qizhi-react/src/table/table.css:38:63:left",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/table/table.css",
-      "line": 34,
+      "line": 38,
       "column": 63,
       "category": "spacing",
       "property": "left",
@@ -14792,10 +14915,10 @@
       "reason": "positional or geometric offset"
     },
     {
-      "id": "shadow:packages/qizhi-react/src/table/table.css:34:76:box-shadow",
+      "id": "shadow:packages/qizhi-react/src/table/table.css:38:76:box-shadow",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/table/table.css",
-      "line": 34,
+      "line": 38,
       "column": 76,
       "category": "shadow",
       "property": "box-shadow",
@@ -14804,10 +14927,10 @@
       "reason": "unmediated shadow responsibility"
     },
     {
-      "id": "color:packages/qizhi-react/src/table/table.css:35:91:background",
+      "id": "color:packages/qizhi-react/src/table/table.css:39:91:background",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/table/table.css",
-      "line": 35,
+      "line": 39,
       "column": 91,
       "category": "color",
       "property": "background",
@@ -14816,10 +14939,22 @@
       "reason": "unmediated color responsibility"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/table/table.css:36:43:padding-top",
+      "id": "layer:packages/qizhi-react/src/table/table.css:40:44:z-index",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/table/table.css",
-      "line": 36,
+      "line": 40,
+      "column": 44,
+      "category": "layer",
+      "property": "z-index",
+      "value": "var(--component-table-fixed-z-index, 2)",
+      "classification": "theme-token-candidate",
+      "reason": "mixed layer literal and CSS variable"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/table/table.css:45:43:padding-top",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/table/table.css",
+      "line": 45,
       "column": 43,
       "category": "spacing",
       "property": "padding-top",
@@ -14828,13 +14963,85 @@
       "reason": "padding-top participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/table/table.css:44:104:padding-inline",
+      "id": "spacing:packages/qizhi-react/src/table/table.css:46:79:padding-bottom",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/table/table.css",
-      "line": 44,
-      "column": 104,
+      "line": 46,
+      "column": 79,
+      "category": "spacing",
+      "property": "padding-bottom",
+      "value": "8px",
+      "classification": "theme-token-candidate",
+      "reason": "padding-bottom participates in component density"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/table/table.css:47:67:gap",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/table/table.css",
+      "line": 47,
+      "column": 67,
+      "category": "spacing",
+      "property": "gap",
+      "value": "4px",
+      "classification": "theme-token-candidate",
+      "reason": "gap participates in component density"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/table/table.css:51:58:margin-inline-start",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/table/table.css",
+      "line": 51,
+      "column": 58,
+      "category": "spacing",
+      "property": "margin-inline-start",
+      "value": "var(--component-table-cell-padding-inline, var(--space-16, 16px))",
+      "classification": "review-required",
+      "reason": "mixed spacing literal and CSS variable"
+    },
+    {
+      "id": "shadow:packages/qizhi-react/src/table/table.css:53:47:box-shadow",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/table/table.css",
+      "line": 53,
+      "column": 47,
+      "category": "shadow",
+      "property": "box-shadow",
+      "value": "inset 3px 0 rgb(var(--primary-6))",
+      "classification": "theme-token-candidate",
+      "reason": "mixed shadow literal and CSS variable"
+    },
+    {
+      "id": "shadow:packages/qizhi-react/src/table/table.css:54:46:box-shadow",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/table/table.css",
+      "line": 54,
+      "column": 46,
+      "category": "shadow",
+      "property": "box-shadow",
+      "value": "inset -3px 0 rgb(var(--primary-6))",
+      "classification": "theme-token-candidate",
+      "reason": "mixed shadow literal and CSS variable"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/table/table.css:63:78:padding-inline",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/table/table.css",
+      "line": 63,
+      "column": 78,
       "category": "spacing",
       "property": "padding-inline",
+      "value": "var(--component-table-cell-padding-inline-compact, var(--space-12, 12px))",
+      "classification": "review-required",
+      "reason": "mixed spacing literal and CSS variable"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/table/table.css:64:60:margin-inline-start",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/table/table.css",
+      "line": 64,
+      "column": 60,
+      "category": "spacing",
+      "property": "margin-inline-start",
       "value": "var(--component-table-cell-padding-inline-compact, var(--space-12, 12px))",
       "classification": "review-required",
       "reason": "mixed spacing literal and CSS variable"

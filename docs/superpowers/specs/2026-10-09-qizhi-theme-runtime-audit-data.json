@@ -1,9 +1,9 @@
 {
   "schemaVersion": 2,
   "status": "passed",
-  "sourceFingerprint": "sha256:2444a0f5252ab3e49fbaf4d2fe0a6993f779cdaa3e07b5eeb18adaf4845c0f30",
-  "serverMode": "external",
-  "baseURL": "http://127.0.0.1:5179",
+  "sourceFingerprint": "sha256:cce4d17b68e910f6ba463eba71c85b7c193195ae691cfa80e38389776e168e4c",
+  "serverMode": "self-started",
+  "baseURL": "http://127.0.0.1:50936",
   "matrix": {
     "button": {
       "portal": false,
