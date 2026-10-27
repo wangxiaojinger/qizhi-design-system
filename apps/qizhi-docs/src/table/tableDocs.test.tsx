@@ -8,7 +8,7 @@ describe("Table docs", () => {
     render(<TableDocsIsland />);
     const props = document.querySelector<HTMLElement>("#table-props")!;
     const business = document.querySelector<HTMLElement>("#table-customization")!;
-    for (const label of ["边框", "悬浮高亮", "表头", "列调宽", "两行省略", "全文提示", "容器固定列断点"]) {
+    for (const label of ["悬浮高亮", "表头", "两行省略", "全文提示", "容器固定列断点"]) {
       expect(within(props).getByRole("switch", { name: label })).toBeChecked();
     }
     expect(within(props).queryByRole("switch", { name: "斑马纹" })).toBeNull();
@@ -23,7 +23,7 @@ describe("Table docs", () => {
     expect(within(enhanced).getByText("-")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("switch", { name: "数据区加载" }));
     expect(enhanced.closest(".qizhi-table")).toHaveAttribute("aria-busy", "true");
-    expect(within(enhanced).getByRole("columnheader", { name: "名称" })).toBeInTheDocument();
+    expect(within(enhanced).getByRole("columnheader", { name: /^名称/ })).toBeInTheDocument();
     expect(tableApi.map((item) => item.name)).toEqual(expect.arrayContaining([
       "emptyCell", "emptyPadding", "fixedBreakpoint",
     ]));
@@ -156,7 +156,7 @@ describe("Table docs", () => {
     render(<TableDocsIsland />);
     expect(tableApi.map((item) => item.name)).toEqual(expect.arrayContaining(["columns", "dataSource", "rowKey", "size", "border", "borderCell", "hover", "stripe", "showHeader", "loading", "scrollX", "rowSelection", "expandable", "childrenColumnName", "pagination", "empty", "draggable", "showSorterTooltip", "onSortChange", "onRowOrderChange", "tableLayout", "layoutMode"]));
     expect(tableColumnApi.map((item) => item.name)).toEqual(expect.arrayContaining(["key", "title", "dataIndex", "width", "fixed", "ellipsis", "render", "sorter", "sortDirections", "defaultSortOrder", "showSorterTooltip", "onCell", "minWidth", "maxWidth", "grow", "align"]));
-    expect(tableColumnApi.find((item) => item.name === "ellipsis")?.defaultValue).toBe("false");
+    expect(tableColumnApi.find((item) => item.name === "ellipsis")?.defaultValue).toBe("继承 Table.ellipsis");
     expect(tableApi.find((item) => item.name === "border")?.defaultValue).toBe("false");
     expect(tableApi.find((item) => item.name === "showSorterTooltip")?.defaultValue).toBe("true");
     expect(tableApiDefaultBehaviors.some((item) => item.includes("Tag 默认中性色"))).toBe(true);

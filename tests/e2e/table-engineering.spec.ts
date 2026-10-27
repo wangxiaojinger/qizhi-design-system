@@ -16,7 +16,14 @@ test("工程表格：确定列宽、文本全文、局部加载和容器固定�
   expect(original[5]).toBe(88);
   const scroller = table.locator("..");
   const size = await scroller.evaluate((node) => ({ client: node.clientWidth, scroll: node.scrollWidth }));
-  if (size.client >= 684) expect(Math.abs(original.reduce((a, b) => a + b, 0) - size.client)).toBeLessThanOrEqual(1);
+  const frame = await table.evaluate((node) => {
+    const style = getComputedStyle(node);
+    return parseFloat(style.borderLeftWidth) + parseFloat(style.borderRightWidth);
+  });
+  if (size.client >= 684 + frame) {
+    expect(Math.abs(original.reduce((a, b) => a + b, 0) + frame - size.client)).toBeLessThanOrEqual(1);
+    expect(size.scroll).toBeLessThanOrEqual(size.client + 1);
+  }
   else expect(size.scroll).toBeGreaterThan(size.client);
   await scroller.evaluate((node) => { node.scrollLeft = node.scrollWidth; });
   await table.getByRole("button", { name: "Open", exact: true }).first().click();
@@ -28,7 +35,7 @@ test("工程表格：确定列宽、文本全文、局部加载和容器固定�
   // pointer. End that hover before the separate keyboard-focus assertions.
   await page.mouse.move(0, 0);
   await expect(page.getByRole("tooltip")).toHaveCount(0);
-  const leaf = table.locator("tbody .qizhi-table__text").first();
+  const leaf = table.locator('tbody td[data-column-key="name"] .qizhi-table__text').first();
   await expect(leaf).toHaveAttribute("tabindex", "0");
   const lineBox = await leaf.evaluate((node) => {
     const box = node.getBoundingClientRect();
@@ -60,7 +67,7 @@ test("工程表格：确定列宽、文本全文、局部加载和容器固定�
   await expect(page.getByRole("tooltip")).toHaveCount(0);
   expect(await getWidths()).toEqual(original);
   await page.getByRole("button", { name: "切换语言", exact: true }).click();
-  await expect(table.getByRole("columnheader", { name: "Name", exact: true })).toBeVisible();
+  await expect(table.getByRole("columnheader", { name: /^Name/ })).toBeVisible();
   expect(await getWidths()).toEqual(original);
   await page.getByRole("button", { name: "切换加载", exact: true }).click();
   const overlay = page.locator("#main [role=status]");
@@ -92,7 +99,8 @@ test("工程表格：确定列宽、文本全文、局部加载和容器固定�
   await page.getByRole("button", { name: "切换表头", exact: true }).click();
   await expect(table.locator("thead")).toHaveCount(0);
   const top = await overlay.evaluate((node) => Number.parseFloat(getComputedStyle(node).top));
-  expect(top).toBe(0);
+  const bodyTop = await table.evaluate((node) => (node as HTMLTableElement).tBodies[0].getBoundingClientRect().top - node.closest(".qizhi-table")!.getBoundingClientRect().top);
+  expect(top).toBeCloseTo(bodyTop, 0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1)).toBe(true);
   await page.screenshot({ path: testInfo.outputPath("engineering.png"), fullPage: true });
   expect(errors).toEqual([]);
@@ -118,7 +126,7 @@ test("工程表格：body 挂载的弹窗与抽屉不依赖页面祖先", async 
     const geometry = await table.locator("..").evaluate((node) => ({ width: node.clientWidth, viewport: innerWidth }));
     expect(geometry.width).toBeLessThanOrEqual(geometry.viewport);
     await expect.poll(async () => table.locator("thead .is-fixed-left").count()).toBe(geometry.width <= 640 ? 0 : 2);
-    const text = table.locator("tbody .qizhi-table__text").first();
+    const text = table.locator('tbody td[data-column-key="name"] .qizhi-table__text').first();
     await text.focus();
     await expect(page.getByRole("tooltip")).toBeVisible();
     await expect(page.getByRole("tooltip")).toHaveCSS("opacity", "1");
@@ -151,7 +159,11 @@ test("1920 宽屏保持名称说明上限、操作紧凑并分摊剩余空间", 
   expect(columns[2]).toBe(320);
   expect(columns[5]).toBe(88);
   const available = await table.locator("..").evaluate((node) => node.clientWidth);
-  expect(Math.abs(columns.reduce((a, b) => a + b, 0) - available)).toBeLessThanOrEqual(1);
+  const frame = await table.evaluate((node) => {
+    const style = getComputedStyle(node);
+    return parseFloat(style.borderLeftWidth) + parseFloat(style.borderRightWidth);
+  });
+  expect(Math.abs(columns.reduce((a, b) => a + b, 0) + frame - available)).toBeLessThanOrEqual(1);
   expect(columns[3]).toBeCloseTo(columns[4], 1);
   await page.screenshot({ path: testInfo.outputPath("wide-1920.png"), fullPage: true });
 });

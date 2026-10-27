@@ -39,8 +39,8 @@ describe("Table column customization integration", () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it("renders no customization controls when not enabled", () => {
-    render(<Table columns={columns} dataSource={rows} rowKey="id" />);
+  it("renders no customization controls when explicitly disabled", () => {
+    render(<Table columns={columns} dataSource={rows} rowKey="id" columnCustomization={{ resize: false }} />);
     expect(screen.queryByRole("button", { name: "列显隐" })).not.toBeInTheDocument();
     expect(screen.queryByRole("separator")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /移动列/ })).not.toBeInTheDocument();

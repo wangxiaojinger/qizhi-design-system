@@ -23,8 +23,11 @@ export interface TableColumnCustomizationLocale {
   minimumVisible: string;
 }
 export interface TableColumnCustomization {
+  /** 默认false。 */
   reorder?: boolean;
+  /** 默认false，true按需开启调宽；其余字段独立合并。 */
   resize?: boolean;
+  /** 默认false；开启后显示列显隐入口。 */
   visibility?: boolean;
   /** @deprecated 兼容旧配置；入口现在由 visibility 控制，此字段不再影响显示。 */
   settings?: boolean;

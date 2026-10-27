@@ -45,8 +45,8 @@ const switches = [
 
 export default function PropsDemo() {
   const [props, setProps] = useState({
-    border: true, borderCell: false, hover: true, checkbox: false, loading: false,
-    showHeader: true, reorder: false, resize: true, visibility: false,
+    border: false, borderCell: false, hover: true, checkbox: false, loading: false,
+    showHeader: true, reorder: false, resize: false, visibility: false,
     twoLines: true, tooltip: true, breakpoint: true, customEmpty: false, empty: false,
   });
   const [size, setSize] = useState<TableSize>("default");
@@ -143,11 +143,10 @@ export default function PropsDemo() {
           borderCell={props.borderCell}
           hover={props.hover}
           loading={{ spinning: props.loading, scope: "body", tip: "模型加载中" }}
+          ellipsis={props.twoLines ? { rows: 2, tooltip: props.tooltip } : false}
           showHeader={props.showHeader}
-          emptyPadding={36}
-          emptyCell="-"
           empty={props.customEmpty ? <Empty description="暂无匹配的模型" /> : undefined}
-          fixedBreakpoint={props.breakpoint ? 640 : undefined}
+          fixedBreakpoint={props.breakpoint ? 640 : false}
           columnCustomization={{
             reorder: props.reorder, resize: props.resize,
             visibility: props.visibility, renderSettings,

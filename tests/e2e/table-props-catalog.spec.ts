@@ -7,10 +7,10 @@ test.beforeEach(async ({ page }) => {
 
 test("属性示例：推荐默认开关与列显隐入口联动", async ({ page }, testInfo) => {
   const demo = page.locator("#table-props");
-  for (const label of ["边框", "悬浮高亮", "表头", "列调宽", "两行省略", "全文提示", "容器固定列断点"]) {
+  for (const label of ["悬浮高亮", "表头", "两行省略", "全文提示", "容器固定列断点"]) {
     await expect(demo.getByRole("switch", { name: label, exact: true })).toBeChecked();
   }
-  for (const label of ["单元格边框", "复选框", "加载中", "列移动", "列显隐", "自定义空态", "无数据"]) {
+  for (const label of ["边框", "列调宽", "单元格边框", "复选框", "加载中", "列移动", "列显隐", "自定义空态", "无数据"]) {
     await expect(demo.getByRole("switch", { name: label, exact: true })).not.toBeChecked();
   }
   await expect(demo.getByRole("switch", { name: "列设置入口", exact: true })).toHaveCount(0);
@@ -27,7 +27,7 @@ test("属性示例：推荐默认开关与列显隐入口联动", async ({ page 
   await control.click();
   await expect(trigger).toHaveCount(0);
   await expect(panel).toHaveCount(0);
-  await expect(demo.getByRole("separator").first()).toBeVisible();
+  await expect(demo.getByRole("separator")).toHaveCount(0);
   await control.click();
   await trigger.click();
   await expect(panel.getByRole("checkbox", { name: "说明", exact: true })).not.toBeChecked();
@@ -66,6 +66,7 @@ test("属性示例：排序表头在移动与调宽四组合下保持正确左�
 
 test("属性示例：模型目录、列能力组合、隐藏表头后保留手动布局", async ({ page }) => {
   const demo = page.locator("#table-props");
+  await demo.getByRole("switch", { name: "列调宽", exact: true }).click();
   await demo.getByRole("switch", { name: "列移动", exact: true }).click();
   await demo.getByRole("switch", { name: "列显隐", exact: true }).click();
   const table = demo.getByRole("table");

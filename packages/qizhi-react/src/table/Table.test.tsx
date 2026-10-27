@@ -37,14 +37,14 @@ describe("Table", () => {
     rerender(<Table rowKey="id" columns={[{ ...columns[0], minWidth: 200 }]} dataSource={data} tableLayout="auto" />);
     expect(container.querySelector("col")).toHaveStyle({ minWidth: "200px" });
   });
-  it("keeps the default table outline-free like the legacy specification", () => {
-    const { container } = render(<Table rowKey="id" columns={columns} dataSource={data} />);
+  it("allows explicitly opting out of the default border", () => {
+    const { container } = render(<Table rowKey="id" columns={columns} dataSource={data} border={false} />);
     expect(container.querySelector(".qizhi-table")).not.toHaveClass("is-bordered");
   });
 
-  it("wraps cell content by default and marks only ellipsis columns", () => {
+  it("respects explicit natural wrapping and legacy single-line ellipsis", () => {
     const contentColumns: TableColumn<Row>[] = [
-      { key: "name", title: "姓名", dataIndex: "name" },
+      { key: "name", title: "姓名", dataIndex: "name", ellipsis: false },
       { key: "salary", title: "薪水", dataIndex: "salary", ellipsis: true },
     ];
     const { container } = render(
@@ -155,7 +155,7 @@ describe("Table", () => {
       { key: "name", title: "姓名", dataIndex: "name", fixed: "left" },
       { key: "salary", title: "薪水", dataIndex: "salary", fixed: "right" },
     ];
-    const { container } = render(<Table rowKey="id" columns={fixedColumns} dataSource={data} scrollX={600} />);
+    const { container } = render(<Table rowKey="id" columns={fixedColumns} dataSource={data} scrollX={600} fixedBreakpoint={false} />);
     const table = container.querySelector(".qizhi-table")!;
     const scroller = container.querySelector(".qizhi-table__scroll")!;
     expect(table).not.toHaveClass("has-left-fixed-shadow", "has-right-fixed-shadow");

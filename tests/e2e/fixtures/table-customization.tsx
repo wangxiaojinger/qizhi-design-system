@@ -30,7 +30,7 @@ function App() {
   ];
   const automatic = mode === "auto" ? columns.slice(0, 3).map((col, index) => ({ ...col, fixed: undefined, minWidth: undefined, maxWidth: undefined, width: index === 0 ? "25%" : undefined })) : columns;
   const data = longText ? rows.map((row) => ({ ...row, b: "UnbrokenModelIdentifier".repeat(8) })) : rows;
-  const table = (label: string) => <Table aria-label={label} rowKey="id" columns={automatic} dataSource={data}
+  const table = (label: string) => <Table fixedBreakpoint={false} aria-label={label} rowKey="id" columns={automatic} dataSource={data}
     layoutMode={mode === "auto" ? "fill" : "compact"} tableLayout={mode === "auto" ? "auto" : "fixed"}
     columnCustomization={{ resize: true, reorder: true, visibility: true, settings: true }}
     columnLayout={mode === "reject" ? initial : layout}

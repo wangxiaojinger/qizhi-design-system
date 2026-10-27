@@ -19,7 +19,7 @@ export type TableColumnEllipsis = boolean | {
 };
 export interface TableLoadingConfig {
   spinning: boolean;
-  /** 默认 table，body 仅遮罩数据区并保留当前数据。 */
+  /** 默认 body，仅遮罩数据区并保留当前数据；table遮罩全表。 */
   scope?: "table" | "body";
   tip?: ReactNode;
 }
@@ -84,20 +84,24 @@ export interface TableProps<RecordType extends object> extends Omit<HTMLAttribut
   dataSource: RecordType[];
   rowKey: keyof RecordType | ((record: RecordType) => TableRowKey);
   size?: TableSize;
+  /** 默认false，可显式开启。 */
   border?: boolean;
   borderCell?: boolean;
   hover?: boolean;
   stripe?: boolean;
   showHeader?: boolean;
+  /** 默认false；开启时默认仅数据区，scope=table可覆盖。 */
   loading?: boolean | TableLoadingConfig;
-  /** 容器宽度小于等于此值时取消固定列，默认不启用。 */
-  fixedBreakpoint?: number;
+  /** 普通文本默认两行省略且仅实际截断时提示；列级配置优先，false自然换行。 */
+  ellipsis?: TableColumnEllipsis;
+  /** 默认640，容器宽度小于等于阈值时取消固定列，false关闭断点。 */
+  fixedBreakpoint?: number | false;
   scrollX?: number | string;
   /** 默认 fixed；compact 未显式指定时使用 auto。 */
   tableLayout?: TableLayout;
   /** 默认 fill；compact 按内容或数字预算收缩。 */
   layoutMode?: TableLayoutMode;
-  /** 三种交互默认关闭；状态可独立用于只读恢复布局。 */
+  /** 调宽、移动和显隐默认关闭；逐字段配置可覆盖默认值。 */
   columnCustomization?: TableColumnCustomization;
   columnLayout?: TableColumnLayoutState;
   defaultColumnLayout?: TableColumnLayoutState;
@@ -109,9 +113,9 @@ export interface TableProps<RecordType extends object> extends Omit<HTMLAttribut
   childrenColumnName?: keyof RecordType;
   pagination?: false | TablePaginationConfig;
   empty?: ReactNode;
-  /** 可选空态垂直内边距；默认保持历史布局。 */
+  /** 空态上下内边距各默认36px，0关闭额外留白。 */
   emptyPadding?: number;
-  /** 仅替换无自定义 render 的 null/undefined/空字符串。默认不替换。 */
+  /** 仅替换无自定义 render 的 null/undefined/空字符串。默认 "-"，null关闭占位。 */
   emptyCell?: ReactNode;
   draggable?: boolean;
   showSorterTooltip?: TableSorterTooltip;

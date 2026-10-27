@@ -43,7 +43,7 @@ function App() {
       { key: "id", title: "编号", dataIndex: "id", minWidth: 80 },
       { key: "name", title: "名称", dataIndex: "name", minWidth: 200 },
     ]} dataSource={rows.slice(0, 2)} /></section>
-    <section id="fixed"><Table rowKey="id" columns={fixed} dataSource={rows.slice(0, 2)}
+    <section id="fixed"><Table fixedBreakpoint={false} rowKey="id" columns={fixed} dataSource={rows.slice(0, 2)}
       rowSelection={{}} expandable={{ expandedRowRender: () => "展开内容" }} showHeader={header} /></section>
     <section id="legacy"><Table rowKey="id" columns={[
       { key: "name", title: "名称", dataIndex: "name", width: 180 },

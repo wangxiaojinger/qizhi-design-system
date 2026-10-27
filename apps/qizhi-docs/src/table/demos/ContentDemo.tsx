@@ -12,21 +12,21 @@ const data: Project[] = [
   {
     key: 1,
     name: "模型服务",
-    description: "提供模型推理、版本管理、运行监控和异常告警能力，内容会根据列宽自然换行。",
-    note: "QIZHI 表格的 ellipsis 列保持单行并在溢出时显示省略号。",
+    description: "本列显式关闭 ellipsis，内容会根据列宽自然换行，行高由内容撑开。",
+    note: "未配置 Table 或列级 ellipsis 时，字符串与数字内容默认最多展示两行；只有实际截断时才可通过全文提示查看完整内容。",
   },
   {
     key: 2,
     name: "数据服务",
     description: "自然换行时，行高由内容撑开，不再固定为单行高度。",
-    note: "需要完整内容时，可通过默认 title 查看原文。",
+    note: "列级 ellipsis={false} 可覆盖表级默认，保留自然换行；ellipsis={true} 仍使用兼容的单行原生 title。",
   },
 ];
 
 const columns: TableColumn<Project>[] = [
   { key: "name", title: "服务", dataIndex: "name", width: 140 },
-  { key: "description", title: "自然换行", dataIndex: "description", width: 260 },
-  { key: "note", title: "单行省略", dataIndex: "note", width: 260, ellipsis: true },
+  { key: "description", title: "自然换行", dataIndex: "description", width: 260, ellipsis: false },
+  { key: "note", title: "默认两行省略", dataIndex: "note", width: 260 },
 ];
 
 export default function ContentDemo() {

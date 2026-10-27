@@ -13,10 +13,10 @@ describe("PropsDemo", () => {
   it("renders local model catalog data with the approved engineering defaults", () => {
     render(<PropsDemo />);
 
-    for (const label of ["边框", "悬浮高亮", "表头", "列调宽", "两行省略", "全文提示", "容器固定列断点"]) {
+    for (const label of ["悬浮高亮", "表头", "两行省略", "全文提示", "容器固定列断点"]) {
       expect(screen.getByRole("switch", { name: label })).toBeChecked();
     }
-    for (const label of ["单元格边框", "复选框", "加载中", "列移动", "列显隐", "自定义空态", "无数据"]) {
+    for (const label of ["边框", "列调宽", "单元格边框", "复选框", "加载中", "列移动", "列显隐", "自定义空态", "无数据"]) {
       expect(screen.getByRole("switch", { name: label })).not.toBeChecked();
     }
     const table = previewTable();
@@ -34,7 +34,7 @@ describe("PropsDemo", () => {
     render(<PropsDemo />);
 
     openSettings();
-    if (label === "列移动") fireEvent.click(screen.getByRole("switch", { name: label }));
+    fireEvent.click(screen.getByRole("switch", { name: label }));
     fireEvent.click(screen.getByRole("switch", { name: label }));
     expect(screen.queryByRole("spinbutton")).toBeNull();
     if (label === "列移动") expect(screen.queryByRole("button", { name: /移动列/ })).toBeNull();

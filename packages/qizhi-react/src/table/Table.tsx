@@ -9,7 +9,7 @@ import { MinusIcon } from "../icon/generated/catalog/MinusIcon";
 import { Pagination } from "../pagination/Pagination";
 import { Radio } from "../radio/Radio";
 import { Tooltip } from "../tooltip/Tooltip";
-import type { TableColumn, TableProps, TableRowKey, TableSortOrder } from "./Table.types";
+import type { TableColumn, TableColumnEllipsis, TableProps, TableRowKey, TableSortOrder } from "./Table.types";
 import "./table.css";
 import { allocateColumnWidths } from "./tableLayout";
 import { TableCellText } from "./TableCellText";
@@ -20,6 +20,7 @@ import { ColumnSettings } from "./ColumnSettings";
 import { DragIcon } from "../icon/generated/catalog/DragIcon";
 
 const cx = (...parts: Array<string | false | undefined>) => parts.filter(Boolean).join(" ");
+const defaultTextEllipsis: TableColumnEllipsis = { rows: 2, tooltip: true };
 const defaultSortDirections = ["ascend", "descend"] as const;
 
 const nextSortOrder = <RecordType extends object>(
@@ -37,7 +38,8 @@ const nextSortOrder = <RecordType extends object>(
 const sortAction = (order: TableSortOrder) =>
   order === "ascend" ? "升序" : order === "descend" ? "降序" : "取消";
 
-export function Table<RecordType extends object>({ columns: sourceColumns, dataSource, rowKey, size = "default", border = false, borderCell = false, hover = true, stripe = false, showHeader = true, loading = false, scrollX, rowSelection, expandable, childrenColumnName = "children" as keyof RecordType, pagination = false, empty, emptyPadding, emptyCell, fixedBreakpoint, draggable = false, showSorterTooltip = true, tableLayout, layoutMode = "fill", columnCustomization, columnLayout, defaultColumnLayout, onColumnLayoutChange, treeColumnKey, onSortChange, onRowOrderChange, className, style, "aria-label": ariaLabel = "表格", ...rest }: TableProps<RecordType>) {
+export function Table<RecordType extends object>({ columns: sourceColumns, dataSource, rowKey, size = "default", border = false, borderCell = false, hover = true, stripe = false, showHeader = true, loading = false, scrollX, rowSelection, expandable, childrenColumnName = "children" as keyof RecordType, pagination = false, empty, emptyPadding = 36, emptyCell = "-", fixedBreakpoint = 640, ellipsis = defaultTextEllipsis, draggable = false, showSorterTooltip = true, tableLayout, layoutMode = "fill", columnCustomization: customization, columnLayout, defaultColumnLayout, onColumnLayoutChange, treeColumnKey, onSortChange, onRowOrderChange, className, style, "aria-label": ariaLabel = "表格", ...rest }: TableProps<RecordType>) {
+  const columnCustomization = useMemo(() => ({ ...customization, resize: customization?.resize ?? false }), [customization]);
   const defaultSort = sourceColumns.find((column) => column.defaultSortOrder);
   const [sort, setSort] = useState<{ key: string; order: TableSortOrder }>({ key: defaultSort?.key ?? "", order: defaultSort?.defaultSortOrder ?? null });
   const sorted = useMemo(() => {
@@ -48,7 +50,7 @@ export function Table<RecordType extends object>({ columns: sourceColumns, dataS
   const pageSize = pagination ? (pagination.pageSize ?? pagination.defaultPageSize ?? 10) : 10;
   const [page, setPage] = useState(pagination ? (pagination.current ?? pagination.defaultCurrent ?? 1) : 1);
   const visible = pagination ? sorted.slice((page - 1) * pageSize, page * pageSize) : sorted;
-  const customizationRequested = columnCustomization !== undefined || columnLayout !== undefined || defaultColumnLayout !== undefined;
+  const customizationRequested = columnCustomization.resize === true || customization !== undefined || columnLayout !== undefined || defaultColumnLayout !== undefined;
   const treeKey = treeColumnKey ?? sourceColumns[0]?.key;
   const hasTree = !expandable && dataSource.some((record) => Array.isArray(record[childrenColumnName]) && (record[childrenColumnName] as unknown[]).length > 0);
   const protectedKeys = treeKey && (hasTree || treeColumnKey !== undefined) ? [treeKey] : [];
@@ -61,7 +63,7 @@ export function Table<RecordType extends object>({ columns: sourceColumns, dataS
     enabled: customizationRequested, protectedKeys, merged });
   const columns = custom.columns;
   const spinning = typeof loading === "boolean" ? loading : loading.spinning;
-  const bodyLoading = typeof loading === "object" && loading.scope === "body";
+  const bodyLoading = typeof loading !== "object" || loading.scope !== "table";
   const loadingTip = typeof loading === "object" ? loading.tip ?? "加载中..." : "加载中...";
   const [loadingBox, setLoadingBox] = useState({ top: 0, height: 0 });
   const effectiveLayout = tableLayout ?? (layoutMode === "compact" ? "auto" : "fixed");
@@ -69,6 +71,7 @@ export function Table<RecordType extends object>({ columns: sourceColumns, dataS
   const scrollRef = useRef<HTMLDivElement>(null);
   const tableRef = useRef<HTMLTableElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
+  const [tableFrameWidth, setTableFrameWidth] = useState(border ? 2 : 0);
   const [renderedWidths, setRenderedWidths] = useState<number[]>([]);
   const previewing = useRef(false);
   const previewWidths = useRef<number[] | null>(null);
@@ -78,11 +81,11 @@ export function Table<RecordType extends object>({ columns: sourceColumns, dataS
   const naturalSignature = useRef("");
   const manualWidths = custom.active ? custom.state.columnWidths : {};
   const hasManual = columns.some((column) => Object.hasOwn(manualWidths, column.key));
-  const fixedEnabled = !(fixedBreakpoint != null && Number.isFinite(fixedBreakpoint)
+  const fixedEnabled = !(typeof fixedBreakpoint === "number" && Number.isFinite(fixedBreakpoint)
     && fixedBreakpoint >= 0 && containerWidth <= fixedBreakpoint);
   const fixedClass = (column: TableColumn<RecordType>) => fixedEnabled && column.fixed && `is-fixed-${column.fixed}`;
   const constrained = effectiveLayout === "fixed" && columns.every((column) => typeof column.width !== "string") && columns.some((column) => column.minWidth != null || column.maxWidth != null || column.grow != null || column.shrink != null);
-  const allocatedWidths = constrained ? allocateColumnWidths(columns, Math.max(containerWidth, typeof scrollX === "number" ? scrollX : 0) - extraColumns * 48, layoutMode === "compact") : undefined;
+  const allocatedWidths = constrained ? allocateColumnWidths(columns, Math.max(containerWidth, typeof scrollX === "number" ? scrollX : 0) - tableFrameWidth - extraColumns * 48, layoutMode === "compact") : undefined;
   const columnWidth = (index: number) => Object.hasOwn(manualWidths, columns[index].key)
     ? manualWidths[columns[index].key]
     : hasManual ? allocatedWidths?.[index] ?? naturalWidths[index + extraColumns]
@@ -92,7 +95,7 @@ export function Table<RecordType extends object>({ columns: sourceColumns, dataS
     column.width, column.minWidth, column.maxWidth, column.grow, column.shrink,
     column.growPriority, column.shrinkPriority, column.settingsLabel,
     typeof column.title === "string" || typeof column.title === "number" ? column.title : null]),
-    tableLayout, layoutMode, scrollX, style });
+    tableLayout, layoutMode, scrollX, border, tableFrameWidth, style });
   const fixedOffsets: number[] = columns.map(() => 0);
   const renderedColumnWidth = (index: number) => renderedWidths[index + extraColumns] ?? (typeof columnWidth(index) === "number" ? columnWidth(index) as number : 0);
   let leftOffset = 0;
@@ -119,6 +122,9 @@ export function Table<RecordType extends object>({ columns: sourceColumns, dataS
         return;
       }
       setContainerWidth((previous) => previous === available ? previous : available);
+      const computed = getComputedStyle(table);
+      const frame = (parseFloat(computed.borderLeftWidth) || 0) + (parseFloat(computed.borderRightWidth) || 0);
+      setTableFrameWidth((previous) => previous === frame ? previous : frame);
       // Reset ends the manual sizing session. A later first resize must read
       // the current native layout, including content changes since that reset.
       if (!hasManual) naturalSignature.current = "";
@@ -130,7 +136,7 @@ export function Table<RecordType extends object>({ columns: sourceColumns, dataS
         table.style.tableLayout = effectiveLayout;
         table.style.width = style?.width != null ? String(style.width) + (typeof style.width === "number" ? "px" : "") : layoutMode === "compact" ? "max-content" : "100%";
         const declared = columns.reduce((sum, column) => sum + (typeof column.width === "number" ? column.width : 0), extraColumns * 48);
-        const minimum = style?.minWidth ?? scrollX ?? (declared || "");
+        const minimum = style?.minWidth ?? scrollX ?? (declared ? declared + frame : "");
         table.style.minWidth = typeof minimum === "number" ? `${minimum}px` : minimum;
         columns.forEach((column, index) => {
           const col = cols[index + extraColumns];
@@ -145,7 +151,7 @@ export function Table<RecordType extends object>({ columns: sourceColumns, dataS
       }
       if (bodyLoading) {
         const headerHeight = table.tHead?.getBoundingClientRect().height ?? 0;
-        const top = scroller.offsetTop + headerHeight;
+        const top = scroller.offsetTop + headerHeight + (parseFloat(computed.borderTopWidth) || 0);
         const height = Math.max(0, scroller.clientHeight - headerHeight);
         setLoadingBox((previous) => previous.top === top && previous.height === height
           ? previous : { top, height });
@@ -163,7 +169,7 @@ export function Table<RecordType extends object>({ columns: sourceColumns, dataS
     observer.observe(table);
     if (hasFixed) table.querySelectorAll(":scope > colgroup > col").forEach((col) => observer.observe(col));
     return () => { observer.disconnect(); window.removeEventListener("resize", measure); };
-  }, [columns, extraColumns, effectiveLayout, layoutMode, scrollX, containerWidth, constrained, showHeader, dataSource, bodyLoading, spinning, fixedBreakpoint, custom.active, hasManual, widthDefinition]);
+  }, [columns, extraColumns, effectiveLayout, layoutMode, scrollX, containerWidth, constrained, showHeader, dataSource, bodyLoading, spinning, fixedBreakpoint, custom.active, hasManual, widthDefinition, border, tableFrameWidth]);
   const keyOf = (record: RecordType): TableRowKey => typeof rowKey === "function" ? rowKey(record) : record[rowKey] as TableRowKey;
   const controlledSelection = rowSelection?.selectedRowKeys !== undefined;
   const [innerSelected, setInnerSelected] = useState<TableRowKey[]>(rowSelection?.defaultSelectedRowKeys ?? []);
@@ -213,7 +219,7 @@ export function Table<RecordType extends object>({ columns: sourceColumns, dataS
   const [dropTarget, setDropTarget] = useState<{ key: string; placement: "before" | "after" } | null>(null);
   const gestureKey = JSON.stringify([custom.state, columns.map((column) => [column.key,
     column.fixed, column.movable, column.resizable, column.hideable, column.minWidth, column.maxWidth]),
-    merged, containerWidth, extraColumns, cancelGeneration]);
+    merged, containerWidth, tableFrameWidth, extraColumns, cancelGeneration]);
   useLayoutEffect(() => {
     dragColumnRef.current = null;
     setDraggedColumn(null);
@@ -235,7 +241,7 @@ export function Table<RecordType extends object>({ columns: sourceColumns, dataS
     previewing.current = true;
     previewWidths.current[index + extraColumns] = width;
     cols.forEach((col, colIndex) => { col.style.width = `${previewWidths.current![colIndex]}px`; });
-    const total = previewWidths.current.reduce((sum, value) => sum + value, 0);
+    const total = previewWidths.current.reduce((sum, value) => sum + value, tableFrameWidth);
     table.style.tableLayout = "fixed";
     table.style.width = `${total}px`;
     table.style.minWidth = `${total}px`;
@@ -407,13 +413,14 @@ export function Table<RecordType extends object>({ columns: sourceColumns, dataS
         const missing = !column.render && (value == null || value === "");
         const content = column.render ? column.render(value, record, index)
           : missing && emptyCell !== undefined ? emptyCell : value as ReactNode;
-        const textEllipsis = typeof column.ellipsis === "object"
-          && (column.ellipsis.rows !== undefined || column.ellipsis.tooltip !== undefined);
+        const cellEllipsis = column.ellipsis ?? ellipsis;
+        const textEllipsis = typeof cellEllipsis === "object"
+          && (cellEllipsis.rows !== undefined || cellEllipsis.tooltip !== undefined);
         const enhancedText = textEllipsis && !missing
           && (typeof content === "string" || typeof content === "number");
-        const showEllipsisTitle = !textEllipsis && (column.ellipsis === true || (typeof column.ellipsis === "object" && column.ellipsis.showTitle !== false));
+        const showEllipsisTitle = !textEllipsis && (cellEllipsis === true || (typeof cellEllipsis === "object" && cellEllipsis.showTitle !== false));
         const title = showEllipsisTitle && (typeof content === "string" || typeof content === "number") ? String(content) : undefined;
-        return <td key={column.key} data-column-key={custom.active ? column.key : undefined} rowSpan={cell.rowSpan} colSpan={cell.colSpan} data-align={cell.style?.textAlign ?? column.align} className={cx("qizhi-table__td", fixedClass(column), cell.className)} style={{ ...columnStyle(columnIndex), ...cell.style }}><div className={cx("qizhi-table__cell", column.ellipsis && !textEllipsis && "is-ellipsis")} title={title} style={column.key === treeKey && level ? { paddingInlineStart: level * 24 } : undefined}>{column.key === treeKey && children?.length && !expandable ? <button type="button" className="qizhi-table__tree-toggle" aria-label={`${isOpen ? "收起" : "展开"}${String(value)}`} aria-expanded={isOpen} onClick={() => toggleExpanded(record)}>{isOpen ? <MinusIcon size={14} /> : <AddIcon size={14} />}</button> : null}{enhancedText ? <TableCellText rows={typeof column.ellipsis === "object" ? column.ellipsis.rows ?? 1 : 1} tooltip={typeof column.ellipsis === "object" && column.ellipsis.tooltip === true}>{content}</TableCellText> : content}</div></td>;
+        return <td key={column.key} data-column-key={custom.active ? column.key : undefined} rowSpan={cell.rowSpan} colSpan={cell.colSpan} data-align={cell.style?.textAlign ?? column.align} className={cx("qizhi-table__td", fixedClass(column), cell.className)} style={{ ...columnStyle(columnIndex), ...cell.style }}><div className={cx("qizhi-table__cell", cellEllipsis && !textEllipsis && "is-ellipsis")} title={title} style={column.key === treeKey && level ? { paddingInlineStart: level * 24 } : undefined}>{column.key === treeKey && children?.length && !expandable ? <button type="button" className="qizhi-table__tree-toggle" aria-label={`${isOpen ? "收起" : "展开"}${String(value)}`} aria-expanded={isOpen} onClick={() => toggleExpanded(record)}>{isOpen ? <MinusIcon size={14} /> : <AddIcon size={14} />}</button> : null}{enhancedText ? <TableCellText rows={typeof cellEllipsis === "object" ? cellEllipsis.rows ?? 1 : 1} tooltip={typeof cellEllipsis === "object" && cellEllipsis.tooltip === true}>{content}</TableCellText> : content}</div></td>;
       })}
     </tr>;
     const details = isOpen && expandedContent != null ? <tr key={`${key}-expanded`} className="qizhi-table__expanded"><td colSpan={columns.length + extraColumns}>{expandedContent}</td></tr> : null;
@@ -421,11 +428,11 @@ export function Table<RecordType extends object>({ columns: sourceColumns, dataS
     return [row, details, ...childRows].filter(Boolean);
   });
   const declaredWidth = columns.reduce((sum, column) => sum + (typeof column.width === "number" ? column.width : 0), 0) + extraColumns * 48;
-  const allocatedTotal = allocatedWidths ? allocatedWidths.reduce((sum, width) => sum + width, extraColumns * 48) : undefined;
-  const manualTotal = hasManual ? columns.reduce((sum, _, index) => sum + (columnWidth(index) as number), extraColumns * 48) : undefined;
+  const allocatedTotal = allocatedWidths ? allocatedWidths.reduce((sum, width) => sum + width, extraColumns * 48 + tableFrameWidth) : undefined;
+  const manualTotal = hasManual ? columns.reduce((sum, _, index) => sum + (columnWidth(index) as number), extraColumns * 48 + tableFrameWidth) : undefined;
   const tableStyle: CSSProperties = hasManual
     ? { ...style, tableLayout: "fixed", width: manualTotal, minWidth: manualTotal }
-    : { tableLayout: effectiveLayout, width: allocatedTotal ?? (layoutMode === "compact" ? "max-content" : "100%"), minWidth: allocatedTotal ?? scrollX ?? (declaredWidth > 0 ? declaredWidth : undefined), ...style };
+    : { tableLayout: effectiveLayout, width: allocatedTotal ?? (layoutMode === "compact" ? "max-content" : "100%"), minWidth: allocatedTotal ?? scrollX ?? (declaredWidth > 0 ? declaredWidth + tableFrameWidth : undefined), ...style };
   restoreWidths.current = () => {
     const table = tableRef.current;
     if (!table) return;

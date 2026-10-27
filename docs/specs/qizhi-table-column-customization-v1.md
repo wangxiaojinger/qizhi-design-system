@@ -2,7 +2,7 @@
 
 ## 目标与非目标
 
-本契约定义 QIZHI `Table` 的可选列移动、独立调宽、列显隐及设置面板。它保持既有 `Table` 默认布局：未传入列定制相关属性时，不改变列顺序、列宽、可见性、业务回调或持久化行为。
+本契约定义 QIZHI `Table` 的可选列移动、独立调宽、列显隐及设置面板。下一版本内置默认关闭调宽、移动和列显隐：未传入列定制相关属性时不显示调宽手柄，但不改变初始列顺序、列宽、可见性、业务回调或持久化行为；已发布的 v0.4.0 不包含这一候选变更。
 
 列定制只管理当前 `columns` 的展示布局；不管理服务端字段、筛选、授权、导出、响应式隐藏、虚拟化、列分组或任何存储介质。业务不能把“列在界面隐藏”当作数据或权限控制。
 
@@ -32,8 +32,8 @@ interface TableColumnCustomization {
 }
 ```
 
-- `columnCustomization` 内 reorder、resize、visibility 三种交互默认关闭，按需独立开启。`visibility` 开启时显示“列显隐”按钮与面板，关闭时不显示入口。旧 `settings` 字段保留类型兼容，不再影响入口。`renderSettings` 可通过 Portal 将完整入口放入已有工具栏。
-- 传入 `columnLayout`、`defaultColumnLayout` 或 `columnCustomization` 中任一项才启用布局状态层。仅传状态时可以只读恢复布局，不会默认开启移动、调宽或显隐。
+- `columnCustomization` 内 reorder、resize、visibility 三种交互按字段合并，默认值为 `{ resize: false, reorder: false, visibility: false }`。因此只传 `{ visibility: true }` 不会开启调宽，传 `{ resize: true }` 才开启调宽。`visibility` 开启时显示“列显隐”按钮与面板，关闭时不显示入口。旧 `settings` 字段保留类型兼容但已废弃且被忽略。`renderSettings` 可通过 Portal 将完整入口放入已有工具栏。
+- 开启列定制或传入布局状态才启用布局状态层；`columnLayout`、`defaultColumnLayout` 可用于受控或非受控恢复布局。仅传状态时不会默认开启移动或显隐。
 - 所有源列 `key` 必须是唯一非空字符串；否则 Table 不启用列定制，按源列定义渲染。不得按下标生成或保存补充键。
 
 ## 受控、初始值与回调
@@ -86,11 +86,11 @@ const [layout, setLayout] = useState(() => defaultColumnLayout(columns));
 />
 ```
 
-无需受控时省略 `columnLayout`，可传 `defaultColumnLayout`。只需调宽时使用 `{ resize: true }`，不会自动出现设置入口。
+无需受控时省略 `columnLayout`，可传 `defaultColumnLayout`。不开启列定制时无需传 `columnCustomization`；传 `{ resize: true }` 可开启调宽，传 `{ visibility: true }` 只开启显隐，不会出现调宽或移动入口。
 
 完整、可复制的持久化示例是 [CustomizationDemo.tsx](../../apps/qizhi-docs/src/table/demos/CustomizationDemo.tsx)。它将 app、user、space、稳定 tableId 与业务版本逐项编码进存储键；以作用域 key 重挂载受控示例，不在初始化时写入；只在提交回调保存，reset 删除缓存，失败不撤销界面。模块初始化不访问 window，读取与写入均处理异常。演示只使用本地数据，不涉及异步请求。
 
-Qways 示例中的模型字段、价格、筛选、账号切换、固定操作列、禁用试用入口均属于业务组合；没有成为 Table 默认行为。旧接入无需修改，采用新能力才需补稳定 key 和按需配置。
+Qways 示例中的模型字段、价格、筛选、账号切换、固定操作列、禁用试用入口均属于业务组合；没有成为 Table 默认行为。已发布版本的旧接入保持原状；升级到包含本候选默认的下一版本后，可用稳定 key 和显式配置覆盖调宽行为。
 
 ## 验收边界
 

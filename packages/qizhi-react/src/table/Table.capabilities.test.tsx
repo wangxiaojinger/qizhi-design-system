@@ -2,12 +2,12 @@ import { act, render, screen } from "@testing-library/react";
 import { Table } from "./Table";
 import type { TableColumn } from "./Table.types";
 
-describe("Table opt-in engineering capabilities", () => {
+describe("Table engineering defaults and overrides", () => {
   const columns: TableColumn<{ id: number; value: unknown }>[] = [
     { key: "value", title: "内容", dataIndex: "value", width: 160, fixed: "left" },
   ];
 
-  it("only fills missing raw cells when requested, preserving render, zero and false", () => {
+  it("fills missing raw cells by default, preserving render, zero and false", () => {
     const rows = [null, undefined, "", 0, false].map((value, id) => ({ id, value }));
     const { container, rerender } = render(
       <Table columns={columns} rowKey="id" dataSource={rows} emptyCell="-" />,
@@ -17,7 +17,7 @@ describe("Table opt-in engineering capabilities", () => {
     rerender(<Table columns={[{ ...columns[0], render: () => "从未使用" }]}
       rowKey="id" dataSource={rows} emptyCell="-" />);
     expect(screen.getAllByText("从未使用")).toHaveLength(5);
-    rerender(<Table columns={columns} rowKey="id" dataSource={rows} />);
+    rerender(<Table columns={columns} rowKey="id" dataSource={rows} emptyCell={null} />);
     expect(container.querySelector("tbody td")).toHaveTextContent("");
   });
 
@@ -53,7 +53,7 @@ describe("Table opt-in engineering capabilities", () => {
       .not.toHaveClass("is-ellipsis");
   });
 
-  it("pads both default and custom empty content once only when opted in", () => {
+  it("pads default and custom empty content once and permits zero padding", () => {
     const { container, rerender } = render(<Table columns={columns} rowKey="id"
       dataSource={[]} emptyPadding={36} />);
     expect(container.querySelector(".qizhi-table__empty-content"))
@@ -63,8 +63,8 @@ describe("Table opt-in engineering capabilities", () => {
     expect(container.querySelectorAll(".qizhi-table__empty-content")).toHaveLength(1);
     expect(container.querySelector(".qizhi-table__empty-content"))
       .toHaveTextContent("没有匹配记录");
-    rerender(<Table columns={columns} rowKey="id" dataSource={[]} />);
-    expect(container.querySelector(".qizhi-table__empty-content")).toBeNull();
+    rerender(<Table columns={columns} rowKey="id" dataSource={[]} emptyPadding={0} />);
+    expect(container.querySelector(".qizhi-table__empty-content")).toHaveStyle({ paddingBlock: "0px" });
   });
 
   it("disables fixed columns by container width and restores them after resize", () => {
@@ -87,7 +87,7 @@ describe("Table opt-in engineering capabilities", () => {
       act(() => callbacks.forEach((callback) => callback([], {} as ResizeObserver)));
       expect(container.querySelector(".is-fixed-left")).toBeNull();
       rerender(<Table columns={columns} rowKey="id"
-        dataSource={[{ id: 1, value: "固定列" }]} />);
+        dataSource={[{ id: 1, value: "固定列" }]} fixedBreakpoint={false} />);
       expect(container.querySelector(".is-fixed-left")).not.toBeNull();
     } finally {
       clientWidth.mockRestore();

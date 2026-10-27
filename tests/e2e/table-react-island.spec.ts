@@ -79,8 +79,11 @@ test("Table 保持十二组 Demo、核心交互和三档响应式", async ({ pag
   })).toBeVisible();
   const salaryBox = await salaryHeader.boundingBox();
   expect(salaryBox).not.toBeNull();
+  const resizeHandle = salaryHeader.getByRole("separator");
+  const resizeHitWidth = await resizeHandle.count() ? await resizeHandle.evaluate((node) => node.getBoundingClientRect().width) : 0;
+  // Reserve the edge only when business configuration enables resizing.
   await salaryHeader.click({
-    position: { x: salaryBox!.width - 8, y: salaryBox!.height / 2 },
+    position: { x: salaryBox!.width - resizeHitWidth - 8, y: salaryBox!.height / 2 },
   });
   await expect(page.locator("#table-sort tbody tr").first()).toContainText("17000");
   await salarySort.click();
@@ -127,15 +130,21 @@ test("Table 保持十二组 Demo、核心交互和三档响应式", async ({ pag
   }).first();
   await fixedViewLink.hover();
   await expect(fixedViewLink).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
-  await expect(fixedViewLink.locator("xpath=ancestor::td")).toHaveCSS(
+  const fixedWidth = await fixedScroller.evaluate((node) => node.clientWidth);
+  if (fixedWidth > 640) await expect(fixedViewLink.locator("xpath=ancestor::td")).toHaveCSS(
     "background-color",
     "rgb(255, 255, 255)",
   );
   await expect(fixedTable).not.toHaveClass(/has-(left|right)-fixed-shadow/);
-  expect(await page.locator("#table-fixed th.is-fixed-left").evaluate((node) => getComputedStyle(node, "::before").boxShadow)).toBe("none");
+  if (fixedWidth > 640) expect(await page.locator("#table-fixed th.is-fixed-left").evaluate((node) => getComputedStyle(node, "::before").boxShadow)).toBe("none");
   await fixedScroller.evaluate((node) => { node.scrollLeft = 120; node.dispatchEvent(new Event("scroll")); });
-  await expect(fixedTable).toHaveClass(/has-left-fixed-shadow/);
-  expect(await page.locator("#table-fixed th.is-fixed-left").evaluate((node) => getComputedStyle(node, "::before").boxShadow)).toContain("rgba(29, 33, 41, 0.18)");
+  if (fixedWidth > 640) {
+    await expect(fixedTable).toHaveClass(/has-left-fixed-shadow/);
+    expect(await page.locator("#table-fixed th.is-fixed-left").evaluate((node) => getComputedStyle(node, "::before").boxShadow)).toContain("rgba(29, 33, 41, 0.18)");
+  } else {
+    await expect(page.locator("#table-fixed th.is-fixed-left")).toHaveCount(0);
+    await expect(fixedTable).not.toHaveClass(/has-left-fixed-shadow/);
+  }
 
   const dragRows = page.locator("#table-drag tbody tr[data-row-key]");
   const firstText = await dragRows.first().innerText();
@@ -149,7 +158,7 @@ test("Table 保持十二组 Demo、核心交互和三档响应式", async ({ pag
   expect(errors).toEqual([]);
 });
 
-test("Table 默认自然换行，ellipsis 列保持单行省略", async ({ page }) => {
+test("Table 显式自然换行与内置两行省略及按需全文", async ({ page }) => {
   await page.goto("/#component-table", { waitUntil: "domcontentloaded" });
 
   const contentDemo = page.locator("#table-content");
@@ -163,9 +172,11 @@ test("Table 默认自然换行，ellipsis 列保持单行省略", async ({ page 
   }));
   expect(wrappedGeometry.height).toBeGreaterThan(wrappedGeometry.lineHeight * 1.5);
   await expect(wrappedCell).toHaveCSS("white-space", "normal");
-  await expect(ellipsisCell).toHaveCSS("white-space", "nowrap");
-  await expect(ellipsisCell).toHaveCSS("text-overflow", "ellipsis");
-  await expect(ellipsisCell).toHaveAttribute("title", /QIZHI/);
+  const defaultLeaf = ellipsisCell.locator(".qizhi-table__text.is-rows-2");
+  await expect(defaultLeaf).toBeVisible();
+  await expect(defaultLeaf).toHaveAttribute("tabindex", "0");
+  await defaultLeaf.focus();
+  await expect(page.getByRole("tooltip")).toContainText("未配置 Table 或列级 ellipsis");
 });
 
 test("嵌套表格单元格不继承展开容器的水平缩进", async ({ page }) => {
@@ -262,8 +273,12 @@ test("Table 组件 Token 与旧尺度变量均可覆盖既有职责", async ({ p
   await basicHeader.hover();
   await expect(selectionRow.locator(".qizhi-table__td").first())
     .toHaveCSS("background-color", "rgb(7, 8, 9)");
-  await expect(page.locator("#table-fixed th.is-fixed-left").first())
-    .toHaveCSS("z-index", "7");
+  const fixedWidth = await page.locator("#table-fixed .qizhi-table__scroll").evaluate((node) => node.clientWidth);
+  if (fixedWidth > 640) {
+    await expect(page.locator("#table-fixed th.is-fixed-left").first()).toHaveCSS("z-index", "7");
+  } else {
+    await expect(page.locator("#table-fixed th.is-fixed-left")).toHaveCount(0);
+  }
 
   const outerExpandedCell = page.locator("#table-nested .qizhi-table__expanded > td").first();
   const nestedCell = page.locator("#table-nested .qizhi-table__expanded .qizhi-table__td").first();

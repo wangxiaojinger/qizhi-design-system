@@ -17,14 +17,14 @@ import customizationSource from "./demos/CustomizationDemo.tsx?raw";
 export interface TableDemoDefinition { id: string; title: string; description: string; component: ComponentType; source: string }
 export const tableDemos: readonly TableDemoDefinition[] = [
   { id: "table-basic", title: "基础用法", description: "使用完整的 TypeScript 数据和列定义，在单元格中组合链接、标签与操作。", component: BasicDemo, source: basicSource },
-  { id: "table-content", title: "多行与省略", description: "单元格默认允许文本自然换行，行高随内容撑开。列设置 ellipsis 后保持单行省略，并可以通过 showTitle 控制原生提示。", component: ContentDemo, source: contentSource },
+  { id: "table-content", title: "多行与省略", description: "下一版本中，字符串与数字默认最多两行省略，并仅在实际截断时显示全文提示；列设置 ellipsis={false} 保持自然换行，ellipsis={true} 保持兼容的单行原生提示。", component: ContentDemo, source: contentSource },
   { id: "table-sort", title: "排序", description: "通过 sorter、sortDirections 与 defaultSortOrder 配置排序，并可控制排序提示作用于完整表头或仅排序图标。", component: SortDemo, source: sortSource },
   { id: "table-fixed", title: "固定列", description: "当表格横向内容较多时，可以固定关键列，保持主要识别信息和操作入口可见。", component: FixedDemo, source: fixedSource },
   { id: "table-selection", title: "开启选择", description: "表格开启选择，可以设置 rowSelection.type 来使用复选框和单选框。checkbox 为复选框，radio 为单选框。", component: SelectionDemo, source: selectionSource },
   { id: "table-expand", title: "展开行", description: "当内容过长，可以通过 expandedRowRender 设置展开行。如果返回值是 null，不会渲染展开按钮。", component: ExpandDemo, source: expandSource },
   { id: "table-nested", title: "嵌套子表格", description: "嵌套子表格的例子，点击展开按钮可以在展开区域展示子表格。", component: NestedDemo, source: nestedSource },
   { id: "table-tree", title: "树形数据展示", description: "树形数据展示的例子，data 里有 children 字段，或者通过 childrenColumnName 设置成自定义字段。", component: TreeDemo, source: treeSource },
-  { id: "table-props", title: "表格属性", description: "以模型目录集中演示常用属性、三项列定制开关及工程规范：受约束列宽、两行省略与按需全文提示、数据区加载、36px 空态留白、容器固定列断点和缺失值占位。属性配置区不属于业务界面。", component: PropsDemo, source: propsSource },
+  { id: "table-props", title: "表格属性", description: "以模型目录集中演示常用属性、三项列定制覆盖开关及工程规范：受约束列宽、两行省略与全文提示、数据区加载、36px 空态留白、640px 容器固定列断点和缺失值占位。属性配置区不属于业务界面。", component: PropsDemo, source: propsSource },
   { id: "table-merge", title: "单元格合并", description: "用于单元格合并，表头可以进行列合并，内容区域可以通过 rowSpan 与 colSpan 合并单元格。", component: MergeDemo, source: mergeSource },
   { id: "table-drag", title: "拖拽排序", description: "拖动表格行可以调整数据顺序，适合手动编排优先级或展示顺序。", component: DragDemo, source: dragSource },
   { id: "table-layout", title: "列宽与自适应", description: "通过列级宽度、伸缩权重与优先级分配空间；演示两行全文提示、数据区加载、空态留白、缺失值与容器固定列断点，并保留旧布局能力。", component: LayoutDemo, source: layoutSource },

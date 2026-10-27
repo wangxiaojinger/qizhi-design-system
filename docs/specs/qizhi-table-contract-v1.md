@@ -21,11 +21,11 @@ type TableLayoutMode = "fill" | "compact";
 type TableColumnAlign = "left" | "center" | "right";
 ```
 
-`TableProps<RecordType>` 实现：`columns`、`dataSource`、`rowKey`、`size`、`border`、`borderCell`、`hover`、`stripe`、`showHeader`、`loading`、`fixedBreakpoint`、`scrollX`、`tableLayout`、`layoutMode`、`columnCustomization`、`columnLayout`、`defaultColumnLayout`、`onColumnLayoutChange`、`treeColumnKey`、`rowSelection`、`expandable`、`childrenColumnName`、`pagination`、`empty`、`emptyPadding`、`emptyCell`、`draggable`、`showSorterTooltip`、`onSortChange`、`onRowOrderChange`、`className`、`style`、`aria-label`。
+`TableProps<RecordType>` 实现：`columns`、`dataSource`、`rowKey`、`size`、`border`、`borderCell`、`hover`、`stripe`、`showHeader`、`loading`、`ellipsis`、`fixedBreakpoint`、`scrollX`、`tableLayout`、`layoutMode`、`columnCustomization`、`columnLayout`、`defaultColumnLayout`、`onColumnLayoutChange`、`treeColumnKey`、`rowSelection`、`expandable`、`childrenColumnName`、`pagination`、`empty`、`emptyPadding`、`emptyCell`、`draggable`、`showSorterTooltip`、`onSortChange`、`onRowOrderChange`、`className`、`style`、`aria-label`。
 
-默认值：`size="default"`、`border=false`、`borderCell=false`、`hover=true`、`stripe=false`、`showHeader=true`、`loading=false`、`tableLayout="fixed"`、`layoutMode="fill"`、`pagination=false`、`childrenColumnName="children"`、`draggable=false`。数据单元格默认自然换行，行高随内容撑开。`size="default"` 使用 16px 上下内边距，`size="middle"` 使用 12px，`size="small"` 使用 8px，不将表头或内容行锁定为固定高度。
+下一版本的组件内置默认值：`size="default"`、`border=false`、`borderCell=false`、`hover=true`、`stripe=false`、`showHeader=true`、`loading=false`、`ellipsis={ rows: 2, tooltip: true }`、`fixedBreakpoint=640`、`emptyPadding=36`、`emptyCell="-"`、`columnCustomization={ resize: false, reorder: false, visibility: false }`、`tableLayout="fixed"`、`layoutMode="fill"`、`pagination=false`、`childrenColumnName="children"`、`draggable=false`。`loading` 启用时 `scope` 默认 `"body"`，传 `"table"` 才遮罩全表；`fixedBreakpoint={false}` 关闭断点。表级省略只处理字符串／数字，列显式 `ellipsis` 优先，`false` 保持自然换行，`true` 或 `{ showTitle }` 保持旧单行原生 title。`emptyCell={null}` 关闭缺失值占位。该本地候选变更属于下一版本，已发布的 v0.4.0 不变。`size="default"` 使用 16px 上下内边距，`size="middle"` 使用 12px，`size="small"` 使用 8px，不将表头或内容行锁定为固定高度。
 
-`TableColumn<RecordType>` 实现：`key`、`title`、`dataIndex`、`width`、`minWidth`、`maxWidth`、`grow`、`shrink`、`growPriority`、`shrinkPriority`、`align`、`fixed`、`movable`、`resizable`、`hideable`、`defaultVisible`、`settingsLabel`、`layoutRole`、`ellipsis`、`render`、`sorter`、`sortDirections`、`defaultSortOrder`、`showSorterTooltip`、`onCell`。`align` 默认为左对齐，排序表头与数据单元格同步对齐。`ellipsis` 默认为 `false`；设为 `true` 或 `{ showTitle }` 时该列单行省略，`showTitle` 默认为 `true`，仅在单元格内容是字符串或数字时输出原生 `title`。排序按未排序、升序、降序、未排序循环，并通过 `onSortChange` 回传。
+`TableColumn<RecordType>` 实现：`key`、`title`、`dataIndex`、`width`、`minWidth`、`maxWidth`、`grow`、`shrink`、`growPriority`、`shrinkPriority`、`align`、`fixed`、`movable`、`resizable`、`hideable`、`defaultVisible`、`settingsLabel`、`layoutRole`、`ellipsis`、`render`、`sorter`、`sortDirections`、`defaultSortOrder`、`showSorterTooltip`、`onCell`。`align` 默认为左对齐，排序表头与数据单元格同步对齐。未配置列 `ellipsis` 时继承表级两行省略；`false` 保持自然换行，`true` 或 `{ showTitle }` 时保持该列的旧单行原生 title，`showTitle` 默认为 `true`。两行省略仅处理字符串或数字，不裁切复杂 render。排序按未排序、升序、降序、未排序循环，并通过 `onSortChange` 回传。
 
 `TableRowSelection<RecordType>` 实现：`type`、`selectedRowKeys`、`defaultSelectedRowKeys`、`checkStrictly`、`getCheckboxProps`、`onChange`。复选框模式支持全选、半选、禁用项和树形父子联动；单选模式只保留一个值。
 
@@ -44,7 +44,7 @@ Table 是自研原生 HTML table，不依赖 AntD/rc-table。它提供显式列�
 - 容器不足时，参与 `grow` 的列先缩至 `minWidth` 或 120px；仍不足时使用内部横向滚动，不能撑宽页面、缩小字体或减少正常 Padding。数字 `scrollX` 参与这一预算并作为增长目标；在该模式下不能使用 string `scrollX`，也不能混用 string `width`。
 - `tableLayout="auto"` 下，`minWidth` 由浏览器原生表格布局处理，`maxWidth` 和 `grow` 不参与数字分配，不能组合使用。`layoutMode="compact"` 未显式 `tableLayout` 时采用 auto 并按内容收缩；显式 `tableLayout="fixed"` 且存在约束时，按数字预算收缩且不分配多余空间。
 - 每张表都输出 `colgroup`，因此 `showHeader=false` 仍保留列宽。固定列按实际 `<col>` 宽度计算同侧累计偏移，支持同侧多个业务列。选择、展开辅助列占用 48px 并纳入列索引，但自身不固定，随内容滚动；左右固定业务列加前置辅助列的实际合计宽度应小于最小容器宽度。必须验证未滚动、滚动中、滚动末端，不能只验证辅助列已经滚走后的布局。
-- 宽度预算包含表头、排序图标、合法内容格式、控件、间距和正常单元格内边距。操作列按全部业务状态与支持语言的最宽合法组合配置，不在分页、筛选、排序或异步更新时重算。默认自然换行；省略只由显式 `ellipsis` 决定，复杂 render 的完整内容提示由业务组合实现。
+- 宽度预算包含表头、排序图标、合法内容格式、控件、间距和正常单元格内边距。操作列按全部业务状态与支持语言的最宽合法组合配置，不在分页、筛选、排序或异步更新时重算。字符串／数字默认最多两行省略；列设置 `ellipsis={false}` 后自然换行。复杂 render 的完整内容提示由业务组合实现，不能被表级两行省略裁切。
 - 默认左对齐，不从字段名推断语义。日期／时间列（包括更新时间）的表头与内容必须左对齐，不允许右对齐；由列配置遵守该使用规范，组件不按字段名强制覆盖 `align`。金额、日期格式和操作收纳策略由业务决定；对齐、列宽和布局模式不改变业务操作的显示、隐藏或折叠规则。分组、合并、树形、嵌套保留各自布局，不自动套用普通列表策略。
 
 能力边界与兼容性要求见 [Table 列宽能力审查与补充方案](./qizhi-table-column-layout-audit-2026-10-14.md)，实际检查见 [验证记录](../verification/table-column-layout-2026-10-14.md)。新增能力须同步类型、实现、API、同源 Demo/复制代码及测试；不得仅更新文档后声称已实现。
@@ -53,11 +53,11 @@ Table 是自研原生 HTML table，不依赖 AntD/rc-table。它提供显式列�
 
 - `shrink` 独立控制压缩权重，未配置沿用 grow；`shrinkPriority`、`growPriority` 越小越先处理，同级按权重分配。0 权重不参与。数字 width 是期望基准而非全部场景的硬最小宽度；显式 minWidth 是下限。未配置新参数沿用历史分配规则。
 - 名称、说明设置上限；达到上限后通过后级 growPriority 的普通数据列承接余量。所有列封顶后的严格上限与铺满不可同时保证，组件不突破上限；业务必须配置未封顶承接列。操作与辅助列不参与余量分配，不靠浏览器原生重新拉宽。compact 是通用特例能力，不作为 Qways 标准页面列表布局。
-- `ellipsis={ rows: 1 | 2, tooltip: true }` 仅省略纯字符串或数字叶子。实际截断时才提供 hover/focus/click 全文 Tooltip，Esc 关闭；内容、容器、字体变化后重测。旧 true/showTitle 保持单行原生 title，复杂 render 中的控件不被新模式限高或裁切。
-- `loading={{ spinning, scope: "body", tip }}` 仅覆盖数据区，保留表头和传入记录；首次无数据时提供加载占位，不把空态冒充加载结果。boolean 仍沿用历史遮罩。不实现 API 请求、缓存、失败重试或授权范围策略。
-- `fixedBreakpoint={640}` 按表格容器宽度（含等号）取消固定列，变宽后恢复，未配置保持原行为。
-- `emptyPadding={36}` 为默认与自定义 empty 增加一层垂直留白并清零空态单元格 padding。自定义内容内部自带 margin/padding 须由调用方消除；组件不篡改任意 ReactNode 内部样式。未配置保留历史布局。
-- `emptyCell="-"` 仅替换未定义 render 的 null/undefined/空字符串。0、false、显式业务状态与 render 不变；缺失值占位不启用全文 Tooltip。默认不自动代填。
+- 表级 `ellipsis={ rows: 2, tooltip: true }` 是下一版本默认，仅省略纯字符串或数字叶子。实际截断时才提供 hover/focus/click 全文 Tooltip，Esc 关闭；内容、容器、字体变化后重测。列级配置优先，`false` 保持自然换行；旧 true/showTitle 保持单行原生 title，复杂 render 中的控件不被新模式限高或裁切。
+- `loading` 默认 `false`；启用 `loading={{ spinning, scope: "body", tip }}` 时默认仅覆盖数据区，保留表头和传入记录，`scope: "table"` 覆盖全表。首次无数据时提供加载占位，不把空态冒充加载结果。不实现 API 请求、缓存、失败重试或授权范围策略。
+- `fixedBreakpoint=640` 按表格容器宽度（含等号）取消固定列，变宽后恢复；传 `false` 关闭断点，数字可替换阈值。
+- `emptyPadding=36` 为默认与自定义 empty 增加一层垂直留白并清零空态单元格 padding，传 0 可关闭额外留白。自定义内容内部自带 margin/padding 须由调用方消除；组件不篡改任意 ReactNode 内部样式。
+- `emptyCell="-"` 默认替换未定义 render 的 null/undefined/空字符串；传 `null` 关闭。0、false、显式业务状态与 render 不变；缺失值占位不启用全文 Tooltip。
 - Qways 的每页 8 条、260/320px、游标、专用模型卡片、ID 复制及 secret 掩码不是组件默认值；业务接入按实际安装包能力核验。日期／时间列仍由业务显式左对齐。
 
 ## 用户列定制
@@ -65,15 +65,15 @@ Table 是自研原生 HTML table，不依赖 AntD/rc-table。它提供显式列�
 ### 属性示例与业务示例的职责
 
 - 「表格属性」使用模型目录演示数据，集中提供边框、密度、选择、加载、表头、空态及三项列定制开关。分页默认右下角，不展示位置切换；斑马纹不在该示例中展示，既有公共 API 保留兼容。
-- 推荐业务初始配置与属性示例一致：开启边框、悬浮高亮、表头、列调宽、两行省略、实际截断全文提示及容器固定列断点，尺寸为 default；单元格边框、复选框、加载中、列移动、列显隐、自定义空态及无数据开关默认关闭，其余能力由业务按需开启。该推荐组合由业务显式配置，不改变通用 Table 既有默认值；用于演示全部能力的独立示例可以显式开启额外功能。
+- 推荐组合已成为下一版本的组件内置默认：开启悬浮高亮、表头、两行省略、实际截断全文提示、36px 空态留白、`"-"` 缺失值占位及 640px 容器固定列断点，尺寸为 default；边框、单元格边框、列调宽、复选框、加载中、列移动、列显隐、自定义空态及无数据开关默认关闭。业务可显式覆盖默认；用于演示全部能力的独立示例可以显式开启额外功能。
 - 列移动关闭或单列不可移动时，排序标题保留正常的单元格左内边距；只有实际渲染移动手柄时才由手柄承接该内边距。调宽手柄不改变标题内边距，窄屏沿用紧凑间距 token。
-- 属性示例同时显式接入已有的 shrink／优先级预算、两行按需全文提示、body 加载、默认和自定义空态 36px 留白、容器 fixedBreakpoint 与 emptyCell 占位。不新增语义重复的 API，不把示例开关变成组件内置工具栏。
+- 属性示例保留用户可控开关以显式覆盖内置默认：关闭两行省略时同时传表级 `ellipsis={false}`，关闭容器断点时传 `fixedBreakpoint={false}`；不新增语义重复的 API，不把示例开关变成组件内置工具栏。
 - 「Qways 模型目录与用户列布局」保留搜索、业务筛选、详情和列显隐入口；三项能力由代码启用，不在业务工具栏展示功能开关。模拟身份切换与布局 JSON 属于独立示例配置；移除未接入的试用占位按钮。
 - 数据请求、服务端筛选／排序、权限、失败重试、布局持久化仍由业务负责。Table 的 onSortChange、rowSelection.onChange、pagination.onChange、onColumnLayoutChange 提供现有交互回调；不能把本地示例描述为已接入真实后端，也不能以隐藏列代替权限控制。
 
 完整可序列化状态为 `TableColumnLayoutState`：`{ schemaVersion: 1, columnOrder, columnWidths, columnVisibility }`。`columnOrder` 始终包含隐藏列；`columnWidths` 只保存用户显式提交的 CSS px；`columnVisibility` 是当前有效列的完整布尔映射。状态及回调元信息的类型和可访问文案配置见 [用户列定制契约](./qizhi-table-column-customization-v1.md)。
 
-- `columnCustomization` 的 `reorder`、`resize`、`visibility` 分别开启交互；visibility 同时控制列显隐按钮和面板，旧 settings 保留类型兼容但不再控制入口，全部默认 `false`；状态本身可独立传入并以只读方式恢复。`renderSettings` 接收完整设置入口，可由业务放入已有工具栏，`locale` 可部分覆盖设置、恢复、全选、移动、调宽及必选提示文案。
+- `columnCustomization` 的 `reorder`、`resize`、`visibility` 分别开启交互；默认 `resize=false`、`reorder=false`、`visibility=false`，传入对象按字段合并，故 `{ visibility: true }` 不开启调宽，`{ resize: true }` 显式开启调宽。visibility 同时控制列显隐按钮和面板，旧 settings 已废弃且被忽略；状态本身可独立传入并以只读方式恢复。`renderSettings` 接收完整设置入口，可由业务放入已有工具栏，`locale` 可部分覆盖设置、恢复、全选、移动、调宽及必选提示文案。
 - `columnLayout` 为受控值：每次渲染按当前列定义规范化，组件不先假装提交成功。`defaultColumnLayout` 只作为非受控首轮初值；两者并存时受控值优先。合法用户操作才通过 `onColumnLayoutChange` 回传一次完整独立快照，`reason` 为 `order`、`width`、`visibility` 或 `reset`，可带 `columnKey`；取消、无变化、外部状态更新及内部规范化不回调。
 - 只接受 `schemaVersion: 1`。无效版本或损坏结构回退当前默认；过期、未知、重复或空键不持久化。列定义改变或权限导致列集合变化时，当前有效键以定义为准，删除旧键、把新键按其当前段定义顺序追加；核心不读写存储、网络或权限数据。
 - 顺序按当前源列连续段约束：`fixed` 从普通、`left`、`right` 任一变化即断段，`movable: false` 是单列屏障，移动不可跨越。`hideable: false`、树入口保护列强制可见；其余列的 `defaultVisible` 默认 `true`。`layoutRole` 默认为 `data`，`action` 不计入至少保留一列可见数据列的限制；纯 action 防御场景仍保留一列可见。

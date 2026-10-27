@@ -41,7 +41,7 @@ function App() {
   const [wideText, setWideText] = useState(false);
   const columns = makeColumns(english);
   const records = empty ? [] : short ? rows.map((row) => ({ ...row, name: "Short" })) : rows;
-  const table = (label: string, custom = false) => <Table aria-label={label} rowKey="id"
+  const table = (label: string, custom = false) => <Table columnCustomization={{ resize: true }} aria-label={label} rowKey="id"
     columns={columns} dataSource={records} fixedBreakpoint={640} emptyPadding={36}
     emptyCell="-" showHeader={header}
     loading={{ spinning: loading, scope: "body", tip: "数据加载中" }}

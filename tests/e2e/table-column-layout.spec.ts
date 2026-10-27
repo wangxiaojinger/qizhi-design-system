@@ -55,8 +55,11 @@ test("Table 列宽约束、容器变化、隐藏表头与多固定列兼容", as
     return headers.map((header, index) => Math.abs(header.getBoundingClientRect().width - cells[index].getBoundingClientRect().width));
   });
   expect(aligned.every((difference) => difference <= 1)).toBe(true);
-  const compactWidth = await page.locator("#compact table").evaluate((node) => node.getBoundingClientRect().width);
-  expect(compactWidth).toBe(376);
+  const compact = await page.locator("#compact table").evaluate((node) => {
+    const style = getComputedStyle(node);
+    return { width: node.getBoundingClientRect().width, frame: parseFloat(style.borderLeftWidth) + parseFloat(style.borderRightWidth) };
+  });
+  expect(compact.width - compact.frame).toBe(376);
   await expect(page.locator("#auto table")).toHaveCSS("table-layout", "auto");
   const alignment = await page.locator("#cell-override .qizhi-table__cell").first().evaluate((node) => {
     const content = node.getBoundingClientRect();
@@ -84,7 +87,7 @@ test("Table 新布局 Demo 可复制且实际容器不溢出", async ({ page }, 
   await expect(table).toBeVisible();
   for (const name of ["受约束的弹性列表", "自动布局列表", "多个固定列列表"]) {
     const layoutTable = demo.getByRole("table", { name, exact: true });
-    const header = layoutTable.getByRole("columnheader", { name: "更新时间", exact: true });
+    const header = layoutTable.getByRole("columnheader", { name: /^更新时间/ });
     await expect(header).toHaveCSS("text-align", "left");
     const index = await header.evaluate((node) => (node as HTMLTableCellElement).cellIndex);
     for (const row of await layoutTable.locator("tbody tr").all()) {
@@ -95,11 +98,17 @@ test("Table 新布局 Demo 可复制且实际容器不溢出", async ({ page }, 
   expect(overflow.every((item) => item.width <= item.parent + 1)).toBe(true);
   const fixedTable = demo.getByRole("table", { name: "多个固定列列表" });
   await expect(fixedTable).toBeVisible();
+  const fixedWidth = await fixedTable.locator("..").evaluate((node) => node.clientWidth);
   for (const position of [0, 90, 10000]) {
     await fixedTable.locator("..").evaluate((node, left) => { node.scrollLeft = left; }, position);
     const boxes = await fixedTable.locator("tbody tr").first().locator("td:is(.is-fixed-left,.is-fixed-right)").evaluateAll((cells) => cells.map((cell) => { const box = cell.getBoundingClientRect(); return { left: box.left, right: box.right }; }));
-    expect(boxes[0].right).toBeLessThanOrEqual(boxes[1].left + 1);
-    expect(boxes[1].right).toBeLessThanOrEqual(boxes[2].left + 1);
+    if (fixedWidth <= 640) {
+      expect(boxes).toHaveLength(0);
+    } else {
+      expect(boxes).toHaveLength(3);
+      expect(boxes[0].right).toBeLessThanOrEqual(boxes[1].left + 1);
+      expect(boxes[1].right).toBeLessThanOrEqual(boxes[2].left + 1);
+    }
   }
   await demo.screenshot({ path: testInfo.outputPath("table-layout-demo.png") });
   await demo.getByRole("button", { name: "查看代码" }).click();
