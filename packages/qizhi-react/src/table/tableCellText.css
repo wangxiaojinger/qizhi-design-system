@@ -1,0 +1,26 @@
+.qizhi-table__text {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  line-height: var(--component-table-text-line-height, 1.5714286);
+}
+
+.qizhi-table__text.is-rows-1 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.qizhi-table__text.is-rows-2 {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.qizhi-tooltip__container.qizhi-table__text-tooltip {
+  overflow-wrap: anywhere;
+  white-space: normal;
+  -webkit-line-clamp: unset;
+}

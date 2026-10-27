@@ -4,6 +4,38 @@ import { tableApi, tableApiDefaultBehaviors, tableColumnApi } from "./tableApi";
 import { tableDemos } from "./tableDocs.registry";
 
 describe("Table docs", () => {
+  it("demonstrates explicit engineering options while retaining the twelve existing demos", () => {
+    render(<TableDocsIsland />);
+    const enhanced = screen.getByRole("table", { name: "工程规范增强列表" });
+    expect(within(enhanced).getByText("0")).toBeInTheDocument();
+    expect(within(enhanced).getByText("-")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("switch", { name: "数据区加载" }));
+    expect(enhanced.closest(".qizhi-table")).toHaveAttribute("aria-busy", "true");
+    expect(within(enhanced).getByRole("columnheader", { name: "名称" })).toBeInTheDocument();
+    expect(tableApi.map((item) => item.name)).toEqual(expect.arrayContaining([
+      "emptyCell", "emptyPadding", "fixedBreakpoint",
+    ]));
+    expect(tableColumnApi.map((item) => item.name)).toEqual(expect.arrayContaining([
+      "shrink", "shrinkPriority", "growPriority",
+    ]));
+  });
+  it("keeps update-time headers and cells left aligned in every layout demo", () => {
+    render(<TableDocsIsland />);
+    const tables = document.querySelectorAll("#table-layout table");
+    let dateColumns = 0;
+    tables.forEach((table) => {
+      const headers = [...table.querySelectorAll("thead th")];
+      const index = headers.findIndex((header) => header.textContent === "更新时间");
+      if (index < 0) return;
+      dateColumns += 1;
+      expect(headers[index]).toHaveAttribute("data-align", "left");
+      table.querySelectorAll("tbody tr").forEach((row) => {
+        expect(row.children[index]).toHaveAttribute("data-align", "left");
+      });
+    });
+    expect(dateColumns).toBe(4);
+  });
+
   it("renders the twelve demos without unsupported sticky or grouped headers", () => {
     render(<TableDocsIsland />);
     expect(screen.getAllByRole("heading", { level: 2 }).map((node) => node.textContent)).toEqual(["基础用法", "多行与省略", "排序", "固定列", "开启选择", "展开行", "嵌套子表格", "树形数据展示", "表格属性", "单元格合并", "拖拽排序", "列宽与自适应", "API"]);

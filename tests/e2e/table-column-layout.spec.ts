@@ -82,6 +82,15 @@ test("Table 新布局 Demo 可复制且实际容器不溢出", async ({ page }, 
   expect(demoGeometry.width).toBeLessThanOrEqual(demoGeometry.parent + 1);
   const table = demo.getByRole("table", { name: "受约束的弹性列表" });
   await expect(table).toBeVisible();
+  for (const name of ["受约束的弹性列表", "自动布局列表", "多个固定列列表"]) {
+    const layoutTable = demo.getByRole("table", { name, exact: true });
+    const header = layoutTable.getByRole("columnheader", { name: "更新时间", exact: true });
+    await expect(header).toHaveCSS("text-align", "left");
+    const index = await header.evaluate((node) => (node as HTMLTableCellElement).cellIndex);
+    for (const row of await layoutTable.locator("tbody tr").all()) {
+      await expect(row.locator("td").nth(index)).toHaveCSS("text-align", "left");
+    }
+  }
   const overflow = await demo.locator(".qizhi-table").evaluateAll((tables) => tables.map((node) => ({ width: node.getBoundingClientRect().width, parent: node.parentElement!.getBoundingClientRect().width })));
   expect(overflow.every((item) => item.width <= item.parent + 1)).toBe(true);
   const fixedTable = demo.getByRole("table", { name: "多个固定列列表" });

@@ -9,7 +9,19 @@ export type TableSorterTooltipTarget = "full-header" | "sorter-icon";
 export type TableSorterTooltip = boolean | { target?: TableSorterTooltipTarget };
 export type TableFixed = "left" | "right";
 export type TablePaginationPosition = "bottomLeft" | "bottomCenter" | "bottomRight";
-export type TableColumnEllipsis = boolean | { showTitle?: boolean };
+export type TableColumnEllipsis = boolean | {
+  showTitle?: boolean;
+  /** 显式启用文本叶子省略；不裁切自定义 render 的控件。 */
+  rows?: 1 | 2;
+  /** 仅实际截断时提供可聚焦、可点击的全文 Tooltip。 */
+  tooltip?: boolean;
+};
+export interface TableLoadingConfig {
+  spinning: boolean;
+  /** 默认 table，body 仅遮罩数据区并保留当前数据。 */
+  scope?: "table" | "body";
+  tip?: ReactNode;
+}
 export type TableLayout = "fixed" | "auto";
 export type TableLayoutMode = "fill" | "compact";
 export type TableColumnAlign = "left" | "center" | "right";
@@ -26,6 +38,12 @@ export interface TableColumn<RecordType> {
   maxWidth?: number;
   /** fixed 数字分配的正数权重；未指定最小宽度时基准为 120px。 */
   grow?: number;
+  /** 未设置时沿用 grow 的压缩权重；0 禁止压缩。 */
+  shrink?: number;
+  /** 数字越小越先压缩，同级按 shrink 权重分配。 */
+  shrinkPriority?: number;
+  /** 数字越小越先扩展，同级按 grow 权重分配。 */
+  growPriority?: number;
   align?: TableColumnAlign;
   fixed?: TableFixed;
   ellipsis?: TableColumnEllipsis;
@@ -70,7 +88,9 @@ export interface TableProps<RecordType extends object> extends Omit<HTMLAttribut
   hover?: boolean;
   stripe?: boolean;
   showHeader?: boolean;
-  loading?: boolean;
+  loading?: boolean | TableLoadingConfig;
+  /** 容器宽度小于等于此值时取消固定列，默认不启用。 */
+  fixedBreakpoint?: number;
   scrollX?: number | string;
   /** 默认 fixed；compact 未显式指定时使用 auto。 */
   tableLayout?: TableLayout;
@@ -81,6 +101,10 @@ export interface TableProps<RecordType extends object> extends Omit<HTMLAttribut
   childrenColumnName?: keyof RecordType;
   pagination?: false | TablePaginationConfig;
   empty?: ReactNode;
+  /** 可选空态垂直内边距；默认保持历史布局。 */
+  emptyPadding?: number;
+  /** 仅替换无自定义 render 的 null/undefined/空字符串。默认不替换。 */
+  emptyCell?: ReactNode;
   draggable?: boolean;
   showSorterTooltip?: TableSorterTooltip;
   onSortChange?: (order: TableSortOrder, column: TableColumn<RecordType>) => void;

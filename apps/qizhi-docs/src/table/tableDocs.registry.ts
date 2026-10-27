@@ -25,5 +25,5 @@ export const tableDemos: readonly TableDemoDefinition[] = [
   { id: "table-props", title: "表格属性", description: "在这里，可以统一查看表格常用属性。表格尺寸通过上下内边距控制：默认 16px、中等 12px、小 8px。", component: PropsDemo, source: propsSource },
   { id: "table-merge", title: "单元格合并", description: "用于单元格合并，表头可以进行列合并，内容区域可以通过 rowSpan 与 colSpan 合并单元格。", component: MergeDemo, source: mergeSource },
   { id: "table-drag", title: "拖拽排序", description: "拖动表格行可以调整数据顺序，适合手动编排优先级或展示顺序。", component: DragDemo, source: dragSource },
-  { id: "table-layout", title: "列宽与自适应", description: "通过列级最小/最大宽度、grow、对齐和布局模式控制剩余空间；支持紧凑布局、原生自动布局、隐藏表头和同侧多个固定列。", component: LayoutDemo, source: layoutSource },
+  { id: "table-layout", title: "列宽与自适应", description: "通过列级宽度、伸缩权重与优先级分配空间；演示两行全文提示、数据区加载、空态留白、缺失值与容器固定列断点，并保留旧布局能力。", component: LayoutDemo, source: layoutSource },
 ];

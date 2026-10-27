@@ -37,6 +37,11 @@
 .qizhi-table.has-left-fixed-shadow .is-fixed-left::before { right: -12px; box-shadow: inset 8px 0 8px -8px rgba(29, 33, 41, 0.18); }
 .qizhi-table.has-right-fixed-shadow .is-fixed-right::before { left: -12px; box-shadow: inset -8px 0 8px -8px rgba(29, 33, 41, 0.18); }
 .qizhi-table__loading { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(255,255,255,.72); }
+.qizhi-table__loading[data-scope="body"] { z-index: var(--component-table-fixed-z-index, 2); }
+.qizhi-table__loading-placeholder { min-height: 80px; }
+.qizhi-table__empty-cell { padding: 0; }
+.qizhi-table__empty-content { min-width: 0; }
+.qizhi-table__empty-content > .qizhi-empty { margin: 0; }
 .qizhi-table__pagination { display: flex; padding-top: 16px; }
 .qizhi-table__pagination.is-bottomLeft { justify-content: flex-start; }
 .qizhi-table__pagination.is-bottomCenter { justify-content: center; }

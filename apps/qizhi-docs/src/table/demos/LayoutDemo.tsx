@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   Link,
+  Empty,
   Space,
   Switch,
   Table,
@@ -43,21 +44,30 @@ const constrainedColumns: TableColumn<Project>[] = [
     title: "项目名称",
     dataIndex: "project",
     minWidth: 180,
+    width: 220,
+    maxWidth: 260,
     grow: 1,
+    shrinkPriority: 1,
   },
   {
     key: "description",
     title: "说明",
     dataIndex: "description",
     minWidth: 180,
+    width: 300,
     maxWidth: 360,
     grow: 2,
+    shrinkPriority: 0,
   },
   {
     key: "status",
     title: "状态",
     dataIndex: "status",
     width: 96,
+    minWidth: 96,
+    grow: 1,
+    growPriority: 1,
+    shrink: 0,
     align: "center",
   },
   {
@@ -65,13 +75,53 @@ const constrainedColumns: TableColumn<Project>[] = [
     title: "更新时间",
     dataIndex: "updatedAt",
     width: 152,
-    align: "right",
+    minWidth: 152,
+    grow: 1,
+    growPriority: 1,
+    shrink: 0,
+    align: "left",
   },
   {
     key: "action",
     title: "操作",
-    width: 104,
+    width: 64,
     fixed: "right",
+    render: () => <Link hoverable={false}>查看</Link>,
+  },
+];
+
+type EngineeringRow = {
+  key: string;
+  name: string;
+  description: string;
+  count: number | null;
+};
+const engineeringRows: EngineeringRow[] = [
+  {
+    key: "one",
+    name: "跨产品设计系统基础组件与可访问性工程项目 g/j/p/q/y_",
+    description: "EnglishUnbrokenIdentifier_gjpqy_".repeat(8),
+    count: 0,
+  },
+  { key: "two", name: "短名称", description: "普通内容无需全文提示", count: null },
+];
+const engineeringColumns: TableColumn<EngineeringRow>[] = [
+  {
+    key: "name", title: "名称", dataIndex: "name", fixed: "left",
+    width: 240, minWidth: 180, maxWidth: 260, grow: 1,
+    shrinkPriority: 1, ellipsis: { rows: 2, tooltip: true },
+  },
+  {
+    key: "description", title: "说明", dataIndex: "description",
+    width: 260, minWidth: 160, maxWidth: 320, grow: 1,
+    shrinkPriority: 0, ellipsis: { rows: 2, tooltip: true },
+  },
+  {
+    key: "count", title: "数量", dataIndex: "count",
+    width: 96, minWidth: 96, grow: 1, growPriority: 1, shrink: 0,
+  },
+  {
+    key: "action", title: "操作", width: 64, fixed: "right",
     render: () => <Link hoverable={false}>查看</Link>,
   },
 ];
@@ -113,7 +163,7 @@ const autoColumns: TableColumn<Project>[] = [
     dataIndex: "updatedAt",
     width: 152,
     minWidth: 152,
-    align: "right",
+    align: "left",
   },
 ];
 
@@ -150,7 +200,7 @@ const fixedColumns: TableColumn<Project>[] = [
     title: "更新时间",
     dataIndex: "updatedAt",
     width: 152,
-    align: "right",
+    align: "left",
   },
   {
     key: "action",
@@ -163,13 +213,15 @@ const fixedColumns: TableColumn<Project>[] = [
 
 export default function LayoutDemo() {
   const [showHeader, setShowHeader] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [noRecords, setNoRecords] = useState(false);
 
   return (
     <Space direction="vertical" size="large" style={fullWidth}>
       <section style={fullWidth}>
         <h4>受约束的弹性列</h4>
         <p>
-          名称和说明按 grow 分配剩余空间；状态、日期和操作使用稳定宽度。
+          名称和说明达到上限后，由显式配置的状态、日期列分摊余量；操作列不扩展。
         </p>
         <Table
           aria-label="受约束的弹性列表"
@@ -181,7 +233,7 @@ export default function LayoutDemo() {
 
       <section style={fullWidth}>
         <h4>紧凑布局</h4>
-        <p>显式 fixed 后按数字预算收缩，不把剩余空间分给 grow 列。</p>
+        <p>特殊容器可显式收缩；标准页面级列表不使用此模式留白。</p>
         <Table
           aria-label="紧凑布局列表"
           rowKey="key"
@@ -189,6 +241,44 @@ export default function LayoutDemo() {
           dataSource={data}
           layoutMode="compact"
           tableLayout="fixed"
+        />
+      </section>
+
+      <section style={fullWidth}>
+        <h4>两行文本与数据区加载</h4>
+        <p>
+          仅实际截断的文本支持悬浮、聚焦、点击查看全文。窄容器取消固定列，
+          缺失值显示 -，保留真实 0；说明先压缩，名称后压缩。
+        </p>
+        <Space size="small">
+          <span>数据区加载</span>
+          <Switch checked={refreshing} onChange={setRefreshing} aria-label="数据区加载" />
+          <span>空数据</span>
+          <Switch checked={noRecords} onChange={setNoRecords} aria-label="增强示例空数据" />
+        </Space>
+        <Table
+          aria-label="工程规范增强列表"
+          rowKey="key"
+          columns={engineeringColumns}
+          dataSource={noRecords ? [] : engineeringRows}
+          emptyCell="-"
+          emptyPadding={36}
+          fixedBreakpoint={640}
+          loading={{ spinning: refreshing, scope: "body", tip: "正在刷新数据..." }}
+        />
+      </section>
+
+      <section style={fullWidth}>
+        <h4>自定义空态留白</h4>
+        <p>默认与自定义 Empty 使用同一层 36px 留白，不重复叠加单元格内边距。</p>
+        <Table
+          aria-label="自定义空态列表"
+          rowKey="key"
+          columns={engineeringColumns}
+          dataSource={[]}
+          emptyPadding={36}
+          fixedBreakpoint={640}
+          empty={<Empty description="没有匹配的项目" />}
         />
       </section>
 

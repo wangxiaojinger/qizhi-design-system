@@ -574,6 +574,7 @@ export type {
   TableColumnAlign,
   TableLayout,
   TableLayoutMode,
+  TableLoadingConfig,
   TableExpandable,
   TableFixed,
   TablePaginationConfig,
