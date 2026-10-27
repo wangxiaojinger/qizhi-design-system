@@ -11,11 +11,12 @@ test("模型目录：布局保存、刷新恢复、账号隔离与重置，业�
   const keys = () => page.evaluate(() => Object.keys(localStorage)
     .filter((key) => key.startsWith("qizhi-table-layout:")));
   expect(await keys()).toHaveLength(0);
+  const handle = table.locator('th[data-column-key="name"]').getByRole("separator");
+  await handle.press("Home");
+  for (let step = 0; step < 5; step++) await handle.press("ArrowRight");
   await demo.getByRole("button", { name: "列设置", exact: true }).click();
   const panel = page.getByRole("dialog", { name: "列设置", exact: true });
-  const width = panel.getByRole("spinbutton", { name: "列宽模型名称" });
-  await width.fill("240");
-  await width.press("Enter");
+  await expect(panel.getByRole("spinbutton")).toHaveCount(0);
   await panel.getByRole("checkbox", { name: "供应商", exact: true }).locator("xpath=ancestor::label").click();
   await page.keyboard.press("Escape");
   await expect(table.locator('th[data-column-key="provider"]')).toHaveCount(0);
@@ -23,7 +24,7 @@ test("模型目录：布局保存、刷新恢复、账号隔离与重置，业�
   await page.reload();
   await expect(table.locator('th[data-column-key="provider"]')).toHaveCount(0);
   await expect.poll(() => table.locator('th[data-column-key="name"]')
-    .evaluate((node) => node.getBoundingClientRect().width)).toBeCloseTo(240, 0);
+    .evaluate((node) => node.getBoundingClientRect().width)).toBeCloseTo(220, 0);
   await demo.getByRole("combobox", { name: "布局作用域" }).click();
   await page.getByRole("option", { name: "用户 B（个人）" }).click();
   await expect(table.locator('th[data-column-key="provider"]')).toHaveCount(1);
@@ -31,9 +32,8 @@ test("模型目录：布局保存、刷新恢复、账号隔离与重置，业�
   await demo.getByRole("combobox", { name: "布局作用域" }).click();
   await page.getByRole("option", { name: "用户 A（个人）" }).click();
   await expect(table.locator('th[data-column-key="provider"]')).toHaveCount(0);
-  await demo.getByRole("button", { name: "列设置", exact: true }).click();
-  await panel.getByRole("button", { name: "恢复默认布局" }).click();
-  await page.keyboard.press("Escape");
+  await demo.getByText("当前布局状态（演示）", { exact: true }).click();
+  await demo.getByRole("button", { name: "恢复默认布局", exact: true }).click();
   expect(await keys()).toHaveLength(0);
   await page.reload();
   await expect(table.locator('th[data-column-key="provider"]')).toHaveCount(1);

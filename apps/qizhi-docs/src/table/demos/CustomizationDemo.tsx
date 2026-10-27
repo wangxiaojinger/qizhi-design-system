@@ -483,6 +483,9 @@ function ModelCatalogScopeDemo({ scope }: { scope: ModelCatalogScope }) {
       />
       <details>
         <summary>当前布局状态（演示）</summary>
+        <Button size="small" onClick={() => handleLayoutChange(
+          defaultModelCatalogLayout(), { reason: "reset" },
+        )}>恢复默认布局</Button>
         <pre style={{ marginBottom: 0, color: "var(--color-text-2)" }}>
           {JSON.stringify(layout, null, 2)}
         </pre>

@@ -81,9 +81,9 @@ test("受控拒绝保持表格和设置面板权威值", async ({ page }) => {
   await resize(page, "a", 30);
   expect(await width(cell(page, "a"))).toBeCloseTo(before, 0);
   await main(page).getByRole("button", { name: "列设置" }).click();
-  const input = page.getByRole("spinbutton", { name: "列宽甲" });
-  await input.fill("170"); await input.press("Enter"); await input.blur();
-  await expect(input).toHaveValue(String(before));
+  await expect(page.getByRole("dialog", { name: "列设置" }).getByRole("spinbutton")).toHaveCount(0);
+  await page.keyboard.press("Escape");
+  await cell(page, "a").getByRole("separator").press("ArrowRight");
   expect(await width(cell(page, "a"))).toBeCloseTo(before, 0);
 });
 test("原生auto和百分比首次从真实像素起点调宽，其他列保持", async ({ page }) => {
@@ -100,7 +100,6 @@ test("原生auto和百分比首次从真实像素起点调宽，其他列保持"
 test("auto恢复默认后内容变化，下一次调宽使用新的实际基准", async ({ page }) => {
   await page.goto(`${fixture}?mode=auto`);
   await resize(page, "a", 25);
-  await main(page).getByRole("button", { name: "列设置", exact: true }).click();
   await page.getByRole("button", { name: "恢复默认布局" }).click();
   await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "改变文本" }).click();
@@ -115,7 +114,7 @@ for (const kind of ["弹窗", "抽屉"]) test(`${kind}中Escape先关列面板�
   const trigger = table.locator("xpath=../..").getByRole("button", { name: "列设置" });
   await trigger.click();
   await expect(page.getByRole("dialog", { name: "列设置" })).toBeVisible();
-  await page.getByRole("spinbutton", { name: "列宽甲" }).focus();
+  await page.getByRole("checkbox", { name: "甲", exact: true }).focus();
   await page.keyboard.press("Escape");
   await expect(page.getByRole("dialog", { name: "列设置" })).toBeHidden();
   await expect(table).toBeVisible();

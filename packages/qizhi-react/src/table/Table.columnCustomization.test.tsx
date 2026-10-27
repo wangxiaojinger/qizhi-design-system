@@ -1,5 +1,6 @@
 import { fireEvent, render, screen, within } from "@testing-library/react";
 import { Table } from "./Table";
+import { defaultColumnLayout } from "./columnLayoutModel";
 import type { TableColumn } from "./Table.types";
 import type { TableColumnLayoutState } from "./TableColumnLayout.types";
 
@@ -66,18 +67,18 @@ describe("Table column customization integration", () => {
     expect(initial.columnVisibility).toEqual({});
   });
 
-  it("resets to CURRENT column defaults, not the saved defaultColumnLayout", () => {
+  it("allows explicit external reset without a user commit or a reset action in visibility settings", () => {
     const onChange = vi.fn();
-    const { container } = render(<Table columns={columns} dataSource={rows} rowKey="id"
-      defaultColumnLayout={saved} columnCustomization={{ settings: true, resize: true }}
+    const { container, rerender } = render(<Table columns={columns} dataSource={rows} rowKey="id"
+      columnLayout={saved} columnCustomization={{ settings: true, resize: true }}
       onColumnLayoutChange={onChange} />);
     fireEvent.click(screen.getByRole("button", { name: "列设置" }));
-    fireEvent.click(screen.getByRole("button", { name: "恢复默认布局" }));
+    expect(screen.queryByRole("button", { name: "恢复默认布局" })).toBeNull();
+    rerender(<Table columns={columns} dataSource={rows} rowKey="id"
+      columnLayout={defaultColumnLayout(columns)} onColumnLayoutChange={onChange} />);
     expect(screen.getAllByRole("columnheader")).toHaveLength(3);
     expect(container.querySelector("col")).not.toHaveStyle({ width: "175px" });
-    expect(onChange).toHaveBeenCalledTimes(1);
-    expect(onChange.mock.calls[0][0].columnWidths).toEqual({});
-    expect(onChange.mock.calls[0][1]).toEqual({ reason: "reset" });
+    expect(onChange).not.toHaveBeenCalled();
   });
 
   it("keeps tree expansion anchored to its key after layout reorders columns", () => {

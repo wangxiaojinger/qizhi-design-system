@@ -446,29 +446,19 @@ export function Table<RecordType extends object>({ columns: sourceColumns, dataS
     });
   };
   const settingsControl = custom.active && columnCustomization?.settings ? <ColumnSettings
-    items={custom.state.columnOrder.map((key, index) => {
+    items={custom.state.columnOrder.map((key) => {
       const column = sourceColumns.find((item) => item.key === key)!;
-      const bounds = columnResizeBounds(column);
-      const visibleIndex = columns.findIndex((item) => item.key === key);
       const cannotHide = column.hideable === false || protectedKeys.includes(key);
       const onlyData = column.layoutRole !== "action" && custom.state.columnVisibility[key] !== false
         && sourceColumns.filter((item) => item.layoutRole !== "action" && custom.state.columnVisibility[item.key] !== false).length <= 1;
-      const before = custom.state.columnOrder[index - 1];
-      const after = custom.state.columnOrder[index + 1];
       return { key, label: labelOf(column), visible: custom.state.columnVisibility[key] !== false,
         hideable: !cannotHide && !onlyData,
         visibilityDisabledReason: cannotHide ? columnCustomization.locale?.required ?? "必需列"
-          : onlyData ? columnCustomization.locale?.minimumVisible ?? "至少保留一列数据" : undefined,
-        width: manualWidths[key] ?? ((visibleIndex >= 0 ? renderedColumnWidth(visibleIndex) : 0)
-          || (typeof column.width === "number" ? column.width : 120)),
-        minWidth: bounds.min, maxWidth: bounds.max, resizable: column.resizable !== false,
-        canMoveBefore: Boolean(before && custom.canMove(key, before, "before")),
-        canMoveAfter: Boolean(after && custom.canMove(key, after, "after")) };
+          : onlyData ? columnCustomization.locale?.minimumVisible ?? "至少保留一列数据" : undefined };
     })}
-    visibility={canHide} reorder={canReorder} resize={canResize}
+    visibility={canHide}
     locale={{ reset: "恢复默认布局", ...columnCustomization.locale }} renderTrigger={columnCustomization.renderSettings}
-    onVisibility={custom.setVisibility} onVisibilityAll={custom.setAllVisibility}
-    onMove={moveOne} onResize={custom.setWidth} onReset={custom.reset} /> : null;
+    onVisibility={custom.setVisibility} onVisibilityAll={custom.setAllVisibility} /> : null;
   const emptyContent = bodyLoading && spinning ? <div className="qizhi-table__loading-placeholder" />
     : emptyPadding != null && Number.isFinite(emptyPadding) && emptyPadding >= 0
       ? <div className="qizhi-table__empty-content" style={{ paddingBlock: emptyPadding }}>{empty ?? <Empty />}</div>

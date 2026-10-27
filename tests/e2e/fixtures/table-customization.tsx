@@ -13,12 +13,15 @@ function App() {
   const mode = new URLSearchParams(location.search).get("mode");
   const [narrow, setNarrow] = useState(false);
   const [longText, setLongText] = useState(false);
+  const [longLabel, setLongLabel] = useState(false);
+  const [layout, setLayout] = useState<TableColumnLayoutState>(initial);
   const [, rerender] = useState(0);
   const [events, setEvents] = useState<{ state: TableColumnLayoutState; reason: string }[]>([]);
   const [modal, setModal] = useState(false);
   const [drawer, setDrawer] = useState(false);
   const columns: TableColumn<Row>[] = [
-    { key: "a", title: "甲", dataIndex: "a", width: 100, minWidth: 80, maxWidth: 200, fixed: "left" },
+    { key: "a", title: "甲", dataIndex: "a", width: 100, minWidth: 80, maxWidth: 200, fixed: "left",
+      settingsLabel: longLabel ? "模型调用统计与工作空间名称" : undefined },
     { key: "b", title: "乙", dataIndex: "b", width: 120, fixed: "left" },
     { key: "c", title: "内容", dataIndex: "c", width: 140 },
     { key: "d", title: "锁定", dataIndex: "d", width: 130, movable: false },
@@ -30,13 +33,18 @@ function App() {
   const table = (label: string) => <Table aria-label={label} rowKey="id" columns={automatic} dataSource={data}
     layoutMode={mode === "auto" ? "fill" : "compact"} tableLayout={mode === "auto" ? "auto" : "fixed"}
     columnCustomization={{ resize: true, reorder: true, visibility: true, settings: true }}
-    columnLayout={mode === "reject" ? initial : undefined}
-    onColumnLayoutChange={(state, meta) => setEvents((previous) => [...previous, { state, reason: meta.reason }])} />;
+    columnLayout={mode === "reject" ? initial : layout}
+    onColumnLayoutChange={(state, meta) => {
+      if (mode !== "reject") setLayout(state);
+      setEvents((previous) => [...previous, { state, reason: meta.reason }]);
+    }} />;
   return <>
     <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
       <button onClick={() => rerender((n) => n + 1)}>父重绘</button>
       <button onClick={() => setNarrow(!narrow)}>切换容器</button>
       <button onClick={() => setLongText(!longText)}>改变文本</button>
+      <button onClick={() => setLongLabel(!longLabel)}>切换列名</button>
+      <button onClick={() => setLayout({ ...initial, columnOrder: automatic.map((col) => col.key) })}>恢复默认布局</button>
       <button onClick={() => setModal(true)}>打开弹窗</button>
       <button onClick={() => setDrawer(true)}>打开抽屉</button>
     </div>

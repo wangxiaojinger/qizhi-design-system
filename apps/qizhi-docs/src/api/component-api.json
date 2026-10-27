@@ -6596,7 +6596,7 @@
         },
         {
           "name": "columnCustomization",
-          "description": "列移动、调宽、显隐和设置面板的独立开关；全部默认关闭。可用 renderSettings 接收完整设置入口并放入既有工具栏，locale 覆盖中文文案。仅传布局状态可只读恢复，不会自动开启交互。",
+          "description": "列移动、调宽、显隐和设置面板的独立开关；全部默认关闭。设置面板只管理显隐，移动与调宽在表头操作。renderSettings 可将入口放入既有工具栏，locale 覆盖文案；仅传布局状态不自动开启交互。",
           "type": "TableColumnCustomization",
           "defaultValue": "—"
         },
@@ -6614,7 +6614,7 @@
         },
         {
           "name": "onColumnLayoutChange",
-          "description": "用户有效移动、调宽、显隐或恢复默认时回传独立的完整布局快照和 { reason, columnKey? }；无变化、取消、外部更新与规范化不会触发。",
+          "description": "用户有效移动、调宽或显隐时回传独立完整布局快照和 { reason, columnKey? }；无变化、取消、业务恢复受控布局、外部更新与规范化不触发。reset 原因类型保留兼容。",
           "type": "(layout: TableColumnLayoutState, meta: TableColumnLayoutMeta) => void",
           "defaultValue": "—"
         },
@@ -6685,7 +6685,7 @@
         "宽度不足时按 shrinkPriority 从小到大压缩，同级按 shrink 权重缩至 minWidth；shrink 未设置时沿用旧 grow 权重，0 明确禁止压缩。仍不足时仅表格内部滚动。数字 scrollX 是预算下限，不应重复增加；约束模式不支持 string scrollX 或混合 string width。列宽按合法内容、表头、图标、控件和 Padding 预算，不根据当前页数据测量。",
         "tableLayout=\"auto\" 时，minWidth 交给浏览器的原生表格布局；maxWidth 与 grow 不参与数字分配，不应组合使用。layoutMode=\"compact\" 且未显式 tableLayout 时默认使用 auto 并按内容收缩；显式 tableLayout=\"fixed\" 且存在约束时，紧凑模式按数字预算收缩，不向 grow 列分配多余空间。",
         "列定制完全按需启用。默认列表仍按现有 fill/固定预算铺满容器；只有用户已提交 columnWidths 时，手动 CSS px 优先，未手动列沿用当前实际／自动预算。手动总宽小于容器允许在满宽卡片内留下表格内部留白；超过容器只在表格滚动区横向滚动，不能撑宽页面或改写用户手动值。",
-        "columnLayout 是受控的完整可序列化状态，defaultColumnLayout 只在非受控首轮读取；外部状态、损坏持久化数据和列定义变化均先规范化，不因此回调。onColumnLayoutChange 只在用户有效提交时给出独立快照与 order/width/visibility/reset 原因。组件核心不读写 localStorage、接口或权限数据。",
+        "columnLayout 是受控的完整可序列化状态，defaultColumnLayout 只在非受控首轮读取；外部状态、损坏持久化数据和列定义变化先规范化，不因此回调。onColumnLayoutChange 在有效提交时给出 order/width/visibility 原因；reset 类型保留兼容。核心不读写存储、接口或权限。",
         "列移动不跨越当前定义中的 left/普通/right 固定区域或 movable=false 锁列；隐藏列仍留在完整 columnOrder。至少保留一列 layoutRole=data 可见，hideable=false 与树入口保护列始终可见。发生 colSpan 合并时，移动和显隐暂时关闭并恢复当前源列顺序；调宽仍可用。",
         "每个表格都通过 colgroup 表达列宽，因此 showHeader=false 仍保持列声明。固定列按实际渲染的列宽计算同侧累计偏移，支持同侧多个业务列；选择和展开辅助列纳入列结构与测量索引，但自身不固定，会随内容滚动。左右固定列加前置选择、展开等辅助列的实际总宽度应小于最小容器宽度，须在 scrollLeft=0、滚动中和末端分别验证，避免窄屏相撞。",
         "列默认左对齐。日期／时间列（包括更新时间）的表头与内容必须左对齐，不允许右对齐。使用 align=\"right\" 或 align=\"center\" 时，表头、排序控件和数据单元格同步对齐；组件不根据字段名推断金额、日期或状态语义。操作列按所有状态和语言中的最宽合法组合设置稳定 width，翻页、筛选或加载时不改变操作展示方式与列宽。",

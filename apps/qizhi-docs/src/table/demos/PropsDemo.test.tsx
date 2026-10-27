@@ -22,25 +22,23 @@ describe("PropsDemo", () => {
     expect(screen.queryByText("试用")).not.toBeInTheDocument();
   });
 
-  it.each([
-    ["列移动", "后移说明"],
-    ["列调宽", "列宽模型名称"],
-    ["列显隐", "全选"],
-  ])("allows %s to close without removing the other settings entry", (label, control) => {
+  it.each(["列移动", "列调宽", "列显隐"])(
+    "allows %s to close without removing the visibility settings entry", (label) => {
     render(<PropsDemo />);
 
     openSettings();
-    expect(screen.getByLabelText(control)).toBeInTheDocument();
     fireEvent.click(screen.getByRole("switch", { name: label }));
-    expect(screen.queryByLabelText(control)).not.toBeInTheDocument();
+    expect(screen.queryByRole("spinbutton")).toBeNull();
+    if (label === "列移动") expect(screen.queryByRole("button", { name: /移动列/ })).toBeNull();
+    if (label === "列调宽") expect(screen.queryByRole("separator")).toBeNull();
+    if (label === "列显隐") expect(screen.getByRole("checkbox", { name: "全选" })).toBeDisabled();
     expect(screen.getByRole("button", { name: "列设置" })).toBeInTheDocument();
   });
 
   it("keeps the controlled layout after the move capability is closed and restored", () => {
     render(<PropsDemo />);
 
-    openSettings();
-    fireEvent.click(screen.getByRole("button", { name: "后移说明" }));
+    fireEvent.keyDown(screen.getByRole("button", { name: "移动列 说明" }), { key: "ArrowRight" });
     const headers = () => [...previewTable().querySelectorAll("th[data-column-key]")]
       .map((header) => header.getAttribute("data-column-key"));
 

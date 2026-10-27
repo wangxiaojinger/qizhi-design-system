@@ -55,10 +55,11 @@ test("属性示例：模型目录、列能力组合、隐藏表头后保留手�
   const key = await header.getAttribute("data-column-key");
   await demo.getByRole("button", { name: "列设置", exact: true }).click();
   const panel = page.getByRole("dialog", { name: "列设置", exact: true });
-  const input = panel.getByRole("spinbutton").first();
-  await input.fill("220");
-  await input.press("Enter");
+  await expect(panel.getByRole("spinbutton")).toHaveCount(0);
   await page.keyboard.press("Escape");
+  const handle = header.getByRole("separator");
+  await handle.press("Home");
+  for (let step = 0; step < 5; step++) await handle.press("ArrowRight");
   const actual = () => table.locator(`th[data-column-key="${key}"]`)
     .evaluate((node) => node.getBoundingClientRect().width);
   await expect.poll(actual).toBeCloseTo(220, 0);

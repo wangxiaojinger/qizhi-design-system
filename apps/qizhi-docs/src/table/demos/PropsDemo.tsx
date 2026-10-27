@@ -169,6 +169,10 @@ export default function PropsDemo() {
       </div>
       <details>
         <summary>前后端接入说明（开发示例）</summary>
+        <Button size="small" onClick={() => {
+          setLayout(defaultColumnLayout(columns));
+          setLastEvent("布局恢复默认");
+        }}>恢复默认布局</Button>
         <p>本例使用本地数据。搜索、接口请求、服务端排序和权限校验由业务实现。</p>
         <p>
           onSortChange、rowSelection.onChange、pagination.onChange 提供交互回调；
