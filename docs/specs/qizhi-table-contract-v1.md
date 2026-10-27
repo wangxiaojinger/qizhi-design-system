@@ -62,6 +62,14 @@ Table 是自研原生 HTML table，不依赖 AntD/rc-table。它提供显式列�
 
 ## 用户列定制
 
+### 属性示例与业务示例的职责
+
+- 「表格属性」使用模型目录演示数据，集中提供边框、密度、选择、加载、表头、空态及四项列定制开关。分页默认右下角，不展示位置切换；斑马纹不在该示例中展示，既有公共 API 保留兼容。
+- 列移动关闭或单列不可移动时，排序标题保留正常的单元格左内边距；只有实际渲染移动手柄时才由手柄承接该内边距。调宽手柄不改变标题内边距，窄屏沿用紧凑间距 token。
+- 属性示例同时显式接入已有的 shrink／优先级预算、两行按需全文提示、body 加载、默认和自定义空态 36px 留白、容器 fixedBreakpoint 与 emptyCell 占位。不新增语义重复的 API，不把示例开关变成组件内置工具栏。
+- 「Qways 模型目录与用户列布局」保留搜索、业务筛选、详情和列设置入口；四项能力由代码启用，不在业务工具栏展示功能开关。模拟身份切换与布局 JSON 属于独立示例配置；移除未接入的试用占位按钮。
+- 数据请求、服务端筛选／排序、权限、失败重试、布局持久化仍由业务负责。Table 的 onSortChange、rowSelection.onChange、pagination.onChange、onColumnLayoutChange 提供现有交互回调；不能把本地示例描述为已接入真实后端，也不能以隐藏列代替权限控制。
+
 完整可序列化状态为 `TableColumnLayoutState`：`{ schemaVersion: 1, columnOrder, columnWidths, columnVisibility }`。`columnOrder` 始终包含隐藏列；`columnWidths` 只保存用户显式提交的 CSS px；`columnVisibility` 是当前有效列的完整布尔映射。状态及回调元信息的类型和可访问文案配置见 [用户列定制契约](./qizhi-table-column-customization-v1.md)。
 
 - `columnCustomization` 的 `reorder`、`resize`、`visibility`、`settings` 分别开启交互，全部默认 `false`；状态本身可独立传入并以只读方式恢复。`renderSettings` 接收完整设置入口，可由业务放入已有工具栏，`locale` 可部分覆盖设置、恢复、全选、移动、调宽及必选提示文案。

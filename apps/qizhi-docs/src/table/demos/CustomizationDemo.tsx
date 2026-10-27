@@ -7,7 +7,6 @@ import {
   Modal,
   Select,
   Space,
-  Switch,
   Table,
   Tag,
   Tooltip,
@@ -257,9 +256,9 @@ export const modelCatalogColumns: TableColumn<ModelCatalogRow>[] = [
     title: "操作",
     settingsLabel: "操作",
     fixed: "right",
-    width: 176,
-    minWidth: 164,
-    maxWidth: 176,
+    width: 80,
+    minWidth: 80,
+    maxWidth: 80,
     movable: false,
     hideable: false,
     resizable: false,
@@ -353,8 +352,6 @@ const scopes = {
 } as const;
 
 type ScopeId = keyof typeof scopes;
-type FeatureKey = "reorder" | "resize" | "visibility" | "settings";
-type FeatureState = Record<FeatureKey, boolean>;
 
 const scopeOptions = Object.entries(scopes).map(([value, definition]) => ({
   label: definition.label,
@@ -370,25 +367,16 @@ const createModelCatalogColumns = (
     render: (_value, model) => (
       <Space size={4}>
         <Button type="text" size="small" onClick={() => onDetails(model)}>详情</Button>
-        <Button size="small" disabled title="试用能力未接入（演示占位）">
-          试用（未接入）
-        </Button>
       </Space>
     ),
   };
 });
 
-function ModelCatalogScopeDemo({ scope, label }: { scope: ModelCatalogScope; label: string }) {
+function ModelCatalogScopeDemo({ scope }: { scope: ModelCatalogScope }) {
   const storageKey = createModelCatalogStorageKey(scope);
   const [layout, setLayout] = useState(() => (
     readModelCatalogLayout(modelCatalogColumns, getBrowserStorage(), storageKey)
   ));
-  const [features, setFeatures] = useState<FeatureState>({
-    reorder: true,
-    resize: true,
-    visibility: true,
-    settings: true,
-  });
   const [toolbarSlot, setToolbarSlot] = useState<HTMLSpanElement | null>(null);
   const [provider, setProvider] = useState("all");
   const [status, setStatus] = useState("all");
@@ -424,9 +412,6 @@ function ModelCatalogScopeDemo({ scope, label }: { scope: ModelCatalogScope; lab
       && (status === "all" || model.status === status)
       && text.includes(query.trim().toLowerCase());
   }), [provider, query, status]);
-  const updateFeature = (key: FeatureKey, checked: boolean) => {
-    setFeatures((current) => ({ ...current, [key]: checked }));
-  };
 
   return (
     <Space direction="vertical" size="medium" style={{ width: "100%", minWidth: 0 }}>
@@ -472,48 +457,8 @@ function ModelCatalogScopeDemo({ scope, label }: { scope: ModelCatalogScope; lab
           onChange={(value) => setStatus(String(value ?? "all"))}
           style={{ minWidth: 116 }}
         />
-        <label>
-          列移动
-          <Switch
-            size="small"
-            checked={features.reorder}
-            aria-label="列移动"
-            onChange={(checked) => updateFeature("reorder", checked)}
-          />
-        </label>
-        <label>
-          列调宽
-          <Switch
-            size="small"
-            checked={features.resize}
-            aria-label="列调宽"
-            onChange={(checked) => updateFeature("resize", checked)}
-          />
-        </label>
-        <label>
-          列显隐
-          <Switch
-            size="small"
-            checked={features.visibility}
-            aria-label="列显隐"
-            onChange={(checked) => updateFeature("visibility", checked)}
-          />
-        </label>
-        <label>
-          列设置入口
-          <Switch
-            size="small"
-            checked={features.settings}
-            aria-label="列设置入口"
-            onChange={(checked) => updateFeature("settings", checked)}
-          />
-        </label>
         <span ref={setToolbarSlot} />
       </div>
-      <p style={{ margin: 0, color: "var(--color-text-3)" }}>
-        当前作用域：{label}。本示例仅在浏览器本地筛选和分页，
-        不发起服务端请求。
-      </p>
       <p style={{ margin: 0, color: "var(--color-text-3)" }}>
         模型数据与价格均为演示，非真实报价。
       </p>
@@ -524,10 +469,10 @@ function ModelCatalogScopeDemo({ scope, label }: { scope: ModelCatalogScope; lab
         columns={columns}
         dataSource={filteredRows}
         columnCustomization={{
-          reorder: features.reorder,
-          resize: features.resize,
-          visibility: features.visibility,
-          settings: features.settings,
+          reorder: true,
+          resize: true,
+          visibility: true,
+          settings: true,
           renderSettings,
         }}
         columnLayout={layout}
@@ -579,17 +524,24 @@ export default function CustomizationDemo() {
           列布局按作用域隔离；切换作用域只读取对应缓存，不会自动写入。
         </p>
       </div>
-      <label>
-        布局作用域
-        <Select
-          aria-label="布局作用域"
-          value={scopeId}
-          options={scopeOptions}
-          onChange={(value) => setScopeId(value as ScopeId)}
-          style={{ minWidth: 176, marginInlineStart: 8 }}
-        />
-      </label>
-      <ModelCatalogScopeDemo key={scopeKey} scope={currentScope.scope} label={currentScope.label} />
+      <fieldset className="table-demo-config">
+        <legend>保存恢复演示配置</legend>
+        <label>
+          布局作用域
+          <Select
+            aria-label="布局作用域"
+            value={scopeId}
+            options={scopeOptions}
+            onChange={(value) => setScopeId(value as ScopeId)}
+            style={{ minWidth: 176, marginInlineStart: 8 }}
+          />
+        </label>
+        <p style={{ marginBottom: 0, color: "var(--color-text-3)" }}>
+          当前作用域：{currentScope.label}。本示例仅在浏览器本地筛选和分页，
+          不发起服务端请求。
+        </p>
+      </fieldset>
+      <ModelCatalogScopeDemo key={scopeKey} scope={currentScope.scope} />
     </Space>
   );
 }

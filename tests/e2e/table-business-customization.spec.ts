@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("模型目录：布局保存、刷新恢复、账号隔离、重置与独立开关", async ({ page }) => {
+test("模型目录：布局保存、刷新恢复、账号隔离与重置，业务界面无演示开关", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/#table-customization");
@@ -37,14 +37,10 @@ test("模型目录：布局保存、刷新恢复、账号隔离、重置与独�
   expect(await keys()).toHaveLength(0);
   await page.reload();
   await expect(table.locator('th[data-column-key="provider"]')).toHaveCount(1);
-  await demo.getByRole("switch", { name: "列设置入口" }).click();
-  await expect(demo.getByRole("button", { name: "列设置", exact: true })).toHaveCount(0);
+  await expect(demo.getByRole("switch")).toHaveCount(0);
+  await expect(demo.getByRole("button", { name: /试用/ })).toHaveCount(0);
   await expect(table.getByRole("separator")).toHaveCount(9);
-  await demo.getByRole("switch", { name: "列调宽" }).click();
-  await expect(table.getByRole("separator")).toHaveCount(0);
   await expect(table.getByRole("button", { name: /移动列/ })).toHaveCount(9);
-  await demo.getByRole("switch", { name: "列移动" }).click();
-  await expect(table.getByRole("button", { name: /移动列/ })).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
   expect(errors).toEqual([]);
 });

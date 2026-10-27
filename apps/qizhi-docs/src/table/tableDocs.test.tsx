@@ -4,6 +4,18 @@ import { tableApi, tableApiDefaultBehaviors, tableColumnApi } from "./tableApi";
 import { tableDemos } from "./tableDocs.registry";
 
 describe("Table docs", () => {
+  it("centralizes feature controls in the catalog props demo rather than business tooling", () => {
+    render(<TableDocsIsland />);
+    const props = document.querySelector<HTMLElement>("#table-props")!;
+    const business = document.querySelector<HTMLElement>("#table-customization")!;
+    for (const label of ["列移动", "列调宽", "列显隐", "列设置入口"]) {
+      expect(within(props).getByRole("switch", { name: label })).toBeChecked();
+    }
+    expect(within(props).queryByRole("switch", { name: "斑马纹" })).toBeNull();
+    expect(within(props).getByRole("table")).toHaveTextContent("Qways");
+    expect(within(business).queryByRole("switch")).toBeNull();
+    expect(within(business).queryByRole("button", { name: /试用/ })).toBeNull();
+  });
   it("demonstrates explicit engineering options while retaining the twelve existing demos", () => {
     render(<TableDocsIsland />);
     const enhanced = screen.getByRole("table", { name: "工程规范增强列表" });
@@ -52,7 +64,7 @@ describe("Table docs", () => {
     expect(screen.getAllByRole("switch").every((node) =>
       node.classList.contains("qizhi-switch"))).toBe(true);
     expect(document.querySelector(".table-demo-switch")).not.toBeInTheDocument();
-    expect(screen.getAllByRole("radiogroup")).toHaveLength(3);
+    expect(screen.getAllByRole("radiogroup")).toHaveLength(2);
     expect(screen.getAllByRole("radio").every((node) =>
       node.classList.contains("qizhi-segmented-item"))).toBe(true);
     fireEvent.click(screen.getByRole("switch", { name: "无数据" }));
@@ -115,14 +127,13 @@ describe("Table docs", () => {
     expect(fixedTable).not.toHaveClass("is-hoverable");
   });
 
-  it("moves the props demo pagination with its segmented control", () => {
+  it("keeps props pagination at the bottom right without a position selector", () => {
     render(<TableDocsIsland />);
-    const propsDemo = document.querySelector("#table-props")!;
+    const propsDemo = document.querySelector<HTMLElement>("#table-props")!;
     const pagination = propsDemo.querySelector<HTMLElement>(".qizhi-pagination")!;
 
     expect(pagination).toHaveClass("is-bottomRight");
-    fireEvent.click(screen.getByRole("radio", { name: "底部居中" }));
-    expect(pagination).toHaveClass("is-bottomCenter");
+    expect(within(propsDemo).queryByRole("radiogroup", { name: "分页位置" })).toBeNull();
   });
 
   it("reuses the Button docs action structure", () => {
@@ -157,8 +168,9 @@ describe("Table docs", () => {
   it("keeps interactive demo source readable instead of collapsing JSX into one line", () => {
     const propsSource = tableDemos.find((demo) => demo.id === "table-props")!.source;
     const sortSource = tableDemos.find((demo) => demo.id === "table-sort")!.source;
-    expect(propsSource).toContain("\n      <Table\n");
-    expect(propsSource).toContain("\n        pagination={{ pageSize: 3, position }}\n");
+    expect(propsSource).toMatch(/\n\s+<Table\n/);
+    expect(propsSource).toContain("pageSize: 3,");
+    expect(propsSource).not.toContain('aria-label="分页位置"');
     expect(sortSource).toContain("sortDirections");
     expect(sortSource).not.toContain("defaultSortOrder");
     expect(sortSource).toContain("showSorterTooltip");

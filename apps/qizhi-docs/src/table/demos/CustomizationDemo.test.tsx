@@ -80,7 +80,9 @@ describe("CustomizationDemo", () => {
       const availableTag = screen.getAllByText("可用")[0].closest(".qizhi-tag");
       expect(availableTag).not.toHaveClass("qizhi-tag-green");
       expect(screen.getByText("+1")).toBeVisible();
-      expect(screen.getByRole("switch", { name: "列设置入口" })).toBeChecked();
+      expect(screen.queryByRole("switch")).not.toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: /试用/ })).not.toBeInTheDocument();
+      expect(screen.getByRole("button", { name: "列设置" })).toBeVisible();
       expect(setItem).not.toHaveBeenCalled();
       expect(removeItem).not.toHaveBeenCalled();
 

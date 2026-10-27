@@ -214,10 +214,10 @@ test("Table 三档 size 通过单元格内边距控制密度", async ({ page }) 
   const propsCell = propsDemo.locator(".qizhi-table__td").first();
   await expect(propsHeader).toHaveCSS("padding-top", "16px");
   await expect(propsCell).toHaveCSS("padding-top", "16px");
-  await propsDemo.getByRole("radio", { name: "中等 48px" }).click();
+  await propsDemo.getByRole("radio", { name: "中等", exact: true }).click();
   await expect(propsHeader).toHaveCSS("padding-top", "12px");
   await expect(propsCell).toHaveCSS("padding-top", "12px");
-  await propsDemo.getByRole("radio", { name: "小 40px" }).click();
+  await propsDemo.getByRole("radio", { name: "小", exact: true }).click();
   await expect(propsHeader).toHaveCSS("padding-top", "8px");
   await expect(propsCell).toHaveCSS("padding-top", "8px");
 });

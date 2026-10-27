@@ -24,9 +24,9 @@ export const tableDemos: readonly TableDemoDefinition[] = [
   { id: "table-expand", title: "展开行", description: "当内容过长，可以通过 expandedRowRender 设置展开行。如果返回值是 null，不会渲染展开按钮。", component: ExpandDemo, source: expandSource },
   { id: "table-nested", title: "嵌套子表格", description: "嵌套子表格的例子，点击展开按钮可以在展开区域展示子表格。", component: NestedDemo, source: nestedSource },
   { id: "table-tree", title: "树形数据展示", description: "树形数据展示的例子，data 里有 children 字段，或者通过 childrenColumnName 设置成自定义字段。", component: TreeDemo, source: treeSource },
-  { id: "table-props", title: "表格属性", description: "在这里，可以统一查看表格常用属性。表格尺寸通过上下内边距控制：默认 16px、中等 12px、小 8px。", component: PropsDemo, source: propsSource },
+  { id: "table-props", title: "表格属性", description: "以模型目录集中演示常用属性、四项列定制开关及工程规范：受约束列宽、两行省略与按需全文提示、数据区加载、36px 空态留白、容器固定列断点和缺失值占位。属性配置区不属于业务界面。", component: PropsDemo, source: propsSource },
   { id: "table-merge", title: "单元格合并", description: "用于单元格合并，表头可以进行列合并，内容区域可以通过 rowSpan 与 colSpan 合并单元格。", component: MergeDemo, source: mergeSource },
   { id: "table-drag", title: "拖拽排序", description: "拖动表格行可以调整数据顺序，适合手动编排优先级或展示顺序。", component: DragDemo, source: dragSource },
   { id: "table-layout", title: "列宽与自适应", description: "通过列级宽度、伸缩权重与优先级分配空间；演示两行全文提示、数据区加载、空态留白、缺失值与容器固定列断点，并保留旧布局能力。", component: LayoutDemo, source: layoutSource },
-  { id: "table-customization", title: "Qways 模型目录与用户列布局", description: "以模型目录展示列移动、调宽、显隐和布局恢复，四个开关独立启用。手动尺寸优先，必要时保留留白或内部滚动；模拟账号与工作空间隔离保存。模型与价格均为演示数据。", component: CustomizationDemo, source: customizationSource },
+  { id: "table-customization", title: "Qways 模型目录与用户列布局", description: "以接近真实业务的模型目录展示列布局保存恢复，能力开关统一放在表格属性示例。手动尺寸优先；模拟账号与工作空间隔离保存，模型与价格均为演示数据。", component: CustomizationDemo, source: customizationSource },
 ];
