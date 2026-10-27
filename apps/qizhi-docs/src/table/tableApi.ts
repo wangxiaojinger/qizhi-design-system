@@ -6,7 +6,7 @@ type TableApiItem = ComponentApiItem<ApiName>;
 type ColumnApiName = Extract<keyof TableColumn<Record<string, unknown>>, string>;
 type TableColumnApiItem = ComponentApiItem<ColumnApiName>;
 export const tableApiDefaultBehaviors = [
-  "下一版本的 Table 内置默认：size=default、border=false、borderCell=false、hover=true、showHeader=true；columnCustomization 合并为 { resize: false, reorder: false, visibility: false }。不传属性即可获得这组默认，传入属性可显式覆盖。已发布的 v0.4.0 不包含本轮本地候选变更。",
+  "v0.5.0的 Table 内置默认：size=default、border=false、borderCell=false、hover=true、showHeader=true；columnCustomization 合并为 { resize: false, reorder: false, visibility: false }。不传属性即可获得这组默认，传入属性可显式覆盖。业务升级到 v0.5.0 后直接采用这些默认值，已有显式配置仍然优先；v0.4.0 保留原有行为。",
   "普通数据列表使用 layoutMode=\"fill\" 与 tableLayout=\"fixed\"，按容器宽度预算。名称、说明设置 minWidth/maxWidth；达到上限后用较后的 growPriority 将余量分配给业务允许扩展的普通数据列，操作、选择、展开列不参与余量扩展。不要按当前页内容反复测量或增加 Padding 消耗空白。",
   "fixed 模式中，只有所有 width 都是数字或未设置时才启用确定性分配。数字 width 是基准；无 width 的列以 minWidth 或 120px 为基准。growPriority 数字较小的列先扩展，同级按 grow 权重分配并受 maxWidth 限制。所有列封顶且总和不足容器时，兼容保留未分配空间；标准页面列表必须配置未封顶的余量承接列，不能偷偷突破名称和说明的上限。",
   "宽度不足时按 shrinkPriority 从小到大压缩，同级按 shrink 权重缩至 minWidth；shrink 未设置时沿用旧 grow 权重，0 明确禁止压缩。仍不足时仅表格内部滚动。数字 scrollX 是预算下限，不应重复增加；约束模式不支持 string scrollX 或混合 string width。列宽按合法内容、表头、图标、控件和 Padding 预算，不根据当前页数据测量。",

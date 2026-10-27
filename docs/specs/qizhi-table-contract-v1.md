@@ -23,7 +23,7 @@ type TableColumnAlign = "left" | "center" | "right";
 
 `TableProps<RecordType>` 实现：`columns`、`dataSource`、`rowKey`、`size`、`border`、`borderCell`、`hover`、`stripe`、`showHeader`、`loading`、`ellipsis`、`fixedBreakpoint`、`scrollX`、`tableLayout`、`layoutMode`、`columnCustomization`、`columnLayout`、`defaultColumnLayout`、`onColumnLayoutChange`、`treeColumnKey`、`rowSelection`、`expandable`、`childrenColumnName`、`pagination`、`empty`、`emptyPadding`、`emptyCell`、`draggable`、`showSorterTooltip`、`onSortChange`、`onRowOrderChange`、`className`、`style`、`aria-label`。
 
-下一版本的组件内置默认值：`size="default"`、`border=false`、`borderCell=false`、`hover=true`、`stripe=false`、`showHeader=true`、`loading=false`、`ellipsis={ rows: 2, tooltip: true }`、`fixedBreakpoint=640`、`emptyPadding=36`、`emptyCell="-"`、`columnCustomization={ resize: false, reorder: false, visibility: false }`、`tableLayout="fixed"`、`layoutMode="fill"`、`pagination=false`、`childrenColumnName="children"`、`draggable=false`。`loading` 启用时 `scope` 默认 `"body"`，传 `"table"` 才遮罩全表；`fixedBreakpoint={false}` 关闭断点。表级省略只处理字符串／数字，列显式 `ellipsis` 优先，`false` 保持自然换行，`true` 或 `{ showTitle }` 保持旧单行原生 title。`emptyCell={null}` 关闭缺失值占位。该本地候选变更属于下一版本，已发布的 v0.4.0 不变。`size="default"` 使用 16px 上下内边距，`size="middle"` 使用 12px，`size="small"` 使用 8px，不将表头或内容行锁定为固定高度。
+v0.5.0的组件内置默认值：`size="default"`、`border=false`、`borderCell=false`、`hover=true`、`stripe=false`、`showHeader=true`、`loading=false`、`ellipsis={ rows: 2, tooltip: true }`、`fixedBreakpoint=640`、`emptyPadding=36`、`emptyCell="-"`、`columnCustomization={ resize: false, reorder: false, visibility: false }`、`tableLayout="fixed"`、`layoutMode="fill"`、`pagination=false`、`childrenColumnName="children"`、`draggable=false`。`loading` 启用时 `scope` 默认 `"body"`，传 `"table"` 才遮罩全表；`fixedBreakpoint={false}` 关闭断点。表级省略只处理字符串／数字，列显式 `ellipsis` 优先，`false` 保持自然换行，`true` 或 `{ showTitle }` 保持旧单行原生 title。`emptyCell={null}` 关闭缺失值占位。这些默认值自 v0.5.0 生效，已发布的 v0.4.0 不变。`size="default"` 使用 16px 上下内边距，`size="middle"` 使用 12px，`size="small"` 使用 8px，不将表头或内容行锁定为固定高度。
 
 `TableColumn<RecordType>` 实现：`key`、`title`、`dataIndex`、`width`、`minWidth`、`maxWidth`、`grow`、`shrink`、`growPriority`、`shrinkPriority`、`align`、`fixed`、`movable`、`resizable`、`hideable`、`defaultVisible`、`settingsLabel`、`layoutRole`、`ellipsis`、`render`、`sorter`、`sortDirections`、`defaultSortOrder`、`showSorterTooltip`、`onCell`。`align` 默认为左对齐，排序表头与数据单元格同步对齐。未配置列 `ellipsis` 时继承表级两行省略；`false` 保持自然换行，`true` 或 `{ showTitle }` 时保持该列的旧单行原生 title，`showTitle` 默认为 `true`。两行省略仅处理字符串或数字，不裁切复杂 render。排序按未排序、升序、降序、未排序循环，并通过 `onSortChange` 回传。
 
@@ -53,7 +53,7 @@ Table 是自研原生 HTML table，不依赖 AntD/rc-table。它提供显式列�
 
 - `shrink` 独立控制压缩权重，未配置沿用 grow；`shrinkPriority`、`growPriority` 越小越先处理，同级按权重分配。0 权重不参与。数字 width 是期望基准而非全部场景的硬最小宽度；显式 minWidth 是下限。未配置新参数沿用历史分配规则。
 - 名称、说明设置上限；达到上限后通过后级 growPriority 的普通数据列承接余量。所有列封顶后的严格上限与铺满不可同时保证，组件不突破上限；业务必须配置未封顶承接列。操作与辅助列不参与余量分配，不靠浏览器原生重新拉宽。compact 是通用特例能力，不作为 Qways 标准页面列表布局。
-- 表级 `ellipsis={ rows: 2, tooltip: true }` 是下一版本默认，仅省略纯字符串或数字叶子。实际截断时才提供 hover/focus/click 全文 Tooltip，Esc 关闭；内容、容器、字体变化后重测。列级配置优先，`false` 保持自然换行；旧 true/showTitle 保持单行原生 title，复杂 render 中的控件不被新模式限高或裁切。
+- 表级 `ellipsis={ rows: 2, tooltip: true }` 是v0.5.0默认，仅省略纯字符串或数字叶子。实际截断时才提供 hover/focus/click 全文 Tooltip，Esc 关闭；内容、容器、字体变化后重测。列级配置优先，`false` 保持自然换行；旧 true/showTitle 保持单行原生 title，复杂 render 中的控件不被新模式限高或裁切。
 - `loading` 默认 `false`；启用 `loading={{ spinning, scope: "body", tip }}` 时默认仅覆盖数据区，保留表头和传入记录，`scope: "table"` 覆盖全表。首次无数据时提供加载占位，不把空态冒充加载结果。不实现 API 请求、缓存、失败重试或授权范围策略。
 - `fixedBreakpoint=640` 按表格容器宽度（含等号）取消固定列，变宽后恢复；传 `false` 关闭断点，数字可替换阈值。
 - `emptyPadding=36` 为默认与自定义 empty 增加一层垂直留白并清零空态单元格 padding，传 0 可关闭额外留白。自定义内容内部自带 margin/padding 须由调用方消除；组件不篡改任意 ReactNode 内部样式。
@@ -65,7 +65,7 @@ Table 是自研原生 HTML table，不依赖 AntD/rc-table。它提供显式列�
 ### 属性示例与业务示例的职责
 
 - 「表格属性」使用模型目录演示数据，集中提供边框、密度、选择、加载、表头、空态及三项列定制开关。分页默认右下角，不展示位置切换；斑马纹不在该示例中展示，既有公共 API 保留兼容。
-- 推荐组合已成为下一版本的组件内置默认：开启悬浮高亮、表头、两行省略、实际截断全文提示、36px 空态留白、`"-"` 缺失值占位及 640px 容器固定列断点，尺寸为 default；边框、单元格边框、列调宽、复选框、加载中、列移动、列显隐、自定义空态及无数据开关默认关闭。业务可显式覆盖默认；用于演示全部能力的独立示例可以显式开启额外功能。
+- 推荐组合已成为v0.5.0的组件内置默认：开启悬浮高亮、表头、两行省略、实际截断全文提示、36px 空态留白、`"-"` 缺失值占位及 640px 容器固定列断点，尺寸为 default；边框、单元格边框、列调宽、复选框、加载中、列移动、列显隐、自定义空态及无数据开关默认关闭。业务可显式覆盖默认；用于演示全部能力的独立示例可以显式开启额外功能。
 - 列移动关闭或单列不可移动时，排序标题保留正常的单元格左内边距；只有实际渲染移动手柄时才由手柄承接该内边距。调宽手柄不改变标题内边距，窄屏沿用紧凑间距 token。
 - 属性示例保留用户可控开关以显式覆盖内置默认：关闭两行省略时同时传表级 `ellipsis={false}`，关闭容器断点时传 `fixedBreakpoint={false}`；不新增语义重复的 API，不把示例开关变成组件内置工具栏。
 - 「Qways 模型目录与用户列布局」保留搜索、业务筛选、详情和列显隐入口；三项能力由代码启用，不在业务工具栏展示功能开关。模拟身份切换与布局 JSON 属于独立示例配置；移除未接入的试用占位按钮。

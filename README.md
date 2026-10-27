@@ -136,6 +136,12 @@ pnpm build
 
 ## 发布
 
+### Table v0.5.0 默认配置
+
+业务升级到 `@wangxiaojinger/qizhi-react@0.5.0` 并重新构建后，未显式配置的 Table 会直接采用新默认：开启悬浮高亮、表头、两行省略、实际截断全文提示和640px容器固定列断点；边框、列调宽、列移动及显隐默认关闭，业务可按需开启或覆盖。
+
+这是组件本身的默认行为，不依赖文档Demo或业务额外封装。已有明确传入的属性继续优先。详见 [v0.5.0 业务升级说明](docs/releases/v0.5.0-table-upgrade.md)。
+
 1. 更新 `packages/qizhi-tokens` 与 `packages/qizhi-react` 的版本号。
 2. 运行 `corepack pnpm verify`。
 3. 在 GitHub 创建并发布 Release。
