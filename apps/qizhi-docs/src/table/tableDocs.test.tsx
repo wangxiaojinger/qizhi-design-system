@@ -4,6 +4,15 @@ import { tableApi, tableApiDefaultBehaviors, tableColumnApi } from "./tableApi";
 import { tableDemos } from "./tableDocs.registry";
 
 describe("Table docs", () => {
+  it("publishes the upgrade guide with defaults, independent feature flags and overrides", () => {
+    render(<TableDocsIsland />);
+    const guide = document.querySelector<HTMLElement>("#table-upgrade-v050")!;
+    expect(guide).toHaveTextContent("pnpm add -E @wangxiaojinger/qizhi-react@0.5.0");
+    expect(guide).toHaveTextContent("默认关闭：外边框、单元格边框、列调宽、列移动、列显隐");
+    expect(guide).toHaveTextContent("columnCustomization={{ reorder: true, resize: true, visibility: true }}");
+    expect(guide).toHaveTextContent("页面原有的显式配置仍优先");
+    expect(within(guide).getByRole("link", { name: "v0.5.0 业务升级接入说明" })).toHaveAttribute("href", "#table-upgrade-v050");
+  });
   it("centralizes feature controls in the catalog props demo rather than business tooling", () => {
     render(<TableDocsIsland />);
     const props = document.querySelector<HTMLElement>("#table-props")!;
@@ -50,7 +59,7 @@ describe("Table docs", () => {
 
   it("preserves the twelve demos and adds the business column-layout demo", () => {
     render(<TableDocsIsland />);
-    expect(screen.getAllByRole("heading", { level: 2 }).map((node) => node.textContent)).toEqual(["基础用法", "多行与省略", "排序", "固定列", "开启选择", "展开行", "嵌套子表格", "树形数据展示", "表格属性", "单元格合并", "拖拽排序", "列宽与自适应", "Qways 模型目录与用户列布局", "API"]);
+    expect(screen.getAllByRole("heading", { level: 2 }).map((node) => node.textContent)).toEqual(["基础用法", "多行与省略", "排序", "固定列", "开启选择", "展开行", "嵌套子表格", "树形数据展示", "表格属性", "单元格合并", "拖拽排序", "列宽与自适应", "Qways 模型目录与用户列布局", "API", "v0.5.0 业务升级接入说明"]);
     expect(document.querySelectorAll("article.codebox-wrapper")).toHaveLength(13);
     expect(screen.queryByRole("heading", { name: "表头吸顶" })).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "表头分组" })).not.toBeInTheDocument();
