@@ -1,6 +1,6 @@
 {
   "name": "@wangxiaojinger/qizhi-react",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "QIZHI Design System React components.",
   "type": "module",
   "main": "./dist/index.js",
@@ -53,7 +53,7 @@
     "remark-gfm": "^4.0.1"
   },
   "scripts": {
-    "build": "pnpm icons:build && vite build && tsc -p tsconfig.build.json",
+    "build": "pnpm icons:build && vite build && tsc -p tsconfig.build.json && node scripts/finalize-declarations.mjs",
     "icons:build": "node --experimental-strip-types scripts/build-direction-icons.mjs && node --experimental-strip-types scripts/build-prompt-icons.mjs && node --experimental-strip-types scripts/build-catalog-icons.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test:exports": "node scripts/exports-contract.mjs"

@@ -10,6 +10,15 @@ test("Table 保持十二组 Demo、核心交互和三档响应式", async ({ pag
   await expect(page.getByRole("heading", { name: "表格 Table" })).toBeVisible();
   await expect(page.locator("#component-table article.codebox-wrapper")).toHaveCount(13);
   await expect(page.locator("#table-basic tbody tr")).toHaveCount(3);
+  const demoTables = page.locator("#component-table article.codebox-wrapper .qizhi-table table");
+  expect(await demoTables.count()).toBeGreaterThanOrEqual(13);
+  for (const table of await demoTables.all()) {
+    const cells = table.locator(":scope > tbody > tr:last-child > td");
+    for (const cell of await cells.all()) {
+      await expect(cell, "每个表格 Demo 最后一行保留底部分割线").toHaveCSS("border-bottom-width", "1px");
+      await expect(cell).toHaveCSS("border-bottom-style", "solid");
+    }
+  }
   const basicTable = page.locator("#table-basic .qizhi-table");
   const basicTableElement = page.locator("#table-basic table");
   const basicHeaders = page.locator("#table-basic thead th");
@@ -122,7 +131,7 @@ test("Table 保持十二组 Demo、核心交互和三档响应式", async ({ pag
   await expect(page.locator("#table-props .qizhi-empty")).toBeVisible();
   await expect(page.locator("#table-sticky, #table-grouped")).toHaveCount(0);
   await expect(page.locator("#table-merge td[rowspan='2']")).toHaveCount(1);
-  await expect(page.locator("#table-fixed tbody tr").last().locator("td").first()).toHaveCSS("border-bottom-width", "0px");
+  await expect(page.locator("#table-fixed tbody tr").last().locator("td").first()).toHaveCSS("border-bottom-width", "1px");
   const fixedTable = page.locator("#table-fixed .qizhi-table");
   const fixedScroller = page.locator("#table-fixed .qizhi-table__scroll");
   const fixedViewLink = page.locator("#table-fixed").getByRole("button", {

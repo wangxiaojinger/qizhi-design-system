@@ -12,7 +12,6 @@ export default function SingleDemo() {
       options={options}
       allOption={{ value: "all", label: "全部" }}
       defaultValue="all"
-      allowClear
     />
   );
 }

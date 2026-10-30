@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "status": "passed",
-  "sourceFingerprint": "sha256:6f181d487eed8aab4dcd7b322a6309676e188758cf35ea2869035953523513c8",
+  "sourceFingerprint": "sha256:d730ab43e57919d07c8d74e9c80c369d901e0a9c7b084d1cac36cc77a1bef4f7",
   "root": ".",
   "exclusions": [
     ".git/**",
@@ -12,23 +12,23 @@
   "summary": {
     "files": 140,
     "unreferencedFiles": 1,
-    "findings": 3021,
+    "findings": 3030,
     "byScope": {
       "docs-runtime": 504,
       "smoke-runtime": 9,
       "generated-runtime": 81,
-      "component-runtime": 829,
+      "component-runtime": 838,
       "legacy-runtime": 1598
     },
     "byCategory": {
-      "spacing": 2360,
-      "color": 440,
+      "spacing": 2367,
+      "color": 442,
       "layer": 94,
       "shadow": 127
     },
     "byClassification": {
-      "review-required": 1037,
-      "theme-token-candidate": 1534,
+      "review-required": 1042,
+      "theme-token-candidate": 1538,
       "structural-constant": 450
     }
   },
@@ -9767,11 +9767,11 @@
       "reason": "unmediated shadow responsibility"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:43:138:padding",
+      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:43:158:padding",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/date-picker/datePicker.css",
       "line": 43,
-      "column": 138,
+      "column": 158,
       "category": "spacing",
       "property": "padding",
       "value": "5px 8px",
@@ -9779,22 +9779,22 @@
       "reason": "padding participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:51:43:margin-left",
+      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:53:43:margin-left",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/date-picker/datePicker.css",
-      "line": 51,
+      "line": 53,
       "column": 43,
       "category": "spacing",
       "property": "margin-left",
-      "value": "-7px",
+      "value": "-10.8px",
       "classification": "structural-constant",
       "reason": "positional or geometric offset"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:52:111:padding-inline",
+      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:54:111:padding-inline",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/date-picker/datePicker.css",
-      "line": 52,
+      "line": 54,
       "column": 111,
       "category": "spacing",
       "property": "padding-inline",
@@ -9803,10 +9803,10 @@
       "reason": "padding-inline participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:53:32:padding-top",
+      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:55:32:padding-top",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/date-picker/datePicker.css",
-      "line": 53,
+      "line": 55,
       "column": 32,
       "category": "spacing",
       "property": "padding-top",
@@ -9815,10 +9815,10 @@
       "reason": "padding-top participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:55:28:padding-bottom",
+      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:57:28:padding-bottom",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/date-picker/datePicker.css",
-      "line": 55,
+      "line": 57,
       "column": 28,
       "category": "spacing",
       "property": "padding-bottom",
@@ -9827,10 +9827,10 @@
       "reason": "padding-bottom participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:57:62:margin",
+      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:59:62:margin",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/date-picker/datePicker.css",
-      "line": 57,
+      "line": 59,
       "column": 62,
       "category": "spacing",
       "property": "margin",
@@ -9839,10 +9839,10 @@
       "reason": "non-component surface or ambiguous design responsibility"
     },
     {
-      "id": "color:packages/qizhi-react/src/date-picker/datePicker.css:59:185:color",
+      "id": "color:packages/qizhi-react/src/date-picker/datePicker.css:61:185:color",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/date-picker/datePicker.css",
-      "line": 59,
+      "line": 61,
       "column": 185,
       "category": "color",
       "property": "color",
@@ -9851,10 +9851,10 @@
       "reason": "unmediated color responsibility"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:63:84:gap",
+      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:65:84:gap",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/date-picker/datePicker.css",
-      "line": 63,
+      "line": 65,
       "column": 84,
       "category": "spacing",
       "property": "gap",
@@ -9863,10 +9863,10 @@
       "reason": "gap participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:63:94:padding",
+      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:65:94:padding",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/date-picker/datePicker.css",
-      "line": 63,
+      "line": 65,
       "column": 94,
       "category": "spacing",
       "property": "padding",
@@ -9875,23 +9875,23 @@
       "reason": "padding participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:67:56:padding",
-      "scope": "component-runtime",
-      "file": "packages/qizhi-react/src/date-picker/datePicker.css",
-      "line": 67,
-      "column": 56,
-      "category": "spacing",
-      "property": "padding",
-      "value": "12px",
-      "classification": "theme-token-candidate",
-      "reason": "padding participates in component density"
-    },
-    {
-      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:71:90:margin",
+      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:71:99:padding-top",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/date-picker/datePicker.css",
       "line": 71,
-      "column": 90,
+      "column": 99,
+      "category": "spacing",
+      "property": "padding-top",
+      "value": "6px",
+      "classification": "theme-token-candidate",
+      "reason": "padding-top participates in component density"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:73:100:margin",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/date-picker/datePicker.css",
+      "line": 73,
+      "column": 100,
       "category": "spacing",
       "property": "margin",
       "value": "2px 4px",
@@ -9899,10 +9899,34 @@
       "reason": "non-component surface or ambiguous design responsibility"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:72:69:padding",
+      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:74:80:padding",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/date-picker/datePicker.css",
-      "line": 72,
+      "line": 74,
+      "column": 80,
+      "category": "spacing",
+      "property": "padding",
+      "value": "9px 12px",
+      "classification": "theme-token-candidate",
+      "reason": "padding participates in component density"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:78:90:margin",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/date-picker/datePicker.css",
+      "line": 78,
+      "column": 90,
+      "category": "spacing",
+      "property": "margin",
+      "value": "0 4px",
+      "classification": "review-required",
+      "reason": "non-component surface or ambiguous design responsibility"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:80:69:padding",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/date-picker/datePicker.css",
+      "line": 80,
       "column": 69,
       "category": "spacing",
       "property": "padding",
@@ -9911,10 +9935,10 @@
       "reason": "padding participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:73:60:padding-block",
+      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:81:60:padding-block",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/date-picker/datePicker.css",
-      "line": 73,
+      "line": 81,
       "column": 60,
       "category": "spacing",
       "property": "padding-block",
@@ -9923,10 +9947,10 @@
       "reason": "padding-block participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:77:87:top",
+      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:85:87:top",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/date-picker/datePicker.css",
-      "line": 77,
+      "line": 85,
       "column": 87,
       "category": "spacing",
       "property": "top",
@@ -9935,10 +9959,10 @@
       "reason": "positional or geometric offset"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:77:97:right",
+      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:85:97:right",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/date-picker/datePicker.css",
-      "line": 77,
+      "line": 85,
       "column": 97,
       "category": "spacing",
       "property": "right",
@@ -9947,10 +9971,10 @@
       "reason": "positional or geometric offset"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:77:109:left",
+      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:85:109:left",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/date-picker/datePicker.css",
-      "line": 77,
+      "line": 85,
       "column": 109,
       "category": "spacing",
       "property": "left",
@@ -11051,10 +11075,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "shadow:packages/qizhi-react/src/input/input.css:17:3:box-shadow",
+      "id": "shadow:packages/qizhi-react/src/input/input.css:18:3:box-shadow",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 17,
+      "line": 18,
       "column": 3,
       "category": "shadow",
       "property": "box-shadow",
@@ -11063,10 +11087,10 @@
       "reason": "mixed shadow literal and CSS variable"
     },
     {
-      "id": "color:packages/qizhi-react/src/input/input.css:18:3:-webkit-text-fill-color",
+      "id": "color:packages/qizhi-react/src/input/input.css:19:3:-webkit-text-fill-color",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 18,
+      "line": 19,
       "column": 3,
       "category": "color",
       "property": "-webkit-text-fill-color",
@@ -11075,10 +11099,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "color:packages/qizhi-react/src/input/input.css:19:3:caret-color",
+      "id": "color:packages/qizhi-react/src/input/input.css:20:3:caret-color",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 19,
+      "line": 20,
       "column": 3,
       "category": "color",
       "property": "caret-color",
@@ -11087,10 +11111,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "color:packages/qizhi-react/src/input/input.css:22:130:color",
+      "id": "color:packages/qizhi-react/src/input/input.css:23:130:color",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 22,
+      "line": 23,
       "column": 130,
       "category": "color",
       "property": "color",
@@ -11099,10 +11123,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/input/input.css:23:24:margin-left",
+      "id": "spacing:packages/qizhi-react/src/input/input.css:24:24:margin-left",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 23,
+      "line": 24,
       "column": 24,
       "category": "spacing",
       "property": "margin-left",
@@ -11111,10 +11135,10 @@
       "reason": "non-component surface or ambiguous design responsibility"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/input/input.css:24:24:margin-right",
+      "id": "spacing:packages/qizhi-react/src/input/input.css:25:24:margin-right",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 24,
+      "line": 25,
       "column": 24,
       "category": "spacing",
       "property": "margin-right",
@@ -11123,10 +11147,10 @@
       "reason": "non-component surface or ambiguous design responsibility"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/input/input.css:27:49:padding-left",
+      "id": "spacing:packages/qizhi-react/src/input/input.css:28:49:padding-left",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 27,
+      "line": 28,
       "column": 49,
       "category": "spacing",
       "property": "padding-left",
@@ -11135,10 +11159,10 @@
       "reason": "padding-left participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/input/input.css:28:49:padding-right",
+      "id": "spacing:packages/qizhi-react/src/input/input.css:29:49:padding-right",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 28,
+      "line": 29,
       "column": 49,
       "category": "spacing",
       "property": "padding-right",
@@ -11147,10 +11171,10 @@
       "reason": "padding-right participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/input/input.css:30:23:margin",
+      "id": "spacing:packages/qizhi-react/src/input/input.css:31:23:margin",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 30,
+      "line": 31,
       "column": 23,
       "category": "spacing",
       "property": "margin",
@@ -11159,10 +11183,10 @@
       "reason": "non-component surface or ambiguous design responsibility"
     },
     {
-      "id": "color:packages/qizhi-react/src/input/input.css:30:44:color",
+      "id": "color:packages/qizhi-react/src/input/input.css:31:44:color",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 30,
+      "line": 31,
       "column": 44,
       "category": "color",
       "property": "color",
@@ -11171,10 +11195,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "color:packages/qizhi-react/src/input/input.css:33:29:color",
+      "id": "color:packages/qizhi-react/src/input/input.css:34:29:color",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 33,
+      "line": 34,
       "column": 29,
       "category": "color",
       "property": "color",
@@ -11183,10 +11207,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "color:packages/qizhi-react/src/input/input.css:34:30:color",
+      "id": "color:packages/qizhi-react/src/input/input.css:35:30:color",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 34,
+      "line": 35,
       "column": 30,
       "category": "color",
       "property": "color",
@@ -11195,10 +11219,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "color:packages/qizhi-react/src/input/input.css:35:33:color",
+      "id": "color:packages/qizhi-react/src/input/input.css:36:33:color",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 35,
+      "line": 36,
       "column": 33,
       "category": "color",
       "property": "color",
@@ -11207,10 +11231,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "color:packages/qizhi-react/src/input/input.css:36:39:color",
+      "id": "color:packages/qizhi-react/src/input/input.css:37:39:color",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 36,
+      "line": 37,
       "column": 39,
       "category": "color",
       "property": "color",
@@ -11219,10 +11243,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/input/input.css:37:44:margin-right",
+      "id": "spacing:packages/qizhi-react/src/input/input.css:38:44:margin-right",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 37,
+      "line": 38,
       "column": 44,
       "category": "spacing",
       "property": "margin-right",
@@ -11231,10 +11255,10 @@
       "reason": "non-component surface or ambiguous design responsibility"
     },
     {
-      "id": "color:packages/qizhi-react/src/input/input.css:37:63:color",
+      "id": "color:packages/qizhi-react/src/input/input.css:38:63:color",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 37,
+      "line": 38,
       "column": 63,
       "category": "color",
       "property": "color",
@@ -11243,10 +11267,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "color:packages/qizhi-react/src/input/input.css:38:35:color",
+      "id": "color:packages/qizhi-react/src/input/input.css:39:35:color",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 38,
+      "line": 39,
       "column": 35,
       "category": "color",
       "property": "color",
@@ -11255,10 +11279,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/input/input.css:44:124:padding",
+      "id": "spacing:packages/qizhi-react/src/input/input.css:45:124:padding",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 44,
+      "line": 45,
       "column": 124,
       "category": "spacing",
       "property": "padding",
@@ -11267,10 +11291,10 @@
       "reason": "padding participates in component density"
     },
     {
-      "id": "color:packages/qizhi-react/src/input/input.css:44:141:border",
+      "id": "color:packages/qizhi-react/src/input/input.css:45:141:border",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 44,
+      "line": 45,
       "column": 141,
       "category": "color",
       "property": "border",
@@ -11279,10 +11303,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "color:packages/qizhi-react/src/input/input.css:44:191:background",
+      "id": "color:packages/qizhi-react/src/input/input.css:45:191:background",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 44,
+      "line": 45,
       "column": 191,
       "category": "color",
       "property": "background",
@@ -11291,10 +11315,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "color:packages/qizhi-react/src/input/input.css:44:233:color",
+      "id": "color:packages/qizhi-react/src/input/input.css:45:233:color",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 44,
+      "line": 45,
       "column": 233,
       "category": "color",
       "property": "color",
@@ -11303,10 +11327,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/input/input.css:49:130:padding",
+      "id": "spacing:packages/qizhi-react/src/input/input.css:50:130:padding",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 49,
+      "line": 50,
       "column": 130,
       "category": "spacing",
       "property": "padding",
@@ -11315,10 +11339,10 @@
       "reason": "padding participates in component density"
     },
     {
-      "id": "color:packages/qizhi-react/src/input/input.css:49:207:color",
+      "id": "color:packages/qizhi-react/src/input/input.css:50:207:color",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 49,
+      "line": 50,
       "column": 207,
       "category": "color",
       "property": "color",
@@ -11327,10 +11351,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "color:packages/qizhi-react/src/input/input.css:54:83:border-color",
+      "id": "color:packages/qizhi-react/src/input/input.css:57:83:border-color",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 54,
+      "line": 57,
       "column": 83,
       "category": "color",
       "property": "border-color",
@@ -11339,10 +11363,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "color:packages/qizhi-react/src/input/input.css:55:34:border-color",
+      "id": "color:packages/qizhi-react/src/input/input.css:58:34:border-color",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 55,
+      "line": 58,
       "column": 34,
       "category": "color",
       "property": "border-color",
@@ -11351,10 +11375,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "shadow:packages/qizhi-react/src/input/input.css:56:92:box-shadow",
+      "id": "shadow:packages/qizhi-react/src/input/input.css:59:92:box-shadow",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 56,
+      "line": 59,
       "column": 92,
       "category": "shadow",
       "property": "box-shadow",
@@ -11363,10 +11387,10 @@
       "reason": "mixed shadow literal and CSS variable"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/input/input.css:57:81:padding",
+      "id": "spacing:packages/qizhi-react/src/input/input.css:60:81:padding",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 57,
+      "line": 60,
       "column": 81,
       "category": "spacing",
       "property": "padding",
@@ -11375,10 +11399,10 @@
       "reason": "padding participates in component density"
     },
     {
-      "id": "color:packages/qizhi-react/src/input/input.css:57:160:color",
+      "id": "color:packages/qizhi-react/src/input/input.css:60:160:color",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 57,
+      "line": 60,
       "column": 160,
       "category": "color",
       "property": "color",
@@ -11387,10 +11411,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "color:packages/qizhi-react/src/input/input.css:58:39:color",
+      "id": "color:packages/qizhi-react/src/input/input.css:61:39:color",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 58,
+      "line": 61,
       "column": 39,
       "category": "color",
       "property": "color",
@@ -11399,10 +11423,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "color:packages/qizhi-react/src/input/input.css:59:54:background",
+      "id": "color:packages/qizhi-react/src/input/input.css:62:54:background",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 59,
+      "line": 62,
       "column": 54,
       "category": "color",
       "property": "background",
@@ -11411,10 +11435,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "color:packages/qizhi-react/src/input/input.css:60:52:color",
+      "id": "color:packages/qizhi-react/src/input/input.css:63:52:color",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 60,
+      "line": 63,
       "column": 52,
       "category": "color",
       "property": "color",
@@ -11423,10 +11447,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "color:packages/qizhi-react/src/input/input.css:61:54:background",
+      "id": "color:packages/qizhi-react/src/input/input.css:64:54:background",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 61,
+      "line": 64,
       "column": 54,
       "category": "color",
       "property": "background",
@@ -11435,10 +11459,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "color:packages/qizhi-react/src/input/input.css:63:51:border-color",
+      "id": "color:packages/qizhi-react/src/input/input.css:66:51:border-color",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 63,
+      "line": 66,
       "column": 51,
       "category": "color",
       "property": "border-color",
@@ -11447,10 +11471,34 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/input/input.css:64:75:right",
+      "id": "color:packages/qizhi-react/src/input/input.css:70:60:border-color",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 64,
+      "line": 70,
+      "column": 60,
+      "category": "color",
+      "property": "border-color",
+      "value": "var(--color-border-2, #e5e6eb)",
+      "classification": "review-required",
+      "reason": "mixed color literal and CSS variable"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/input/input.css:71:83:padding-bottom",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/input/input.css",
+      "line": 71,
+      "column": 83,
+      "category": "spacing",
+      "property": "padding-bottom",
+      "value": "30px",
+      "classification": "theme-token-candidate",
+      "reason": "padding-bottom participates in component density"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/input/input.css:72:75:right",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/input/input.css",
+      "line": 72,
       "column": 75,
       "category": "spacing",
       "property": "right",
@@ -11459,10 +11507,10 @@
       "reason": "positional or geometric offset"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/input/input.css:64:88:bottom",
+      "id": "spacing:packages/qizhi-react/src/input/input.css:72:88:bottom",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 64,
+      "line": 72,
       "column": 88,
       "category": "spacing",
       "property": "bottom",
@@ -11471,10 +11519,10 @@
       "reason": "positional or geometric offset"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/input/input.css:65:54:gap",
+      "id": "spacing:packages/qizhi-react/src/input/input.css:73:54:gap",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 65,
+      "line": 73,
       "column": 54,
       "category": "spacing",
       "property": "gap",
@@ -11483,10 +11531,10 @@
       "reason": "gap participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/input/input.css:70:79:margin-left",
+      "id": "spacing:packages/qizhi-react/src/input/input.css:78:79:margin-left",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/input/input.css",
-      "line": 70,
+      "line": 78,
       "column": 79,
       "category": "spacing",
       "property": "margin-left",
@@ -13487,10 +13535,46 @@
       "reason": "padding-left participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/select/select.css:21:76:padding-left",
+      "id": "spacing:packages/qizhi-react/src/select/select.css:22:46:margin-left",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/select/select.css",
-      "line": 21,
+      "line": 22,
+      "column": 46,
+      "category": "spacing",
+      "property": "margin-left",
+      "value": "4px",
+      "classification": "review-required",
+      "reason": "non-component surface or ambiguous design responsibility"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/select/select.css:24:82:margin-bottom",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/select/select.css",
+      "line": 24,
+      "column": 82,
+      "category": "spacing",
+      "property": "margin-bottom",
+      "value": "4px",
+      "classification": "review-required",
+      "reason": "non-component surface or ambiguous design responsibility"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/select/select.css:24:102:padding",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/select/select.css",
+      "line": 24,
+      "column": 102,
+      "category": "spacing",
+      "property": "padding",
+      "value": "4px 8px",
+      "classification": "theme-token-candidate",
+      "reason": "padding participates in component density"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/select/select.css:28:76:padding-left",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/select/select.css",
+      "line": 28,
       "column": 76,
       "category": "spacing",
       "property": "padding-left",
@@ -13499,10 +13583,10 @@
       "reason": "padding-left participates in component density"
     },
     {
-      "id": "color:packages/qizhi-react/src/select/select.css:22:263:color",
+      "id": "color:packages/qizhi-react/src/select/select.css:29:263:color",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/select/select.css",
-      "line": 22,
+      "line": 29,
       "column": 263,
       "category": "color",
       "property": "color",
@@ -13511,10 +13595,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/select/select.css:30:68:gap",
+      "id": "spacing:packages/qizhi-react/src/select/select.css:37:68:gap",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/select/select.css",
-      "line": 30,
+      "line": 37,
       "column": 68,
       "category": "spacing",
       "property": "gap",
@@ -13523,10 +13607,10 @@
       "reason": "gap participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/select/select.css:33:41:padding-right",
+      "id": "spacing:packages/qizhi-react/src/select/select.css:40:41:padding-right",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/select/select.css",
-      "line": 33,
+      "line": 40,
       "column": 41,
       "category": "spacing",
       "property": "padding-right",
@@ -13535,10 +13619,10 @@
       "reason": "padding-right participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/select/select.css:35:123:padding",
+      "id": "spacing:packages/qizhi-react/src/select/select.css:42:123:padding",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/select/select.css",
-      "line": 35,
+      "line": 42,
       "column": 123,
       "category": "spacing",
       "property": "padding",
@@ -13547,10 +13631,10 @@
       "reason": "padding participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/select/select.css:37:47:padding",
+      "id": "spacing:packages/qizhi-react/src/select/select.css:44:47:padding",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/select/select.css",
-      "line": 37,
+      "line": 44,
       "column": 47,
       "category": "spacing",
       "property": "padding",
@@ -13559,10 +13643,10 @@
       "reason": "padding participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/select/select.css:41:59:margin-top",
+      "id": "spacing:packages/qizhi-react/src/select/select.css:48:59:margin-top",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/select/select.css",
-      "line": 41,
+      "line": 48,
       "column": 59,
       "category": "spacing",
       "property": "margin-top",
@@ -13571,10 +13655,10 @@
       "reason": "non-component surface or ambiguous design responsibility"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/select/select.css:42:36:padding",
+      "id": "spacing:packages/qizhi-react/src/select/select.css:49:36:padding",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/select/select.css",
-      "line": 42,
+      "line": 49,
       "column": 36,
       "category": "spacing",
       "property": "padding",
@@ -13583,10 +13667,10 @@
       "reason": "padding participates in component density"
     },
     {
-      "id": "color:packages/qizhi-react/src/select/select.css:42:55:color",
+      "id": "color:packages/qizhi-react/src/select/select.css:49:55:color",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/select/select.css",
-      "line": 42,
+      "line": 49,
       "column": 55,
       "category": "color",
       "property": "color",
@@ -13595,10 +13679,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "color:packages/qizhi-react/src/select/select.css:44:43:background",
+      "id": "color:packages/qizhi-react/src/select/select.css:51:43:background",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/select/select.css",
-      "line": 44,
+      "line": 51,
       "column": 43,
       "category": "color",
       "property": "background",
@@ -13607,10 +13691,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "color:packages/qizhi-react/src/select/select.css:45:41:background",
+      "id": "color:packages/qizhi-react/src/select/select.css:52:41:background",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/select/select.css",
-      "line": 45,
+      "line": 52,
       "column": 41,
       "category": "color",
       "property": "background",
@@ -13619,10 +13703,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "color:packages/qizhi-react/src/select/select.css:45:83:color",
+      "id": "color:packages/qizhi-react/src/select/select.css:52:83:color",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/select/select.css",
-      "line": 45,
+      "line": 52,
       "column": 83,
       "category": "color",
       "property": "color",
@@ -13631,10 +13715,10 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/select/select.css:47:44:gap",
+      "id": "spacing:packages/qizhi-react/src/select/select.css:54:44:gap",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/select/select.css",
-      "line": 47,
+      "line": 54,
       "column": 44,
       "category": "spacing",
       "property": "gap",
@@ -13643,10 +13727,10 @@
       "reason": "gap participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/select/select.css:47:54:padding",
+      "id": "spacing:packages/qizhi-react/src/select/select.css:54:54:padding",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/select/select.css",
-      "line": 47,
+      "line": 54,
       "column": 54,
       "category": "spacing",
       "property": "padding",
@@ -13655,10 +13739,10 @@
       "reason": "padding participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/select/select.css:49:69:gap",
+      "id": "spacing:packages/qizhi-react/src/select/select.css:56:69:gap",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/select/select.css",
-      "line": 49,
+      "line": 56,
       "column": 69,
       "category": "spacing",
       "property": "gap",
@@ -13667,10 +13751,10 @@
       "reason": "gap participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/select/select.css:50:97:gap",
+      "id": "spacing:packages/qizhi-react/src/select/select.css:57:97:gap",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/select/select.css",
-      "line": 50,
+      "line": 57,
       "column": 97,
       "category": "spacing",
       "property": "gap",
@@ -13679,10 +13763,10 @@
       "reason": "gap participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/select/select.css:52:100:margin-top",
+      "id": "spacing:packages/qizhi-react/src/select/select.css:59:100:margin-top",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/select/select.css",
-      "line": 52,
+      "line": 59,
       "column": 100,
       "category": "spacing",
       "property": "margin-top",
@@ -13691,10 +13775,10 @@
       "reason": "non-component surface or ambiguous design responsibility"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/select/select.css:54:64:gap",
+      "id": "spacing:packages/qizhi-react/src/select/select.css:61:64:gap",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/select/select.css",
-      "line": 54,
+      "line": 61,
       "column": 64,
       "category": "spacing",
       "property": "gap",
@@ -13703,10 +13787,10 @@
       "reason": "gap participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/select/select.css:54:130:padding",
+      "id": "spacing:packages/qizhi-react/src/select/select.css:61:130:padding",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/select/select.css",
-      "line": 54,
+      "line": 61,
       "column": 130,
       "category": "spacing",
       "property": "padding",
@@ -13715,10 +13799,10 @@
       "reason": "padding participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/select/select.css:55:86:gap",
+      "id": "spacing:packages/qizhi-react/src/select/select.css:62:86:gap",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/select/select.css",
-      "line": 55,
+      "line": 62,
       "column": 86,
       "category": "spacing",
       "property": "gap",
@@ -13727,10 +13811,10 @@
       "reason": "gap participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/select/select.css:58:103:margin-top",
+      "id": "spacing:packages/qizhi-react/src/select/select.css:65:103:margin-top",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/select/select.css",
-      "line": 58,
+      "line": 65,
       "column": 103,
       "category": "spacing",
       "property": "margin-top",
@@ -13739,10 +13823,10 @@
       "reason": "non-component surface or ambiguous design responsibility"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/select/select.css:62:88:margin-left",
+      "id": "spacing:packages/qizhi-react/src/select/select.css:69:88:margin-left",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/select/select.css",
-      "line": 62,
+      "line": 69,
       "column": 88,
       "category": "spacing",
       "property": "margin-left",
@@ -13751,10 +13835,10 @@
       "reason": "non-component surface or ambiguous design responsibility"
     },
     {
-      "id": "color:packages/qizhi-react/src/select/select.css:63:44:color",
+      "id": "color:packages/qizhi-react/src/select/select.css:70:44:color",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/select/select.css",
-      "line": 63,
+      "line": 70,
       "column": 44,
       "category": "color",
       "property": "color",
@@ -14699,10 +14783,22 @@
       "reason": "unmediated color responsibility"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/table/table.css:10:123:padding-block",
+      "id": "color:packages/qizhi-react/src/table/table.css:10:43:border-bottom",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/table/table.css",
       "line": 10,
+      "column": 43,
+      "category": "color",
+      "property": "border-bottom",
+      "value": "1px solid var(--component-table-border, var(--color-border-1, #f2f3f5))",
+      "classification": "review-required",
+      "reason": "mixed color literal and CSS variable"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/table/table.css:11:123:padding-block",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/table/table.css",
+      "line": 11,
       "column": 123,
       "category": "spacing",
       "property": "padding-block",
@@ -14711,10 +14807,10 @@
       "reason": "mixed spacing literal and CSS variable"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/table/table.css:11:121:padding-block",
+      "id": "spacing:packages/qizhi-react/src/table/table.css:12:121:padding-block",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/table/table.css",
-      "line": 11,
+      "line": 12,
       "column": 121,
       "category": "spacing",
       "property": "padding-block",
@@ -14723,10 +14819,10 @@
       "reason": "mixed spacing literal and CSS variable"
     },
     {
-      "id": "color:packages/qizhi-react/src/table/table.css:12:58:border-left",
+      "id": "color:packages/qizhi-react/src/table/table.css:13:58:border-left",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/table/table.css",
-      "line": 12,
+      "line": 13,
       "column": 58,
       "category": "color",
       "property": "border-left",
@@ -15705,6 +15801,18 @@
       "value": "0 6px 16px rgba(29, 33, 41, .12)",
       "classification": "theme-token-candidate",
       "reason": "unmediated shadow responsibility"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/time-picker/timePicker.css:27:78:padding",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/time-picker/timePicker.css",
+      "line": 27,
+      "column": 78,
+      "category": "spacing",
+      "property": "padding",
+      "value": "6px 8px",
+      "classification": "theme-token-candidate",
+      "reason": "padding participates in component density"
     },
     {
       "id": "spacing:packages/qizhi-react/src/timeline/timeline.css:12:3:column-gap",

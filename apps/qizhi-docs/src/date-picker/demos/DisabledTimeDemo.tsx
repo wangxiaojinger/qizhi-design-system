@@ -31,6 +31,7 @@ export default function DisabledTimeDemo() {
       <div className="date-picker-docs-row date-picker-docs-row--wide">
         <DatePicker
           showTime
+          disabledDate={(date) => date < startOfToday}
           disabledTime={() => ({
             disabledHours: Array.from(
               { length: 18 },
@@ -48,6 +49,7 @@ export default function DisabledTimeDemo() {
         />
         <DatePicker.RangePicker
           showTime
+          disabledDate={(date) => date < startOfToday}
           hideDisabledTimeOptions
           disabledTime={(_date, field) =>
             field === "start"

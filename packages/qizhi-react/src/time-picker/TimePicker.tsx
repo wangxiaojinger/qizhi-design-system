@@ -17,6 +17,8 @@ import {
   getFloatingCoordinates,
 } from "../overlay/floatingPosition";
 import { TimePanel, type TimeParts } from "./TimePanel";
+import { Button } from "../button/Button";
+import { CloseIcon } from "../icon";
 import type {
   TimePickerComponent,
   TimePickerFormat,
@@ -53,6 +55,10 @@ const TimePickerInternal = forwardRef<HTMLDivElement, InternalProps>(function Ti
     size = "default",
     status = "default",
     disabled = false,
+    allowClear = true,
+    needConfirm = false,
+    disabledTime,
+    hideDisabledOptions = false,
     className,
     style,
     range,
@@ -76,15 +82,19 @@ const TimePickerInternal = forwardRef<HTMLDivElement, InternalProps>(function Ti
       : rangeInner
     : [];
   const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState<readonly string[]>([]);
+  const displayValues = needConfirm && open ? draft : range ? rangeValue : [single];
   const [activeField, setActiveField] = useState<"start" | "end">("start");
+  useEffect(() => { setDraft(range ? [...rangeValue] : [single]); }, [single, JSON.stringify(rangeValue), range]);
+  useEffect(() => { if (disabled) setOpen(false); }, [disabled]);
   const rootRef = useRef<HTMLDivElement | null>(null);
   const popupRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLInputElement | null>(null);
   const popupId = `qizhi-time-picker-${useId().replace(/:/g, "")}`;
   const [popupStyle, setPopupStyle] = useState({ left: -10000, top: -10000, width: 194 });
   const currentFieldValue = range
-    ? (activeField === "start" ? rangeValue[0] : rangeValue[1]) ?? ""
-    : single;
+    ? (activeField === "start" ? displayValues[0] : displayValues[1]) ?? ""
+    : displayValues[0] ?? "";
   const value = parseTime(currentFieldValue);
 
   const setRootRef = (node: HTMLDivElement | null) => {
@@ -95,6 +105,12 @@ const TimePickerInternal = forwardRef<HTMLDivElement, InternalProps>(function Ti
   const close = (restoreFocus = false) => {
     setOpen(false);
     if (restoreFocus) requestAnimationFrame(() => triggerRef.current?.focus());
+  };
+  const blurWithin = (event: React.FocusEvent<HTMLElement>) => {
+    const inside = (target: EventTarget | null) => target instanceof Node && (!!rootRef.current?.contains(target) || !!popupRef.current?.contains(target));
+    if (inside(event.relatedTarget)) return;
+    if (event.relatedTarget) close();
+    else queueMicrotask(() => { if (!inside(document.activeElement)) close(); });
   };
   const updatePopupPosition = useCallback(() => {
     if (!rootRef.current || !popupRef.current) return;
@@ -156,11 +172,20 @@ const TimePickerInternal = forwardRef<HTMLDivElement, InternalProps>(function Ti
     (props as TimePickerProps).onChange?.(next);
   };
   const commitRange = (next: [string, string]) => {
+    if ((props as TimeRangePickerProps).order !== false && next[0] && next[1]) next = [...next].sort() as [string, string];
+    if (next[0] && next[1] && (!isAllowed(next[0], "start") || !isAllowed(next[1], "end"))) return;
     if (!controlled) setRangeInner(next);
     (props as TimeRangePickerProps).onChange?.(next);
   };
   const choose = (nextParts: TimeParts) => {
     const nextValue = formatTime(nextParts, format);
+    if (!isAllowed(nextValue, range ? activeField : undefined)) return;
+    if (needConfirm) {
+      const next = [...displayValues];
+      next[range && activeField === "end" ? 1 : 0] = nextValue;
+      setDraft(next);
+      return;
+    }
     if (!range) {
       commitSingle(nextValue);
       return;
@@ -172,6 +197,7 @@ const TimePickerInternal = forwardRef<HTMLDivElement, InternalProps>(function Ti
   const openField = (field: "start" | "end", input: HTMLInputElement) => {
     if (disabled) return;
     triggerRef.current = input;
+    if (!open) setDraft(range ? [...rangeValue] : [single]);
     setActiveField(field);
     if (range) setOpen(true);
     else setOpen((current) => !current);
@@ -184,6 +210,7 @@ const TimePickerInternal = forwardRef<HTMLDivElement, InternalProps>(function Ti
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       triggerRef.current = event.currentTarget;
+      if (!open) setDraft(range ? [...rangeValue] : [single]);
       setActiveField(field);
       setOpen(true);
     }
@@ -205,6 +232,14 @@ const TimePickerInternal = forwardRef<HTMLDivElement, InternalProps>(function Ti
     ? (props as TimeRangePickerProps).placeholders ?? ["开始时间", "结束时间"]
     : undefined;
   const label = ariaLabel ?? (range ? "选择时间范围" : "选择时间");
+  const isAllowed = (candidate: string, field?: "start" | "end") => {
+    if (!/^(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d)?$/.test(candidate)) return false;
+    const parts = parseTime(candidate);
+    const limits = disabledTime?.(candidate, field);
+    return !limits?.disabledHours?.includes(parts.hour) && !limits?.disabledMinutes?.includes(parts.minute) && (format === "HH:mm" || !limits?.disabledSeconds?.includes(parts.second));
+  };
+  const confirmationValues = range && (props as TimeRangePickerProps).order !== false ? [...draft].sort() : draft;
+  const canConfirm = range ? isAllowed(confirmationValues[0] ?? "", "start") && isAllowed(confirmationValues[1] ?? "", "end") : isAllowed(draft[0] ?? "");
 
   const popup = open ? createPortal(
     <div
@@ -213,16 +248,21 @@ const TimePickerInternal = forwardRef<HTMLDivElement, InternalProps>(function Ti
       role="dialog"
       aria-label={label}
       className="qizhi-time-picker__popup"
+      onBlur={blurWithin}
       style={{ ...popupStyle, visibility: popupStyle.left < 0 ? "hidden" : "visible" }}
       onMouseDown={(event) => event.stopPropagation()}
       onClick={(event) => event.stopPropagation()}
+      onKeyDown={(event) => { if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); close(true); } }}
     >
       <TimePanel
         value={value}
         format={format}
         step={step}
+        disabled={disabledTime?.(currentFieldValue, range ? activeField : undefined)}
+        hideDisabled={hideDisabledOptions}
         onChange={choose}
       />
+      {needConfirm ? <footer><Button type="primary" size="small" disabled={!canConfirm} onClick={() => { if (!canConfirm) return; if (range) commitRange([draft[0], draft[1]]); else commitSingle(draft[0]); close(true); }}>确认</Button></footer> : null}
     </div>,
     document.body,
   ) : null;
@@ -231,6 +271,7 @@ const TimePickerInternal = forwardRef<HTMLDivElement, InternalProps>(function Ti
     <div
       ref={setRootRef}
       data-testid="qizhi-time-picker"
+      onBlur={blurWithin}
       data-status={status}
       className={controlContainerClassName(
         "qizhi-time-picker",
@@ -251,7 +292,7 @@ const TimePickerInternal = forwardRef<HTMLDivElement, InternalProps>(function Ti
               className="qizhi-time-picker__input"
               aria-label={placeholders?.[0]}
               placeholder={placeholders?.[0]}
-              value={rangeValue[0] ?? ""}
+              value={displayValues[0] ?? ""}
               onClick={(event) => openField("start", event.currentTarget)}
               onKeyDown={(event) => handleKeyDown(event, "start")}
             />
@@ -263,7 +304,7 @@ const TimePickerInternal = forwardRef<HTMLDivElement, InternalProps>(function Ti
               className="qizhi-time-picker__input"
               aria-label={placeholders?.[1]}
               placeholder={placeholders?.[1]}
-              value={rangeValue[1] ?? ""}
+              value={displayValues[1] ?? ""}
               onClick={(event) => openField("end", event.currentTarget)}
               onKeyDown={(event) => handleKeyDown(event, "end")}
             />
@@ -276,13 +317,14 @@ const TimePickerInternal = forwardRef<HTMLDivElement, InternalProps>(function Ti
             className="qizhi-time-picker__input"
             aria-label={label}
             placeholder={(props as TimePickerProps).placeholder ?? "请选择时间"}
-            value={single}
+            value={displayValues[0] ?? ""}
             onClick={(event) => openField("start", event.currentTarget)}
             onKeyDown={(event) => handleKeyDown(event, "start")}
           />
         </span>
       )}
       <span className="qizhi-time-picker__suffix" aria-hidden="true"><TimeIcon /></span>
+      {allowClear && !disabled && (range ? rangeValue.length > 0 : !!single) ? <button type="button" className="qizhi-time-picker__clear" aria-label="清空时间" onClick={(event) => { event.stopPropagation(); if (range) { if (!controlled) setRangeInner([]); (props as TimeRangePickerProps).onChange?.([]); } else commitSingle(""); setDraft([]); close(); }}><CloseIcon /></button> : null}
       {popup}
     </div>
   );

@@ -1,16 +1,14 @@
-import { act, fireEvent, render, screen, within } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { fireEvent, render, screen, within } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
 import { FilterSelectDocsIsland } from "./FilterSelectDocsIsland";
 import { filterSelectApi } from "./filterSelectApi";
 import { filterSelectDemos } from "./filterSelectDocs.registry";
 
 describe("FilterSelect docs", () => {
-  it("归入选择器并提供五组可复制 Demo", () => {
+  it("归入选择器并提供三组可复制 Demo", () => {
     expect(filterSelectDemos.map((demo) => demo.title)).toEqual([
       "单选筛选",
       "多选筛选",
-      "本地搜索",
-      "远程搜索",
       "状态与自定义",
     ]);
     filterSelectDemos.forEach((demo) => {
@@ -21,13 +19,13 @@ describe("FilterSelect docs", () => {
     });
   });
 
-  it("渲染五组 Demo 和独立 API", () => {
+  it("渲染三组 Demo 和独立 API", () => {
     render(<FilterSelectDocsIsland />);
     expect(screen.getByRole("heading", {
       level: 1,
       name: "筛选选择器 FilterSelect",
     })).toBeInTheDocument();
-    expect(screen.getAllByRole("heading", { level: 2 })).toHaveLength(6);
+    expect(screen.getAllByRole("heading", { level: 2 })).toHaveLength(4);
     expect(document.getElementById("filter-select-API")).toBeInTheDocument();
     expect(screen.getByRole("table", {
       name: "FilterSelect API",
@@ -50,24 +48,9 @@ describe("FilterSelect docs", () => {
     const multiple = document.getElementById("筛选选择器-多选筛选")!;
     expect(within(multiple).getByText("标签：标签A、标签B"))
       .toBeInTheDocument();
-    expect(within(multiple).getByText("+3个更多")).toBeInTheDocument();
+    expect(within(multiple).getByText("+3")).toBeInTheDocument();
   });
 
-  it("远程搜索 Demo 会进入加载并显示匹配结果", async () => {
-    vi.useFakeTimers();
-    render(<FilterSelectDocsIsland />);
-    const remote = document.getElementById("筛选选择器-远程搜索")!;
-    const input = within(remote).getByRole("combobox");
-    fireEvent.click(input);
-    fireEvent.change(input, { target: { value: "研究" } });
-    expect(within(remote).getByText("所有者：全部")).toBeInTheDocument();
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(320);
-    });
-    expect(screen.getByRole("option", { name: "研究团队管理员" }))
-      .toBeInTheDocument();
-    vi.useRealTimers();
-  });
 
   it("API 元数据覆盖筛选摘要、搜索和即时变更能力", () => {
     expect(filterSelectApi.map((item) => item.name)).toEqual(

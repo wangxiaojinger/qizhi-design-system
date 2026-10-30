@@ -63,7 +63,7 @@ export const inputGroupApi = [
 export const inputSearchApi = [
   { name: "loading", description: "搜索时是否显示加载状态；加载中阻止重复搜索。", type: "boolean", defaultValue: "false" },
   { name: "searchButton", description: "是否显示搜索按钮，也可传入自定义按钮内容。", type: "boolean | ReactNode", defaultValue: "false" },
-  { name: "onSearch", description: "点击搜索按钮或按下回车键时触发。", type: "(value: string) => void", defaultValue: "—" },
+  { name: "onSearch", description: "点击搜索图标、按钮或按回车触发；禁用、加载和输入法组合确认时不触发。", type: "(value: string) => void", defaultValue: "—" },
 ] as const satisfies readonly InputApiItem[];
 
 export const inputPasswordApi = [

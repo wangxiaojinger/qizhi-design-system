@@ -22,4 +22,11 @@
 .qizhi-time-picker--disabled .qizhi-time-picker__suffix { color: var(--color-text-4); }
 .qizhi-time-picker__popup { position: fixed; z-index: 1000; box-sizing: border-box; padding: 8px; border: 1px solid var(--color-border-2); border-radius: 2px; background: var(--color-bg-2); box-shadow: 0 6px 16px rgba(29, 33, 41, .12); }
 .qizhi-time-picker__popup:has(.qizhi-time-panel__column:nth-child(2):last-child) { --qizhi-time-columns: 2; }
+.qizhi-time-picker__popup { padding: 0; }
+.qizhi-time-picker__popup .qizhi-time-panel__options { position: relative; display: grid; grid-auto-rows: 28px; height: 168px; }
+.qizhi-time-picker__popup footer { display: flex; justify-content: flex-end; padding: 6px 8px; border-top: 1px solid var(--color-border-1); }
+.qizhi-time-picker__clear { display: none; align-items: center; border: 0; padding: 0; background: transparent; color: var(--color-text-3); cursor: pointer; }
+.qizhi-time-picker__clear svg { width: 16px; height: 16px; }
+.qizhi-time-picker:has(.qizhi-time-picker__clear):is(:hover, :focus-within) .qizhi-time-picker__suffix { display: none; }
+.qizhi-time-picker:is(:hover, :focus-within) .qizhi-time-picker__clear { display: inline-flex; }
 @media (max-width: 375px) { .qizhi-time-picker__popup { max-width: calc(100vw - 16px); } }

@@ -1,4 +1,4 @@
-import type { KeyboardEvent } from "react";
+import { useLayoutEffect, useRef, type KeyboardEvent } from "react";
 import type { DisabledTimeConfig } from "../date-picker/DatePicker.types";
 import type { TimePickerFormat, TimePickerStep } from "./TimePicker.types";
 import "./timePanel.css";
@@ -20,7 +20,7 @@ interface TimePanelProps {
 }
 
 const pad = (value: number) => String(value).padStart(2, "0");
-const safeStep = (value?: number) => Math.max(1, Math.floor(value ?? 1));
+const safeStep = (value?: number) => value != null && Number.isFinite(value) ? Math.max(1, Math.floor(value)) : 1;
 
 export function TimePanel({
   value,
@@ -31,6 +31,13 @@ export function TimePanel({
   title,
   onChange,
 }: TimePanelProps) {
+  const panelRef = useRef<HTMLElement>(null);
+  useLayoutEffect(() => {
+    panelRef.current?.querySelectorAll<HTMLElement>(".qizhi-time-panel__options").forEach((column) => {
+      const selected = column.querySelector<HTMLElement>('[aria-selected="true"]');
+      if (selected) column.scrollTop = selected.offsetTop - column.offsetTop;
+    });
+  }, [value.hour, value.minute, value.second, format, hideDisabled]);
   const columns: Array<{
     key: keyof TimeParts;
     label: string;
@@ -65,8 +72,10 @@ export function TimePanel({
         : null;
     if (nextIndex != null) {
       event.preventDefault();
-      const buttons = event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>("[role=option]");
-      buttons?.[nextIndex]?.focus();
+      const buttons = Array.from(event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>("[role=option]:not(:disabled)") ?? []);
+      const current = buttons.indexOf(event.currentTarget);
+      const delta = event.key === "ArrowDown" || event.key === "ArrowRight" ? 1 : -1;
+      buttons[Math.max(0, Math.min(buttons.length - 1, current + delta))]?.focus();
       return;
     }
     if (event.key === "Enter" || event.key === " ") {
@@ -76,7 +85,7 @@ export function TimePanel({
   };
 
   return (
-    <section className="qizhi-time-panel">
+    <section ref={panelRef} className="qizhi-time-panel">
       {title ? <h3>{title}</h3> : null}
       <div className="qizhi-time-panel__columns">
         {columns.map((column) => {

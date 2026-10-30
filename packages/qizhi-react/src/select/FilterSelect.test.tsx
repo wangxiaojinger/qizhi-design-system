@@ -119,17 +119,9 @@ describe("FilterSelect single", () => {
     expect(screen.getByText("所有者：企业管理员")).toBeInTheDocument();
   });
 
-  it("keeps clear available when a selected remote option is absent", () => {
-    render(<FilterSelect
-      label="所有者"
-      value="enterprise"
-      options={[{ label: "其他结果", value: "other" }]}
-      allowClear
-      aria-label="所有者筛选"
-    />);
-
-    expect(screen.getByRole("button", { name: "清除选择" }))
-      .toBeInTheDocument();
+  it("never clears a single filter even when allowClear is supplied", () => {
+    render(<FilterSelect label="所有者" value="enterprise" options={ownerOptions} allowClear />);
+    expect(screen.queryByRole("button", { name: "清除选择" })).not.toBeInTheDocument();
   });
 
   it("shows an unknown controlled value without synthesizing an option", async () => {
@@ -150,48 +142,7 @@ describe("FilterSelect single", () => {
     expect(onChange).toHaveBeenCalledWith("research", ownerOptions[1]);
   });
 
-  it("clears to custom empty text and emits undefined", async () => {
-    const user = userEvent.setup();
-    const onChange = vi.fn();
-    render(<FilterSelect
-      label="所有者"
-      defaultValue="enterprise"
-      options={ownerOptions}
-      emptyText="不限"
-      allowClear
-      onChange={onChange}
-      aria-label="所有者筛选"
-    />);
 
-    await user.click(screen.getByRole("button", { name: "清除选择" }));
-    expect(onChange).toHaveBeenCalledWith(undefined, undefined);
-    expect(screen.getByText("所有者：不限")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "清除选择" }))
-      .not.toBeInTheDocument();
-    await user.click(screen.getByText("所有者：不限"));
-    expect(screen.getByRole("option", { name: "企业管理员" }))
-      .toHaveAttribute("aria-selected", "false");
-  });
-
-  it("stays empty after selecting and clearing an initially empty filter", async () => {
-    const user = userEvent.setup();
-    render(<FilterSelect
-      label="所有者"
-      options={ownerOptions}
-      allowClear
-      aria-label="所有者筛选"
-    />);
-
-    await user.click(screen.getByText("所有者：全部"));
-    await user.click(screen.getByRole("option", { name: "企业管理员" }));
-    await user.click(screen.getByRole("button", { name: "清除选择" }));
-    expect(screen.getByText("所有者：全部")).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "清除选择" }))
-      .not.toBeInTheDocument();
-    await user.click(screen.getByText("所有者：全部"));
-    expect(screen.getByRole("option", { name: "企业管理员" }))
-      .toHaveAttribute("aria-selected", "false");
-  });
 });
 
 describe("FilterSelect multiple and search", () => {
@@ -208,7 +159,7 @@ describe("FilterSelect multiple and search", () => {
     [[], "标签：全部标签"],
     [["research"], "标签：research"],
     [["a", "b"], "标签：标签A、标签B"],
-    [["a", "b", "c", "d", "e"], "标签：标签A、标签B +3个更多"],
+    [["a", "b", "c", "d", "e"], "标签：标签A、标签B +3"],
   ])("formats selected values %j as %s", (defaultValue, expected) => {
     const { container } = render(<FilterSelect mode="multiple" label="标签" options={tagOptions} defaultValue={defaultValue} aria-label="标签筛选" />);
     expect(container.querySelector(".qizhi-filter-select__summary")).toHaveTextContent(expected);
@@ -216,8 +167,8 @@ describe("FilterSelect multiple and search", () => {
   });
 
   it.each([
-    [-1, "标签： +3个更多"],
-    [0, "标签： +3个更多"],
+    [-1, "标签： +3"],
+    [0, "标签： +3"],
     [8, "标签：标签A、标签B、标签C"],
   ])("normalizes maxDisplayCount=%s", (maxDisplayCount, expected) => {
     const { container } = render(<FilterSelect mode="multiple" label="标签" options={tagOptions} defaultValue={["a", "b", "c"]} maxDisplayCount={maxDisplayCount} aria-label="标签筛选" />);
@@ -302,7 +253,7 @@ describe("FilterSelect multiple and search", () => {
     const { rerender } = render(<FilterSelect searchable label="所有者" options={ownerOptions} aria-label="所有者筛选" />);
     const input = screen.getByRole("combobox", { name: "所有者筛选" });
     await user.click(input);
-    await user.type(input, "enterprise");
+    await user.type(screen.getByRole("textbox", { name: "所有者筛选搜索" }), "enterprise");
     expect(screen.getByRole("option", { name: "企业管理员" })).toBeInTheDocument();
     expect(screen.queryByRole("option", { name: "研究团队管理员" })).not.toBeInTheDocument();
 
@@ -325,7 +276,7 @@ describe("FilterSelect multiple and search", () => {
     />);
     const input = screen.getByRole("combobox", { name: "所有者筛选" });
     await user.click(input);
-    await user.type(input, "xyz");
+    await user.type(screen.getByRole("textbox", { name: "所有者筛选搜索" }), "xyz");
     expect(onSearch).toHaveBeenLastCalledWith("xyz");
     expect(screen.getAllByRole("option")).toHaveLength(2);
     expect(screen.getByText("所有者：企业管理员")).toBeInTheDocument();
@@ -337,9 +288,9 @@ describe("FilterSelect multiple and search", () => {
     render(<FilterSelect searchable retainDisplayValueWhenOpen={false} label="所有者" defaultValue="enterprise" options={ownerOptions} aria-label="所有者筛选" />);
     const input = screen.getByRole("combobox", { name: "所有者筛选" });
     await user.click(input);
-    await user.type(input, "研究");
+    await user.type(screen.getByRole("textbox", { name: "所有者筛选搜索" }), "研究");
     expect(screen.queryByText("所有者：企业管理员")).not.toBeInTheDocument();
-    expect(input).toHaveValue("研究");
+    expect(screen.getByRole("textbox", { name: "所有者筛选搜索" })).toHaveValue("研究");
   });
 
   it("warns for a non-text label without an explicit accessible name", () => {

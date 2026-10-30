@@ -1,5 +1,23 @@
 import { expect, test } from "@playwright/test";
 
+test("错误与警告输入框在悬停和聚焦时保持状态边框", async ({ page }) => {
+  await page.goto("/#component-input");
+  for (const [placeholder, token] of [["错误状态", "--component-input-border-error"], ["警告状态", "--component-input-border-warning"]]) {
+    const input = page.locator("#component-input").getByPlaceholder(placeholder, { exact: true });
+    const control = input.locator("..");
+    await expect(control).toHaveClass(/qizhi-input--size-default/);
+    await input.scrollIntoViewIfNeeded();
+    await page.mouse.move(0, 0);
+    const border = await control.evaluate((node, token) => { const probe = document.createElement("span"); probe.style.color = `var(${token})`; node.append(probe); const color = getComputedStyle(probe).color; probe.remove(); return color; }, token);
+    await expect(control).toHaveCSS("border-top-color", border);
+    await input.hover();
+    await expect(control).toHaveCSS("border-color", border);
+    await input.focus();
+    await expect(control).toHaveCSS("border-color", border);
+    await input.blur();
+  }
+});
+
 test("Input React Island exposes the approved component family", async ({ page }, testInfo) => {
   test.setTimeout(60_000);
   const errors: string[] = [];

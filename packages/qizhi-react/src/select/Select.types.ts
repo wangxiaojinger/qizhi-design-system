@@ -15,7 +15,7 @@ export interface SelectOptionGroup {
   options: SelectOption[];
 }
 
-export interface SelectSearchConfig { retainInputValue?: boolean }
+export interface SelectSearchConfig { retainInputValue?: boolean; placement?: "trigger" | "popup"; placeholder?: string }
 export interface SelectCreateConfig { formatter?: (input: string) => ReactNode }
 export interface SelectAutoWidth { minWidth?: number; maxWidth?: number }
 

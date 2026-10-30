@@ -14,8 +14,6 @@ export default function StatesDemo() {
         label="标签"
         options={options}
         defaultValue={["research", "design", "system"]}
-        renderMore={(count) => `另有 ${count} 项`}
-        allowClear
       />
       <FilterSelect
         label="状态"

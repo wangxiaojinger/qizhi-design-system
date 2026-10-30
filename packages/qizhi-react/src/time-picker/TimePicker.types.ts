@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode, Ref } from "react";
 import type { InputStatus } from "../input/Input.types";
+import type { DisabledTimeConfig } from "../date-picker/DatePicker.types";
 
 export type TimePickerSize = "mini" | "small" | "default" | "large";
 export type TimePickerFormat = "HH:mm:ss" | "HH:mm";
@@ -16,6 +17,10 @@ interface TimePickerSharedProps {
   size?: TimePickerSize;
   status?: InputStatus;
   disabled?: boolean;
+  allowClear?: boolean;
+  needConfirm?: boolean;
+  hideDisabledOptions?: boolean;
+  disabledTime?: (value: string, field?: "start" | "end") => DisabledTimeConfig;
   className?: string;
   style?: CSSProperties;
   "aria-label"?: string;
@@ -30,6 +35,7 @@ export interface TimePickerProps extends TimePickerSharedProps {
 }
 
 export interface TimeRangePickerProps extends TimePickerSharedProps {
+  order?: boolean;
   value?: readonly [string, string] | readonly [];
   defaultValue?: readonly [string, string] | readonly [];
   onChange?: (value: [string, string] | []) => void;

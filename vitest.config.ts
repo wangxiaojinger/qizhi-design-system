@@ -10,5 +10,5 @@ export default defineConfig({
       { find: "@wangxiaojinger/qizhi-react", replacement: fileURLToPath(new URL("./packages/qizhi-react/src/index.ts", import.meta.url)) },
     ],
   },
-  test: { environment: "jsdom", setupFiles: ["./tests/setup.ts"], globals: true, restoreMocks: true, exclude: ["tests/e2e/**", "node_modules/**", "dist/**", "generated-react-pages/**"] }
+  test: { environment: "jsdom", setupFiles: ["./tests/setup.ts"], globals: true, restoreMocks: true, exclude: ["tests/e2e/**", "**/node_modules/**", "dist/**", "generated-react-pages/**"] }
 });

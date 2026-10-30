@@ -54,7 +54,7 @@ describe("TimePicker docs", () => {
 
   it("documents exactly the approved v1 API", () => {
     expect(timePickerApi.map((item) => item.name)).toEqual([
-      "value", "defaultValue", "onChange", "format", "step", "size",
+      "value", "defaultValue", "onChange", "allowClear", "needConfirm", "order", "disabledTime", "hideDisabledOptions", "format", "step", "size",
       "status", "disabled", "placeholder", "placeholders", "className",
       "style", "aria-label", "ref",
     ]);

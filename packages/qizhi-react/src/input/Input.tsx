@@ -31,7 +31,12 @@ const getGroupedInputStyle = (style?: CSSProperties) => {
 const notifyInputChange = (
   input: HTMLInputElement,
   onChange: InputProps["onChange"],
-) => onChange?.({ target: input, currentTarget: input } as ChangeEvent<HTMLInputElement>);
+) => {
+  const event = new Event("input", { bubbles: true, cancelable: true });
+  Object.defineProperties(event, { target: { value: input }, currentTarget: { value: input }, nativeEvent: { value: event } });
+  Object.assign(event, { persist: () => undefined, isDefaultPrevented: () => event.defaultPrevented, isPropagationStopped: () => event.cancelBubble });
+  onChange?.(event as unknown as ChangeEvent<HTMLInputElement>);
+};
 
 type InputBaseProps = InputProps & { addonAfterClassName?: string };
 
@@ -71,7 +76,7 @@ const InputBase = forwardRef<HTMLInputElement, InputBaseProps>(function Input(
   const currentValue = controlled ? stringValue(value) : innerValue;
   const limit = getLengthLimit(maxLength);
   const overLimit = !!limit?.errorOnly && currentValue.length > limit.length;
-  const clearable = allowClear && !showWordLimit;
+  const clearable = allowClear;
   const hasClearButton = clearable && !!currentValue && !disabled && !readOnly;
   const autoWidthOptions = typeof autoWidth === "object" ? autoWidth : {};
   const setRefs = (node: HTMLInputElement | null) => {
@@ -99,11 +104,12 @@ const InputBase = forwardRef<HTMLInputElement, InputBaseProps>(function Input(
     if (!controlled) setInnerValue(nextValue);
     if (input) {
       input.value = nextValue;
-      if (report) notifyInputChange(input, onChange);
+      try { if (report) notifyInputChange(input, onChange); }
+      finally { if (controlled) input.value = currentValue; }
     }
   };
   const normalizeValue = () => {
-    if (!normalize) return;
+    if (!normalize || disabled || readOnly) return;
     const nextValue = normalize(currentValue);
     if (nextValue !== currentValue) updateValue(nextValue);
   };
@@ -146,7 +152,7 @@ const InputBase = forwardRef<HTMLInputElement, InputBaseProps>(function Input(
       aria-invalid={overLimit || status === "error" || rest["aria-invalid"] || undefined}
       onChange={handleChange}
       onBlur={(event) => { if (normalizeTrigger === "blur") normalizeValue(); onBlur?.(event); }}
-      onKeyDown={(event) => { if (normalizeTrigger === "enter" && event.key === "Enter") normalizeValue(); onKeyDown?.(event); }}
+      onKeyDown={(event) => { if (normalizeTrigger === "enter" && event.key === "Enter" && !event.nativeEvent.isComposing && event.keyCode !== 229) normalizeValue(); onKeyDown?.(event); }}
     />
     {showWordLimit && limit ? <span className={joinClassName("qizhi-input__word-limit", overLimit && "qizhi-input__word-limit--error")}>{currentValue.length}/{limit.length}</span> : null}
     {hasClearButton ? <button className="qizhi-input__clear" type="button" aria-label="清空输入内容" onMouseDown={(event) => event.preventDefault()} onClick={handleClear}><MultiplyIcon /></button> : null}
@@ -168,10 +174,10 @@ const InputSearch = forwardRef<HTMLInputElement, InputSearchProps>(function Inpu
     if (typeof ref === "function") ref(node);
     else if (ref) ref.current = node;
   };
-  const submit = () => { if (!loading) onSearch?.(localRef.current?.value ?? ""); };
+  const submit = () => { if (!loading && !props.disabled) onSearch?.(localRef.current?.value ?? ""); };
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") submit();
     onKeyDown?.(event);
+    if (event.key === "Enter" && !event.nativeEvent.isComposing && event.keyCode !== 229 && !event.defaultPrevented) submit();
   };
   const buttonLabel = loading ? "搜索中" : "搜索";
   return <InputBase
@@ -181,8 +187,8 @@ const InputSearch = forwardRef<HTMLInputElement, InputSearchProps>(function Inpu
     allowClear={false}
     addonAfterClassName={searchButton ? "qizhi-input__addon--search" : undefined}
     onKeyDown={handleKeyDown}
-    suffix={searchButton ? suffix : (loading ? <LoadingIcon className="qizhi-input-search__spinner" /> : (suffix ?? <SearchIcon />))}
-    addAfter={searchButton ? <button className="qizhi-input-search__button" type="button" aria-label={buttonLabel} disabled={loading} onClick={submit}>{loading ? <LoadingIcon className="qizhi-input-search__spinner" /> : searchButton === true ? <SearchIcon /> : searchButton}</button> : props.addAfter}
+    suffix={searchButton ? suffix : (loading ? <LoadingIcon className="qizhi-input-search__spinner" /> : (suffix ?? <button className="qizhi-input-search__icon-button" type="button" aria-label={buttonLabel} disabled={loading || props.disabled} onClick={submit}><SearchIcon /></button>))}
+    addAfter={searchButton ? <button className="qizhi-input-search__button" type="button" aria-label={buttonLabel} disabled={loading || props.disabled} onClick={submit}>{loading ? <LoadingIcon className="qizhi-input-search__spinner" /> : searchButton === true ? <SearchIcon /> : searchButton}</button> : props.addAfter}
   />;
 });
 
@@ -200,12 +206,13 @@ const InputPassword = forwardRef<HTMLInputElement, InputPasswordProps>(function 
     else if (ref) ref.current = node;
   };
   const toggle = () => {
+    if (props.disabled) return;
     const next = !visible;
     if (!controlled) setInnerVisible(next);
     onVisibilityChange?.(next);
     window.setTimeout(() => localRef.current?.focus(), 0);
   };
-  return <InputBase {...props} ref={setRefs} type={visible ? "text" : "password"} allowClear={false} suffix={<button className="qizhi-input-password__toggle" type="button" aria-label={visible ? "隐藏密码" : "显示密码"} onMouseDown={(event) => event.preventDefault()} onClick={toggle}>{visible ? <EyeVisibleIcon /> : <EyeHiddenIcon />}</button>} />;
+  return <InputBase {...props} ref={setRefs} type={visible ? "text" : "password"} allowClear={false} suffix={<button className="qizhi-input-password__toggle" type="button" disabled={props.disabled} aria-label={visible ? "隐藏密码" : "显示密码"} onMouseDown={(event) => event.preventDefault()} onClick={toggle}>{visible ? <EyeVisibleIcon /> : <EyeHiddenIcon />}</button>} />;
 });
 
 const InputTextArea = forwardRef<HTMLTextAreaElement, InputTextAreaProps>(function InputTextArea(
@@ -234,9 +241,9 @@ const InputTextArea = forwardRef<HTMLTextAreaElement, InputTextAreaProps>(functi
       const lineHeight = Number.parseFloat(computed.lineHeight) || 22;
       const paddingY = Number.parseFloat(computed.paddingTop) + Number.parseFloat(computed.paddingBottom);
       const borderY = Number.parseFloat(computed.borderTopWidth) + Number.parseFloat(computed.borderBottomWidth);
-      const minHeight = bounds.minRows ? Math.ceil(bounds.minRows * lineHeight + paddingY + borderY) : 32;
+      const minHeight = Math.ceil((bounds.minRows ?? rows ?? 1) * lineHeight + paddingY + borderY);
       const maxHeight = bounds.maxRows ? Math.ceil(bounds.maxRows * lineHeight + paddingY + borderY) : Number.POSITIVE_INFINITY;
-      const scrollHeight = node.scrollHeight;
+      const scrollHeight = node.scrollHeight + borderY;
       node.style.height = `${Math.min(Math.max(scrollHeight, minHeight), maxHeight)}px`;
       node.style.overflowY = scrollHeight > maxHeight ? "auto" : "hidden";
     };
@@ -245,7 +252,7 @@ const InputTextArea = forwardRef<HTMLTextAreaElement, InputTextAreaProps>(functi
     const observer = new ResizeObserver(syncHeight);
     observer.observe(node);
     return () => observer.disconnect();
-  }, [autoSize, bounds.maxRows, bounds.minRows, currentValue]);
+  }, [autoSize, bounds.maxRows, bounds.minRows, currentValue, rows]);
   const counter = showWordLimit && limit ? <span className={joinClassName("qizhi-input__word-limit", overLimit && "qizhi-input__word-limit--error")}>{currentValue.length}/{limit.length}</span> : null;
   const field = <span className={controlContainerClassName("qizhi-textarea__control")}><textarea {...rest} ref={setRefs} className="qizhi-textarea__field" disabled={disabled} readOnly={readOnly} value={currentValue} rows={minRows} maxLength={limit && !limit.errorOnly ? limit.length : undefined} aria-invalid={overLimit || status === "error" || rest["aria-invalid"] || undefined} onChange={(event) => { if (!controlled) setInnerValue(event.target.value); onChange?.(event); }} />{wordLimitPlacement === "inside" ? counter : null}</span>;
   return <span className={joinClassName("qizhi-textarea", autoSize && "qizhi-textarea--auto-size", disabled && "qizhi-textarea--disabled", readOnly && "qizhi-textarea--readonly", status !== "default" && `qizhi-textarea--${status}`, overLimit && "qizhi-textarea--error", wordLimitPlacement === "outside" && "qizhi-textarea--word-limit-outside", className)}>{field}{wordLimitPlacement === "outside" ? counter : null}</span>;

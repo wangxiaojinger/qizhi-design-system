@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useId, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useLayoutEffect, useId, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Select } from "./Select";
 import type { SelectOption, SelectRawValue } from "./Select.types";
@@ -64,18 +64,43 @@ export function FilterSelect(props: FilterSelectProps) {
   const accessibleName = ariaLabel ?? (textOf(label) || placeholder);
   const mappedFilterOption = filterOption === false ? () => true : filterOption === true ? undefined : filterOption;
   const requestedDisplayCount = multipleProps.maxDisplayCount ?? 2;
+  const summaryRef = useRef<HTMLSpanElement>(null);
+  const [fittedCount, setFittedCount] = useState(requestedDisplayCount);
   const maxDisplayCount = Number.isFinite(requestedDisplayCount) ? Math.max(0, Math.floor(requestedDisplayCount)) : 2;
-  const shownValues = multipleValue.slice(0, maxDisplayCount);
+  const shownValues = multipleValue.slice(0, Math.max(0, Math.min(maxDisplayCount, fittedCount)));
   const hiddenCount = Math.max(0, multipleValue.length - shownValues.length);
   const separator = multipleProps.separator ?? "、";
   const summaryId = `qizhi-filter-select-summary-${useId().replace(/:/g, "")}`;
+  useLayoutEffect(() => {
+    const node = summaryRef.current;
+    if (!multiple || !node) return;
+    const measure = () => {
+      if (!node.clientWidth) return;
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+      if (!context) return;
+      context.font = getComputedStyle(node).font;
+      let count = Math.min(maxDisplayCount, multipleValue.length);
+      while (count > 1) {
+        const text = `${textOf(label)}：${multipleValue.slice(0, count).map((value) => textOf(resolveLabel(value))).join(textOf(separator))}`;
+        const more = count < multipleValue.length ? ` +${multipleValue.length - count}` : "";
+        if (context.measureText(text + more).width <= node.clientWidth) break;
+        count -= 1;
+      }
+      setFittedCount(count);
+    };
+    measure();
+    const observer = typeof ResizeObserver !== "undefined" ? new ResizeObserver(measure) : undefined;
+    observer?.observe(node);
+    return () => observer?.disconnect();
+  }, [multiple, multipleValue.join("\u0000"), maxDisplayCount, label, separator, options]);
   const multipleSummary = multipleValue.length
-    ? <><span>{label}：{shownValues.map((value, index) => <Fragment key={keyOf(value)}>{index ? separator : null}{resolveLabel(value)}</Fragment>)}</span>{hiddenCount > 0 ? <> <span className="qizhi-filter-select__more">{multipleProps.renderMore ? multipleProps.renderMore(hiddenCount) : `+${hiddenCount}个更多`}</span></> : null}</>
+    ? <><span>{label}：{shownValues.map((value, index) => <Fragment key={keyOf(value)}>{index ? separator : null}{resolveLabel(value)}</Fragment>)}</span>{hiddenCount > 0 ? <> <span className="qizhi-filter-select__more">{multipleProps.renderMore ? multipleProps.renderMore(hiddenCount) : `+${hiddenCount}`}</span></> : null}</>
     : <span>{label}：{multipleProps.emptyText ?? "全部标签"}</span>;
   const singleSummary = <span>{label}：{summary}</span>;
   const renderDisplay = ({ open, searching }: { open: boolean; searching: boolean }) => {
     if (!retainDisplayValueWhenOpen && open && searching) return null;
-    return <span id={summaryId} className="qizhi-filter-select__summary">{multiple ? multipleSummary : singleSummary}</span>;
+    return <span ref={summaryRef} id={summaryId} className="qizhi-filter-select__summary">{multiple ? multipleSummary : singleSummary}</span>;
   };
 
   if (multiple) {
@@ -83,7 +108,7 @@ export function FilterSelect(props: FilterSelectProps) {
       mode="multiple"
       options={mergedOptions}
       value={multipleValue}
-      showSearch={searchable}
+      showSearch={searchable ? { placement: "popup", placeholder } : false}
       searchValue={searchValue}
       filterOption={mappedFilterOption}
       onSearch={onSearch}
@@ -108,13 +133,13 @@ export function FilterSelect(props: FilterSelectProps) {
   return <Select
     options={mergedOptions}
     value={singleValue}
-    showSearch={searchable}
+    showSearch={searchable ? { placement: "popup", placeholder } : false}
     searchValue={searchValue}
     filterOption={mappedFilterOption}
     onSearch={onSearch}
     loading={loading}
     disabled={disabled}
-    allowClear={allowClear}
+    allowClear={false}
     placeholder={placeholder}
     notFoundContent={notFoundContent}
     renderOption={renderOption}

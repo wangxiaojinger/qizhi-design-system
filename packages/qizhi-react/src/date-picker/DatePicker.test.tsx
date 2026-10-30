@@ -5,6 +5,85 @@ import { DatePicker } from "./DatePicker";
 import datePickerCss from "./datePicker.css?raw";
 
 describe("DatePicker", () => {
+  it("does not normalize impossible dates into another month", async () => {
+    const user = userEvent.setup();
+    render(<DatePicker showTime value="2026-02-30 09:00:00" />);
+    await user.click(screen.getByRole("combobox"));
+    expect(screen.getByRole("button", { name: "确认" })).toBeDisabled();
+  });
+
+  it("opens the selected quarter in its own year", async () => {
+    const user = userEvent.setup();
+    render(<DatePicker mode="quarter" defaultValue="2024-Q3" />);
+    await user.click(screen.getByRole("combobox"));
+    expect(screen.getByText("2024年")).toBeInTheDocument();
+  });
+
+  it("edits only the end date of a completed range", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<DatePicker.RangePicker defaultValue={["2026-08-10", "2026-08-15"]} onChange={onChange} />);
+    await user.click(screen.getByRole("combobox", { name: "选择日期范围结束" }));
+    await user.click(screen.getByRole("button", { name: "2026年8月20日" }));
+    expect(onChange).toHaveBeenCalledWith(["2026-08-10", "2026-08-20"]);
+  });
+  it("uses end restrictions when opened from the end field by keyboard", () => {
+    render(<DatePicker.RangePicker showTime defaultValue={["2026-08-15 09:00:00", "2026-08-16 18:00:00"]} disabledTime={(_, field) => ({ disabledHours: field === "end" ? [0] : [23] })} />);
+    fireEvent.keyDown(screen.getByRole("combobox", { name: "选择日期时间范围结束" }), { key: "Enter" });
+    expect(within(screen.getByRole("listbox", { name: "时" })).getByRole("option", { name: "00" })).toBeDisabled();
+  });
+
+  it("does not invent a range date when only time is clicked", async () => {
+    const user = userEvent.setup();
+    render(<DatePicker.RangePicker showTime />);
+    const start = screen.getByRole("combobox", { name: "选择日期时间范围" });
+    await user.click(start);
+    await user.click(within(screen.getByRole("listbox", { name: "时" })).getByRole("option", { name: "09" }));
+    expect(start).toHaveValue("");
+    expect(screen.getByRole("button", { name: "确认" })).toBeDisabled();
+  });
+
+  it("marks disabled months as unavailable", async () => {
+    const user = userEvent.setup();
+    render(<DatePicker mode="month" defaultPickerDate="2026-08-01" disabledDate={(date) => date.getMonth() < 7} />);
+    await user.click(screen.getByRole("combobox"));
+    expect(screen.getByRole("button", { name: "1月" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "8月" })).toBeEnabled();
+  });
+  it("retains the complete existing date and time on confirmation", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<DatePicker showTime defaultValue="2026-08-15 09:12:30" onChange={onChange} />);
+    await user.click(screen.getByRole("combobox"));
+    await user.click(screen.getByRole("button", { name: "确认" }));
+    expect(onChange).toHaveBeenCalledWith("2026-08-15 09:12:30");
+  });
+
+  it("edits start time independently and applies the active field restrictions", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(<DatePicker.RangePicker showTime defaultValue={["2026-08-15 09:12:30", "2026-08-16 18:20:40"]} disabledTime={(_, field) => ({ disabledHours: field === "start" ? [0] : [23] })} onChange={onChange} />);
+    await user.click(screen.getByRole("combobox", { name: "选择日期时间范围" }));
+    const hours = screen.getByRole("listbox", { name: "时" });
+    expect(within(hours).getByRole("option", { name: "00" })).toBeDisabled();
+    await user.click(within(hours).getByRole("option", { name: "10" }));
+    await user.click(screen.getByRole("button", { name: "确认" }));
+    expect(onChange).toHaveBeenCalledWith(["2026-08-15 10:12:30", "2026-08-16 18:20:40"]);
+  });
+
+  it("rejects disabled times and reversed datetime ranges on confirmation", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    const { unmount } = render(<DatePicker showTime defaultValue="2026-08-15 00:00:00" disabledTime={() => ({ disabledHours: [0] })} onChange={onChange} />);
+    await user.click(screen.getByRole("combobox"));
+    await user.click(screen.getByRole("button", { name: "确认" }));
+    expect(onChange).not.toHaveBeenCalled();
+    unmount();
+    render(<DatePicker.RangePicker showTime defaultValue={["2026-08-15 18:00:00", "2026-08-15 09:00:00"]} onChange={onChange} />);
+    await user.click(screen.getByRole("combobox", { name: "选择日期时间范围" }));
+    await user.click(screen.getByRole("button", { name: "确认" }));
+    expect(onChange).not.toHaveBeenCalled();
+  });
   it("opens an accessible date dialog and commits a single date immediately", async () => {
     const user = userEvent.setup();
     const onChange = vi.fn();

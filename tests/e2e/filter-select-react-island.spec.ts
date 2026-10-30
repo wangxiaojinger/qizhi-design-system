@@ -9,7 +9,7 @@ test("FilterSelect 摘要、搜索、键盘与响应式布局", async ({
   });
   await page.goto("/#component-filter-select");
   const section = page.locator("#component-filter-select");
-  await expect(section.locator(".codebox-wrapper")).toHaveCount(5);
+  await expect(section.locator(".codebox-wrapper")).toHaveCount(3);
   await expect(section.locator("#filter-select-API")).toBeVisible();
 
   const single = section.locator('[id="筛选选择器-单选筛选"]');
@@ -38,7 +38,7 @@ test("FilterSelect 摘要、搜索、键盘与响应式布局", async ({
   const multiple = section.locator('[id="筛选选择器-多选筛选"]');
   const multipleInput = multiple.getByRole("combobox");
   await expect(multiple.getByText("标签：标签A、标签B")).toBeVisible();
-  await expect(multiple.getByText("+3个更多")).toBeVisible();
+  await expect(multiple.getByText("+3")).toBeVisible();
   await multipleInput.click();
   const multiplePopup = page.locator(".qizhi-select-popup").last();
   const option = multiplePopup.getByRole("option", { name: "标签A" });
@@ -60,38 +60,11 @@ test("FilterSelect 摘要、搜索、键盘与响应式布局", async ({
   )).toBeLessThanOrEqual(1);
   await option.click();
   await expect(multiple.getByText("标签：标签B、标签C")).toBeVisible();
-  await expect(multiple.getByText("+2个更多")).toBeVisible();
+  await expect(multiple.getByText("+2")).toBeVisible();
   await multiple.screenshot({
     path: testInfo.outputPath(`filter-select-multiple-${testInfo.project.name}.png`),
   });
-  await multipleInput.press("Escape");
 
-  const local = section.locator('[id="筛选选择器-本地搜索"]');
-  const localInput = local.getByRole("combobox");
-  await expect(localInput).not.toHaveAttribute("placeholder");
-  await localInput.click();
-  await localInput.fill("研究");
-  await expect(local.getByText("所有者：全部")).toBeVisible();
-  await expect(page.getByRole("option", { name: "研究团队管理员" }))
-    .toBeVisible();
-  await expect(page.getByRole("option", { name: "企业管理员" }))
-    .toHaveCount(0);
-  await local.screenshot({
-    path: testInfo.outputPath(`filter-select-search-${testInfo.project.name}.png`),
-  });
-  await localInput.press("Escape");
-
-  const remote = section.locator('[id="筛选选择器-远程搜索"]');
-  const remoteInput = remote.getByRole("combobox");
-  await remoteInput.click();
-  await remoteInput.fill("研究");
-  await expect(remote.getByText("所有者：全部")).toBeVisible();
-  expect(await remote.locator(".qizhi-filter-select__summary").evaluate(
-    (node) => node.scrollWidth <= node.clientWidth,
-  )).toBe(true);
-  await expect(page.getByRole("option", { name: "研究团队管理员" }))
-    .toBeVisible();
-  await expect(remote.getByText("所有者：全部")).toBeVisible();
   const popup = page.locator(".qizhi-select-popup").last();
   const popupBounds = await popup.boundingBox();
   expect(popupBounds).not.toBeNull();
@@ -113,8 +86,8 @@ test("FilterSelect 摘要、搜索、键盘与响应式布局", async ({
     }
     return true;
   })).toBe(true);
-  await remote.screenshot({
-    path: testInfo.outputPath(`filter-select-remote-${testInfo.project.name}.png`),
+  await multiple.screenshot({
+    path: testInfo.outputPath(`filter-select-popup-${testInfo.project.name}.png`),
   });
 
   expect(await page.evaluate(() => (

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -13,4 +13,18 @@ for (const target of Object.values(pkg.exports)) {
   for (const relative of paths) assert.ok(existsSync(resolve(packageRoot, relative)), `missing ${relative}`);
 }
 
-console.log("qizhi-react package exports are complete");
+function checkDeclarations(folder) {
+  for (const entry of readdirSync(folder, { withFileTypes: true })) {
+    const file = resolve(folder, entry.name);
+    if (entry.isDirectory()) { checkDeclarations(file); continue; }
+    if (!file.endsWith(".d.ts")) continue;
+    const source = readFileSync(file, "utf8");
+    assert.doesNotMatch(source, /^import\s+["'][^"']+\.css["']/m, `CSS side effect in ${file}`);
+    for (const match of source.matchAll(/(?:from\s*|import\s*\(\s*)["'](\.[^"']+)["']/g)) {
+      assert.match(match[1], /\.js$/, `NodeNext requires an explicit extension in ${file}`);
+      assert.ok(existsSync(resolve(dirname(file), match[1].replace(/\.js$/, ".d.ts"))), `missing declaration ${match[1]} in ${file}`);
+    }
+  }
+}
+checkDeclarations(resolve(packageRoot, "dist"));
+console.log("qizhi-react package exports and declaration imports are complete");

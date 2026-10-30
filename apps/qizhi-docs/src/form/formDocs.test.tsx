@@ -173,11 +173,11 @@ describe("Form docs", () => {
     const serviceName = within(demo).getByRole("textbox", { name: "远程服务名称" });
     const region = within(demo).getByRole("combobox", { name: "部署区域" });
 
-    expect(within(demo).getByRole("status", { name: "未保存修改状态" })).toHaveTextContent("所有修改已保存");
+    expect(within(demo).queryByRole("status", { name: "未保存修改状态" })).not.toBeInTheDocument();
     fireEvent.change(serviceName, { target: { value: "changed-service" } });
     expect(within(demo).getByRole("status", { name: "未保存修改状态" })).toHaveTextContent("有未保存修改");
     fireEvent.click(within(demo).getByRole("button", { name: "保存当前修改" }));
-    expect(within(demo).getByRole("status", { name: "未保存修改状态" })).toHaveTextContent("所有修改已保存");
+    expect(within(demo).queryByRole("status", { name: "未保存修改状态" })).not.toBeInTheDocument();
 
     fireEvent.change(region, { target: { value: "loading" } });
     expect(within(demo).getByText("正在加载")).toBeInTheDocument();

@@ -3,6 +3,56 @@ import userEvent from "@testing-library/user-event";
 import { expect, test, vi } from "vitest";
 import { TimePicker } from "./TimePicker";
 
+test("discards unconfirmed edits on Escape and restores the committed value", async () => {
+  const user = userEvent.setup();
+  const onChange = vi.fn();
+  render(<TimePicker needConfirm defaultValue="08:00:00" onChange={onChange} />);
+  const input = screen.getByRole("combobox");
+  await user.click(input);
+  await user.click(within(screen.getByRole("listbox", { name: "时" })).getByRole("option", { name: "09" }));
+  await user.keyboard("{Escape}");
+  expect(input).toHaveValue("08:00:00");
+  expect(onChange).not.toHaveBeenCalled();
+  await user.click(input);
+  expect(within(screen.getByRole("listbox", { name: "时" })).getByRole("option", { name: "08" })).toHaveAttribute("aria-selected", "true");
+});
+
+test("confirms draft values and clears the result", async () => {
+  const user = userEvent.setup();
+  const onChange = vi.fn();
+  render(<TimePicker needConfirm defaultValue="08:30:00" onChange={onChange} />);
+  await user.click(screen.getByRole("combobox"));
+  await user.click(within(screen.getByRole("listbox", { name: "时" })).getByRole("option", { name: "09" }));
+  expect(onChange).not.toHaveBeenCalled();
+  await user.click(screen.getByRole("button", { name: "确认" }));
+  expect(onChange).toHaveBeenLastCalledWith("09:30:00");
+  await user.click(screen.getByRole("button", { name: "清空时间" }));
+  expect(onChange).toHaveBeenLastCalledWith("");
+});
+
+test("skips disabled hours with keyboard and closes from a panel option", async () => {
+  const user = userEvent.setup();
+  render(<TimePicker disabledTime={() => ({ disabledHours: [1] })} />);
+  await user.click(screen.getByRole("combobox"));
+  const hours = screen.getByRole("listbox", { name: "时" });
+  expect(within(hours).getByRole("option", { name: "01" })).toBeDisabled();
+  const zero = within(hours).getByRole("option", { name: "00" });
+  zero.focus();
+  await user.keyboard("{ArrowDown}");
+  expect(within(hours).getByRole("option", { name: "02" })).toHaveFocus();
+  await user.keyboard("{Escape}");
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+});
+
+test("orders a completed range by default", async () => {
+  const user = userEvent.setup();
+  const onChange = vi.fn();
+  render(<TimePicker.RangePicker defaultValue={["18:00:00", "19:00:00"]} onChange={onChange} />);
+  await user.click(screen.getByRole("combobox", { name: "结束时间" }));
+  await user.click(within(screen.getByRole("listbox", { name: "时" })).getByRole("option", { name: "08" }));
+  expect(onChange).toHaveBeenLastCalledWith(["08:00:00", "18:00:00"]);
+});
+
 test("selects an option into an uncontrolled single value", async () => {
   const user = userEvent.setup();
   const onChange = vi.fn();
@@ -31,7 +81,7 @@ test("keeps controlled display bound to value while reporting changes", async ()
 test("edits each range field without sorting or closing the popup", async () => {
   const user = userEvent.setup();
   const onChange = vi.fn();
-  render(<TimePicker.RangePicker onChange={onChange} />);
+  render(<TimePicker.RangePicker order={false} onChange={onChange} />);
   const start = screen.getByRole("combobox", { name: "开始时间" });
   const end = screen.getByRole("combobox", { name: "结束时间" });
   await user.click(start);

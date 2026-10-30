@@ -2503,11 +2503,11 @@
           "name": "renderMore",
           "description": "自定义多选摘要的剩余数量。",
           "type": "(count: number) => ReactNode",
-          "defaultValue": "count => `+${count}个更多`"
+          "defaultValue": "count => `+${count}`"
         },
         {
           "name": "searchable",
-          "description": "启用本地或远程搜索输入。",
+          "description": "在下拉列表顶部启用本地或远程搜索输入。",
           "type": "boolean",
           "defaultValue": "false"
         },
@@ -2537,7 +2537,7 @@
         },
         {
           "name": "allowClear",
-          "description": "有值时提供清除入口。",
+          "description": "仅多选提供清除入口；单选不支持清空。",
           "type": "boolean",
           "defaultValue": "false"
         },
@@ -3840,7 +3840,7 @@
         },
         {
           "name": "onSearch",
-          "description": "点击搜索按钮或按下回车键时触发。",
+          "description": "点击搜索图标、按钮或按回车触发；禁用、加载和输入法组合确认时不触发。",
           "type": "(value: string) => void",
           "defaultValue": "—"
         }
@@ -3972,7 +3972,7 @@
         },
         {
           "name": "onSearch",
-          "description": "点击搜索按钮或按下回车键时触发。",
+          "description": "点击搜索图标、按钮或按回车触发；禁用、加载和输入法组合确认时不触发。",
           "type": "(value: string) => void",
           "defaultValue": "—"
         }
@@ -7053,9 +7053,39 @@
         },
         {
           "name": "onChange",
-          "description": "选择时、分或秒后立即触发；范围值不自动排序。",
+          "description": "默认选择后立即触发；needConfirm 开启时确认后触发。",
           "type": "(value) => void",
           "defaultValue": "—"
+        },
+        {
+          "name": "allowClear",
+          "description": "有值时允许清空。",
+          "type": "boolean",
+          "defaultValue": "true"
+        },
+        {
+          "name": "needConfirm",
+          "description": "编辑草稿并在确认后提交。",
+          "type": "boolean",
+          "defaultValue": "false"
+        },
+        {
+          "name": "order",
+          "description": "范围模式自动排序；跨午夜可设 false。",
+          "type": "boolean",
+          "defaultValue": "true"
+        },
+        {
+          "name": "disabledTime",
+          "description": "按当前时间和起止字段返回禁用时、分、秒数组。",
+          "type": "(value: string, field?: 'start' | 'end') => DisabledTimeConfig",
+          "defaultValue": "—"
+        },
+        {
+          "name": "hideDisabledOptions",
+          "description": "隐藏禁用选项。",
+          "type": "boolean",
+          "defaultValue": "false"
         },
         {
           "name": "format",

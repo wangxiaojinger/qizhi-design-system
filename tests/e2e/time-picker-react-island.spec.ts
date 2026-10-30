@@ -49,7 +49,7 @@ test("TimePicker React Island preserves all eight approved contracts", async ({ 
   })).toBe(true);
   await expect.poll(() => basicPopup.locator(".qizhi-time-panel__column").evaluateAll(
     (columns) => columns.map((column) => Math.round(column.getBoundingClientRect().width)),
-  )).toEqual([59, 59, 59]);
+  )).toEqual([64, 64, 64]);
   const clippingAncestors = await basicPopup.evaluate((popup) => {
     const offenders: string[] = [];
     const popupRect = popup.getBoundingClientRect();
@@ -87,7 +87,7 @@ test("TimePicker React Island preserves all eight approved contracts", async ({ 
     await expectPopupAttachedToTrigger(basic.locator(".qizhi-time-picker"), basicPopup);
     await page.setViewportSize(viewport);
   }
-  await basic.screenshot({ path: testInfo.outputPath("time-picker-basic-open.png") });
+  await basicPopup.screenshot({ path: testInfo.outputPath("time-picker-basic-open.png") });
   await basicInput.press("Escape");
   await expect(basicPopup).toBeHidden();
   await expect(basicInput).toBeFocused();
@@ -101,8 +101,8 @@ test("TimePicker React Island preserves all eight approved contracts", async ({ 
   await end.click();
   await page.getByRole("dialog", { name: "选择时间范围" })
     .getByRole("listbox", { name: "时" }).getByRole("option", { name: "08" }).click();
-  await expect(start).toHaveValue("18:00:00");
-  await expect(end).toHaveValue("08:00:00");
+  await expect(start).toHaveValue("08:00:00");
+  await expect(end).toHaveValue("18:00:00");
   await range.screenshot({ path: testInfo.outputPath("time-picker-range-open.png") });
   await end.press("Escape");
 
@@ -125,7 +125,7 @@ test("TimePicker React Island preserves all eight approved contracts", async ({ 
   await expect(size.locator(".qizhi-time-picker")).toHaveCSS("height", "36px");
 
   const disabled = section.locator("#时间选择器-禁用");
-  await expect(disabled.getByRole("combobox")).toHaveCount(2);
+  await expect(disabled.getByRole("combobox")).toHaveCount(3);
   await expect(disabled.getByRole("combobox").nth(0)).toBeDisabled();
   await expect(disabled.getByRole("combobox").nth(1)).toHaveValue("08:30:00");
 

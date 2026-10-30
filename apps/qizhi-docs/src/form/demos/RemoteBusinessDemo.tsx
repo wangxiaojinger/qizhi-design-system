@@ -57,6 +57,7 @@ function RemoteRegionInput(props: { value?: string; onChange?: (value: string) =
     <AutoComplete
       {...props}
       aria-label="部署区域"
+      style={{ width: "100%" }}
       data={queryState === "ready" ? ["华北", "华东", "华南"] : []}
       filterOption={false}
       loading={queryState === "loading"}
@@ -105,9 +106,7 @@ export default function RemoteBusinessDemo() {
         Message.success({ content: "提交成功" });
       }}
     >
-      <output className="form-docs-dirty-status" aria-label="未保存修改状态">
-        {dirty ? "有未保存修改" : "所有修改已保存"}
-      </output>
+      {dirty ? <output className="form-docs-dirty-status" aria-label="未保存修改状态">有未保存修改</output> : null}
 
       <Form.Item
         name={["service", "name"]}
