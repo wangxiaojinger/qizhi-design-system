@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "status": "passed",
-  "sourceFingerprint": "sha256:d730ab43e57919d07c8d74e9c80c369d901e0a9c7b084d1cac36cc77a1bef4f7",
+  "sourceFingerprint": "sha256:afc525b93c28e89ef39ce2437728add369f13fb4e1a9fcfee5365379c625acdf",
   "root": ".",
   "exclusions": [
     ".git/**",
@@ -12,22 +12,22 @@
   "summary": {
     "files": 140,
     "unreferencedFiles": 1,
-    "findings": 3030,
+    "findings": 3031,
     "byScope": {
       "docs-runtime": 504,
       "smoke-runtime": 9,
       "generated-runtime": 81,
-      "component-runtime": 838,
+      "component-runtime": 839,
       "legacy-runtime": 1598
     },
     "byCategory": {
       "spacing": 2367,
       "color": 442,
-      "layer": 94,
+      "layer": 95,
       "shadow": 127
     },
     "byClassification": {
-      "review-required": 1042,
+      "review-required": 1043,
       "theme-token-candidate": 1538,
       "structural-constant": 450
     }
@@ -7427,34 +7427,22 @@
       "reason": "unmediated layer responsibility"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/auto-complete/autoComplete.css:18:3:top",
+      "id": "layer:packages/qizhi-react/src/auto-complete/autoComplete.css:18:3:z-index",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/auto-complete/autoComplete.css",
       "line": 18,
       "column": 3,
-      "category": "spacing",
-      "property": "top",
-      "value": "calc(100% + 4px)",
-      "classification": "structural-constant",
-      "reason": "positional or geometric offset"
-    },
-    {
-      "id": "layer:packages/qizhi-react/src/auto-complete/autoComplete.css:20:3:z-index",
-      "scope": "component-runtime",
-      "file": "packages/qizhi-react/src/auto-complete/autoComplete.css",
-      "line": 20,
-      "column": 3,
       "category": "layer",
       "property": "z-index",
-      "value": "40",
+      "value": "1000",
       "classification": "theme-token-candidate",
       "reason": "unmediated layer responsibility"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/auto-complete/autoComplete.css:25:3:padding",
+      "id": "spacing:packages/qizhi-react/src/auto-complete/autoComplete.css:23:3:padding",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/auto-complete/autoComplete.css",
-      "line": 25,
+      "line": 23,
       "column": 3,
       "category": "spacing",
       "property": "padding",
@@ -7463,10 +7451,10 @@
       "reason": "padding participates in component density"
     },
     {
-      "id": "shadow:packages/qizhi-react/src/auto-complete/autoComplete.css:30:3:box-shadow",
+      "id": "shadow:packages/qizhi-react/src/auto-complete/autoComplete.css:28:3:box-shadow",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/auto-complete/autoComplete.css",
-      "line": 30,
+      "line": 28,
       "column": 3,
       "category": "shadow",
       "property": "box-shadow",
@@ -7475,10 +7463,10 @@
       "reason": "unmediated shadow responsibility"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/auto-complete/autoComplete.css:35:31:padding",
+      "id": "spacing:packages/qizhi-react/src/auto-complete/autoComplete.css:33:31:padding",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/auto-complete/autoComplete.css",
-      "line": 35,
+      "line": 33,
       "column": 31,
       "category": "spacing",
       "property": "padding",
@@ -7487,10 +7475,10 @@
       "reason": "padding participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/auto-complete/autoComplete.css:41:3:padding",
+      "id": "spacing:packages/qizhi-react/src/auto-complete/autoComplete.css:39:3:padding",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/auto-complete/autoComplete.css",
-      "line": 41,
+      "line": 39,
       "column": 3,
       "category": "spacing",
       "property": "padding",
@@ -7499,10 +7487,10 @@
       "reason": "padding participates in component density"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/auto-complete/autoComplete.css:56:3:padding",
+      "id": "spacing:packages/qizhi-react/src/auto-complete/autoComplete.css:54:3:padding",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/auto-complete/autoComplete.css",
-      "line": 56,
+      "line": 54,
       "column": 3,
       "category": "spacing",
       "property": "padding",
@@ -9431,10 +9419,34 @@
       "reason": "mixed color literal and CSS variable"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/chart/chart.css:14:100:margin",
+      "id": "spacing:packages/qizhi-react/src/chart/chart.css:1:87:padding",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/chart/chart.css",
-      "line": 14,
+      "line": 1,
+      "column": 87,
+      "category": "spacing",
+      "property": "padding",
+      "value": "20px 24px var(--chart-card-bottom)",
+      "classification": "review-required",
+      "reason": "mixed spacing literal and CSS variable"
+    },
+    {
+      "id": "layer:packages/qizhi-react/src/chart/chart.css:8:47:z-index",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/chart/chart.css",
+      "line": 8,
+      "column": 47,
+      "category": "layer",
+      "property": "z-index",
+      "value": "1",
+      "classification": "structural-constant",
+      "reason": "local stacking order"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/chart/chart.css:17:100:margin",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/chart/chart.css",
+      "line": 17,
       "column": 100,
       "category": "spacing",
       "property": "margin",
@@ -9443,10 +9455,10 @@
       "reason": "positional or geometric offset"
     },
     {
-      "id": "layer:packages/qizhi-react/src/chart/chart.css:15:41:z-index",
+      "id": "layer:packages/qizhi-react/src/chart/chart.css:18:41:z-index",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/chart/chart.css",
-      "line": 15,
+      "line": 18,
       "column": 41,
       "category": "layer",
       "property": "z-index",

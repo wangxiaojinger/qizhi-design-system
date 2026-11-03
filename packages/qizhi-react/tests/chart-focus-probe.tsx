@@ -21,8 +21,8 @@ const init = async (mode: "normal" | "grouped" | "stacked" | "line", controlled 
   props = { label: "聚焦用量", unit: "次", data: values, series: definitions, mode: mode === "line" ? "normal" : mode,
     focusable, clearFocusOnBackgroundClick: clear, dimOpacity, ...(controlled ? { focusedItem: null } : {}), onFocusChange: item => { changes.push(item); } };
   draw();
-  // 公共卡片两侧各24px；探针复用相同正式适配器，用于检查真实图形属性。
-  const width = Math.floor(document.getElementById("public")!.getBoundingClientRect().width - 48);
+  // 公共卡片两侧各24px，窄屏绘图区至少520px；探针保持相同几何尺寸。
+  const width = Math.max(520, Math.floor(document.getElementById("public")!.getBoundingClientRect().width - 48));
   chart = await renderChart(host, { model: normalizeChart(values, definitions), series: definitions, visibleKeys: definitions.map(s => s.key),
     kind: kind as "line" | "bar", mode: props.mode!, width, height: 280, xFormatter: x => x, valueFormatter: String, focusable });
 };

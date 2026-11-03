@@ -1,8 +1,11 @@
-.qizhi-chart { position: relative; box-sizing: border-box; width: 100%; min-width: 0; padding: var(--chart-card-padding) var(--chart-card-padding) var(--chart-card-bottom); border-radius: var(--chart-radius); background: linear-gradient(180deg, var(--chart-surface), transparent); font-family: var(--font-sans); font-size: var(--chart-body-font-size); line-height: var(--line-height-regular); color: var(--color-text-1); }
-.qizhi-chart__title { margin-bottom: var(--chart-card-bottom); color: var(--chart-title-color); font-size: var(--chart-body-font-size); font-weight: 600; line-height: 22px; overflow-wrap: anywhere; }
+.qizhi-chart { position: relative; box-sizing: border-box; width: 100%; min-width: 0; padding: 20px 24px var(--chart-card-bottom); border-radius: var(--chart-radius); background: linear-gradient(180deg, var(--chart-surface), transparent); font-family: var(--font-sans); font-size: var(--chart-body-font-size); line-height: var(--line-height-regular); color: var(--color-text-1); }
+.qizhi-chart__scroll { width: 100%; overflow-x: auto; overflow-y: hidden; }
+.qizhi-chart__content { min-width: 520px; }
+.qizhi-chart__title { margin-bottom: 0; color: var(--chart-title-color); font-size: var(--chart-body-font-size); font-weight: 600; line-height: 22px; overflow-wrap: anywhere; }
 .qizhi-chart__plot { position: relative; width: 100%; min-width: 0; }
 .qizhi-chart__plot:focus-visible { outline: 2px solid rgb(var(--primary-6)); outline-offset: 2px; border-radius: var(--border-radius-medium); }
 .qizhi-chart__canvas { position: absolute; inset: 0; overflow: hidden; }
+.qizhi-chart__indicator { position: absolute; z-index: 1; width: 0; border-left: 1px dashed var(--chart-axis); pointer-events: none; }
 .qizhi-chart__unit { color: var(--chart-text); font-size: var(--chart-label-font-size); font-weight: 400; }
 .qizhi-chart__state { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: var(--chart-padding); }
 .qizhi-chart__legend { display: flex; justify-content: flex-start; flex-wrap: wrap; column-gap: var(--chart-legend-gap); row-gap: var(--chart-marker-gap); margin-top: var(--chart-gap); }

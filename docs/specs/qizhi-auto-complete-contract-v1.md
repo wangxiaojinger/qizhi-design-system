@@ -17,6 +17,6 @@
 
 ## DOM 和样式契约
 
-- 默认 AutoComplete 通过正式 Input 继承 `qizhi-control-container`，由 Input 外层承担完整盒模型；AutoComplete 外层只负责候选弹层定位。
+- 默认 AutoComplete 通过正式 Input 继承 `qizhi-control-container`，由 Input 外层承担完整盒模型；候选弹层通过 Portal 挂载到 `document.body`，并根据视口空间在输入框上下翻转。
 - 自定义 `triggerElement` 保留调用方提供的结构和视觉，组件只注入 value、事件、ref 与 combobox ARIA，不额外包一层输入边框。
 - 统一结构不新增公共 Props，现有 TypeScript API 和官网 API 元数据保持不变。

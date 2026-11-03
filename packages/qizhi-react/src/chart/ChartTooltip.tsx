@@ -1,6 +1,5 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { getFittedFloatingPlacement } from "../overlay/floatingPosition";
 import type { ChartSeries } from "./Chart.types";
 import { colorTokenCss, seriesColorToken } from "./chartModel";
 
@@ -13,7 +12,12 @@ export function ChartTooltip({ id, anchor, title, items }: ChartTooltipProps) {
   const [position, setPosition] = useState({ left: anchor.x, top: anchor.y });
   useLayoutEffect(() => {
     if (!ref.current) return;
-    const update = () => setPosition(getFittedFloatingPlacement(new DOMRect(anchor.x, anchor.y, 0, 0), ref.current!.getBoundingClientRect(), "top"));
+    const update = () => {
+      const rect = ref.current!.getBoundingClientRect(); const gap = 12; const edge = 8;
+      const left = anchor.x + gap + rect.width <= window.innerWidth - edge ? anchor.x + gap : Math.max(edge, anchor.x - gap - rect.width);
+      const top = Math.min(window.innerHeight - edge - rect.height, Math.max(edge, anchor.y - rect.height / 2));
+      setPosition({ left, top });
+    };
     update();
     const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(update);
     observer?.observe(ref.current); return () => observer?.disconnect();

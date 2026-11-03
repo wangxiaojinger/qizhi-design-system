@@ -729,4 +729,4 @@ import "./typography/typography.css";
 
 export { LineChart } from "./chart/LineChart";
 export { BarChart } from "./chart/BarChart";
-export type { ChartDatum, ChartSeries, FocusedItem, ChartFocusProps, LineChartProps, BarChartProps, BarChartMode } from "./chart/Chart.types";
+export type { ChartDateRange, ChartDatum, ChartSeries, FocusedItem, ChartFocusProps, LineChartProps, BarChartProps, BarChartMode } from "./chart/Chart.types";

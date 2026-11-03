@@ -172,6 +172,7 @@ describe("Form docs", () => {
     const demo = document.getElementById("表单-远程联动与未保存修改")!;
     const serviceName = within(demo).getByRole("textbox", { name: "远程服务名称" });
     const region = within(demo).getByRole("combobox", { name: "部署区域" });
+    const regionPopup = () => within(document.getElementById(region.getAttribute("aria-controls")!)!);
 
     expect(within(demo).queryByRole("status", { name: "未保存修改状态" })).not.toBeInTheDocument();
     fireEvent.change(serviceName, { target: { value: "changed-service" } });
@@ -180,13 +181,13 @@ describe("Form docs", () => {
     expect(within(demo).queryByRole("status", { name: "未保存修改状态" })).not.toBeInTheDocument();
 
     fireEvent.change(region, { target: { value: "loading" } });
-    expect(within(demo).getByText("正在加载")).toBeInTheDocument();
+    expect(regionPopup().getByText("正在加载")).toBeInTheDocument();
     fireEvent.change(region, { target: { value: "empty" } });
-    expect(within(demo).getByText("暂无匹配区域")).toBeInTheDocument();
+    expect(regionPopup().getByText("暂无匹配区域")).toBeInTheDocument();
     fireEvent.change(region, { target: { value: "error" } });
-    expect(within(demo).getByRole("alert")).toHaveTextContent("区域查询失败");
-    fireEvent.click(within(demo).getByRole("button", { name: "重试" }));
-    expect(within(demo).getByRole("option", { name: "华北" })).toBeInTheDocument();
+    expect(regionPopup().getByRole("alert")).toHaveTextContent("区域查询失败");
+    fireEvent.click(regionPopup().getByRole("button", { name: "重试" }));
+    expect(regionPopup().getByRole("option", { name: "华北" })).toBeInTheDocument();
 
     fireEvent.change(serviceName, { target: { value: "slow-invalid" } });
     fireEvent.change(serviceName, { target: { value: "valid-service" } });

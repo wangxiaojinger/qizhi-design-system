@@ -6,7 +6,21 @@ import type { G2Spec } from "@antv/g2";
 
 export const PLOT_PADDING = { left: 44, right: 1, top: 24, bottom: 40 };
 const FOCUS_POINT_RADIUS = 3;
-export const getPlotPadding = (_width: number, focusableLine = false) => focusableLine ? { ...PLOT_PADDING, right: PLOT_PADDING.right + FOCUS_POINT_RADIUS } : PLOT_PADDING;
+export const getPlotPadding = (_width: number, focusableLine = false, left = PLOT_PADDING.left) => ({ ...PLOT_PADDING, left, right: PLOT_PADDING.right + (focusableLine ? FOCUS_POINT_RADIUS : 0) });
+export const getValueAxisPadding = (values: readonly number[], valueFormatter: (value: number) => string) => {
+  const samples = [0, ...values]; const extent = Math.max(...samples.map(Math.abs), 0);
+  if (extent) samples.push(extent * 1.2, -extent * 1.2);
+  const context = typeof document === "undefined" || typeof CanvasRenderingContext2D === "undefined" ? null : document.createElement("canvas").getContext("2d");
+  if (context) context.font = "12px sans-serif";
+  const width = Math.max(...samples.map(value => context?.measureText(valueFormatter(value)).width ?? valueFormatter(value).length * 7.2), 0);
+  return Math.max(PLOT_PADDING.left, Math.ceil(width) + 16);
+};
+export const visibleCategoryIndexes = (length: number, limit = 7) => {
+  if (length <= 0) return [];
+  const count = Math.min(length, limit);
+  if (count === 1) return [0];
+  return Array.from({ length: count }, (_, index) => Math.round(index * (length - 1) / (count - 1)));
+};
 export interface EngineInput {
   model: ChartModel; series: readonly ChartSeries[]; visibleKeys: string[];
   kind: "line" | "bar"; mode: BarChartMode; width: number; height: number;
@@ -41,20 +55,12 @@ export async function renderChart(host: HTMLElement, input: EngineInput) {
   const fontFamily = css.getPropertyValue("--font-sans");
   const fontSize = parseFloat(css.getPropertyValue("--chart-label-font-size")) || 12;
   const data = buildPlotData(input);
-  const measure = document.createElement("canvas").getContext("2d");
-  if (measure) measure.font = `${fontSize}px ${fontFamily}`;
-  const shorten = (text: string, maxWidth: number) => {
-    const chars = Array.from(String(text));
-    const widthOf = (value: string) => measure?.measureText(value).width ?? value.length * fontSize;
-    if (widthOf(chars.join("")) <= maxWidth) return chars.join("");
-    while (chars.length && widthOf(`${chars.join("")}…`) > maxWidth) chars.pop();
-    return `${chars.join("")}…`;
-  };
   const chart = new Chart({ container: host, width: input.width, height: input.height, autoFit: false });
   const isLine = input.kind === "line";
-  const padding = getPlotPadding(input.width, isLine && input.focusable);
-  const maxLabels = Math.max(2, Math.floor((input.width - padding.left - padding.right) / 100) + 1);
-  const step = Math.max(1, Math.ceil((input.model.categories.length - 1) / (maxLabels - 1)));
+  const values = input.model.rows.flatMap(row => row.values.filter((value): value is number => value !== null));
+  const stackedValues = input.mode === "stacked" ? input.model.rows.map(row => row.values.reduce<number>((sum, value) => sum + (value ?? 0), 0)) : [];
+  const padding = getPlotPadding(input.width, isLine && input.focusable, getValueAxisPadding([...values, ...stackedValues], input.valueFormatter));
+  const visibleIndexes = new Set(visibleCategoryIndexes(input.model.categories.length));
   const axis = {
     x: { title: false, grid: false, tick: false, line: true, lineStroke: axisColor,
       labelSpacing: parseFloat(css.getPropertyValue("--chart-axis-label-gap")),
@@ -63,16 +69,11 @@ export async function renderChart(host: HTMLElement, input: EngineInput) {
       labelAutoHide: false, labelAutoRotate: false, labelAutoEllipsis: false, transform: [],
       labelFormatter: (x: string) => {
         const index = input.model.categories.indexOf(x);
-        if (index % step !== 0 && index !== input.model.categories.length - 1) return "";
-        const plotWidth = input.width - padding.left - padding.right;
-        const budget = Math.max(12, Math.min(84, isLine ? plotWidth / Math.max(1, maxLabels - 1) * 0.85 : plotWidth / (input.model.categories.length + 0.7) * 1.65));
-        let text = input.xFormatter(x);
-        if (/^\d{4}-\d{2}-\d{2}$/.test(text) && (input.width < 260 || (measure?.measureText(text).width ?? text.length * fontSize) > budget)) text = text.slice(5);
-        return shorten(text, budget);
+        return visibleIndexes.has(index) ? input.xFormatter(x) : "";
       } },
-    y: { title: false, line: false, tick: false, labelSpacing: padding.left, labelTextAlign: "left", grid: true, gridStroke: borderColor, gridStrokeOpacity: 1, gridLineDash: [],
+    y: { title: false, line: false, tick: false, labelSpacing: 16, labelTextAlign: "right", grid: true, gridStroke: borderColor, gridStrokeOpacity: 1, gridLineDash: [],
       labelFill: textColor, labelOpacity: 1, labelFontFamily: fontFamily, labelFontSize: fontSize,
-      transform: [], labelAutoEllipsis: false, labelFormatter: (value: number) => shorten(input.valueFormatter(Number(value)), padding.left - 6) },
+      transform: [], labelAutoHide: false, labelAutoEllipsis: false, labelFormatter: (value: number) => input.valueFormatter(Number(value)) },
   };
   const widthTier = window.innerWidth >= 1280 ? "large" : window.innerWidth >= 768 ? "medium" : "small";
   const maxBarWidth = parseFloat(css.getPropertyValue(`--chart-bar-width-${widthTier}`));
@@ -89,7 +90,7 @@ export async function renderChart(host: HTMLElement, input: EngineInput) {
       return [
         { ...common, data: filtered, type: "line", encode: { ...common.encode, series: "segment", shape: "smooth" },
           style: { lineWidth: parseFloat(css.getPropertyValue("--chart-line-width")) || 2, lineDash: [] } },
-        { ...common, data: filtered, type: "point", encode: { ...common.encode, size: input.focusable ? FOCUS_POINT_RADIUS : 2, ...(input.focusable ? { shape: "circle" } : {}) }, style: { lineWidth: input.focusable ? 12 : 0, ...(input.focusable ? { strokeOpacity: 0, cursor: "pointer" } : {}) } },
+        ...(input.focusable ? [{ ...common, data: filtered, type: "point", encode: { ...common.encode, size: FOCUS_POINT_RADIUS, shape: "circle" }, style: { fillOpacity: 0, strokeOpacity: 0, lineWidth: 12, cursor: "pointer" } }] : []),
       ];
     }) : [{ ...common, type: "interval", style: input.mode === "grouped" ? {} : { maxWidth: maxBarWidth }, transform: input.mode === "grouped" ? [{ type: "dodgeX" }] : input.mode === "stacked" ? [{ type: "stackY" }] : [] }],
   };

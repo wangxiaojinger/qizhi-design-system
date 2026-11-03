@@ -36,7 +36,7 @@ export const chartDemos: readonly ChartDemoDefinition[] = [
   {
     id: "图表-基础折线",
     title: "折线图：基础折线",
-    description: "展示单个指标随时间的变化，适用于请求量等趋势观察。以下为演示数据。",
+    description: "展示单个指标随时间的变化，并按所选日期范围将无数据日期补为 0。以下为演示数据。",
     component: BasicLineDemo,
     source: basicLineSource,
   },

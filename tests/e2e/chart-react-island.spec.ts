@@ -19,13 +19,17 @@ test("图表文档：三视口布局、提示、图例、状态、源码与键�
     const metrics = await article.evaluate(element => {
       const demo = element.querySelector(".demo")!; const chart = demo.querySelector(".qizhi-chart")!; const plot = chart.querySelector(".qizhi-chart__plot")!;
       const actions = element.querySelector(".component-example-actions")!;
+      const scroll = chart.querySelector(".qizhi-chart__scroll")!;
       return { overflow: element.scrollWidth > element.clientWidth + 1, demoOverflow: demo.scrollWidth > demo.clientWidth + 1,
-        plot: plot.getBoundingClientRect().width, chart: chart.getBoundingClientRect().width, height: plot.getBoundingClientRect().height, rightEdge: chart.getBoundingClientRect().right, viewport: innerWidth,
+        plot: plot.getBoundingClientRect().width, chart: chart.getBoundingClientRect().width, height: plot.getBoundingClientRect().height, rightEdge: chart.getBoundingClientRect().right, viewport: innerWidth, scrollWidth: scroll.clientWidth, scrollContent: scroll.scrollWidth, overflowX: getComputedStyle(scroll).overflowX,
         gap: getComputedStyle(demo).marginBottom, right: getComputedStyle(actions).paddingRight, cardPadding: getComputedStyle(chart).paddingLeft, radius: getComputedStyle(chart).borderRadius, background: getComputedStyle(chart).backgroundImage, titleSize: getComputedStyle(chart.querySelector(".qizhi-chart__title")!).fontSize };
     });
     expect(metrics.overflow).toBe(false); expect(metrics.demoOverflow).toBe(false);
     expect(metrics.rightEdge).toBeLessThanOrEqual(metrics.viewport);
-    expect(metrics.plot).toBeCloseTo(metrics.chart - 48, 0); expect(metrics.height).toBe(280); expect(metrics.plot).toBeGreaterThan(130);
+    expect(metrics.plot).toBeCloseTo(Math.max(520, metrics.chart - 48), 0); expect(metrics.height).toBe(280);
+    expect(metrics.scrollWidth).toBeCloseTo(metrics.chart - 48, 0);
+    expect(metrics.overflowX).toBe("auto");
+    if (metrics.scrollWidth < 520) expect(metrics.scrollContent).toBeGreaterThan(metrics.scrollWidth);
     expect(metrics.gap).toBe("12px"); expect(metrics.right).toBe("0px");
     expect(metrics.cardPadding).toBe("24px"); expect(metrics.radius).toBe("8px"); expect(metrics.titleSize).toBe("14px"); expect(metrics.background).toContain("rgb(247, 249, 252)");
     await article.locator(".demo").screenshot({ path: resolve(shots, `${testInfo.project.name}-${index + 1}.png`) });
@@ -59,7 +63,9 @@ test("图表文档：三视口布局、提示、图例、状态、源码与键�
   await expect(multi.getByRole("table")).toContainText("160 次");
   await expect(doc.getByRole("button", { name: "收起数据", exact: true })).toHaveCount(0);
   const box = await plot.boundingBox(); if (!box) throw new Error("绘图区不可见");
-  await page.mouse.move(box.x + box.width / 2, box.y + 120); await expect(page.getByRole("tooltip")).toBeVisible();
+  const scrollBox = await multi.locator(".qizhi-chart__scroll").boundingBox();
+  if (!scrollBox) throw new Error("图表滚动视口不可见");
+  await page.mouse.move(scrollBox.x + scrollBox.width / 2, box.y + 120); await expect(page.getByRole("tooltip")).toBeVisible();
   await page.mouse.move(0, 0); await expect(page.getByRole("tooltip")).toHaveCount(0);
   for (const index of [7, 9]) {
     const article = articles.nth(index); await article.getByRole("switch").click(); await expect(article.locator('[data-ready="true"]')).toHaveCount(1);

@@ -14,7 +14,16 @@ export const colorTokenCss = (name: string) => {
   return /^\s*\d+\s*,/.test(value) ? `rgb(var(${name}))` : `var(${name})`;
 };
 
-export function normalizeChart(data: readonly ChartDatum[], series: readonly ChartSeries[]): ChartModel {
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+const parseIsoDate = (value: string) => {
+  if (!ISO_DATE.test(value)) return null;
+  const [year, month, day] = value.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day ? date : null;
+};
+const formatIsoDate = (date: Date) => date.toISOString().slice(0, 10);
+
+export function normalizeChart(data: readonly ChartDatum[], series: readonly ChartSeries[], dateRange?: { start: string; end: string }): ChartModel {
   const invalid = (): ChartModel => ({ categories: [], rows: [], hasValues: false, error: "图表数据格式有误" });
   if (!Array.isArray(data) || !Array.isArray(series) || !series.length) return invalid();
   const keys = new Map<string, number>();
@@ -32,6 +41,17 @@ export function normalizeChart(data: readonly ChartDatum[], series: readonly Cha
     seen.get(item.x)!.add(item.series);
     rows.get(item.x)!.values[keys.get(item.series)!] = item.value;
     hasValues ||= item.value !== null;
+  }
+  if (dateRange) {
+    const start = parseIsoDate(dateRange.start); const end = parseIsoDate(dateRange.end);
+    if (!start || !end || start > end) return invalid();
+    const completed = new Map<string, ChartRow>();
+    for (let cursor = start.getTime(); cursor <= end.getTime(); cursor += 86_400_000) {
+      const x = formatIsoDate(new Date(cursor));
+      completed.set(x, rows.get(x) ?? { x, values: series.map(() => 0) });
+    }
+    if ([...rows.keys()].some(x => !completed.has(x))) return invalid();
+    return { categories: [...completed.keys()], rows: [...completed.values()], hasValues: true };
   }
   return { categories: [...rows.keys()], rows: [...rows.values()], hasValues };
 }

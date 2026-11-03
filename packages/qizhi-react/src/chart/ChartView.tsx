@@ -9,17 +9,20 @@ import type { TableColumn } from "../table/Table.types";
 import type { BarChartMode, LineChartProps, FocusedItem } from "./Chart.types";
 import { normalizeChart, colorTokenCss, seriesColorToken } from "./chartModel";
 import type { ChartRow } from "./chartModel";
-import { renderChart, getPlotPadding } from "./chartEngine";
+import { renderChart, getPlotPadding, getValueAxisPadding } from "./chartEngine";
 import { useChartFocus } from "./useChartFocus";
 import { focusItems, resolveFocus, sameFocus } from "./chartFocus";
 import { ChartTooltip } from "./ChartTooltip";
 import "./chart.css";
 
-const identity = (value: string) => value;
 const numberFormat = new Intl.NumberFormat("zh-CN", { maximumFractionDigits: 20 });
 const defaultValueFormat = (value: number) => numberFormat.format(value);
+const defaultXFormat = (value: string) => {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  return match ? `${Number(match[2])}月${Number(match[3])}日` : value;
+};
 
-export function ChartView({ kind, mode = "normal", data, series, label, unit = "", xFormatter = identity, valueFormatter = defaultValueFormat,
+export function ChartView({ kind, mode = "normal", data, series, dateRange, label, unit = "", xFormatter = defaultXFormat, valueFormatter = defaultValueFormat,
   legend = true, tooltip = true, loading = false, error, height = 280, className, id, ref, focusable = false, focusedItem, defaultFocusedItem, onFocusChange, dimOpacity = 0.3, clearFocusOnBackgroundClick = true }: LineChartProps & { kind: "line" | "bar"; mode?: BarChartMode }) {
   const internalId = useId(); const tableId = `${internalId}-data`; const tipId = `${internalId}-tip`; const helpId = `${internalId}-help`;
   const plot = useRef<HTMLDivElement>(null); const engineHost = useRef<HTMLDivElement>(null);
@@ -27,13 +30,15 @@ export function ChartView({ kind, mode = "normal", data, series, label, unit = "
   const [width, setWidth] = useState(0); const [hidden, setHidden] = useState<string[]>([]);
   const [engineError, setEngineError] = useState(false); const [ready, setReady] = useState(false);
   const [active, setActive] = useState<{ index: number; x: number; y: number; keyboard: boolean } | null>(null);
-  const model = useMemo(() => normalizeChart(data, series), [data, series]);
+  const model = useMemo(() => normalizeChart(data, series, dateRange), [data, series, dateRange?.start, dateRange?.end]);
   const allFocusItems = useMemo(() => focusItems(data, series, model), [data, series, model]);
   const focus = useChartFocus({ focusable, focusedItem, defaultFocusedItem, onFocusChange }, allFocusItems);
   const engine = useRef<Awaited<ReturnType<typeof renderChart>> | null>(null);
   const [keyboardItem, setKeyboardItem] = useState<FocusedItem | null>(null);
   const invalid = model.error || !label?.trim() || !Number.isFinite(height) || height <= 0 || !["normal", "grouped", "stacked"].includes(mode) || (kind === "bar" && mode === "normal" && series.length !== 1);
-  const padding = getPlotPadding(width, kind === "line" && focusable);
+  const axisValues = model.rows.flatMap(row => row.values.filter((value): value is number => value !== null));
+  const stackedValues = mode === "stacked" ? model.rows.map(row => row.values.reduce<number>((sum, value) => sum + (value ?? 0), 0)) : [];
+  const padding = getPlotPadding(width, kind === "line" && focusable, getValueAxisPadding([...axisValues, ...stackedValues], valueFormatter));
   const safeHeight = Number.isFinite(height) && height > 0 ? height : 280;
   const state = loading ? "loading" : error ? "error" : invalid ? "invalid" : !model.rows.length ? "empty" : !model.hasValues ? "missing" : "normal";
   const keys = series.map(s => s.key); const keySignature = JSON.stringify(keys);
@@ -127,7 +132,9 @@ export function ChartView({ kind, mode = "normal", data, series, label, unit = "
   };
   const row = active && state === "normal" && tooltip && !engineError ? model.rows[active.index] : undefined;
   const items = row ? series.flatMap((item, index) => visibleKeys.includes(item.key) ? [{ series: item, index, value: formatValue(row.values[index]) }] : []) : [];
+  const indicatorLeft = active && plot.current ? active.x - plot.current.getBoundingClientRect().left : 0;
   return <div ref={ref} id={id ?? internalId} className={["qizhi-chart", className].filter(Boolean).join(" ")} role="region" aria-label={label} aria-busy={loading} data-kind={kind} data-mode={mode} data-state={engineError && state === "normal" ? "engine-error" : state}>
+    <div className="qizhi-chart__scroll"><div className="qizhi-chart__content">
     <div className="qizhi-chart__title">{label}{unit ? <span className="qizhi-chart__unit">（{unit}）</span> : null}</div>
     <div ref={plot} className="qizhi-chart__plot" style={{ height: safeHeight }} role={focusable && state === "normal" && !engineError ? "listbox" : "group"} aria-label={`${label}绘图区`}
       aria-activedescendant={focusable && cursor && state === "normal" && !engineError ? `${internalId}-item-${allFocusItems.indexOf(cursor)}` : undefined}
@@ -140,6 +147,7 @@ export function ChartView({ kind, mode = "normal", data, series, label, unit = "
         </div>)}
       </div> : null}
       <div ref={engineHost} className="qizhi-chart__canvas" aria-hidden="true" />
+      {kind === "line" && row && active ? <span className="qizhi-chart__indicator" aria-hidden="true" style={{ left: indicatorLeft, top: padding.top, bottom: padding.bottom }} /> : null}
       {state !== "normal" || engineError ? <div className="qizhi-chart__state">
         {state === "loading" ? <Spin tip="正在加载" /> : state === "error" || state === "invalid" || engineError ? <Alert type="error" content={state === "error" ? error : state === "invalid" ? "图表数据格式有误" : "图表暂时无法显示"} /> : <Empty description={state === "empty" ? "暂无数据" : "暂无有效数据"} />}
       </div> : null}
@@ -153,6 +161,7 @@ export function ChartView({ kind, mode = "normal", data, series, label, unit = "
       </Button>)}
     </div> : null}
     {canShowData ? <div id={tableId} className="qizhi-chart__sr-only"><Table columns={columns} dataSource={model.rows} rowKey="x" size="small" aria-label={`${label}数据`} /></div> : null}
+    </div></div>
     {row && active ? <ChartTooltip id={tipId} anchor={active} title={xFormatter(row.x)} items={items} /> : null}
     <span className="qizhi-chart__sr-only" role="status" aria-live="polite">{active?.keyboard && row ? `${xFormatter(row.x)}，${items.map(item => `${item.series.label}：${item.value}`).join("，")}` : ""}</span>
   </div>;

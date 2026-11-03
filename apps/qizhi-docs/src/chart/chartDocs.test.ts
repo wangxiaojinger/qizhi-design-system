@@ -25,7 +25,7 @@ const demoTitles = [
 ];
 
 const demoDescriptions = [
-  "展示单个指标随时间的变化，适用于请求量等趋势观察。以下为演示数据。",
+  "展示单个指标随时间的变化，并按所选日期范围将无数据日期补为 0。以下为演示数据。",
   "在同一坐标系中对比多个同单位指标的变化，适用于不同服务的请求量对比。以下为演示数据。",
   "使用柱形比较各时间点或分类的数值，适用于每日请求量对比。以下为演示数据。",
   "在同一分类中并排展示多个系列，便于比较输入与输出用量的差异。以下为演示数据。",
@@ -122,9 +122,10 @@ describe("Chart docs", () => {
     const error = readChartSource("demos/ErrorDemo.tsx");
     const zeroMissing = readChartSource("demos/ZeroMissingDemo.tsx");
 
-    [120, 180, 150, 230, 210, 280, 260].forEach((value) => {
+    [120, 180, 150, 210, 280, 260, 300, 290, 320].forEach((value) => {
       expect(basicLine).toContain(`value: ${value}`);
     });
+    expect(basicLine).toContain('dateRange={{ start: "2026-09-01", end: "2026-09-10" }}');
     [1200, 1600, 1400, 2000, 1800, 2400, 2200].forEach((value) => {
       expect(grouped).toContain(`value: ${value}`);
       expect(stacked).toContain(`value: ${value}`);

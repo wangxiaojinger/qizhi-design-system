@@ -4,6 +4,8 @@ import type { Ref } from "react";
 export interface ChartDatum { readonly x: string; readonly series: string; readonly value: number | null }
 /** 系列顺序稳定，颜色只能引用启智已登记的颜色变量。 */
 export interface ChartSeries { readonly key: string; readonly label: string; readonly colorToken?: string }
+/** ISO 日历日期范围；起止日期均包含在内。 */
+export interface ChartDateRange { readonly start: string; readonly end: string }
 /** 持续聚焦的数据项。dataKey 优先于索引，dataIndex 是分类顺序索引。 */
 export interface FocusedItem {
   readonly seriesKey: string;
@@ -27,6 +29,8 @@ export interface ChartFocusProps {
 export interface LineChartProps extends ChartFocusProps {
   data: readonly ChartDatum[];
   series: readonly ChartSeries[];
+  /** 传入后按自然日补齐范围；没有数据的日期按各系列 0 处理。 */
+  dateRange?: ChartDateRange;
   /** 图表可访问名称，同时显示为卡片标题。 */
   label: string;
   /** 标题后的括号单位，同时用于提示和数据表。 */

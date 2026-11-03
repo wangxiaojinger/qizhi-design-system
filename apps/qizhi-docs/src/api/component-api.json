@@ -1722,6 +1722,12 @@
           "defaultValue": "必填"
         },
         {
+          "name": "dateRange",
+          "description": "日期范围（dateRange）；传入 YYYY-MM-DD 起止日期后按自然日补齐，缺少的数据日期按各系列 0 展示。",
+          "type": "{ start: string; end: string }",
+          "defaultValue": "—"
+        },
+        {
           "name": "label",
           "description": "图表可访问名称（label），同时用作可见卡片标题。",
           "type": "string",
@@ -1735,9 +1741,9 @@
         },
         {
           "name": "xFormatter",
-          "description": "横轴文本格式化（xFormatter），只改变显示文字，不改变输入顺序。",
+          "description": "横轴文本格式化（xFormatter），只改变显示文字；ISO 日期默认显示为 M月D日。",
           "type": "(value: string) => string",
-          "defaultValue": "原样显示"
+          "defaultValue": "日期显示为 M月D日，其他原样显示"
         },
         {
           "name": "valueFormatter",

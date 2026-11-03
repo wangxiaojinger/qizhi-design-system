@@ -5,6 +5,8 @@ import { autoCompleteApi } from "./autoCompleteApi";
 import { autoCompleteDemos } from "./autoCompleteDocs.registry";
 
 describe("AutoComplete docs", () => {
+  const popupFor = (input: HTMLElement) => within(document.getElementById(input.getAttribute("aria-controls")!)!);
+
   it("保留旧站 8 组 Demo 的顺序、标题和说明", () => {
     expect(autoCompleteDemos.map((demo) => demo.title)).toEqual([
       "基础用法", "自定义选项", "自定义输入组件", "区分大小写", "复杂用法", "查询模式 确定类目", "查询模式 不确定类目", "自定义过滤规则",
@@ -44,18 +46,18 @@ describe("AutoComplete docs", () => {
     render(<AutoCompleteDocsIsland />);
     const basic = within(document.getElementById("自动补全-基础用法")!).getByRole("combobox");
     fireEvent.change(basic, { target: { value: "bei" } });
-    expect(within(document.getElementById("自动补全-基础用法")!).getAllByRole("option")).toHaveLength(5);
+    expect(popupFor(basic).getAllByRole("option")).toHaveLength(5);
 
     const strict = within(document.getElementById("自动补全-区分大小写")!).getByRole("combobox");
     fireEvent.change(strict, { target: { value: "B" } });
-    expect(within(document.getElementById("自动补全-区分大小写")!).getByText("暂无匹配结果")).toBeInTheDocument();
-    expect(within(document.getElementById("自动补全-区分大小写")!).queryByRole("option")).not.toBeInTheDocument();
+    expect(popupFor(strict).getByText("暂无匹配结果")).toBeInTheDocument();
+    expect(popupFor(strict).queryByRole("option")).not.toBeInTheDocument();
     fireEvent.change(strict, { target: { value: "b" } });
-    expect(within(document.getElementById("自动补全-区分大小写")!).getAllByRole("option")).toHaveLength(3);
+    expect(popupFor(strict).getAllByRole("option")).toHaveLength(3);
 
     const certain = within(document.getElementById("自动补全-查询模式-确定类目")!).getByRole("combobox");
     fireEvent.change(certain, { target: { value: "model" } });
-    expect(within(document.getElementById("自动补全-查询模式-确定类目")!).getAllByRole("option")).toHaveLength(9);
+    expect(popupFor(certain).getAllByRole("option")).toHaveLength(9);
   });
 
   it("API 列出远程查询四态能力", () => {

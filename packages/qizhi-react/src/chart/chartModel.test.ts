@@ -29,6 +29,21 @@ describe("图表数据语义", () => {
     expect(model.normalizeChart([{ x: "一", series: "a", value: null }], series).hasValues).toBe(false);
     expect(model.normalizeChart([{ x: "一", series: "a", value: 0 }], series).hasValues).toBe(true);
   });
+  it("按日期范围补齐各系列零值，并拒绝越界或非法范围", () => {
+    const result = model.normalizeChart(
+      [{ x: "2026-10-10", series: "a", value: 12 }],
+      series,
+      { start: "2026-10-09", end: "2026-10-11" },
+    );
+    expect(result.categories).toEqual(["2026-10-09", "2026-10-10", "2026-10-11"]);
+    expect(result.rows).toEqual([
+      { x: "2026-10-09", values: [0, 0] },
+      { x: "2026-10-10", values: [12, null] },
+      { x: "2026-10-11", values: [0, 0] },
+    ]);
+    expect(model.normalizeChart(data, series, { start: "2026-02-30", end: "2026-03-01" }).error).toBeDefined();
+    expect(model.normalizeChart(data, series, { start: "2026-10-11", end: "2026-10-10" }).error).toBeDefined();
+  });
 });
 
 it("品牌别名解析为颜色而不是裸 RGB 三元组", () => {
