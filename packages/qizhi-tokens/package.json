@@ -1,6 +1,6 @@
 {
   "name": "@wangxiaojinger/qizhi-tokens",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "QIZHI Design System design tokens.",
   "type": "module",
   "main": "./dist/index.js",

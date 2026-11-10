@@ -22,6 +22,21 @@ jobs:
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
       - run: pnpm verify
+      - name: Verify both package versions are unpublished
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          for package in qizhi-tokens qizhi-react; do
+            version=$(node -p "require('./packages/$package/package.json').version")
+            versions=$(npm view "@wangxiaojinger/$package" versions --json)
+            node --input-type=module -e '
+              const [name, version, versions] = process.argv.slice(1);
+              if ([JSON.parse(versions)].flat().includes(version)) {
+                throw new Error(name + "@" + version + " is already published");
+              }
+            ' "$package" "$version" "$versions"
+          done
       - name: Publish design tokens
         run: pnpm --filter @wangxiaojinger/qizhi-tokens publish --no-git-checks
         env:
