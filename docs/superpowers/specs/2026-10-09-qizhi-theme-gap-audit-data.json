@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "status": "passed",
-  "sourceFingerprint": "sha256:5b200f294aefaa6e10e1c4a07ba9d3d01a669c3dccf568e02187748da1964192",
+  "sourceFingerprint": "sha256:4750caf585a2b5aa9f7e7e83d9cc2be0209e8f7a5ed96162bef493e50f6c3193",
   "root": ".",
   "exclusions": [
     ".git/**",
