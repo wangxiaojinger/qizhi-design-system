@@ -5,6 +5,12 @@
 .qizhi-chart__plot { position: relative; width: 100%; min-width: 0; }
 .qizhi-chart__plot:focus-visible { outline: 2px solid rgb(var(--primary-6)); outline-offset: 2px; border-radius: var(--border-radius-medium); }
 .qizhi-chart__canvas { position: absolute; inset: 0; overflow: hidden; }
+.qizhi-chart__plot--range-selectable { cursor: crosshair; user-select: none; touch-action: pan-y; }
+/* The renderer sets touch-action inline on its canvas. Keep page scrolling available. */
+.qizhi-chart__plot--range-selectable canvas { touch-action: pan-y !important; }
+.qizhi-chart__range-selection { position: absolute; z-index: 2; box-sizing: border-box; border-inline: 1px dashed; border-inline-color: rgb(var(--primary-6)); background: rgba(var(--primary-6), 0.16); pointer-events: none; }
+.qizhi-chart__range-guide { position: absolute; z-index: 3; box-sizing: border-box; height: 0; border-top: 1px dashed; border-top-color: rgb(var(--primary-6)); pointer-events: none; }
+.qizhi-chart__range-selection-label { position: absolute; z-index: 4; box-sizing: border-box; max-width: calc(100% - 8px); padding: 2px 6px; border: 1px solid rgb(var(--primary-6)); border-radius: var(--border-radius-small); background: var(--color-bg-popup); color: var(--color-text-1); font-size: var(--chart-label-font-size); font-variant-numeric: tabular-nums; line-height: var(--line-height-regular); overflow-wrap: anywhere; pointer-events: none; }
 .qizhi-chart__indicator { position: absolute; z-index: 1; width: 0; border-left: 1px dashed var(--chart-axis); pointer-events: none; }
 .qizhi-chart__unit { color: var(--chart-text); font-size: var(--chart-label-font-size); font-weight: 400; }
 .qizhi-chart__state { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: var(--chart-padding); }

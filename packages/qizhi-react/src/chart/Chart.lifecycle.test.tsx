@@ -2,7 +2,7 @@ import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { LineChart } from "./LineChart";
 const engine = vi.hoisted(() => ({ render: vi.fn() }));
-vi.mock("./chartEngine", () => ({ getValueAxisPadding: () => 64, getPlotPadding: () => ({ left: 64, right: 48, top: 24, bottom: 40 }), renderChart: engine.render }));
+vi.mock("./chartEngine", () => ({ BAR_BAND_PADDING: { inner: 0.3, outer: 0.5 }, getValueAxisPadding: () => 64, getPlotPadding: () => ({ left: 64, right: 48, top: 24, bottom: 40 }), renderChart: engine.render }));
 const series = [{ key: "a", label: "请求量" }];
 const data = [{ x: "一", series: "a", value: 12 }];
 beforeEach(() => {

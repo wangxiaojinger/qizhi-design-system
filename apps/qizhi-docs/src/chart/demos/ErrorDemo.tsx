@@ -1,3 +1,4 @@
+import type { ChartDateRange, ChartDatum, LineChartProps } from "@wangxiaojinger/qizhi-react";
 import { useState } from "react";
 import { LineChart, Switch } from "@wangxiaojinger/qizhi-react";
 
@@ -13,7 +14,9 @@ const data = [
 
 const series = [{ key: "requests", label: "请求量" }];
 
-export default function ErrorDemo() {
+type DemoQuery = (data: readonly ChartDatum[], dateRange?: ChartDateRange) => Pick<LineChartProps, "data" | "dateRange" | "rangeSelection">;
+
+export default function ErrorDemo({ query = (data, dateRange) => ({ data, dateRange }) }: { query?: DemoQuery } = {}) {
   const [hasError, setHasError] = useState(true);
 
   return (
@@ -29,7 +32,7 @@ export default function ErrorDemo() {
         </div>
       </div>
       <LineChart focusable
-        data={data}
+        {...query(data)}
         series={series}
         label="错误状态请求量趋势图"
         unit="次"

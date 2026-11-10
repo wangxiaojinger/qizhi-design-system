@@ -1,3 +1,4 @@
+import type { ChartDateRange, ChartDatum, LineChartProps } from "@wangxiaojinger/qizhi-react";
 import { LineChart } from "@wangxiaojinger/qizhi-react";
 
 const data = [
@@ -11,16 +12,18 @@ const data = [
 ];
 
 const series = [{ key: "cost", label: "费用" }];
+const formatCost = new Intl.NumberFormat("zh-CN", { minimumFractionDigits: 2, maximumFractionDigits: 3 }).format;
 
-export default function CostTrendDemo() {
+type DemoQuery = (data: readonly ChartDatum[], dateRange?: ChartDateRange) => Pick<LineChartProps, "data" | "dateRange" | "rangeSelection">;
+
+export default function CostTrendDemo({ query = (data, dateRange) => ({ data, dateRange }) }: { query?: DemoQuery } = {}) {
   return (
     <LineChart focusable
-      data={data}
+      {...query(data)}
       series={series}
       label="费用趋势图"
       unit="元"
-      xFormatter={(value) => value.slice(5)}
-      valueFormatter={(value) => value.toFixed(2)}
+      valueFormatter={formatCost}
     />
   );
 }

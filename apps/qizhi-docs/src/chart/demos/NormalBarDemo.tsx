@@ -1,3 +1,4 @@
+import type { ChartDateRange, ChartDatum, LineChartProps } from "@wangxiaojinger/qizhi-react";
 import { BarChart } from "@wangxiaojinger/qizhi-react";
 
 const data = [
@@ -12,6 +13,8 @@ const data = [
 
 const series = [{ key: "requests", label: "请求量" }];
 
-export default function NormalBarDemo() {
-  return <BarChart focusable data={data} series={series} label="每日请求量柱状图" unit="次" />;
+type DemoQuery = (data: readonly ChartDatum[], dateRange?: ChartDateRange, kind?: "bar") => Pick<LineChartProps, "data" | "dateRange" | "rangeSelection">;
+
+export default function NormalBarDemo({ query = (data, dateRange) => ({ data, dateRange }) }: { query?: DemoQuery } = {}) {
+  return <BarChart focusable {...query(data, undefined, "bar")} series={series} label="每日请求量柱状图" unit="次" />;
 }

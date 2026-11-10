@@ -274,7 +274,8 @@ export const Popover = forwardRef<PopoverHandle, PopoverProps>(function Popover(
       first.focus();
     },
   });
-  const popupContainer = getPopupContainer && triggerRef.current ? getPopupContainer(triggerRef.current) : document.body;
+  const popupContainer = typeof document === "undefined" ? null
+    : getPopupContainer && triggerRef.current ? getPopupContainer(triggerRef.current) : document.body;
   const primitiveLabel = typeof content === "string" || typeof content === "number" ? String(content) : undefined;
   const rootStyle = {
     ...styles?.root,
@@ -286,7 +287,7 @@ export const Popover = forwardRef<PopoverHandle, PopoverProps>(function Popover(
   } as CSSProperties;
   const arrowStyle = styles?.arrow as CSSProperties | undefined;
 
-  const popup = visible ? createPortal(
+  const popup = visible && popupContainer ? createPortal(
     <div
       ref={setPopupNode}
       id={popupId}

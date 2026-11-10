@@ -21,7 +21,15 @@ test("正式适配器的几何、缺失分段、颜色和销毁性能", async ({
   expect(normal).toHaveLength(4); expect(grouped).toHaveLength(8); expect(stacked).toHaveLength(8);
   expect(new Set(stacked.map(shape => shape.x.toFixed(2))).size).toBe(4);
   expect(new Set(grouped.map(shape => shape.x.toFixed(2))).size).toBe(8);
-  expect(gap).toHaveLength(5); // 两段折线（含单点段）和三个非缺失点。
+  expect(gap).toHaveLength(5);
+  const elements = JSON.parse((await page.locator('[data-mode="line-gap"]').getAttribute("data-segments"))!) as { key: string; line: boolean; x: number; width: number }[];
+  const points = elements.filter(element => !element.line);
+  expect(points.map(point => point.key)).toEqual(["一", "三", "四"]);
+  const lines = elements.filter(element => element.line);
+  expect(lines.map(line => line.key)).toEqual(["一", "三"]);
+  expect(lines[0].width).toBe(0);
+  expect(lines[1].x).toBeCloseTo(points[1].x + points[1].width / 2, 2);
+  expect(lines[1].x + lines[1].width).toBeCloseTo(points[2].x + points[2].width / 2, 2);
   expect(JSON.parse((await page.locator('[data-mode="stacked"]').getAttribute("data-colors"))!)).toEqual(["rgb(51, 102, 255)", "rgb(0, 224, 150)"]);
   const performance = JSON.parse((await page.locator("#probe").getAttribute("data-performance"))!);
   expect(performance.map((item: { canvasesAfterDestroy: number }) => item.canvasesAfterDestroy)).toEqual([0, 0, 0]);

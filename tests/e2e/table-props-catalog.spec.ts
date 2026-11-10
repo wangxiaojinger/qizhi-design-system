@@ -103,7 +103,7 @@ test("属性示例：模型目录、列能力组合、隐藏表头后保留手�
   await expect(panel).toBeVisible();
   await page.keyboard.press("Escape");
   await demo.getByRole("switch", { name: "表头", exact: true }).click();
-  expect(await actual()).toBeCloseTo(220, 0);
+  await expect.poll(actual).toBeCloseTo(220, 0);
   await demo.getByRole("switch", { name: "列显隐", exact: true }).click();
   await expect(demo.getByRole("button", { name: "列显隐", exact: true })).toHaveCount(0);
   await expect(table.getByRole("button", { name: /移动列/ }).first()).toBeVisible();

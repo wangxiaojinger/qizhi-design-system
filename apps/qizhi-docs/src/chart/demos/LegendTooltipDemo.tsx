@@ -1,3 +1,4 @@
+import type { ChartDateRange, ChartDatum, LineChartProps } from "@wangxiaojinger/qizhi-react";
 import { useState } from "react";
 import { LineChart, Switch } from "@wangxiaojinger/qizhi-react";
 
@@ -23,7 +24,9 @@ const series = [
   { key: "service-b", label: "服务乙" },
 ];
 
-export default function LegendTooltipDemo() {
+type DemoQuery = (data: readonly ChartDatum[], dateRange?: ChartDateRange) => Pick<LineChartProps, "data" | "dateRange" | "rangeSelection">;
+
+export default function LegendTooltipDemo({ query = (data, dateRange) => ({ data, dateRange }) }: { query?: DemoQuery } = {}) {
   const [legend, setLegend] = useState(true);
   const [tooltip, setTooltip] = useState(true);
 
@@ -48,7 +51,7 @@ export default function LegendTooltipDemo() {
         </div>
       </div>
       <LineChart focusable
-        data={data}
+        {...query(data)}
         series={series}
         label="服务请求量图例与提示信息示例"
         unit="次"

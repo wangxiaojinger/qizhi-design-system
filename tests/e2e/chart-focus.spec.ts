@@ -109,3 +109,27 @@ test("折线聚焦点具有可见填充，其他点和连接线淡化", async ({
   await page.waitForTimeout(220);
   for (const shape of await probe(page, "shapes")) expect(shape.opacity).toBe(!shape.line && shape.series === "gpu" && shape.key === "09-02" ? 1 : 0.3);
 });
+
+test("横向滚动后悬停保留当前提示，继续滚动关闭旧提示", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "mobile-375", "手机视口提供横向滚动");
+  await page.goto("/tests/fixtures/chart-engine/focus.html");
+  await probe(page, "init", ["normal"]);
+  const plot = page.locator("#public .qizhi-chart__plot");
+  await expect(plot).toHaveAttribute("data-ready", "true");
+  const shape = (await probe(page, "shapes")).find((item: { key: string }) => item.key === "09-03");
+  await pointerAt(page, plot, shape.x + shape.width / 2, shape.y + shape.height / 2, "move");
+  const scroll = page.locator("#public .qizhi-chart__scroll");
+  expect(await scroll.evaluate(node => node.scrollLeft)).toBeGreaterThan(0);
+  const tooltip = page.getByRole("tooltip");
+  await expect(tooltip).toContainText("09-03");
+
+  // 模拟已更新布局的滚动通知晚于指针事件送达。
+  await scroll.evaluate(node => {
+    node.dispatchEvent(new Event("scroll"));
+    return new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+  });
+  await expect(tooltip).toContainText("09-03");
+
+  await scroll.evaluate(node => { node.scrollLeft = 0; });
+  await expect(tooltip).toHaveCount(0);
+});

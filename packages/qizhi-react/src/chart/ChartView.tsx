@@ -1,21 +1,119 @@
-import { useEffect, useId, useMemo, useRef, useState } from "react";
-import type { KeyboardEvent, PointerEvent } from "react";
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
+import type { KeyboardEvent, PointerEvent as ReactPointerEvent } from "react";
 import { Alert } from "../alert/Alert";
 import { Button } from "../button/Button";
 import { Empty } from "../empty/Empty";
 import { Spin } from "../spin/Spin";
 import { Table } from "../table/Table";
 import type { TableColumn } from "../table/Table.types";
-import type { BarChartMode, LineChartProps, FocusedItem } from "./Chart.types";
-import { normalizeChart, colorTokenCss, seriesColorToken } from "./chartModel";
+import type { BarChartMode, ChartTimeDomain, ChartTimeRange, ChartTimeRangeSelection, LineChartProps, FocusedItem } from "./Chart.types";
+import { normalizeChart, parseChartTime, colorTokenCss, seriesColorToken } from "./chartModel";
 import type { ChartRow } from "./chartModel";
-import { renderChart, getPlotPadding, getValueAxisPadding } from "./chartEngine";
+import { BAR_BAND_PADDING, renderChart, getPlotPadding } from "./chartEngine";
 import { useChartFocus } from "./useChartFocus";
 import { focusItems, resolveFocus, sameFocus } from "./chartFocus";
 import { ChartTooltip } from "./ChartTooltip";
 import "./chart.css";
 
 const numberFormat = new Intl.NumberFormat("zh-CN", { maximumFractionDigits: 20 });
+const RANGE_SELECTION_THRESHOLD = 6;
+const TIME_SELECTION_STEPS = { millisecond: 1, second: 1_000, minute: 60_000 };
+const TIME_LABEL_END = { millisecond: 23, second: 19, minute: 16 };
+
+type ActiveBrush = {
+  pointerId: number;
+  startX: number;
+  currentX: number;
+  captured: boolean;
+  selection: ChartTimeRangeSelection;
+  domain: ChartTimeDomain;
+  timestamps?: readonly number[];
+  selectionLeft: number;
+  selectionWidth: number;
+  element: HTMLDivElement;
+};
+
+type BrushPreview = { left: number; width: number; guideY: number; label: string };
+
+type BrushListeners = {
+  move: (event: globalThis.PointerEvent) => void;
+  up: (event: globalThis.PointerEvent) => void;
+  cancel: (event: globalThis.PointerEvent) => void;
+  lostCapture: (event: Event) => void;
+  keydown: (event: globalThis.KeyboardEvent) => void;
+};
+
+const clamp = (value: number, minimum: number, maximum: number) => Math.max(minimum, Math.min(maximum, value));
+const isValidTimeDomain = (domain: ChartTimeDomain) => Number.isFinite(domain.start) && Number.isFinite(domain.end) && domain.end > domain.start && (domain.step === undefined || Number.isFinite(domain.step) && domain.step > 0);
+const formatCursorTime = (time: number, selection?: ChartTimeRangeSelection) => {
+  if (selection?.formatTime) return selection.formatTime(time);
+  const date = new Date(time);
+  if (!Number.isFinite(date.getTime())) return "无效时间";
+  const end = TIME_LABEL_END[selection?.precision ?? "second"];
+  return date.toISOString().slice(0, end).replace("T", " ");
+};
+const inferTimeDomain = (categories: readonly string[], timestamps: readonly number[]): ChartTimeDomain | undefined => {
+  const start = timestamps[0];
+  const last = timestamps[timestamps.length - 1];
+  if (categories.every(category => /^\d{4}-\d{2}-\d{2}$/.test(category))) return { start, end: last + 86_400_000 };
+  if (timestamps.length < 2) return;
+  const interval = timestamps[1] - start;
+  const regular = timestamps.every((time, index) => time === start + index * interval);
+  // Irregular samples do not reveal a bucket length. Include the last timestamp without inventing one.
+  return { start, end: last + (regular ? interval : 1) };
+};
+const brushGeometry = (kind: "line" | "bar", categoryCount: number, left: number, width: number) => {
+  if (kind === "line") return { left, width };
+  const { inner, outer } = BAR_BAND_PADDING;
+  const step = width / (categoryCount - inner + 2 * outer);
+  const margin = (outer - inner / 2) * step;
+  return { left: left + margin, width: Math.max(0, width - margin * 2) };
+};
+const brushTimestamps = (kind: "line" | "bar", timestamps: readonly number[], domain: ChartTimeDomain, terminalCategory?: string) => {
+  if (timestamps.length === 1) {
+    const [time] = timestamps;
+    // Without a terminal slot, a single point or bar is centered in the selection geometry.
+    return !terminalCategory && time > domain.start && time < domain.end
+      ? [domain.start, time, domain.end] : undefined;
+  }
+  const interior = kind === "bar" || terminalCategory ? timestamps.slice(1) : timestamps.slice(1, -1);
+  if (interior.length && (interior[0] <= domain.start || interior[interior.length - 1] >= domain.end)) return undefined;
+  return [domain.start, ...interior, domain.end];
+};
+const timeRangeAt = (brush: ActiveBrush): ChartTimeRange => {
+  const { domain, timestamps } = brush;
+  const rawAt = (x: number) => {
+    const ratio = clamp((x - brush.selectionLeft) / brush.selectionWidth, 0, 1);
+    if (!timestamps) return domain.start + ratio * (domain.end - domain.start);
+    // Point and band scales space samples evenly. Interpolate between the actual adjacent timestamps.
+    const index = ratio * (timestamps.length - 1);
+    const left = Math.min(Math.floor(index), timestamps.length - 2);
+    return timestamps[left] + (index - left) * (timestamps[left + 1] - timestamps[left]);
+  };
+  const rawStart = rawAt(Math.min(brush.startX, brush.currentX));
+  const rawEnd = rawAt(Math.max(brush.startX, brush.currentX));
+  const resolvedStep = brush.selection.resolveStep?.({ start: rawStart, end: rawEnd });
+  const step = resolvedStep !== undefined && Number.isFinite(resolvedStep) && resolvedStep > 0
+    ? resolvedStep : domain.step ?? TIME_SELECTION_STEPS[brush.selection.precision ?? "second"];
+  return {
+    start: clamp(Math.floor(rawStart / step) * step, domain.start, domain.end),
+    end: clamp(Math.ceil(rawEnd / step) * step, domain.start, domain.end),
+  };
+};
+const timeRangeGeometry = (brush: ActiveBrush, range: ChartTimeRange) => {
+  const { domain, timestamps } = brush;
+  const toX = (time: number) => {
+    if (!timestamps) return brush.selectionLeft + (time - domain.start) / (domain.end - domain.start) * brush.selectionWidth;
+    if (time <= domain.start) return brush.selectionLeft;
+    if (time >= timestamps[timestamps.length - 1]) return brush.selectionLeft + brush.selectionWidth;
+    const right = Math.max(1, timestamps.findIndex(value => value >= time));
+    const ratio = (right - 1 + (time - timestamps[right - 1]) / (timestamps[right] - timestamps[right - 1])) / (timestamps.length - 1);
+    return brush.selectionLeft + ratio * brush.selectionWidth;
+  };
+  const start = toX(range.start);
+  const end = toX(range.end);
+  return { left: start, width: end - start };
+};
 const defaultValueFormat = (value: number) => numberFormat.format(value);
 const defaultXFormat = (value: string) => {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
@@ -23,22 +121,59 @@ const defaultXFormat = (value: string) => {
 };
 
 export function ChartView({ kind, mode = "normal", data, series, dateRange, label, unit = "", xFormatter = defaultXFormat, valueFormatter = defaultValueFormat,
-  legend = true, tooltip = true, loading = false, error, height = 280, className, id, ref, focusable = false, focusedItem, defaultFocusedItem, onFocusChange, dimOpacity = 0.3, clearFocusOnBackgroundClick = true }: LineChartProps & { kind: "line" | "bar"; mode?: BarChartMode }) {
+  legend = true, tooltip = true, rangeSelection, xAxisType, loading = false, error, height = 280, className, id, ref, focusable = false, focusedItem, defaultFocusedItem, onFocusChange, dimOpacity = 0.3, clearFocusOnBackgroundClick = true }: LineChartProps & { kind: "line" | "bar"; mode?: BarChartMode }) {
   const internalId = useId(); const tableId = `${internalId}-data`; const tipId = `${internalId}-tip`; const helpId = `${internalId}-help`;
   const plot = useRef<HTMLDivElement>(null); const engineHost = useRef<HTMLDivElement>(null);
   const [viewportWidth, setViewportWidth] = useState(0);
   const [width, setWidth] = useState(0); const [hidden, setHidden] = useState<string[]>([]);
   const [engineError, setEngineError] = useState(false); const [ready, setReady] = useState(false);
-  const [active, setActive] = useState<{ index: number; x: number; y: number; keyboard: boolean } | null>(null);
-  const model = useMemo(() => normalizeChart(data, series, dateRange), [data, series, dateRange?.start, dateRange?.end]);
+  const [active, setActive] = useState<{ index: number; x: number; y: number; keyboard: boolean; plotLeft: number; plotTop: number } | null>(null);
+  const [brushPreview, setBrushPreview] = useState<BrushPreview | null>(null);
+  const suppressBrushClick = useRef(false);
+  const activeBrush = useRef<ActiveBrush | null>(null);
+  const brushListeners = useRef<BrushListeners | null>(null);
+  const finishBrushRef = useRef<(commit: boolean) => void>(() => undefined);
+  const sourceModel = useMemo(() => normalizeChart(data, series, dateRange), [data, series, dateRange?.start, dateRange?.end]);
+  const [localSelection, setLocalSelection] = useState<{ source: typeof sourceModel; range: ChartTimeRange }>();
+  const selection = rangeSelection || undefined;
+  const localRange = rangeSelection !== false && xAxisType !== "category" && !selection?.onChange && localSelection?.source === sourceModel
+    ? localSelection.range : undefined;
+  const model = useMemo(() => {
+    if (!localRange) return sourceModel;
+    const rows = sourceModel.rows.filter(row => {
+      const time = parseChartTime(row.x);
+      return time >= localRange.start && time < localRange.end;
+    });
+    return { ...sourceModel, rows, categories: rows.map(row => row.x), hasValues: rows.some(row => row.values.some(value => value !== null)) };
+  }, [sourceModel, localRange]);
+  const timestamps = useMemo(() => model.categories.map(parseChartTime), [model.categories]);
+  const isTimeAxis = xAxisType !== "category" && timestamps.length > 0
+    && timestamps.every((time, index) => Number.isFinite(time) && (index === 0 || time > timestamps[index - 1]));
+  // A single retained timestamp has no inferable interval; the prior selection still defines one.
+  const availableDomain: ChartTimeDomain | undefined = selection?.timeDomain
+    ?? (isTimeAxis ? inferTimeDomain(model.categories, timestamps) ?? localRange : undefined);
+  const timeDomain = availableDomain && localRange ? {
+    ...availableDomain,
+    start: Math.max(availableDomain.start, localRange.start),
+    end: Math.min(availableDomain.end, localRange.end),
+  } : availableDomain;
+  const canBrush = rangeSelection !== false && isTimeAxis && timeDomain !== undefined && isValidTimeDomain(timeDomain);
+  // Place a single bar at the selection origin when its timestamp is the domain start.
+  const singleBarCenter = canBrush && kind === "bar" && timestamps.length === 1 && timestamps[0] === timeDomain?.start
+    ? brushGeometry("bar", 1, 0, 1).left : undefined;
+  // Reserve a real plot interval after the last point without inserting a data row or tick label.
+  const terminalCategory = canBrush && kind === "line" && timeDomain
+    && (timestamps.length > 1 || timestamps[0] <= timeDomain.start)
+    && timeDomain.end - timestamps[timestamps.length - 1] > 1
+    ? "__qizhi_chart_terminal__" : undefined;
+  const lineIntervals = Math.max(0, model.categories.length - (terminalCategory ? 0 : 1));
   const allFocusItems = useMemo(() => focusItems(data, series, model), [data, series, model]);
   const focus = useChartFocus({ focusable, focusedItem, defaultFocusedItem, onFocusChange }, allFocusItems);
   const engine = useRef<Awaited<ReturnType<typeof renderChart>> | null>(null);
   const [keyboardItem, setKeyboardItem] = useState<FocusedItem | null>(null);
   const invalid = model.error || !label?.trim() || !Number.isFinite(height) || height <= 0 || !["normal", "grouped", "stacked"].includes(mode) || (kind === "bar" && mode === "normal" && series.length !== 1);
-  const axisValues = model.rows.flatMap(row => row.values.filter((value): value is number => value !== null));
-  const stackedValues = mode === "stacked" ? model.rows.map(row => row.values.reduce<number>((sum, value) => sum + (value ?? 0), 0)) : [];
-  const padding = getPlotPadding(width, kind === "line" && focusable, getValueAxisPadding([...axisValues, ...stackedValues], valueFormatter));
+  const [renderedPadding, setRenderedPadding] = useState<ReturnType<typeof getPlotPadding>>();
+  const padding = renderedPadding ?? getPlotPadding(width, kind === "line" && focusable);
   const safeHeight = Number.isFinite(height) && height > 0 ? height : 280;
   const state = loading ? "loading" : error ? "error" : invalid ? "invalid" : !model.rows.length ? "empty" : !model.hasValues ? "missing" : "normal";
   const keys = series.map(s => s.key); const keySignature = JSON.stringify(keys);
@@ -54,7 +189,13 @@ export function ChartView({ kind, mode = "normal", data, series, dateRange, labe
   const columns: TableColumn<ChartRow>[] = [{ key: "x", title: "日期／分类", render: (_value, row) => xFormatter(row.x) },
     ...series.map((item, index) => ({ key: `series-${item.key}`, title: item.label, render: (_value: unknown, row: ChartRow) => formatValue(row.values[index]) }))];
   useEffect(() => { if (!legend) setHidden([]); }, [legend]);
-  useEffect(() => { setActive(null); }, [data, series, tooltip, loading, error, width]);
+  useEffect(() => { setActive(null); }, [model, tooltip, loading, error, width]);
+  const hasBrushCallback = Boolean(selection?.onChange);
+  useLayoutEffect(() => () => finishBrushRef.current(false), [
+    kind, model, state, width, canBrush, hasBrushCallback, terminalCategory,
+    timeDomain?.start, timeDomain?.end, timeDomain?.step, selection?.precision,
+    padding.left, padding.right,
+  ]);
   useEffect(() => {
     if (!plot.current) return;
     const measure = () => { const node = plot.current; if (!node) return; setWidth(Math.max(0, Math.floor(node.getBoundingClientRect().width))); setViewportWidth(window.innerWidth); };
@@ -68,48 +209,156 @@ export function ChartView({ kind, mode = "normal", data, series, dateRange, labe
     const holder = document.createElement("div"); engineHost.current.append(holder);
     let disposed = false; let disposeEngine: (() => void) | undefined;
     renderChart(holder, { model, series, visibleKeys, kind, mode, width, height: safeHeight, xFormatter, valueFormatter, focusable,
+      useDefaultTimeLabels: xFormatter === defaultXFormat, categoricalAxis: xAxisType === "category", terminalCategory, singleBarCenter,
       onItemClick: identity => {
+        if (suppressBrushClick.current) return;
         const current = focusCurrent.current;
         const item = current.allFocusItems.find(item => item.seriesKey === identity.seriesKey && item.dataKey === identity.dataKey);
         if (item) { setKeyboardItem(item); current.focus.handleItemClick(item); }
       },
-      onBackgroundClick: () => { const current = focusCurrent.current; if (current.clearFocusOnBackgroundClick) current.focus.clearFocus(); },
+      onBackgroundClick: () => {
+        if (suppressBrushClick.current) return;
+        const current = focusCurrent.current; if (current.clearFocusOnBackgroundClick) current.focus.clearFocus();
+      },
     })
-      .then(chart => { if (disposed) chart.destroy(); else { engine.current = chart; chart.updateFocus?.(focusCurrent.current.focus.focusedItem, focusCurrent.current.dimOpacity); disposeEngine = () => { if (engine.current === chart) engine.current = null; chart.destroy(); }; setReady(true); } })
+      .then(chart => { if (disposed) chart.destroy(); else { engine.current = chart; setRenderedPadding(chart.plotPadding); chart.updateFocus?.(focusCurrent.current.focus.focusedItem, focusCurrent.current.dimOpacity); disposeEngine = () => { if (engine.current === chart) engine.current = null; chart.destroy(); }; setReady(true); } })
       .catch(() => { if (!disposed) { holder.remove(); setEngineError(true); } });
     return () => { disposed = true; disposeEngine?.(); holder.remove(); };
-  }, [state, model, series, visibleSignature, kind, mode, focusable, width, viewportWidth, safeHeight, xFormatter, valueFormatter]);
+  }, [state, model, series, visibleSignature, kind, mode, focusable, width, viewportWidth, safeHeight, xFormatter, valueFormatter, xAxisType, terminalCategory, singleBarCenter]);
+  const pointCount = model.rows.length;
+  const anchorX = useCallback((index: number, rect: DOMRect) => {
+    const ratio = kind === "bar" ? singleBarCenter ?? (index + 0.5) / pointCount : lineIntervals ? index / lineIntervals : 0.5;
+    return rect.left + padding.left + Math.max(0, rect.width - padding.left - padding.right) * ratio;
+  }, [kind, singleBarCenter, pointCount, lineIntervals, padding.left, padding.right]);
+  const hasActive = Boolean(active);
   useEffect(() => {
-    if (!active) return;
+    if (!hasActive) return;
+    setActive(current => {
+      if (!current || !plot.current) return current;
+      const x = anchorX(current.index, plot.current.getBoundingClientRect());
+      return current.x === x ? current : { ...current, x };
+    });
     const close = () => setActive(null);
     const outside = (event: globalThis.PointerEvent) => { if (!plot.current?.contains(event.target as Node)) close(); };
     const scroll = () => setActive(current => {
-      if (!current?.keyboard || !plot.current) return null;
+      if (!current || !plot.current) return null;
       const rect = plot.current.getBoundingClientRect();
-      const count = model.rows.length;
-      const ratio = kind === "bar" ? (current.index + 0.5) / count : count === 1 ? 0.5 : current.index / (count - 1);
-      return { ...current, x: rect.left + padding.left + Math.max(0, rect.width - padding.left - padding.right) * ratio, y: rect.top + rect.height / 2 };
+      // A deferred scroll event can arrive after a pointer move already used the new position.
+      if (!current.keyboard) return rect.left === current.plotLeft && rect.top === current.plotTop ? current : null;
+      return { ...current, x: anchorX(current.index, rect), y: rect.top + rect.height / 2 };
     });
     window.addEventListener("resize", close); window.addEventListener("scroll", scroll, true); document.addEventListener("pointerdown", outside);
     return () => { window.removeEventListener("resize", close); window.removeEventListener("scroll", scroll, true); document.removeEventListener("pointerdown", outside); };
-  }, [!!active]);
+  }, [hasActive, anchorX]);
   const showAt = (index: number, keyboard: boolean, pointerY?: number) => {
     if (!tooltip || state !== "normal" || engineError || !plot.current || !model.rows.length) return;
     const bounded = Math.max(0, Math.min(index, model.rows.length - 1)); const rect = plot.current.getBoundingClientRect();
-    const count = model.rows.length;
-    const ratio = kind === "bar" ? (bounded + 0.5) / count : count === 1 ? 0.5 : bounded / (count - 1);
-    setActive({ index: bounded, keyboard, x: rect.left + padding.left + Math.max(0, rect.width - padding.left - padding.right) * ratio,
-      y: pointerY ?? rect.top + rect.height / 2 });
+    setActive({ index: bounded, keyboard, x: anchorX(bounded, rect),
+      y: pointerY ?? rect.top + rect.height / 2, plotLeft: rect.left, plotTop: rect.top });
   };
-  const onPointer = (event: PointerEvent<HTMLDivElement>) => {
+  const onPointer = (event: ReactPointerEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect(); const x = event.clientX - rect.left; const y = event.clientY - rect.top;
     if (x < padding.left || x > rect.width - padding.right || y < padding.top || y > rect.height - padding.bottom) { setActive(null); return; }
     const ratio = (x - padding.left) / Math.max(1, rect.width - padding.left - padding.right);
-    const index = kind === "bar" ? Math.floor(ratio * model.rows.length) : Math.round(ratio * (model.rows.length - 1));
+    const index = kind === "bar" ? Math.floor(ratio * model.rows.length) : Math.round(ratio * lineIntervals);
     showAt(index, false, event.clientY);
   };
+  const removeBrushListeners = () => {
+    const listeners = brushListeners.current;
+    const current = activeBrush.current;
+    if (!listeners) return;
+    window.removeEventListener("pointermove", listeners.move);
+    window.removeEventListener("pointerup", listeners.up);
+    window.removeEventListener("pointercancel", listeners.cancel);
+    document.removeEventListener("keydown", listeners.keydown);
+    current?.element.removeEventListener("lostpointercapture", listeners.lostCapture);
+    brushListeners.current = null;
+  };
+  const finishBrush = (commit: boolean) => {
+    const current = activeBrush.current;
+    if (!current) return;
+    removeBrushListeners(); activeBrush.current = null; setBrushPreview(null);
+    try { if (current.captured) current.element.releasePointerCapture?.(current.pointerId); } catch {
+      // Pointer capture can already have been released when the browser cancels a gesture.
+    }
+    const moved = Math.abs(current.currentX - current.startX) >= RANGE_SELECTION_THRESHOLD;
+    if (!commit || !moved) return;
+    const range = timeRangeAt(current);
+    if (range.end <= range.start) return;
+    if (selection?.onChange) selection.onChange(range);
+    else setLocalSelection({ source: sourceModel, range });
+  };
+  finishBrushRef.current = finishBrush;
+  const updateBrush = (event: Pick<globalThis.PointerEvent, "pointerId" | "clientX" | "clientY">) => {
+    const current = activeBrush.current;
+    if (!current || event.pointerId !== current.pointerId || !Number.isFinite(event.clientX)) return;
+    const rect = current.element.getBoundingClientRect();
+    const nextX = clamp(event.clientX - rect.left, current.selectionLeft, current.selectionLeft + current.selectionWidth);
+    const guideY = clamp(Number.isFinite(event.clientY) ? event.clientY - rect.top : rect.height / 2, padding.top, rect.height - padding.bottom);
+    if (nextX === current.currentX) {
+      setBrushPreview(previous => previous && previous.guideY !== guideY ? { ...previous, guideY } : previous);
+      return;
+    }
+    current.currentX = nextX;
+    if (Math.abs(nextX - current.startX) >= RANGE_SELECTION_THRESHOLD) {
+      suppressBrushClick.current = true;
+      if (!current.captured) {
+        try {
+          current.element.setPointerCapture?.(current.pointerId);
+          current.captured = true;
+        } catch {
+          // The window listeners still handle the gesture if capture is unavailable.
+        }
+      }
+      setActive(null);
+      const timeRange = timeRangeAt(current);
+      const previewGeometry = timeRangeGeometry(current, timeRange);
+      const label = `${formatCursorTime(timeRange.start, current.selection)} ～ ${formatCursorTime(timeRange.end, current.selection)}`;
+      setBrushPreview({ ...previewGeometry, guideY, label });
+    } else {
+      setBrushPreview(null);
+    }
+  };
+  const beginBrush = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (!canBrush || !timeDomain || state !== "normal" || engineError || event.button !== 0 || (event.isPrimary === false && Boolean(event.pointerType))) return false;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    const plotWidth = rect.width - padding.left - padding.right;
+    const geometry = brushGeometry(kind, model.categories.length, padding.left, plotWidth);
+    if (geometry.width <= 0 || x < geometry.left || x > geometry.left + geometry.width || y < padding.top || y > rect.height - padding.bottom) return false;
+    finishBrush(false);
+    const current: ActiveBrush = {
+      pointerId: event.pointerId, startX: x, currentX: x, captured: false,
+      selection: selection ?? {}, domain: timeDomain, timestamps: brushTimestamps(kind, timestamps, timeDomain, terminalCategory),
+      selectionLeft: geometry.left, selectionWidth: geometry.width, element: event.currentTarget,
+    };
+    activeBrush.current = current;
+    const belongsToActivePointer = (pointerEvent: globalThis.PointerEvent | Event) => {
+      const pointerId = (pointerEvent as globalThis.PointerEvent).pointerId;
+      return typeof pointerId !== "number" || pointerId === current.pointerId;
+    };
+    const listeners: BrushListeners = {
+      move: pointerEvent => updateBrush(pointerEvent),
+      up: pointerEvent => { if (!belongsToActivePointer(pointerEvent)) return; updateBrush(pointerEvent); finishBrushRef.current(true); },
+      cancel: pointerEvent => { if (belongsToActivePointer(pointerEvent)) finishBrushRef.current(false); },
+      lostCapture: lostCaptureEvent => {
+        // Touch starts with implicit capture on the renderer's canvas.
+        // Its bubbled loss during transfer must not cancel the plot gesture.
+        if (lostCaptureEvent.target === current.element && belongsToActivePointer(lostCaptureEvent)) finishBrushRef.current(false);
+      },
+      keydown: keyEvent => { if (keyEvent.key === "Escape") { keyEvent.preventDefault(); finishBrushRef.current(false); } },
+    };
+    brushListeners.current = listeners;
+    window.addEventListener("pointermove", listeners.move);
+    window.addEventListener("pointerup", listeners.up);
+    window.addEventListener("pointercancel", listeners.cancel);
+    document.addEventListener("keydown", listeners.keydown);
+    current.element.addEventListener("lostpointercapture", listeners.lostCapture);
+    return true;
+  };
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === "Escape") { setActive(null); return; }
+    if (event.key === "Escape") { finishBrush(false); setActive(null); return; }
     if (focusable && state === "normal" && !engineError && cursor) {
       if (["Enter", " "].includes(event.key)) { event.preventDefault(); focus.handleItemClick(cursor); return; }
       if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", "Home", "End"].includes(event.key)) {
@@ -131,28 +380,50 @@ export function ChartView({ kind, mode = "normal", data, series, dateRange, labe
     showAt(index, true);
   };
   const row = active && state === "normal" && tooltip && !engineError ? model.rows[active.index] : undefined;
+  const cursorTime = row && xFormatter === defaultXFormat && /^\d{4}-\d{2}-\d{2}T/.test(row.x) ? Date.parse(row.x) : NaN;
+  const cursorLabel = !row ? "" : Number.isFinite(cursorTime)
+    ? formatCursorTime(cursorTime, selection)
+    : xFormatter(row.x);
   const items = row ? series.flatMap((item, index) => visibleKeys.includes(item.key) ? [{ series: item, index, value: formatValue(row.values[index]) }] : []) : [];
   const indicatorLeft = active && plot.current ? active.x - plot.current.getBoundingClientRect().left : 0;
   return <div ref={ref} id={id ?? internalId} className={["qizhi-chart", className].filter(Boolean).join(" ")} role="region" aria-label={label} aria-busy={loading} data-kind={kind} data-mode={mode} data-state={engineError && state === "normal" ? "engine-error" : state}>
     <div className="qizhi-chart__scroll"><div className="qizhi-chart__content">
     <div className="qizhi-chart__title">{label}{unit ? <span className="qizhi-chart__unit">（{unit}）</span> : null}</div>
-    <div ref={plot} className="qizhi-chart__plot" style={{ height: safeHeight }} role={focusable && state === "normal" && !engineError ? "listbox" : "group"} aria-label={`${label}绘图区`}
+    <div ref={plot} className={canBrush && state === "normal" && !engineError ? "qizhi-chart__plot qizhi-chart__plot--range-selectable" : "qizhi-chart__plot"} style={{ height: safeHeight }} role={focusable && state === "normal" && !engineError ? "listbox" : "group"} aria-label={`${label}绘图区`}
       aria-activedescendant={focusable && cursor && state === "normal" && !engineError ? `${internalId}-item-${allFocusItems.indexOf(cursor)}` : undefined}
       tabIndex={state === "normal" && !engineError ? 0 : undefined} aria-describedby={`${helpId}${row ? ` ${tipId}` : ""}`} data-ready={ready}
-      onPointerMove={event => { if (event.pointerType !== "touch") onPointer(event); }} onPointerDown={onPointer}
-      onPointerLeave={event => { if (event.pointerType !== "touch") setActive(current => current?.keyboard ? current : null); }} onKeyDown={onKeyDown} onBlur={() => setActive(null)}>
+      onPointerDown={event => {
+        if (!canBrush || (event.isPrimary === false && Boolean(event.pointerType))) return;
+        suppressBrushClick.current = false;
+        beginBrush(event);
+        if (event.pointerType !== "touch") onPointer(event);
+      }}
+      onPointerMove={event => { if (event.pointerType !== "touch" && !activeBrush.current?.captured) onPointer(event); }}
+      onClickCapture={event => {
+        if (!suppressBrushClick.current) return;
+        suppressBrushClick.current = false;
+        event.stopPropagation();
+      }}
+      onPointerLeave={event => { if (event.pointerType !== "touch" && !activeBrush.current) setActive(current => current?.keyboard ? current : null); }} onKeyDown={onKeyDown} onBlur={() => setActive(null)}>
       {focusable && state === "normal" && !engineError ? <div className="qizhi-chart__sr-only">
         {selectable.map(item => <div key={JSON.stringify([item.seriesKey, item.dataKey])} id={`${internalId}-item-${allFocusItems.indexOf(item)}`} role="option" aria-selected={focus.isFocused(item)}>
           {`${xFormatter(item.dataKey!)}，${series.find(s => s.key === item.seriesKey)!.label}：${formatValue(item.data!.value)}`}
         </div>)}
       </div> : null}
       <div ref={engineHost} className="qizhi-chart__canvas" aria-hidden="true" />
+      {brushPreview ? <>
+        <span className="qizhi-chart__range-selection" aria-hidden="true" style={{ left: brushPreview.left, width: brushPreview.width, top: padding.top, bottom: padding.bottom }} />
+        <span className="qizhi-chart__range-guide" aria-hidden="true" style={{ left: padding.left, right: padding.right, top: brushPreview.guideY }} />
+        <span className="qizhi-chart__range-selection-label" role="status" aria-live="polite" style={{ left: padding.left + 4, top: padding.top + 4 }}>{brushPreview.label}</span>
+      </> : null}
       {kind === "line" && row && active ? <span className="qizhi-chart__indicator" aria-hidden="true" style={{ left: indicatorLeft, top: padding.top, bottom: padding.bottom }} /> : null}
       {state !== "normal" || engineError ? <div className="qizhi-chart__state">
         {state === "loading" ? <Spin tip="正在加载" /> : state === "error" || state === "invalid" || engineError ? <Alert type="error" content={state === "error" ? error : state === "invalid" ? "图表数据格式有误" : "图表暂时无法显示"} /> : <Empty description={state === "empty" ? "暂无数据" : "暂无有效数据"} />}
       </div> : null}
     </div>
-    <span id={helpId} className="qizhi-chart__sr-only">{focusable ? "左右方向键切换分类，上下方向键切换系列，起始和结束键定位首尾，回车或空格选择或取消，退出键关闭提示且保留选择。" : "使用左右方向键查看数据，起始和结束键定位首尾，退出键关闭提示。"}辅助技术可读取完整数据表。</span>
+    </div></div>
+    <span id={helpId} className="qizhi-chart__sr-only">{focusable ? "左右方向键切换分类，上下方向键切换系列，起始和结束键定位首尾，回车或空格选择或取消，退出键关闭提示且保留选择。" : "使用左右方向键查看数据，起始和结束键定位首尾，退出键关闭提示。"}{canBrush ? "可在绘图区横向拖动选择时间范围。" : ""}辅助技术可读取完整数据表。</span>
+    {localRange ? <Button type="text" onClick={() => setLocalSelection(undefined)}>重置时间范围</Button> : null}
     {state === "normal" && !engineError && legend ? <div className="qizhi-chart__legend" role="group" aria-label="图例">
       {series.map((item, index) => <Button key={item.key} type="text" className="qizhi-chart__legend-item" aria-label={item.label} aria-pressed={visibleKeys.includes(item.key)}
         title={visibleKeys.length === 1 && visibleKeys.includes(item.key) ? "至少保留一个系列可见" : undefined}
@@ -161,8 +432,7 @@ export function ChartView({ kind, mode = "normal", data, series, dateRange, labe
       </Button>)}
     </div> : null}
     {canShowData ? <div id={tableId} className="qizhi-chart__sr-only"><Table columns={columns} dataSource={model.rows} rowKey="x" size="small" aria-label={`${label}数据`} /></div> : null}
-    </div></div>
-    {row && active ? <ChartTooltip id={tipId} anchor={active} title={xFormatter(row.x)} items={items} /> : null}
-    <span className="qizhi-chart__sr-only" role="status" aria-live="polite">{active?.keyboard && row ? `${xFormatter(row.x)}，${items.map(item => `${item.series.label}：${item.value}`).join("，")}` : ""}</span>
+    {row && active ? <ChartTooltip id={tipId} anchor={active} title={cursorLabel} items={items} /> : null}
+    <span className="qizhi-chart__sr-only" role="status" aria-live="polite">{active?.keyboard && row ? `${cursorLabel}，${items.map(item => `${item.series.label}：${item.value}`).join("，")}` : ""}</span>
   </div>;
 }

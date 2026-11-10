@@ -1,3 +1,4 @@
+import type { ChartDateRange, ChartDatum, LineChartProps } from "@wangxiaojinger/qizhi-react";
 import { useState } from "react";
 import { LineChart, Switch } from "@wangxiaojinger/qizhi-react";
 
@@ -13,7 +14,9 @@ const data = [
 
 const series = [{ key: "requests", label: "请求量" }];
 
-export default function LoadingDemo() {
+type DemoQuery = (data: readonly ChartDatum[], dateRange?: ChartDateRange) => Pick<LineChartProps, "data" | "dateRange" | "rangeSelection">;
+
+export default function LoadingDemo({ query = (data, dateRange) => ({ data, dateRange }) }: { query?: DemoQuery } = {}) {
   const [loading, setLoading] = useState(true);
 
   return (
@@ -29,7 +32,7 @@ export default function LoadingDemo() {
         </div>
       </div>
       <LineChart focusable
-        data={data}
+        {...query(data)}
         series={series}
         label="加载中的请求量趋势图"
         unit="次"

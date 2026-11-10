@@ -1,3 +1,4 @@
+import type { ChartDateRange, ChartDatum, LineChartProps } from "@wangxiaojinger/qizhi-react";
 import { BarChart } from "@wangxiaojinger/qizhi-react";
 
 const data = [
@@ -22,10 +23,12 @@ const series = [
   { key: "output", label: "输出用量" },
 ];
 
-export default function GroupedBarDemo() {
+type DemoQuery = (data: readonly ChartDatum[], dateRange?: ChartDateRange, kind?: "bar") => Pick<LineChartProps, "data" | "dateRange" | "rangeSelection">;
+
+export default function GroupedBarDemo({ query = (data, dateRange) => ({ data, dateRange }) }: { query?: DemoQuery } = {}) {
   return (
     <BarChart focusable
-      data={data}
+      {...query(data, undefined, "bar")}
       series={series}
       label="输入与输出用量分组柱状图"
       unit="词元"

@@ -1,3 +1,4 @@
+import type { ChartDateRange, ChartDatum, LineChartProps } from "@wangxiaojinger/qizhi-react";
 import { LineChart } from "@wangxiaojinger/qizhi-react";
 
 const data = [
@@ -14,6 +15,8 @@ const data = [
 
 const series = [{ key: "requests", label: "请求量" }];
 
-export default function BasicLineDemo() {
-  return <LineChart focusable data={data} series={series} dateRange={{ start: "2026-09-01", end: "2026-09-10" }} label="请求量趋势图" unit="次" />;
+type DemoQuery = (data: readonly ChartDatum[], dateRange?: ChartDateRange) => Pick<LineChartProps, "data" | "dateRange" | "rangeSelection">;
+
+export default function BasicLineDemo({ query = (data, dateRange) => ({ data, dateRange }) }: { query?: DemoQuery } = {}) {
+  return <LineChart focusable {...query(data, { start: "2026-09-01", end: "2026-09-10" })} series={series} label="请求量趋势图" unit="次" />;
 }

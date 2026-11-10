@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Button, CodeIcon, CopyIcon } from "@wangxiaojinger/qizhi-react";
 import { useCopyFeedback } from "../button/useCopyFeedback";
 import { CodeHighlight } from "../code/CodeHighlight";
+import type { ChartDemoQuery } from "./chartDocsRange";
 import type { ChartDemoDefinition } from "./chartDocs.registry";
 
-export function ChartDemoCodebox({ demo }: { demo: ChartDemoDefinition }) {
+export function ChartDemoCodebox({ demo, query }: { demo: ChartDemoDefinition; query?: ChartDemoQuery }) {
   const [expanded, setExpanded] = useState(false);
   const { copy, message } = useCopyFeedback(demo.source);
   const Demo = demo.component;
@@ -24,7 +25,7 @@ export function ChartDemoCodebox({ demo }: { demo: ChartDemoDefinition }) {
           </div>
         </div>
       </div>
-      <div className="demo chart-docs-demo"><Demo /></div>
+      <div className="demo chart-docs-demo"><Demo query={query} /></div>
       <div className="component-example-actions">
         <span className="qizhi-copy-status" role="status">{message}</span>
         <Button

@@ -4,6 +4,8 @@ import type {
   ChartDatum,
   ChartSeries,
   LineChartProps,
+  DateTimeRangePickerProps,
+  GranularitySelectProps,
 } from "@wangxiaojinger/qizhi-react";
 import type { ComponentApiItem } from "../api/ApiTable";
 
@@ -13,6 +15,8 @@ type ChartDatumApiItem = ComponentApiItem<keyof ChartDatum>;
 type ChartSeriesApiItem = ComponentApiItem<keyof ChartSeries>;
 
 export const chartCommonApi = [
+  { name: "xAxisType", description: "默认识别按时间顺序排列的 ISO 日期和时间戳。日期仅用作分类标签时设置 category。", type: '"category" | "time"', defaultValue: "自动识别" },
+  { name: "rangeSelection", description: "时间轴默认可拖选，分类轴不启用。设置 false 可关闭。有 onChange 时由页面联动查询，无回调时缩小当前图表范围。precision 默认秒，可设置毫秒或分钟。timeDomain 可覆盖推断边界和对齐步长，resolveStep 可按选区跨度决定步长。", type: "ChartRangeSelection", defaultValue: "时间轴启用" },
   { name: "focusable", description: "允许数据项持续聚焦；默认关闭，保留现有行为。", type: "boolean", defaultValue: "false" },
   { name: "focusedItem", description: "受控聚焦项；undefined 为非受控，null 表示无聚焦。", type: "FocusedItem | null", defaultValue: "undefined" },
   { name: "defaultFocusedItem", description: "非受控初始聚焦项，后续变更忽略。", type: "FocusedItem | null", defaultValue: "null" },
@@ -52,9 +56,9 @@ export const chartCommonApi = [
   },
   {
     name: "xFormatter",
-    description: "横轴文本格式化（xFormatter），只改变显示文字；ISO 日期默认显示为 M月D日。",
+    description: "横轴文本格式化（xFormatter）适用于横轴、提示与数据表。等间隔时间数据按可用宽度选择固定刻度间隔，默认按时间跨度简写 ISO 时间戳。",
     type: "(value: string) => string",
-    defaultValue: "日期显示为 M月D日，其他原样显示",
+    defaultValue: "日期显示为 M月D日，时间刻度按跨度简写",
   },
   {
     name: "valueFormatter",
@@ -169,3 +173,22 @@ export const focusedItemApi = [
   { name: "dataKey", description: "稳定分类标识，对应 ChartDatum.x（分类键）；定位时优先于索引，回调始终提供。", type: "string", defaultValue: "—" },
   { name: "data", description: "当前原始数据项；回调始终提供，身份比较不使用此字段。", type: "ChartDatum", defaultValue: "—" },
 ] as const satisfies readonly ComponentApiItem<keyof FocusedItem>[];
+
+export const timeRangePickerApi = [
+  { name: "value", description: "当前有效的毫秒时间范围，包含开始且排除结束。", type: "TimeRange", defaultValue: "必填" },
+  { name: "onChange", description: "提交快捷项或通过校验的输入时触发。", type: "(range: TimeRange) => void", defaultValue: "必填" },
+  { name: "timeZone", description: "显示和解析输入使用的 IANA 时区。", type: "string", defaultValue: "UTC" },
+  { name: "shortcuts", description: "应用提供的快捷项，按点击时刻解析。", type: "readonly TimeRangeShortcut[]", defaultValue: "[]" },
+  { name: "validate", description: "返回错误文案以阻止提交并保留草稿。", type: "(range: TimeRange) => string | undefined", defaultValue: "—" },
+  { name: "disabled", description: "禁用时间范围触发器。", type: "boolean", defaultValue: "false" },
+  { name: "className", description: "触发器的外部布局类名。", type: "string", defaultValue: "—" },
+] as const satisfies readonly ComponentApiItem<keyof DateTimeRangePickerProps>[];
+
+export const granularitySelectApi = [
+  { name: "options", description: "手动粒度选项，允许禁用，auto 由组件提供。", type: "readonly GranularityOption[]", defaultValue: "必填" },
+  { name: "value", description: "受控的粒度模式，auto 表示自动。", type: "string | number", defaultValue: "必填" },
+  { name: "resolvedValue", description: "自动模式显示的实际粒度，来自 options。", type: "string | number", defaultValue: "—" },
+  { name: "onChange", description: "用户选择粒度时触发。", type: "(value: string | number) => void", defaultValue: "必填" },
+  { name: "disabled", description: "禁用粒度选择。", type: "boolean", defaultValue: "false" },
+  { name: "className", description: "控件的外部布局类名。", type: "string", defaultValue: "—" },
+] as const satisfies readonly ComponentApiItem<keyof GranularitySelectProps>[];

@@ -20,3 +20,46 @@ jobs:
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
       - run: pnpm verify
+
+  chart-browser:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        viewport: [desktop-1440, narrow-1024, mobile-375]
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @wangxiaojinger/qizhi-tokens build
+      - name: Install chart test browser
+        run: pnpm exec playwright install --with-deps chrome
+      - name: Run chart browser tests
+        env:
+          QIZHI_DOCS_BASE_URL: http://127.0.0.1:5173
+        run: |
+          pnpm dev --port 5173 --strictPort > "$RUNNER_TEMP/qizhi-vite.log" 2>&1 &
+          vite_pid=$!
+          trap 'kill "$vite_pid" 2>/dev/null || true' EXIT
+          for attempt in {1..30}; do
+            if curl -fsS "$QIZHI_DOCS_BASE_URL/" > /dev/null; then
+              pnpm e2e chart- --project "${{ matrix.viewport }}" --workers=1
+              exit $?
+            fi
+            if ! kill -0 "$vite_pid" 2>/dev/null; then break; fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/qizhi-vite.log"
+          exit 1
+
+      - name: Upload browser diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: chart-browser-${{ matrix.viewport }}
+          path: |
+            test-results/
+            ${{ runner.temp }}/qizhi-vite.log
