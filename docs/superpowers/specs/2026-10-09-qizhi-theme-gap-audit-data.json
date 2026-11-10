@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "status": "passed",
-  "sourceFingerprint": "sha256:afc525b93c28e89ef39ce2437728add369f13fb4e1a9fcfee5365379c625acdf",
+  "sourceFingerprint": "sha256:85b199f4243ec6d6f311ce16b0465d1fca35fa66c37f073ffb1bbae05b93af06",
   "root": ".",
   "exclusions": [
     ".git/**",
@@ -10,26 +10,26 @@
     "assets/remixicon/**"
   ],
   "summary": {
-    "files": 140,
+    "files": 141,
     "unreferencedFiles": 1,
-    "findings": 3031,
+    "findings": 3039,
     "byScope": {
       "docs-runtime": 504,
       "smoke-runtime": 9,
       "generated-runtime": 81,
-      "component-runtime": 839,
+      "component-runtime": 847,
       "legacy-runtime": 1598
     },
     "byCategory": {
-      "spacing": 2367,
-      "color": 442,
-      "layer": 95,
+      "spacing": 2371,
+      "color": 443,
+      "layer": 98,
       "shadow": 127
     },
     "byClassification": {
-      "review-required": 1043,
-      "theme-token-candidate": 1538,
-      "structural-constant": 450
+      "review-required": 1045,
+      "theme-token-candidate": 1543,
+      "structural-constant": 451
     }
   },
   "files": [
@@ -165,6 +165,7 @@
     "packages/qizhi-react/src/task-overview/taskOverview.css",
     "packages/qizhi-react/src/time-picker/timePanel.css",
     "packages/qizhi-react/src/time-picker/timePicker.css",
+    "packages/qizhi-react/src/time-range-picker/timeRangePicker.css",
     "packages/qizhi-react/src/timeline/timeline.css",
     "packages/qizhi-react/src/tooltip/tooltip.css",
     "packages/qizhi-react/src/top-navigation/topNavigation.css",
@@ -9431,10 +9432,70 @@
       "reason": "mixed spacing literal and CSS variable"
     },
     {
-      "id": "layer:packages/qizhi-react/src/chart/chart.css:8:47:z-index",
+      "id": "layer:packages/qizhi-react/src/chart/chart.css:11:53:z-index",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/chart/chart.css",
-      "line": 8,
+      "line": 11,
+      "column": 53,
+      "category": "layer",
+      "property": "z-index",
+      "value": "2",
+      "classification": "structural-constant",
+      "reason": "local stacking order"
+    },
+    {
+      "id": "color:packages/qizhi-react/src/chart/chart.css:11:160:background",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/chart/chart.css",
+      "line": 11,
+      "column": 160,
+      "category": "color",
+      "property": "background",
+      "value": "rgba(var(--primary-6), 0.16)",
+      "classification": "review-required",
+      "reason": "mixed color literal and CSS variable"
+    },
+    {
+      "id": "layer:packages/qizhi-react/src/chart/chart.css:12:49:z-index",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/chart/chart.css",
+      "line": 12,
+      "column": 49,
+      "category": "layer",
+      "property": "z-index",
+      "value": "3",
+      "classification": "theme-token-candidate",
+      "reason": "unmediated layer responsibility"
+    },
+    {
+      "id": "layer:packages/qizhi-react/src/chart/chart.css:13:59:z-index",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/chart/chart.css",
+      "line": 13,
+      "column": 59,
+      "category": "layer",
+      "property": "z-index",
+      "value": "4",
+      "classification": "theme-token-candidate",
+      "reason": "unmediated layer responsibility"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/chart/chart.css:13:124:padding",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/chart/chart.css",
+      "line": 13,
+      "column": 124,
+      "category": "spacing",
+      "property": "padding",
+      "value": "2px 6px",
+      "classification": "theme-token-candidate",
+      "reason": "padding participates in component density"
+    },
+    {
+      "id": "layer:packages/qizhi-react/src/chart/chart.css:14:47:z-index",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/chart/chart.css",
+      "line": 14,
       "column": 47,
       "category": "layer",
       "property": "z-index",
@@ -9443,10 +9504,10 @@
       "reason": "local stacking order"
     },
     {
-      "id": "spacing:packages/qizhi-react/src/chart/chart.css:17:100:margin",
+      "id": "spacing:packages/qizhi-react/src/chart/chart.css:23:100:margin",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/chart/chart.css",
-      "line": 17,
+      "line": 23,
       "column": 100,
       "category": "spacing",
       "property": "margin",
@@ -9455,10 +9516,10 @@
       "reason": "positional or geometric offset"
     },
     {
-      "id": "layer:packages/qizhi-react/src/chart/chart.css:18:41:z-index",
+      "id": "layer:packages/qizhi-react/src/chart/chart.css:24:41:z-index",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/chart/chart.css",
-      "line": 18,
+      "line": 24,
       "column": 41,
       "category": "layer",
       "property": "z-index",
@@ -15825,6 +15886,42 @@
       "value": "6px 8px",
       "classification": "theme-token-candidate",
       "reason": "padding participates in component density"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/time-range-picker/timeRangePicker.css:20:3:gap",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/time-range-picker/timeRangePicker.css",
+      "line": 20,
+      "column": 3,
+      "category": "spacing",
+      "property": "gap",
+      "value": "8px",
+      "classification": "theme-token-candidate",
+      "reason": "gap participates in component density"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/time-range-picker/timeRangePicker.css:35:3:gap",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/time-range-picker/timeRangePicker.css",
+      "line": 35,
+      "column": 3,
+      "category": "spacing",
+      "property": "gap",
+      "value": "8px",
+      "classification": "theme-token-candidate",
+      "reason": "gap participates in component density"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/time-range-picker/timeRangePicker.css:39:3:margin-block-end",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/time-range-picker/timeRangePicker.css",
+      "line": 39,
+      "column": 3,
+      "category": "spacing",
+      "property": "margin-block-end",
+      "value": "12px",
+      "classification": "review-required",
+      "reason": "non-component surface or ambiguous design responsibility"
     },
     {
       "id": "spacing:packages/qizhi-react/src/timeline/timeline.css:12:3:column-gap",

@@ -17,6 +17,10 @@ export function ChartApiTable() {
       <ApiTable api="focusedItemApi" label="聚焦数据项接口" />
       <h3>ChartSeries（图表系列）</h3>
       <ApiTable api="chartSeriesApi" label="ChartSeries（图表系列）API（接口）" />
+      <h3>DateTimeRangePicker（时间范围）</h3>
+      <ApiTable api="timeRangePickerApi" label="时间范围接口" />
+      <h3>GranularitySelect（聚合粒度）</h3>
+      <ApiTable api="granularitySelectApi" label="聚合粒度接口" />
     </section>
   );
 }

@@ -12,11 +12,18 @@ async function run() {
     const selected = single ? series.slice(0, 1) : series;
     const values = single ? data.filter(d => d.series === "a").map(d => mode === "line-gap" && d.x === "二" ? { ...d, value: null } : d) : data;
     const chart = await renderChart(host, { kind: mode === "line-gap" ? "line" : "bar", mode: mode === "line-gap" ? "normal" : mode,
-      model: normalizeChart(values, selected), series: selected, visibleKeys: selected.map(s => s.key), width: 560, height: 280, xFormatter: x => x, valueFormatter: String });
+      model: normalizeChart(values, selected), series: selected, visibleKeys: selected.map(s => s.key), width: 560, height: 280, xFormatter: x => x, valueFormatter: String, focusable: mode === "line-gap" });
     const context = chart.getContext();
     host.dataset.shapes = JSON.stringify(context.canvas!.document.getElementsByClassName("element").map(element => {
       const box = element.getBBox(); return { x: box.x, y: box.y, width: box.width, height: box.height };
     }));
+    if (mode === "line-gap") {
+      host.dataset.segments = JSON.stringify(context.canvas!.document.getElementsByClassName("element").map(element => {
+        const bound = (element as unknown as { __data__: { data: { x: string }; seriesIndex?: number[] } }).__data__;
+        const { x, width } = element.getBBox();
+        return { key: bound.data.x, line: Array.isArray(bound.seriesIndex), x, width };
+      }));
+    }
     host.dataset.colors = JSON.stringify(selected.map(s => context.views![0].scale.color.map(s.key)));
     host.dataset.ready = "true";
   }

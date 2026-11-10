@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import { queryDemoData } from "./chartDocsRange";
 
 const chartDirectory = resolve(import.meta.dirname);
 const readChartSource = (name: string) => {
@@ -125,7 +126,7 @@ describe("Chart docs", () => {
     [120, 180, 150, 210, 280, 260, 300, 290, 320].forEach((value) => {
       expect(basicLine).toContain(`value: ${value}`);
     });
-    expect(basicLine).toContain('dateRange={{ start: "2026-09-01", end: "2026-09-10" }}');
+    expect(basicLine).toContain('query(data, { start: "2026-09-01", end: "2026-09-10" })');
     [1200, 1600, 1400, 2000, 1800, 2400, 2200].forEach((value) => {
       expect(grouped).toContain(`value: ${value}`);
       expect(stacked).toContain(`value: ${value}`);
@@ -194,4 +195,25 @@ it("所有现有图表示例显式开启聚焦，展示与复制同源", () => {
   }
   expect(count).toBe(12);
   expect(readChartSource("chartDocs.registry.ts").match(/component:/g)).toHaveLength(13);
+});
+
+it("小时数据补零时保留显式未知值和查询的结束边界", () => {
+  const start = Date.UTC(2026, 8, 1, 23);
+  const end = Date.UTC(2026, 8, 2, 2);
+  const query = queryDemoData({ start, end }, "hour", () => {});
+  const result = query([{ x: "2026-09-01", series: "requests", value: null }]);
+  expect(result.data).toEqual([
+    { x: "2026-09-01T23:00:00.000Z", series: "requests", value: null },
+    { x: "2026-09-02T00:00:00.000Z", series: "requests", value: 0 },
+    { x: "2026-09-02T01:00:00.000Z", series: "requests", value: 0 },
+  ]);
+  expect(result.rangeSelection).toMatchObject({ timeDomain: { start, end } });
+  expect(query([]).data).toEqual([]);
+});
+
+it("日查询无匹配记录时仍返回可补齐的完整日期范围", () => {
+  const query = queryDemoData({ start: Date.UTC(2026, 8, 3), end: Date.UTC(2026, 8, 5) }, "day", () => {});
+  const result = query([{ x: "2026-09-01", series: "requests", value: 24 }]);
+  expect(result.data).toEqual([]);
+  expect(result.dateRange).toEqual({ start: "2026-09-03", end: "2026-09-04" });
 });

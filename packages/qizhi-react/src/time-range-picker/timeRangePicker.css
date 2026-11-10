@@ -1,0 +1,44 @@
+.qizhi-time-range-picker {
+  max-inline-size: 100%;
+  min-block-size: var(--control-height, 32px);
+  block-size: auto;
+  white-space: normal;
+  text-align: start;
+}
+
+.qizhi-time-range-picker__popup {
+  max-inline-size: calc(100vw - 16px);
+  box-sizing: border-box;
+}
+
+.qizhi-time-range-picker__panel {
+  inline-size: min(320px, calc(100vw - 56px));
+}
+
+.qizhi-time-range-picker__panel :is(form, label) {
+  display: grid;
+  gap: 8px;
+}
+
+.qizhi-time-range-picker__panel p {
+  margin: 0;
+}
+
+.qizhi-time-range-picker__panel [role="alert"] {
+  color: var(--color-danger);
+}
+
+.qizhi-time-range-picker__shortcuts,
+.qizhi-time-range-picker__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.qizhi-time-range-picker__shortcuts {
+  margin-block-end: 12px;
+}
+
+.qizhi-time-range-picker__actions {
+  justify-content: flex-end;
+}

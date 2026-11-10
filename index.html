@@ -520,6 +520,44 @@
             </div>
 
             <div class="qizhi-changelog__list">
+              <section class="qizhi-changelog__day" id="changelog-2026-11-10" data-toc-label="2026-11-10">
+                <header class="qizhi-changelog__day-head">
+                  <h2><time datetime="2026-11-10">2026-11-10</time></h2>
+                  <span class="qizhi-changelog__count">8 次更新</span>
+                </header>
+                <article class="qizhi-changelog__entry">
+                  <header class="qizhi-changelog__entry-head"><div><h3>用量图表受控更新和时间选择器回归修复</h3></div></header>
+                  <ul><li>范围更新时取消旧拖选，提交使用当前回调。图表提示与重绘位置同步，时间选择器保留键盘焦点，起点单柱的长刻度保持可读。补齐右端连续性断言。</li></ul>
+                </article>
+                <article class="qizhi-changelog__entry">
+                  <header class="qizhi-changelog__entry-head"><div><h3>柱状图起点单柱可正常框选</h3></div></header>
+                  <ul><li>单柱对齐可选时间的起点，左侧可选区域可提交有效范围，跨柱拖选保留起点数据。</li></ul>
+                </article>
+                <article class="qizhi-changelog__entry">
+                  <header class="qizhi-changelog__entry-head"><div><h3>图表单点位置与选区时间对齐</h3></div></header>
+                  <ul><li>折线图和柱状图缩放到单个时间戳后，框住该点会选中对应时间并保留数据。</li></ul>
+                </article>
+                <article class="qizhi-changelog__entry">
+                  <header class="qizhi-changelog__entry-head"><div><h3>图表单点缩放后可继续框选</h3></div></header>
+                  <ul><li>折线图和柱状图缩放后只剩一个时间戳时，仍可在上一次选择的范围内继续拖选。</li></ul>
+                </article>
+                <article class="qizhi-changelog__entry">
+                  <header class="qizhi-changelog__entry-head"><div><h3>图表二次框选与缺采样日期刻度</h3></div></header>
+                  <ul><li>二次框选保留上一次的时间边界，缺少小时采样时自定义日期刻度仍按日期去重。浏览器回归按拖动顺序检查时间回跳。</li></ul>
+                </article>
+                <article class="qizhi-changelog__entry">
+                  <header class="qizhi-changelog__entry-head"><div><h3>末桶拖选与自定义日期刻度</h3></div></header>
+                  <ul><li>折线图末桶可连续拖选，自动推断的时间域可包含最后的数据。自定义日期格式按日期分组显示刻度。</li></ul>
+                </article>
+                <article class="qizhi-changelog__entry">
+                  <header class="qizhi-changelog__entry-head"><div><h3>用量图表时间边界</h3></div></header>
+                  <ul><li>拖至图表末端可包含最后一个时间桶。长范围小时图按自然日显示等距日期刻度，已确认无记录的用量时段保留横轴并补零。</li></ul>
+                </article>
+                <article class="qizhi-changelog__entry">
+                  <header class="qizhi-changelog__entry-head"><div><h3>用量图表时间范围与聚合粒度</h3></div></header>
+                  <ul><li>新增日期时间范围与聚合粒度控件。折线图和柱状图默认支持时间轴拖选，统一时间刻度、游标和选区格式，并覆盖长范围、稀疏时间数据和手机视口交互。</li></ul>
+                </article>
+              </section>
               <section class="qizhi-changelog__day" id="changelog-2026-11-03" data-toc-label="2026-11-03">
                 <header class="qizhi-changelog__day-head">
                   <h2><time datetime="2026-11-03">2026-11-03</time></h2>
