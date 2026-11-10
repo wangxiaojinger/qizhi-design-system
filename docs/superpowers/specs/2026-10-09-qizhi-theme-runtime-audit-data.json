@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "status": "passed",
-  "sourceFingerprint": "sha256:56893c52fe1113dd5c2bde7936998abf0fd0b5c756833bc92684b718ba58ec62",
+  "sourceFingerprint": "sha256:77d1d72b4b61c9600e37892dfc57b000c0dc8bed18df98de0692060891f2bc13",
   "serverMode": "external",
   "baseURL": "http://127.0.0.1:5217/qizhi-design-system-docs",
   "matrix": {
