@@ -1,9 +1,9 @@
 {
   "schemaVersion": 2,
   "status": "passed",
-  "sourceFingerprint": "sha256:4b7083e217226d2de8599a61d30b8042aa78dde6c34bae85c558399b729f681e",
-  "serverMode": "external",
-  "baseURL": "http://127.0.0.1:5217/qizhi-design-system-docs",
+  "sourceFingerprint": "sha256:705b81513ebefafbf6c060eb091dcb36a4f6b6839afc064ac85529f69484de0e",
+  "serverMode": "self-started",
+  "baseURL": "http://127.0.0.1:55332",
   "matrix": {
     "button": {
       "portal": false,

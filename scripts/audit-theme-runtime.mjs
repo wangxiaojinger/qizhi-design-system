@@ -95,6 +95,7 @@ async function auditButton(page) {
   const section = page.locator("#components-button");
   const target = section.locator(".qizhi-btn-primary").first();
   const sibling = section.locator(".qizhi-btn-primary").nth(1);
+  await target.waitFor({ state: "visible" });
   const heightBefore = await css(target, "height");
   await setVars(page.locator("html"), { "--primary-6": "80, 120, 255" });
   const brandDefault = await css(target, "background-color");
