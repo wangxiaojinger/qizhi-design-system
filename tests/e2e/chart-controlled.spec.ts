@@ -56,36 +56,26 @@ for (const kind of ["bar", "line"]) {
   });
 
   test(`${kind} 时间域改变后键盘提示跟随数据点`, async ({ page }) => {
-    await page.addInitScript(() => {
-      const fillText = CanvasRenderingContext2D.prototype.fillText;
-      CanvasRenderingContext2D.prototype.fillText = function (text, x, y, maxWidth) {
-        if (text === "00:00") {
-          const transform = this.getTransform();
-          this.canvas.dataset.controlledTick = String((transform.a * x + transform.c * y + transform.e) / this.canvas.width);
-        }
-        return fillText.call(this, text, x, y, maxWidth);
-      };
-    });
     const plot = await openPlot(page, kind);
-    const canvas = plot.locator("canvas[data-controlled-tick]");
+    const canvas = plot.locator("canvas");
     const tip = page.getByRole("tooltip");
     await plot.press("Home");
     await expect(tip).toBeVisible();
-    const originalTick = Number(await canvas.getAttribute("data-controlled-tick"));
+    const originalTip = await tip.boundingBox();
 
     await page.evaluate(() => window.dispatchEvent(new Event("qizhi-test-shift-domain")));
     await expect(page.getByLabel("当前结束时间")).toHaveText(String(day(2)));
-    await expect.poll(async () => Number(await canvas.getAttribute("data-controlled-tick")) - originalTick).toBeGreaterThan(0.2);
+    await expect(plot).toHaveAttribute("data-ready", "true");
     await expect(plot).toBeFocused();
     await expect.poll(async () => {
       const box = await canvas.boundingBox();
-      const tick = Number(await canvas.getAttribute("data-controlled-tick"));
       const tooltip = await tip.boundingBox();
       if (!box || !tooltip) return Infinity;
-      const anchor = box.x + box.width * tick;
+      const anchor = box.x + 44 + (box.width - 45) / 2;
       const expected = anchor + 12 + tooltip.width <= page.viewportSize()!.width - 8
         ? anchor + 12 : Math.max(8, anchor - 12 - tooltip.width);
       return Math.abs(tooltip.x - expected);
     }).toBeLessThan(2);
+    expect((await tip.boundingBox())?.x).not.toBe(originalTip?.x);
   });
 }

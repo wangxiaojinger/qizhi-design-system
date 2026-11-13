@@ -7,8 +7,12 @@ test("图表文档：三视口布局、提示、图例、状态、源码与键�
   test.setTimeout(90000);
   const errors: string[] = []; page.on("pageerror", error => errors.push(error.message));
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.clock.setFixedTime(Date.UTC(2026, 8, 10, 16));
   await page.goto("/#component-chart");
   const doc = page.locator("#component-chart");
+  const controls = doc.getByRole("group", { name: "图表共同时间范围" });
+  await controls.getByLabel("开始时间", { exact: true }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "确认", exact: true }).click();
   await expect(doc.locator(".codebox-wrapper")).toHaveCount(12);
   await expect(doc.locator('[data-ready="true"]')).toHaveCount(9, { timeout: 30000 });
   await expect(doc.locator('[data-state="engine-error"]')).toHaveCount(0);
@@ -20,16 +24,16 @@ test("图表文档：三视口布局、提示、图例、状态、源码与键�
       const demo = element.querySelector(".demo")!; const chart = demo.querySelector(".qizhi-chart")!; const plot = chart.querySelector(".qizhi-chart__plot")!;
       const actions = element.querySelector(".component-example-actions")!;
       const scroll = chart.querySelector(".qizhi-chart__scroll")!;
-      return { overflow: element.scrollWidth > element.clientWidth + 1, demoOverflow: demo.scrollWidth > demo.clientWidth + 1,
+      return { usageAxis: chart.getAttribute("data-usage-axis") === "true", overflow: element.scrollWidth > element.clientWidth + 1, demoOverflow: demo.scrollWidth > demo.clientWidth + 1,
         plot: plot.getBoundingClientRect().width, chart: chart.getBoundingClientRect().width, height: plot.getBoundingClientRect().height, rightEdge: chart.getBoundingClientRect().right, viewport: innerWidth, scrollWidth: scroll.clientWidth, scrollContent: scroll.scrollWidth, overflowX: getComputedStyle(scroll).overflowX,
         gap: getComputedStyle(demo).marginBottom, right: getComputedStyle(actions).paddingRight, cardPadding: getComputedStyle(chart).paddingLeft, radius: getComputedStyle(chart).borderRadius, background: getComputedStyle(chart).backgroundImage, titleSize: getComputedStyle(chart.querySelector(".qizhi-chart__title")!).fontSize };
     });
     expect(metrics.overflow).toBe(false); expect(metrics.demoOverflow).toBe(false);
     expect(metrics.rightEdge).toBeLessThanOrEqual(metrics.viewport);
-    expect(metrics.plot).toBeCloseTo(Math.max(520, metrics.chart - 48), 0); expect(metrics.height).toBe(280);
+    expect(metrics.plot).toBeCloseTo((metrics.usageAxis ? metrics.chart - 48 : Math.max(520, metrics.chart - 48)), 0); expect(metrics.height).toBe(280);
     expect(metrics.scrollWidth).toBeCloseTo(metrics.chart - 48, 0);
     expect(metrics.overflowX).toBe("auto");
-    if (metrics.scrollWidth < 520) expect(metrics.scrollContent).toBeGreaterThan(metrics.scrollWidth);
+    if (!metrics.usageAxis && metrics.scrollWidth < 520) expect(metrics.scrollContent).toBeGreaterThan(metrics.scrollWidth);
     expect(metrics.gap).toBe("12px"); expect(metrics.right).toBe("0px");
     expect(metrics.cardPadding).toBe("24px"); expect(metrics.radius).toBe("8px"); expect(metrics.titleSize).toBe("14px"); expect(metrics.background).toContain("rgb(247, 249, 252)");
     await article.locator(".demo").screenshot({ path: resolve(shots, `${testInfo.project.name}-${index + 1}.png`) });
@@ -50,7 +54,7 @@ test("图表文档：三视口布局、提示、图例、状态、源码与键�
   expect(bounds.ancestors[0].tag).toBe("BODY");
   await page.screenshot({ path: resolve(shots, `${testInfo.project.name}-tooltip.png`) });
   await plot.press("ArrowRight"); await expect(page.getByRole("tooltip")).toContainText("100 次");
-  await plot.press("End"); await expect(page.getByRole("tooltip")).toContainText("150 次");
+  await plot.press("End"); await expect(page.getByRole("tooltip")).toContainText("0 次");
   await plot.press("Escape"); await expect(page.getByRole("tooltip")).toHaveCount(0);
   const legends = multi.locator(".qizhi-chart__legend button");
   await expect(multi.locator(".qizhi-chart__legend")).toHaveCSS("justify-content", "flex-start");

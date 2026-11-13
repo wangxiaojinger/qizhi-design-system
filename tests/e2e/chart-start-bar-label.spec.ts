@@ -1,11 +1,11 @@
 import { expect, test } from "@playwright/test";
 
 for (const short of [false, true]) {
-  test(`起点单柱的${short ? "短标签仍居中" : "长标签不被裁切"}`, async ({ page }) => {
+  test(`起点单柱的${short ? "重复短标签回退为时间" : "重复长标签回退为时间"}`, async ({ page }) => {
     await page.addInitScript(() => {
       const fillText = CanvasRenderingContext2D.prototype.fillText;
       CanvasRenderingContext2D.prototype.fillText = function (label, x, y, ...args) {
-        if (label.startsWith("起点标签")) {
+        if (/^01-01(?: 00:00(?::00)?)?$/.test(label)) {
           const transform = this.getTransform();
           const metrics = this.measureText(label);
           const anchor = transform.a * x + transform.c * y + transform.e;
@@ -25,11 +25,7 @@ for (const short of [false, true]) {
     const bounds = JSON.parse((await canvas.getAttribute("data-tick-bounds"))!);
     expect(bounds.left).toBeGreaterThanOrEqual(0);
     expect(bounds.right).toBeLessThanOrEqual(bounds.width);
-    if (short) {
-      expect(bounds.label).toBe("起点标签");
-      expect(bounds.align).toBe("center");
-    } else {
-      expect(bounds.label).toMatch(/…$/);
-    }
+    expect(bounds.label).toMatch(/^01-01/);
+    expect(bounds.align).toBe("left");
   });
 }

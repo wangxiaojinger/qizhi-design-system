@@ -1,3 +1,4 @@
+import type { ChartDatum, LineChartProps } from "@wangxiaojinger/qizhi-react";
 import { BarChart } from "@wangxiaojinger/qizhi-react";
 
 const data = [
@@ -22,10 +23,12 @@ const series = [
   { key: "output", label: "输出用量" },
 ];
 
-export default function ResponsiveKeyboardDemo() {
+type DemoQuery = (data: readonly ChartDatum[]) => Pick<LineChartProps, "data" | "usageTimeAxis" | "rangeSelection">;
+
+export default function ResponsiveKeyboardDemo({ query = data => ({ data }) }: { query?: DemoQuery } = {}) {
   return (
     <BarChart focusable
-      data={data}
+      {...query(data)}
       series={series}
       label="可响应和键盘操作的输入输出用量堆叠柱状图"
       unit="词元"

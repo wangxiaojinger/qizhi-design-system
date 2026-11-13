@@ -24,7 +24,7 @@ test("原有折线图全部支持鼠标聚焦，状态恢复后同样生效", as
   const doc = page.locator("#component-chart");
   await expect(doc.locator(".codebox-wrapper")).toHaveCount(12);
   for (const id of ["图表-加载中", "图表-错误状态"]) await page.locator(`[id="${id}"]`).getByRole("switch").click();
-  const charts = doc.locator('.qizhi-chart[data-kind="line"]');
+  const charts = doc.locator('.codebox-wrapper .qizhi-chart[data-kind="line"]');
   await expect(charts).toHaveCount(8);
   let tested = 0;
   for (let i = 0; i < 8; i++) {

@@ -47,6 +47,15 @@ export interface ChartTimeRangeSelection {
 }
 /** 时间轴默认支持拖选，false 显式关闭。 */
 export type ChartRangeSelection = ChartTimeRangeSelection | false;
+/** Actual statistics interval returned for one natural time bucket. */
+export interface ChartTimeBucket extends ChartTimeRange { readonly x: string }
+
+export interface ChartUsageTimeAxis {
+  readonly granularity: "hour" | "day";
+  readonly timeZone?: string;
+  readonly buckets: readonly ChartTimeBucket[];
+}
+
 export interface LineChartProps extends ChartFocusProps {
   data: readonly ChartDatum[];
   series: readonly ChartSeries[];
@@ -63,6 +72,8 @@ export interface LineChartProps extends ChartFocusProps {
   /** 日期标签用于分类比较时，显式指定 category。 */
   xAxisType?: "category" | "time";
   rangeSelection?: ChartRangeSelection;
+  /** Align usage ticks to the returned bucket keys and display their actual query intervals. */
+  usageTimeAxis?: ChartUsageTimeAxis;
   loading?: boolean;
   error?: string;
   height?: number;

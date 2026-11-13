@@ -729,8 +729,9 @@ import "./typography/typography.css";
 
 export { LineChart } from "./chart/LineChart";
 export { BarChart } from "./chart/BarChart";
-export type { ChartDateRange, ChartDatum, ChartSeries, ChartRange, ChartTimeRange, ChartTimeDomain, ChartCategoryRangeSelection, ChartTimeRangeSelection, ChartRangeSelection, FocusedItem, ChartFocusProps, LineChartProps, BarChartProps, BarChartMode } from "./chart/Chart.types";
+export type { ChartDateRange, ChartDatum, ChartSeries, ChartRange, ChartTimeBucket, ChartUsageTimeAxis, ChartTimeRange, ChartTimeDomain, ChartCategoryRangeSelection, ChartTimeRangeSelection, ChartRangeSelection, FocusedItem, ChartFocusProps, LineChartProps, BarChartProps, BarChartMode } from "./chart/Chart.types";
 
+export { usageTimeShortcuts } from "./time-range-picker/usageTimeShortcuts";
 export { DateTimeRangePicker } from "./time-range-picker/DateTimeRangePicker";
 export type { TimeRange, DateTimeRangePickerProps, TimeRangeShortcut } from "./time-range-picker/DateTimeRangePicker.types";
 export { GranularitySelect } from "./granularity-select/GranularitySelect";

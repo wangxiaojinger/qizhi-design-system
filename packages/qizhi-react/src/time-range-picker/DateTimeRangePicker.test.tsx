@@ -11,15 +11,15 @@ describe("DateTimeRangePicker", () => {
     const onChange = vi.fn();
     render(<DateTimeRangePicker value={{ start, end }} onChange={onChange}
       validate={range => range.end > end ? "超出查询范围" : undefined} />);
-    const trigger = screen.getByRole("button", { name: /时间范围/ });
+    const trigger = screen.getByRole("combobox", { name: "开始时间" });
     fireEvent.click(trigger);
     const input = await screen.findByLabelText("结束时间（不含）");
     fireEvent.change(input, { target: { value: "2026-11-03T00:00" } });
-    fireEvent.click(screen.getByRole("button", { name: "应用" }));
+    fireEvent.click(screen.getByRole("button", { name: "确认" }));
     expect(screen.getByRole("alert")).toHaveTextContent("超出查询范围");
     expect(onChange).not.toHaveBeenCalled();
     fireEvent.change(input, { target: { value: "2026-11-01T12:00" } });
-    fireEvent.click(screen.getByRole("button", { name: "应用" }));
+    fireEvent.click(screen.getByRole("button", { name: "确认" }));
     expect(onChange).toHaveBeenCalledOnce();
     expect(onChange).toHaveBeenCalledWith({ start, end: start + 43_200_000 });
     await waitFor(() => expect(trigger).toHaveFocus());
@@ -30,7 +30,7 @@ describe("DateTimeRangePicker", () => {
     const onChange = vi.fn();
     render(<DateTimeRangePicker value={{ start, end }} onChange={onChange}
       shortcuts={[{ key: "day", label: "最近一天", resolve }]} />);
-    fireEvent.click(screen.getByRole("button", { name: /时间范围/ }));
+    fireEvent.click(screen.getByRole("combobox", { name: "开始时间" }));
     fireEvent.click(await screen.findByRole("button", { name: "最近一天" }));
     expect(resolve).toHaveBeenCalledOnce();
     expect(onChange).toHaveBeenCalledWith({ start, end });
@@ -49,7 +49,7 @@ it("discards a draft when the picker is disabled or the time zone changes", asyn
   const onChange = vi.fn();
   const value = { start, end };
   const { rerender } = render(<DateTimeRangePicker value={value} onChange={onChange} />);
-  const trigger = screen.getByRole("button", { name: /时间范围/ });
+  const trigger = screen.getByRole("combobox", { name: "开始时间" });
   fireEvent.click(trigger);
   fireEvent.change(await screen.findByLabelText("开始时间"), { target: { value: "2026-11-01T01:00" } });
   rerender(<DateTimeRangePicker value={value} onChange={onChange} disabled />);
@@ -66,13 +66,13 @@ it("discards a draft when the picker is disabled or the time zone changes", asyn
 it("配置统计时区时按当地时间显示和提交，界面省略时区标记", async () => {
   const onChange = vi.fn();
   render(<DateTimeRangePicker value={{ start, end }} onChange={onChange} timeZone="Asia/Shanghai" />);
-  const trigger = screen.getByRole("button", { name: /时间范围/ });
-  expect(trigger).toHaveTextContent("2026-11-01 08:00:00");
+  const trigger = screen.getByRole("combobox", { name: "开始时间" });
+  expect(trigger).toHaveValue("2026-11-01 08:00:00");
   expect(trigger).not.toHaveTextContent(/Asia\/Shanghai|UTC/);
   fireEvent.click(trigger);
   expect(await screen.findByRole("dialog")).not.toHaveTextContent(/Asia\/Shanghai|UTC/);
   fireEvent.change(screen.getByLabelText("结束时间（不含）"), { target: { value: "2026-11-01T10:00" } });
-  fireEvent.click(screen.getByRole("button", { name: "应用" }));
+  fireEvent.click(screen.getByRole("button", { name: "确认" }));
   expect(onChange).toHaveBeenCalledExactlyOnceWith({ start, end: start + 7_200_000 });
 });
 
@@ -80,6 +80,6 @@ it("无效时区显示错误并禁止提交", () => {
   const onChange = vi.fn();
   render(<DateTimeRangePicker value={{ start, end }} onChange={onChange} timeZone="browser" />);
   expect(screen.getByRole("alert")).toHaveTextContent("时间范围或时区配置无效");
-  expect(screen.queryByRole("button", { name: /时间范围/ })).not.toBeInTheDocument();
+  expect(screen.queryByRole("combobox", { name: "开始时间" })).not.toBeInTheDocument();
   expect(onChange).not.toHaveBeenCalled();
 });

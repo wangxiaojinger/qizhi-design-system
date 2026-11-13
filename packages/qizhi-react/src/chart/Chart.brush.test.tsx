@@ -208,18 +208,16 @@ it.each([
   const onChange = vi.fn();
   const timestamps = days.map(day => Date.UTC(2026, 0, day));
   const last = timestamps.at(-1)!;
-  const isBar = Chart === BarChart;
   const end = last + (finalBucket ? 86_400_000 : 0);
   render(<Chart label="时间域" data={timestamps.map((time, index) => ({
     x: new Date(time).toISOString(), series: "requests", value: index + 1,
   }))} series={series} rangeSelection={{ timeDomain: { start: timestamps[0], end }, onChange, formatTime: String }} />);
 
   const plot = screen.getByRole("group", { name: "时间域绘图区" });
-  const intervalWidth = isBar ? 355 / 3.7 : 355 / (finalBucket ? 3 : 2);
-  const axisStart = isBar ? 44 + 0.35 * intervalWidth : 44;
-  const point = axisStart + intervalWidth;
-  const halfway = point + intervalWidth / 2;
+  const xAt = (time: number) => 44 + 355 * (time - timestamps[0]) / (end - timestamps[0]);
   const midpoint = (timestamps[1] + last) / 2;
+  const point = xAt(timestamps[1]);
+  const halfway = xAt(midpoint);
 
   gesture(plot, "pointerdown", halfway);
   gesture(window, "pointermove", point);

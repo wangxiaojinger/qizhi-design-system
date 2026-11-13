@@ -39,7 +39,7 @@ const parsePickerDate = (value?: string) => {
 };
 const addMonths = (date: Date, amount: number) => new Date(date.getFullYear(), date.getMonth() + amount, 1);
 const parseValue = (value?: string) => {
-  const match = value?.match(/^(\d{4})-(\d{2})-(\d{2})(?: (\d{2}):(\d{2}):(\d{2}))?$/);
+  const match = value?.match(/^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/);
   if (!match) return undefined;
   const date = new Date(+match[1], +match[2] - 1, +match[3], +(match[4] ?? 0), +(match[5] ?? 0), +(match[6] ?? 0));
   return date.getFullYear() === +match[1] && date.getMonth() === +match[2] - 1 && date.getDate() === +match[3] && date.getHours() === +(match[4] ?? 0) && date.getMinutes() === +(match[5] ?? 0) && date.getSeconds() === +(match[6] ?? 0) ? date : undefined;
@@ -138,6 +138,13 @@ function DatePickerInternal(props: InternalProps) {
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(() => parseValue(single));
   const [time, setTime] = useState(() => partsOf(parseValue(single)));
   const [rangeDates, setRangeDates] = useState<Array<Date | undefined>>(() => rangeValue.map(parseValue));
+  const rangeProps = range ? props as DateRangePickerProps : undefined;
+  const notifyOpen = rangeProps?.onOpenChange;
+  useEffect(() => { notifyOpen?.(open); }, [open, notifyOpen]);
+  const editableRange = showTime && rangeProps?.editable;
+  const [typedRange, setTypedRange] = useState<(string | undefined)[]>([]);
+  const [rangeError, setRangeError] = useState<string>();
+  const rangeErrorId = useId();
   const activeIndex = activeRangeField === "start" ? 0 : 1;
   const activeDate = range ? rangeDates[activeIndex] : selectedDate;
   const activeTime = range ? partsOf(activeDate) : time;
@@ -148,11 +155,32 @@ function DatePickerInternal(props: InternalProps) {
     return !limits?.disabledHours?.includes(date.getHours()) && !limits?.disabledMinutes?.includes(date.getMinutes()) && !limits?.disabledSeconds?.includes(date.getSeconds());
   };
   const withTime = (date: Date, parts = activeTime) => new Date(date.getFullYear(), date.getMonth(), date.getDate(), parts.hour, parts.minute, parts.second);
+  const rangeTime = (date: Date, parts: typeof time) => {
+    if (!disabledTime) return withTime(date, parts);
+    const firstAllowed = (current: number, blocked: readonly number[] | undefined, max: number) => {
+      if (!blocked?.includes(current)) return current;
+      return Array.from({ length: max }, (_, index) => index).find(value => !blocked.includes(value)) ?? current;
+    };
+    const limits = disabledTime(withTime(date, parts), activeRangeField);
+    const hour = firstAllowed(parts.hour, limits.disabledHours, 24);
+    const minutes = disabledTime(withTime(date, { ...parts, hour }), activeRangeField);
+    const minute = firstAllowed(parts.minute, minutes.disabledMinutes, 60);
+    const seconds = disabledTime(withTime(date, { ...parts, hour, minute }), activeRangeField);
+    const second = firstAllowed(parts.second, seconds.disabledSeconds, 60);
+    return withTime(date, { hour, minute, second });
+  };
+  const resetTypedField = (index: number) => {
+    setTypedRange(current => current.map((text, field) => field === index ? undefined : text));
+    setRangeError(undefined);
+  };
   const updateTime = (parts: typeof time) => {
-    if (range) setRangeDates((current) => { if (!current[activeIndex]) return current; const next = [...current]; next[activeIndex] = withTime(current[activeIndex]!, parts); return next; });
+    if (editableRange) resetTypedField(activeIndex);
+    if (range) setRangeDates((current) => { if (!current[activeIndex]) return current; const next = [...current]; next[activeIndex] = rangeTime(current[activeIndex]!, parts); return next; });
     else { setTime(parts); if (selectedDate) setSelectedDate(withTime(selectedDate, parts)); }
   };
   useEffect(() => {
+      setTypedRange([]);
+      setRangeError(undefined);
       setDraftRange(showTime ? rangeValue.map((value) => value.slice(0, 10)) : rangeValue);
       setRangeDates(rangeValue.map(parseValue));
       setSelectedDate(parseValue(single));
@@ -163,6 +191,26 @@ function DatePickerInternal(props: InternalProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLInputElement | null>(null);
   const popupRef = useRef<HTMLDivElement | null>(null);
+  const rangeKey = JSON.stringify(rangeValue);
+  useEffect(() => {
+    if (!rangeProps?.closeOnValueChange || !popupRef.current) return;
+    if (!disabled && popupRef.current.contains(document.activeElement)) triggerRef.current?.focus();
+    setOpen(false);
+  }, [rangeKey, rangeProps?.closeOnValueChange, disabled]);
+  const editRangeField = (index: number, text: string) => {
+    setTypedRange(current => {
+      const next = [...current];
+      next[index] = text;
+      return next;
+    });
+    const date = parseValue(text);
+    const next = [...rangeDates];
+    next[index] = date;
+    setRangeDates(next);
+    setDraftRange(next.map(item => item ? dateValue(item) : ""));
+    if (date) setPickerDate(parsePickerDate(text));
+    setRangeError(undefined);
+  };
   const blurWithin = (event: React.FocusEvent<HTMLElement>) => {
     const inside = (target: EventTarget | null) => target instanceof Node && (!!rootRef.current?.contains(target) || !!popupRef.current?.contains(target));
     if (inside(event.relatedTarget)) return;
@@ -211,10 +259,9 @@ function DatePickerInternal(props: InternalProps) {
     if (periodDisabled(date, mode, disabledDate)) return;
     const formatted = formatDate(date, mode);
     if (range && showTime) {
+      if (editableRange) resetTypedField(activeIndex);
       const next = [...rangeDates];
-      const limits = disabledTime?.(date, activeRangeField);
-      const firstAllowed = (current: number, blocked: readonly number[] | undefined, max: number) => !blocked?.includes(current) ? current : Array.from({ length: max }, (_, index) => index).find((value) => !blocked?.includes(value)) ?? current;
-      next[activeIndex] = withTime(date, { hour: firstAllowed(activeTime.hour, limits?.disabledHours, 24), minute: firstAllowed(activeTime.minute, limits?.disabledMinutes, 60), second: firstAllowed(activeTime.second, limits?.disabledSeconds, 60) });
+      next[activeIndex] = rangeTime(date, activeTime);
       setRangeDates(next);
       setDraftRange(next.map((item) => item ? dateValue(item) : ""));
       if (activeRangeField === "start") setActiveRangeField("end");
@@ -240,34 +287,53 @@ function DatePickerInternal(props: InternalProps) {
     const suffix = ` ${[time.hour, time.minute, time.second].map(pad).join(":")}`;
     if (range) {
       const [start, end] = rangeDates;
-      if (!validDate(start, "start") || !validDate(end, "end") || start! > end!) return;
-      commitRange([stamp(start!), stamp(end!)]);
+      if (!start || !end || start > end) {
+        if (editableRange) setRangeError("请输入有效的起止时间。");
+        return;
+      }
+      const next: [string, string] = [stamp(start), stamp(end)];
+      const error = rangeProps?.validateRange?.(next);
+      if (error) { setRangeError(error); return; }
+      if (!validDate(start, "start") || !validDate(end, "end")) {
+        if (editableRange) setRangeError("请输入有效的起止时间。");
+        return;
+      }
+      commitRange(next);
     } else if (selectedDate && validDate(withTime(selectedDate))) commitSingle(`${dateValue(selectedDate)}${suffix}`);
     else return;
     setOpen(false);
+    if (editableRange) triggerRef.current?.focus();
   };
   const clear = (event: ReactMouseEvent) => { event.stopPropagation(); if (range) { setDraftRange([]); setActiveRangeField("start"); commitRange([]); } else commitSingle(""); setOpen(false); };
-  const openWithKeyboard = (event: KeyboardEvent<HTMLInputElement>) => { if (disabled) return; if (event.key === "Enter" || event.key === " ") { event.preventDefault(); if (range) setActiveRangeField(event.currentTarget.hasAttribute("data-date-picker-end") ? "end" : "start"); setOpen(true); } if (event.key === "Escape") setOpen(false); };
+  const openWithKeyboard = (event: KeyboardEvent<HTMLInputElement>) => { if (disabled) return; if (editableRange && open && event.key === "Enter") { event.preventDefault(); confirm(); return; } if (event.key === "Enter" || (event.key === " " && !(editableRange && open))) { event.preventDefault(); if (range) setActiveRangeField(event.currentTarget.hasAttribute("data-date-picker-end") ? "end" : "start"); setOpen(true); } if (event.key === "Escape") setOpen(false); };
   const handleControlClick = (event: ReactMouseEvent<HTMLDivElement>) => {
     if (disabled) return;
     const target = event.target as HTMLElement;
     if (target.closest(".qizhi-date-picker__popup")) return;
     if (target.closest(".qizhi-date-picker__clear")) return;
     const rangeInput = target.closest("[data-date-picker-start], [data-date-picker-end]");
+    if (rangeInput instanceof HTMLInputElement) triggerRef.current = rangeInput;
     if (rangeInput?.hasAttribute("data-date-picker-end")) setActiveRangeField("end");
     if (rangeInput?.hasAttribute("data-date-picker-start")) setActiveRangeField("start");
     if (range && rangeInput) setOpen(true);
     else setOpen((current) => !current);
   };
   const inputCommon = { readOnly: true, disabled, role: "combobox", "aria-haspopup": "dialog", "aria-expanded": open, "aria-controls": popupId, "aria-invalid": status === "error" || undefined, onKeyDown: openWithKeyboard, onFocus: (event: React.FocusEvent<HTMLInputElement>) => { triggerRef.current = event.currentTarget; } } as const;
-  const popup = open ? createPortal(<div ref={popupRef} id={popupId} onBlur={blurWithin} className={join("qizhi-date-picker__popup", range && "qizhi-date-picker__popup--range", showTime && "qizhi-date-picker__popup--time")} role="dialog" aria-label={ariaLabel} style={{ left: popupPosition.left, top: popupPosition.top, visibility: popupPosition.ready ? "visible" : "hidden" }} onPointerDownCapture={(event) => { if ((event.target as HTMLElement).closest("button:disabled")) event.preventDefault(); }} onMouseDown={(event) => event.stopPropagation()} onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); setOpen(false); triggerRef.current?.focus(); } }}><div className="qizhi-date-picker__main"><div className="qizhi-date-picker__panels">{Array.from({ length: panels }, (_, index) => <CalendarPanel key={index} pickerDate={addMonths(pickerDate, index)} mode={mode} value={showTime && selectedDate ? dateValue(selectedDate) : single} range={draftRange} disabledDate={disabledDate} side={panels === 1 ? "single" : index === 0 ? "left" : "right"} onNavigate={(next) => setPickerDate(index === 0 ? next : addMonths(next, -1))} onSelect={select} />)}</div>{showTime ? <div className="qizhi-date-picker__time"><TimePanel title="选择时间" value={activeTime} disabled={disabledTime?.(activeDate, range ? activeRangeField : undefined)} hideDisabled={hideDisabledTimeOptions} onChange={updateTime} /></div> : null}</div>{showTime ? <footer><Button type="text" size="small" onClick={() => { const now = new Date(); if (!validDate(now, range ? activeRangeField : undefined)) return; if (range) { const next = [...rangeDates]; next[activeIndex] = now; setRangeDates(next); setDraftRange(next.map((item) => item ? dateValue(item) : "")); return; } setSelectedDate(now); setPickerDate(new Date(now.getFullYear(), now.getMonth(), 1)); setTime({ hour: now.getHours(), minute: now.getMinutes(), second: now.getSeconds() }); }}>此刻</Button><Button type="primary" size="small" disabled={range ? !validDate(rangeDates[0], "start") || !validDate(rangeDates[1], "end") || rangeDates[0]! > rangeDates[1]! : !selectedDate || !validDate(withTime(selectedDate))} onClick={confirm}>确认</Button></footer> : mode === "date" || mode === "week" ? <footer><Button type="text" size="small" onClick={() => select(new Date())}>今天</Button></footer> : null}</div>, document.body) : null;
+  const popup = open ? createPortal(<div ref={popupRef} id={popupId} onBlur={blurWithin} className={join("qizhi-date-picker__popup", range && "qizhi-date-picker__popup--range", showTime && "qizhi-date-picker__popup--time")} role="dialog" aria-label={ariaLabel} style={{ left: popupPosition.left, top: popupPosition.top, visibility: popupPosition.ready ? "visible" : "hidden" }} onPointerDownCapture={(event) => { if ((event.target as HTMLElement).closest("button:disabled")) event.preventDefault(); }} onMouseDown={(event) => event.stopPropagation()} onKeyDown={(event) => { if (event.key === "Escape") { event.stopPropagation(); setOpen(false); triggerRef.current?.focus(); } }}><div className="qizhi-date-picker__main"><div className="qizhi-date-picker__panels">{Array.from({ length: panels }, (_, index) => <CalendarPanel key={index} pickerDate={addMonths(pickerDate, index)} mode={mode} value={showTime && selectedDate ? dateValue(selectedDate) : single} range={draftRange} disabledDate={disabledDate} side={panels === 1 ? "single" : index === 0 ? "left" : "right"} onNavigate={(next) => setPickerDate(index === 0 ? next : addMonths(next, -1))} onSelect={select} />)}</div>{showTime ? <div className="qizhi-date-picker__time"><TimePanel title="选择时间" value={activeTime} disabled={disabledTime?.(activeDate, range ? activeRangeField : undefined)} hideDisabled={hideDisabledTimeOptions} onChange={updateTime} /></div> : null}</div>{showTime ? <><footer>{rangeProps?.shortcuts?.length ? <div className="qizhi-date-picker__shortcuts" role="group" aria-label="快捷时间范围">
+    {rangeProps.shortcuts.map(shortcut => <Button key={shortcut.key} size="small" type="text" onClick={() => {
+      const error = shortcut.onSelect();
+      if (error) { setRangeError(error); return; }
+      setOpen(false);
+      triggerRef.current?.focus();
+    }}>{shortcut.label}</Button>)}
+  </div> : <Button type="text" size="small" onClick={() => { const now = new Date(); if (!validDate(now, range ? activeRangeField : undefined)) return; if (range) { if (editableRange) resetTypedField(activeIndex); const next = [...rangeDates]; next[activeIndex] = now; setRangeDates(next); setDraftRange(next.map((item) => item ? dateValue(item) : "")); return; } setSelectedDate(now); setPickerDate(new Date(now.getFullYear(), now.getMonth(), 1)); setTime({ hour: now.getHours(), minute: now.getMinutes(), second: now.getSeconds() }); }}>此刻</Button>}<Button type="primary" size="small" disabled={range ? !editableRange && (!validDate(rangeDates[0], "start") || !validDate(rangeDates[1], "end") || rangeDates[0]! > rangeDates[1]!) : !selectedDate || !validDate(withTime(selectedDate))} onClick={confirm}>确认</Button></footer>{rangeError && <p id={rangeErrorId} className="qizhi-date-picker__range-error" role="alert">{rangeError}</p>}</> : mode === "date" || mode === "week" ? <footer><Button type="text" size="small" onClick={() => select(new Date())}>今天</Button></footer> : null}</div>, document.body) : null;
   const rangePlaceholders = range ? (props as DateRangePickerProps).placeholders : undefined;
   return <div ref={rootRef} onBlur={blurWithin} data-testid="qizhi-date-picker" data-status={status} aria-disabled={disabled || undefined} className={controlContainerClassName("qizhi-date-picker", range && "qizhi-date-picker--range", showTime && "qizhi-date-picker--time", status !== "default" && `qizhi-date-picker--${status}`, hasValue && "has-value", open && "is-open", disabled && "is-disabled", className)} style={style} onClick={handleControlClick}>
     {prefix != null ? <div className="qizhi-date-picker__prefix" aria-hidden="true">{prefix}</div> : null}
     {range ? <>
-      <div className={join("qizhi-date-picker__input-wrap", activeRangeField === "start" && "is-active")} data-date-picker-input-wrap="start"><input {...inputCommon} className="qizhi-date-picker__input" data-date-picker-start aria-label={ariaLabel} value={open && showTime ? rangeDates[0] ? stamp(rangeDates[0]) : "" : rangeValue[0] ?? ""} placeholder={rangePlaceholders?.[0] ?? placeholder ?? "开始日期"} /></div>
-      <span className="qizhi-date-picker__separator" aria-hidden="true">-</span>
-      <div className={join("qizhi-date-picker__input-wrap", activeRangeField === "end" && "is-active")} data-date-picker-input-wrap="end"><input {...inputCommon} className="qizhi-date-picker__input" data-date-picker-end aria-label={`${ariaLabel}结束`} value={open && showTime ? rangeDates[1] ? stamp(rangeDates[1]) : "" : rangeValue[1] ?? ""} placeholder={rangePlaceholders?.[1] ?? "结束日期"} /></div>
+      <div className={join("qizhi-date-picker__input-wrap", activeRangeField === "start" && "is-active")} data-date-picker-input-wrap="start"><input {...inputCommon} className="qizhi-date-picker__input" data-date-picker-start aria-label={rangeProps?.inputLabels?.[0] ?? ariaLabel} readOnly={!editableRange || !open} aria-invalid={Boolean(rangeError) || inputCommon["aria-invalid"]} aria-describedby={rangeError ? rangeErrorId : undefined} onChange={editableRange ? event => editRangeField(0, event.target.value) : undefined} value={open && showTime ? typedRange[0] ?? (rangeDates[0] ? stamp(rangeDates[0]) : "") : rangeValue[0] ?? ""} placeholder={rangePlaceholders?.[0] ?? placeholder ?? "开始日期"} /></div>
+      <span className="qizhi-date-picker__separator" aria-hidden="true">{rangeProps?.separator ?? "-"}</span>
+      <div className={join("qizhi-date-picker__input-wrap", activeRangeField === "end" && "is-active")} data-date-picker-input-wrap="end"><input {...inputCommon} className="qizhi-date-picker__input" data-date-picker-end aria-label={rangeProps?.inputLabels?.[1] ?? `${ariaLabel}结束`} readOnly={!editableRange || !open} aria-invalid={Boolean(rangeError) || inputCommon["aria-invalid"]} aria-describedby={rangeError ? rangeErrorId : undefined} onChange={editableRange ? event => editRangeField(1, event.target.value) : undefined} value={open && showTime ? typedRange[1] ?? (rangeDates[1] ? stamp(rangeDates[1]) : "") : rangeValue[1] ?? ""} placeholder={rangePlaceholders?.[1] ?? "结束日期"} /></div>
     </> : <div className="qizhi-date-picker__input-wrap"><input {...inputCommon} className="qizhi-date-picker__input" aria-label={ariaLabel} value={single} placeholder={placeholder ?? defaultPlaceholder(mode, showTime)} /></div>}
     <button type="button" className="qizhi-date-picker__clear" aria-label={range ? "清空日期范围" : "清空日期"} disabled={disabled} hidden={!allowClear || !hasValue} onMouseDown={(event) => event.preventDefault()} onClick={clear}><CloseIcon /></button>
     <div className="qizhi-date-picker__suffix" aria-hidden="true"><CalendarIcon /></div>

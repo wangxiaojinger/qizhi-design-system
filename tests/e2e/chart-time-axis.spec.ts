@@ -125,7 +125,7 @@ test("十天小时数据只在等距日历刻度显示日期", async ({ page }) 
             const { x, width } = element.getBBox();
             return { text: String(element.style.text), left: x, right: x + width, center: x + width / 2 };
           })
-          .filter(({ text }: { text: string }) => /^09-\d{2}$/.test(text))
+          .filter(({ text }: { text: string }) => /^(?:08|09)-\d{2}(?: \d{2}:\d{2}(?::\d{2})?)?$/.test(text))
           .sort((a: { center: number }, b: { center: number }) => a.center - b.center);
         results.push({ kind, width, labels });
         chart.destroy();
@@ -159,7 +159,7 @@ for (const { scenario, days, missingHour, startHour } of [
       const original = CanvasRenderingContext2D.prototype.fillText;
       const labels = new WeakMap<HTMLCanvasElement, Map<number, string>>();
       CanvasRenderingContext2D.prototype.fillText = function (text, x, y, maxWidth) {
-        if (this.canvas.closest("#custom-calendar-probe") && /^09-\d{2}$/.test(text)) {
+        if (this.canvas.closest("#custom-calendar-probe") && /^(?:08|09)-\d{2}(?: \d{2}:\d{2}(?::\d{2})?)?$/.test(text)) {
           const transform = this.getTransform();
           const position = transform.a * x + transform.c * y + transform.e;
           const ticks = labels.get(this.canvas) ?? new Map<number, string>();
@@ -205,14 +205,70 @@ for (const { scenario, days, missingHour, startHour } of [
       const canvas = chart.locator('.qizhi-chart__plot[data-ready="true"] canvas[data-calendar-ticks]');
       await expect(canvas).toHaveCount(1);
       const ticks: [number, string][] = JSON.parse((await canvas.getAttribute("data-calendar-ticks"))!);
-      expect.soft(ticks.map(([, label]) => label), name).toEqual(Array.from({ length: days }, (_, index) => `09-${String(index + 1).padStart(2, "0")}`));
-      if (ticks.length !== days) continue;
-      const hourSpacing = (ticks[1][0] - ticks[0][0]) / (24 - startHour);
-      expect(hourSpacing).toBeGreaterThan(0);
-      for (let index = 2; index < ticks.length; index++) {
-        const slots = missingHour >= (index - 1) * 24 - startHour && missingHour < index * 24 - startHour ? 23 : 24;
-        expect.soft(Math.abs(ticks[index][0] - ticks[index - 1][0] - hourSpacing * slots), name).toBeLessThan(1);
-      }
+      const labels = ticks.map(([, label]) => label);
+      expect.soft(new Set(labels).size, name).toBe(labels.length);
+      expect.soft(ticks.length, name).toBeGreaterThanOrEqual(2);
+      const step = (ticks.at(-1)![0] - ticks[0][0]) / (ticks.length - 1);
+      ticks.forEach(([position], index) =>
+        expect.soft(position, name).toBeCloseTo(ticks[0][0] + index * step, 0));
     }
   });
 }
+
+test("非整点时间域的刻度覆盖两端且等距，缺桶保留真实时间位置", async ({ page }) => {
+  await page.goto("/tests/fixtures/chart-engine/start-bar-label.html", { waitUntil: "domcontentloaded" });
+  const results = await page.evaluate(async () => {
+    const enginePath = "/packages/qizhi-react/src/chart/chartEngine.ts";
+    const modelPath = "/packages/qizhi-react/src/chart/chartModel.ts";
+    const { renderChart } = await import(enginePath);
+    const { normalizeChart } = await import(modelPath);
+    const start = Date.UTC(2026, 8, 1, 4, 13);
+    const minute = 60_000;
+    const series = [{ key: "requests", label: "请求量" }];
+    const data = [0, 60, 360].map((offset, index) => ({
+      x: new Date(start + offset * minute).toISOString(), series: "requests", value: index + 1,
+    }));
+    const results = [];
+    for (const kind of ["line", "bar"] as const) {
+      const host = document.createElement("div");
+      document.body.append(host);
+      const width = Math.min(800, innerWidth - 40);
+      const chart = await renderChart(host, {
+        model: normalizeChart(data, series), series, visibleKeys: ["requests"], width, height: 280,
+        kind, mode: "normal", useDefaultTimeLabels: true, xFormatter: String, valueFormatter: String,
+        timeStart: start, timeEnd: start + 411 * minute,
+      });
+      const canvasDocument = chart.getContext().canvas.document;
+      const labels = canvasDocument.getElementsByTagName("text")
+        .map((element: { style: { text: string }; getBBox: () => { x: number; width: number } }) =>
+          {
+            const { x, width } = element.getBBox();
+            return { text: String(element.style.text), x, width };
+          })
+        .filter((label: { text: string }) => label.text.includes(":"))
+        .sort((a: { x: number }, b: { x: number }) => a.x - b.x);
+      const marks = canvasDocument.getElementsByClassName("element").map((element: { getBBox: () => { x: number; width: number } }) => {
+        const { x, width } = element.getBBox();
+        return { x, width };
+      });
+      results.push({ labels, width, kind, marks });
+      chart.destroy();
+      host.remove();
+    }
+    return results;
+  });
+
+  for (const { labels, width, kind, marks } of results) {
+    expect(labels.length, kind).toBeGreaterThanOrEqual(3);
+    expect(labels[0].text).toMatch(/^04:13/);
+    expect(labels.at(-1).text).toMatch(/^11:04/);
+    expect(labels[0].x).toBeCloseTo(44, 0);
+    expect(Math.abs(labels.at(-1).x + labels.at(-1).width - (width - 1))).toBeLessThanOrEqual(1);
+    const plotWidth = width - 45;
+    labels.slice(1, -1).forEach((label: { x: number; width: number }, i: number) =>
+      expect(Math.abs(label.x + label.width / 2 - (44 + plotWidth * (i + 1) / (labels.length - 1)))).toBeLessThanOrEqual(1));
+    const last = marks.at(-1);
+    const lastX = kind === "line" ? last.x + last.width : last.x + last.width / 2;
+    expect(Math.abs(lastX - (44 + plotWidth * 360 / 411))).toBeLessThanOrEqual(1);
+  }
+});

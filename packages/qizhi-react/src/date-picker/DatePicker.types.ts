@@ -32,6 +32,14 @@ export interface DatePickerProps extends DatePickerSharedProps {
 
 export interface DateRangePickerProps extends DatePickerSharedProps {
   placeholders?: readonly [string, string];
+  inputLabels?: readonly [string, string];
+  editable?: boolean;
+  closeOnValueChange?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  separator?: ReactNode;
+  validateRange?: (value: [string, string]) => string | undefined;
+  /** Footer actions return a validation message to keep the panel open. */
+  shortcuts?: readonly { key: string; label: ReactNode; onSelect: () => string | undefined }[];
   value?: readonly [string, string] | readonly [];
   defaultValue?: readonly [string, string] | readonly [];
   onChange?: (value: [string, string] | []) => void;

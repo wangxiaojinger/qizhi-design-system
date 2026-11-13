@@ -1753,7 +1753,7 @@
         },
         {
           "name": "xFormatter",
-          "description": "横轴文本格式化（xFormatter）适用于横轴、提示与数据表。等间隔时间数据按可用宽度选择固定刻度间隔，默认按时间跨度简写 ISO 时间戳。",
+          "description": "横轴文本格式化（xFormatter）适用于横轴、提示与数据表。时间轴按实际起止时间等距布置刻度，按可用宽度调整数量，默认按跨度简写时间。",
           "type": "(value: string) => string",
           "defaultValue": "日期显示为 M月D日，时间刻度按跨度简写"
         },

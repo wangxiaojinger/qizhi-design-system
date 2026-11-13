@@ -10,7 +10,7 @@ test("普通与堆叠柱按三档宽度收窄", async ({page}, info) => {
     const { normalizeChart } = await import(modelPath);
     const widths: number[] = [];
     for (const mode of ["normal", "grouped", "stacked", "line"] as const) {
-      const original = document.querySelector(mode === "line" ? "#component-chart .qizhi-chart[data-kind=\"line\"] .qizhi-chart__plot" : `#component-chart .qizhi-chart[data-kind="bar"][data-mode="${mode}"] .qizhi-chart__plot`)!;
+      const original = document.querySelector(mode === "line" ? "#component-chart .codebox-wrapper .qizhi-chart[data-kind=\"line\"] .qizhi-chart__plot" : `#component-chart .codebox-wrapper .qizhi-chart[data-kind="bar"][data-mode="${mode}"] .qizhi-chart__plot`)!;
       const host = document.createElement("div"); document.body.append(host);
       const series = (mode === "normal" || mode === "line" ? ["a"] : ["a", "b"]).map(key => ({ key, label: key }));
       const data = Array.from({ length: 7 }, (_, i) => series.map(s => ({ x: String(i), series: s.key, value: i + 1 }))).flat();
@@ -57,7 +57,7 @@ test("普通与堆叠柱按三档宽度收窄", async ({page}, info) => {
   const viewport = page.viewportSize()!.width;
   const expected = viewport >= 1280 ? 32 : viewport >= 768 ? 16 : 10;
   for (const mode of ["normal", "stacked"]) {
-    const chart = page.locator(`#component-chart .qizhi-chart[data-kind="bar"][data-mode="${mode}"]`).first();
+    const chart = page.locator(`#component-chart .codebox-wrapper .qizhi-chart[data-kind="bar"][data-mode="${mode}"]`).first();
     await chart.screenshot({ path: info.outputPath(`bar-width-${mode}.png`) });
   }
   for (const width of result) expect(width).toBeCloseTo(expected, 2);

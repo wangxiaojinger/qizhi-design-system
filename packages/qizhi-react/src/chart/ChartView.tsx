@@ -9,10 +9,11 @@ import type { TableColumn } from "../table/Table.types";
 import type { BarChartMode, ChartTimeDomain, ChartTimeRange, ChartTimeRangeSelection, LineChartProps, FocusedItem } from "./Chart.types";
 import { normalizeChart, parseChartTime, colorTokenCss, seriesColorToken } from "./chartModel";
 import type { ChartRow } from "./chartModel";
-import { BAR_BAND_PADDING, renderChart, getPlotPadding } from "./chartEngine";
+import { renderChart, getPlotPadding } from "./chartEngine";
 import { useChartFocus } from "./useChartFocus";
 import { focusItems, resolveFocus, sameFocus } from "./chartFocus";
 import { ChartTooltip } from "./ChartTooltip";
+import { interpolateUsageBrush, usageBrushAnchors, usageBucketTitle } from "./chartUsageTime";
 import "./chart.css";
 
 const numberFormat = new Intl.NumberFormat("zh-CN", { maximumFractionDigits: 20 });
@@ -27,7 +28,7 @@ type ActiveBrush = {
   captured: boolean;
   selection: ChartTimeRangeSelection;
   domain: ChartTimeDomain;
-  timestamps?: readonly number[];
+  usageAnchors?: ReturnType<typeof usageBrushAnchors>;
   selectionLeft: number;
   selectionWidth: number;
   element: HTMLDivElement;
@@ -62,33 +63,11 @@ const inferTimeDomain = (categories: readonly string[], timestamps: readonly num
   // Irregular samples do not reveal a bucket length. Include the last timestamp without inventing one.
   return { start, end: last + (regular ? interval : 1) };
 };
-const brushGeometry = (kind: "line" | "bar", categoryCount: number, left: number, width: number) => {
-  if (kind === "line") return { left, width };
-  const { inner, outer } = BAR_BAND_PADDING;
-  const step = width / (categoryCount - inner + 2 * outer);
-  const margin = (outer - inner / 2) * step;
-  return { left: left + margin, width: Math.max(0, width - margin * 2) };
-};
-const brushTimestamps = (kind: "line" | "bar", timestamps: readonly number[], domain: ChartTimeDomain, terminalCategory?: string) => {
-  if (timestamps.length === 1) {
-    const [time] = timestamps;
-    // Without a terminal slot, a single point or bar is centered in the selection geometry.
-    return !terminalCategory && time > domain.start && time < domain.end
-      ? [domain.start, time, domain.end] : undefined;
-  }
-  const interior = kind === "bar" || terminalCategory ? timestamps.slice(1) : timestamps.slice(1, -1);
-  if (interior.length && (interior[0] <= domain.start || interior[interior.length - 1] >= domain.end)) return undefined;
-  return [domain.start, ...interior, domain.end];
-};
 const timeRangeAt = (brush: ActiveBrush): ChartTimeRange => {
-  const { domain, timestamps } = brush;
+  const { domain } = brush;
   const rawAt = (x: number) => {
     const ratio = clamp((x - brush.selectionLeft) / brush.selectionWidth, 0, 1);
-    if (!timestamps) return domain.start + ratio * (domain.end - domain.start);
-    // Point and band scales space samples evenly. Interpolate between the actual adjacent timestamps.
-    const index = ratio * (timestamps.length - 1);
-    const left = Math.min(Math.floor(index), timestamps.length - 2);
-    return timestamps[left] + (index - left) * (timestamps[left + 1] - timestamps[left]);
+    return brush.usageAnchors ? interpolateUsageBrush(ratio, brush.usageAnchors, "ratio") : domain.start + ratio * (domain.end - domain.start);
   };
   const rawStart = rawAt(Math.min(brush.startX, brush.currentX));
   const rawEnd = rawAt(Math.max(brush.startX, brush.currentX));
@@ -101,15 +80,9 @@ const timeRangeAt = (brush: ActiveBrush): ChartTimeRange => {
   };
 };
 const timeRangeGeometry = (brush: ActiveBrush, range: ChartTimeRange) => {
-  const { domain, timestamps } = brush;
-  const toX = (time: number) => {
-    if (!timestamps) return brush.selectionLeft + (time - domain.start) / (domain.end - domain.start) * brush.selectionWidth;
-    if (time <= domain.start) return brush.selectionLeft;
-    if (time >= timestamps[timestamps.length - 1]) return brush.selectionLeft + brush.selectionWidth;
-    const right = Math.max(1, timestamps.findIndex(value => value >= time));
-    const ratio = (right - 1 + (time - timestamps[right - 1]) / (timestamps[right] - timestamps[right - 1])) / (timestamps.length - 1);
-    return brush.selectionLeft + ratio * brush.selectionWidth;
-  };
+  const { domain } = brush;
+  const toX = (time: number) => brush.selectionLeft
+    + (brush.usageAnchors ? interpolateUsageBrush(time, brush.usageAnchors, "time") : (time - domain.start) / (domain.end - domain.start)) * brush.selectionWidth;
   const start = toX(range.start);
   const end = toX(range.end);
   return { left: start, width: end - start };
@@ -121,7 +94,7 @@ const defaultXFormat = (value: string) => {
 };
 
 export function ChartView({ kind, mode = "normal", data, series, dateRange, label, unit = "", xFormatter = defaultXFormat, valueFormatter = defaultValueFormat,
-  legend = true, tooltip = true, rangeSelection, xAxisType, loading = false, error, height = 280, className, id, ref, focusable = false, focusedItem, defaultFocusedItem, onFocusChange, dimOpacity = 0.3, clearFocusOnBackgroundClick = true }: LineChartProps & { kind: "line" | "bar"; mode?: BarChartMode }) {
+  legend = true, tooltip = true, rangeSelection, usageTimeAxis, xAxisType, loading = false, error, height = 280, className, id, ref, focusable = false, focusedItem, defaultFocusedItem, onFocusChange, dimOpacity = 0.3, clearFocusOnBackgroundClick = true }: LineChartProps & { kind: "line" | "bar"; mode?: BarChartMode }) {
   const internalId = useId(); const tableId = `${internalId}-data`; const tipId = `${internalId}-tip`; const helpId = `${internalId}-help`;
   const plot = useRef<HTMLDivElement>(null); const engineHost = useRef<HTMLDivElement>(null);
   const [viewportWidth, setViewportWidth] = useState(0);
@@ -136,7 +109,7 @@ export function ChartView({ kind, mode = "normal", data, series, dateRange, labe
   const sourceModel = useMemo(() => normalizeChart(data, series, dateRange), [data, series, dateRange?.start, dateRange?.end]);
   const [localSelection, setLocalSelection] = useState<{ source: typeof sourceModel; range: ChartTimeRange }>();
   const selection = rangeSelection || undefined;
-  const localRange = rangeSelection !== false && xAxisType !== "category" && !selection?.onChange && localSelection?.source === sourceModel
+  const localRange = rangeSelection !== false && !usageTimeAxis && xAxisType !== "category" && !selection?.onChange && localSelection?.source === sourceModel
     ? localSelection.range : undefined;
   const model = useMemo(() => {
     if (!localRange) return sourceModel;
@@ -150,28 +123,31 @@ export function ChartView({ kind, mode = "normal", data, series, dateRange, labe
   const isTimeAxis = xAxisType !== "category" && timestamps.length > 0
     && timestamps.every((time, index) => Number.isFinite(time) && (index === 0 || time > timestamps[index - 1]));
   // A single retained timestamp has no inferable interval; the prior selection still defines one.
-  const availableDomain: ChartTimeDomain | undefined = selection?.timeDomain
+  const buckets = usageTimeAxis?.buckets;
+  const validBuckets = isTimeAxis && buckets?.length === model.categories.length
+    && buckets.every((bucket, index) => bucket.x === model.categories[index]
+      && Number.isFinite(bucket.start) && Number.isFinite(bucket.end) && bucket.end > bucket.start
+      && (index === 0 || bucket.start === buckets[index - 1].end));
+  const usageAxis = validBuckets ? usageTimeAxis : undefined;
+  const usageDomain = usageAxis && {
+    start: usageAxis.buckets[0].start, end: usageAxis.buckets[usageAxis.buckets.length - 1].end,
+    step: selection?.timeDomain?.step,
+  };
+  const availableDomain: ChartTimeDomain | undefined = usageDomain ?? selection?.timeDomain
     ?? (isTimeAxis ? inferTimeDomain(model.categories, timestamps) ?? localRange : undefined);
   const timeDomain = availableDomain && localRange ? {
     ...availableDomain,
     start: Math.max(availableDomain.start, localRange.start),
     end: Math.min(availableDomain.end, localRange.end),
   } : availableDomain;
-  const canBrush = rangeSelection !== false && isTimeAxis && timeDomain !== undefined && isValidTimeDomain(timeDomain);
-  // Place a single bar at the selection origin when its timestamp is the domain start.
-  const singleBarCenter = canBrush && kind === "bar" && timestamps.length === 1 && timestamps[0] === timeDomain?.start
-    ? brushGeometry("bar", 1, 0, 1).left : undefined;
-  // Reserve a real plot interval after the last point without inserting a data row or tick label.
-  const terminalCategory = canBrush && kind === "line" && timeDomain
-    && (timestamps.length > 1 || timestamps[0] <= timeDomain.start)
-    && timeDomain.end - timestamps[timestamps.length - 1] > 1
-    ? "__qizhi_chart_terminal__" : undefined;
-  const lineIntervals = Math.max(0, model.categories.length - (terminalCategory ? 0 : 1));
+  const axisDomain = isTimeAxis && timeDomain && isValidTimeDomain(timeDomain) ? timeDomain : undefined;
+  const canBrush = rangeSelection !== false && axisDomain !== undefined && (!usageAxis || Boolean(selection?.onChange));
+  const lineIntervals = Math.max(0, model.categories.length - 1);
   const allFocusItems = useMemo(() => focusItems(data, series, model), [data, series, model]);
   const focus = useChartFocus({ focusable, focusedItem, defaultFocusedItem, onFocusChange }, allFocusItems);
   const engine = useRef<Awaited<ReturnType<typeof renderChart>> | null>(null);
   const [keyboardItem, setKeyboardItem] = useState<FocusedItem | null>(null);
-  const invalid = model.error || !label?.trim() || !Number.isFinite(height) || height <= 0 || !["normal", "grouped", "stacked"].includes(mode) || (kind === "bar" && mode === "normal" && series.length !== 1);
+  const invalid = model.error || Boolean(usageTimeAxis && model.categories.length && !validBuckets) || !label?.trim() || !Number.isFinite(height) || height <= 0 || !["normal", "grouped", "stacked"].includes(mode) || (kind === "bar" && mode === "normal" && series.length !== 1);
   const [renderedPadding, setRenderedPadding] = useState<ReturnType<typeof getPlotPadding>>();
   const padding = renderedPadding ?? getPlotPadding(width, kind === "line" && focusable);
   const safeHeight = Number.isFinite(height) && height > 0 ? height : 280;
@@ -192,7 +168,7 @@ export function ChartView({ kind, mode = "normal", data, series, dateRange, labe
   useEffect(() => { setActive(null); }, [model, tooltip, loading, error, width]);
   const hasBrushCallback = Boolean(selection?.onChange);
   useLayoutEffect(() => () => finishBrushRef.current(false), [
-    kind, model, state, width, canBrush, hasBrushCallback, terminalCategory,
+    kind, model, state, width, canBrush, hasBrushCallback, usageAxis,
     timeDomain?.start, timeDomain?.end, timeDomain?.step, selection?.precision,
     padding.left, padding.right,
   ]);
@@ -209,7 +185,7 @@ export function ChartView({ kind, mode = "normal", data, series, dateRange, labe
     const holder = document.createElement("div"); engineHost.current.append(holder);
     let disposed = false; let disposeEngine: (() => void) | undefined;
     renderChart(holder, { model, series, visibleKeys, kind, mode, width, height: safeHeight, xFormatter, valueFormatter, focusable,
-      useDefaultTimeLabels: xFormatter === defaultXFormat, categoricalAxis: xAxisType === "category", terminalCategory, singleBarCenter,
+      useDefaultTimeLabels: xFormatter === defaultXFormat, categoricalAxis: xAxisType === "category", usageAxis, timeStart: axisDomain?.start, timeEnd: axisDomain?.end,
       onItemClick: identity => {
         if (suppressBrushClick.current) return;
         const current = focusCurrent.current;
@@ -224,19 +200,20 @@ export function ChartView({ kind, mode = "normal", data, series, dateRange, labe
       .then(chart => { if (disposed) chart.destroy(); else { engine.current = chart; setRenderedPadding(chart.plotPadding); chart.updateFocus?.(focusCurrent.current.focus.focusedItem, focusCurrent.current.dimOpacity); disposeEngine = () => { if (engine.current === chart) engine.current = null; chart.destroy(); }; setReady(true); } })
       .catch(() => { if (!disposed) { holder.remove(); setEngineError(true); } });
     return () => { disposed = true; disposeEngine?.(); holder.remove(); };
-  }, [state, model, series, visibleSignature, kind, mode, focusable, width, viewportWidth, safeHeight, xFormatter, valueFormatter, xAxisType, terminalCategory, singleBarCenter]);
+  }, [state, model, series, visibleSignature, kind, mode, focusable, width, viewportWidth, safeHeight, xFormatter, valueFormatter, xAxisType, usageAxis, axisDomain?.start, axisDomain?.end]);
   const pointCount = model.rows.length;
   const anchorX = useCallback((index: number, rect: DOMRect) => {
-    const ratio = kind === "bar" ? singleBarCenter ?? (index + 0.5) / pointCount : lineIntervals ? index / lineIntervals : 0.5;
+    const ratio = usageAxis ? engine.current?.usagePositions?.[index] ?? (index + 0.5) / pointCount : axisDomain ? clamp((timestamps[index] - axisDomain.start) / (axisDomain.end - axisDomain.start), 0, 1) : kind === "bar" ? (index + 0.5) / pointCount : lineIntervals ? index / lineIntervals : 0.5;
     return rect.left + padding.left + Math.max(0, rect.width - padding.left - padding.right) * ratio;
-  }, [kind, singleBarCenter, pointCount, lineIntervals, padding.left, padding.right]);
+  }, [kind, usageAxis, axisDomain, timestamps, pointCount, lineIntervals, padding.left, padding.right]);
   const hasActive = Boolean(active);
   useEffect(() => {
     if (!hasActive) return;
     setActive(current => {
       if (!current || !plot.current) return current;
-      const x = anchorX(current.index, plot.current.getBoundingClientRect());
-      return current.x === x ? current : { ...current, x };
+      const rect = plot.current.getBoundingClientRect();
+      const x = anchorX(current.index, rect);
+      return current.x === x && current.plotLeft === rect.left ? current : { ...current, x, plotLeft: rect.left };
     });
     const close = () => setActive(null);
     const outside = (event: globalThis.PointerEvent) => { if (!plot.current?.contains(event.target as Node)) close(); };
@@ -245,7 +222,7 @@ export function ChartView({ kind, mode = "normal", data, series, dateRange, labe
       const rect = plot.current.getBoundingClientRect();
       // A deferred scroll event can arrive after a pointer move already used the new position.
       if (!current.keyboard) return rect.left === current.plotLeft && rect.top === current.plotTop ? current : null;
-      return { ...current, x: anchorX(current.index, rect), y: rect.top + rect.height / 2 };
+      return { ...current, x: anchorX(current.index, rect), y: rect.top + rect.height / 2, plotLeft: rect.left, plotTop: rect.top };
     });
     window.addEventListener("resize", close); window.addEventListener("scroll", scroll, true); document.addEventListener("pointerdown", outside);
     return () => { window.removeEventListener("resize", close); window.removeEventListener("scroll", scroll, true); document.removeEventListener("pointerdown", outside); };
@@ -260,7 +237,10 @@ export function ChartView({ kind, mode = "normal", data, series, dateRange, labe
     const rect = event.currentTarget.getBoundingClientRect(); const x = event.clientX - rect.left; const y = event.clientY - rect.top;
     if (x < padding.left || x > rect.width - padding.right || y < padding.top || y > rect.height - padding.bottom) { setActive(null); return; }
     const ratio = (x - padding.left) / Math.max(1, rect.width - padding.left - padding.right);
-    const index = kind === "bar" ? Math.floor(ratio * model.rows.length) : Math.round(ratio * lineIntervals);
+    const time = axisDomain ? axisDomain.start + ratio * (axisDomain.end - axisDomain.start) : undefined;
+    const edges = engine.current?.usageEdges;
+    const index = usageAxis && edges ? edges.findIndex((edge, i) => i > 0 && ratio <= edge) - 1 : time !== undefined ? timestamps.reduce((nearest, value, i) =>
+      Math.abs(value - time) < Math.abs(timestamps[nearest] - time) ? i : nearest, 0) : kind === "bar" ? Math.floor(ratio * model.rows.length) : Math.round(ratio * lineIntervals);
     showAt(index, false, event.clientY);
   };
   const removeBrushListeners = () => {
@@ -325,12 +305,15 @@ export function ChartView({ kind, mode = "normal", data, series, dateRange, labe
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
     const plotWidth = rect.width - padding.left - padding.right;
-    const geometry = brushGeometry(kind, model.categories.length, padding.left, plotWidth);
+    const geometry = { left: padding.left, width: plotWidth };
     if (geometry.width <= 0 || x < geometry.left || x > geometry.left + geometry.width || y < padding.top || y > rect.height - padding.bottom) return false;
     finishBrush(false);
+    const positions = engine.current?.usagePositions;
+    if (usageAxis && (!ready || !positions)) return false;
     const current: ActiveBrush = {
       pointerId: event.pointerId, startX: x, currentX: x, captured: false,
-      selection: selection ?? {}, domain: timeDomain, timestamps: brushTimestamps(kind, timestamps, timeDomain, terminalCategory),
+      selection: selection ?? {}, domain: timeDomain,
+      usageAnchors: usageAxis && positions ? usageBrushAnchors(usageAxis.buckets, positions) : undefined,
       selectionLeft: geometry.left, selectionWidth: geometry.width, element: event.currentTarget,
     };
     activeBrush.current = current;
@@ -381,12 +364,12 @@ export function ChartView({ kind, mode = "normal", data, series, dateRange, labe
   };
   const row = active && state === "normal" && tooltip && !engineError ? model.rows[active.index] : undefined;
   const cursorTime = row && xFormatter === defaultXFormat && /^\d{4}-\d{2}-\d{2}T/.test(row.x) ? Date.parse(row.x) : NaN;
-  const cursorLabel = !row ? "" : Number.isFinite(cursorTime)
+  const cursorLabel = !row ? "" : usageAxis && active ? usageBucketTitle(usageAxis.buckets[active.index], usageAxis) : Number.isFinite(cursorTime)
     ? formatCursorTime(cursorTime, selection)
     : xFormatter(row.x);
   const items = row ? series.flatMap((item, index) => visibleKeys.includes(item.key) ? [{ series: item, index, value: formatValue(row.values[index]) }] : []) : [];
   const indicatorLeft = active && plot.current ? active.x - plot.current.getBoundingClientRect().left : 0;
-  return <div ref={ref} id={id ?? internalId} className={["qizhi-chart", className].filter(Boolean).join(" ")} role="region" aria-label={label} aria-busy={loading} data-kind={kind} data-mode={mode} data-state={engineError && state === "normal" ? "engine-error" : state}>
+  return <div ref={ref} id={id ?? internalId} className={["qizhi-chart", className].filter(Boolean).join(" ")} role="region" aria-label={label} aria-busy={loading} data-kind={kind} data-mode={mode} data-usage-axis={Boolean(usageAxis)} data-state={engineError && state === "normal" ? "engine-error" : state}>
     <div className="qizhi-chart__scroll"><div className="qizhi-chart__content">
     <div className="qizhi-chart__title">{label}{unit ? <span className="qizhi-chart__unit">（{unit}）</span> : null}</div>
     <div ref={plot} className={canBrush && state === "normal" && !engineError ? "qizhi-chart__plot qizhi-chart__plot--range-selectable" : "qizhi-chart__plot"} style={{ height: safeHeight }} role={focusable && state === "normal" && !engineError ? "listbox" : "group"} aria-label={`${label}绘图区`}
@@ -432,7 +415,7 @@ export function ChartView({ kind, mode = "normal", data, series, dateRange, labe
       </Button>)}
     </div> : null}
     {canShowData ? <div id={tableId} className="qizhi-chart__sr-only"><Table columns={columns} dataSource={model.rows} rowKey="x" size="small" aria-label={`${label}数据`} /></div> : null}
-    {row && active ? <ChartTooltip id={tipId} anchor={active} title={cursorLabel} items={items} /> : null}
+    {row && active ? <ChartTooltip id={tipId} kind={kind} anchor={active} barBounds={kind === "bar" && usageAxis ? engine.current?.getBarBounds?.(row.x) : undefined} plotLeft={active.plotLeft} title={cursorLabel} items={items} /> : null}
     <span className="qizhi-chart__sr-only" role="status" aria-live="polite">{active?.keyboard && row ? `${cursorLabel}，${items.map(item => `${item.series.label}：${item.value}`).join("，")}` : ""}</span>
   </div>;
 }

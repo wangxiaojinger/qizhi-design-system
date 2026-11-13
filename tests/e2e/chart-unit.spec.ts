@@ -3,7 +3,7 @@ import { mkdirSync } from "node:fs";
 test("十二个图表的单位跟随标题且无绘图区单位列", async ({ page }, testInfo) => {
   test.setTimeout(60000);
   await page.goto("/#component-chart", { waitUntil: "domcontentloaded" });
-  const charts = page.locator("#component-chart .qizhi-chart");
+  const charts = page.locator("#component-chart .codebox-wrapper .qizhi-chart");
   await expect(charts).toHaveCount(12);
   await expect(charts.getByRole("button", { name: /^(查看数据|收起数据)$/ })).toHaveCount(0);
   await expect(page.locator('#component-chart [data-ready="true"]')).toHaveCount(9, { timeout: 30000 });

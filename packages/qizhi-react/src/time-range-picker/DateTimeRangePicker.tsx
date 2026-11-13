@@ -1,104 +1,84 @@
-import { useEffect, useId, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Alert } from "../alert/Alert";
-import { Button } from "../button/Button";
-import type { ButtonHandle } from "../button/Button.types";
-import { Input } from "../input/Input";
-import { Popover } from "../popover/Popover";
+import { DatePicker } from "../date-picker/DatePicker";
 import { formatRangeDateTime, parseRangeDateTime } from "./rangeDateTime";
 import type { TimeRange, DateTimeRangePickerProps } from "./DateTimeRangePicker.types";
-import "./timeRangePicker.css";
+
+const invalidRange = "请输入有效的起止时间，结束时间须晚于开始时间。重复或不存在的当地时间可改用 UTC 后重试。";
 
 export function DateTimeRangePicker({
-  value, onChange, shortcuts = [], timeZone = "UTC", validate, disabled, className,
+  value, onChange, onShortcutSelect, shortcuts = [], timeZone = "UTC", validate, disableFuture, disabled, className,
 }: DateTimeRangePickerProps) {
-  const [visible, setVisible] = useState(false);
-  const [draft, setDraft] = useState({ start: "", end: "" });
-  const [error, setError] = useState<string>();
-  const trigger = useRef<ButtonHandle>(null);
-  const panel = useRef<HTMLDivElement>(null);
-  const errorId = useId();
-  const format = (time: number) => formatRangeDateTime(time, timeZone);
-  const start = format(value.start);
-  const end = format(value.end);
-
+  const [open, setOpen] = useState(false);
+  const [, setClockSecond] = useState(0);
   useEffect(() => {
-    const popup = panel.current;
-    if (!disabled && popup?.contains(popup.ownerDocument.activeElement)) trigger.current?.focus();
-    setVisible(false);
-    setError(undefined);
-  }, [disabled, timeZone, value.start, value.end]);
+    if (!open || !disableFuture) return;
+    const tick = () => setClockSecond(Math.floor(Date.now() / 1000));
+    tick();
+    const timer = window.setInterval(tick, 250);
+    return () => window.clearInterval(timer);
+  }, [open, disableFuture]);
 
+  const start = formatRangeDateTime(value.start, timeZone);
+  const end = formatRangeDateTime(value.end, timeZone);
   if (start === undefined || end === undefined) {
     return <Alert type="error" content="时间范围或时区配置无效。" />;
   }
 
-  const onVisibleChange = (next: boolean) => {
-    if (next) setDraft({ start, end });
-    setError(undefined);
-    setVisible(next);
-  };
-
-  const close = () => {
-    onVisibleChange(false);
-    trigger.current?.focus();
-  };
-
-  const commit = (range: TimeRange) => {
-    const { start, end } = range;
-    if (!Number.isFinite(start) || !Number.isFinite(end) || start >= end) {
-      setError("请输入有效的起止时间，结束时间须晚于开始时间。重复或不存在的当地时间可改用 UTC 后重试。");
-      return;
+  const formatted = [start.replace("T", " "), end.replace("T", " ")] as const;
+  const toRange = ([from, to]: [string, string]): TimeRange => ({
+    start: from === formatted[0] ? value.start : parseRangeDateTime(from.replace(" ", "T"), timeZone) ?? NaN,
+    end: to === formatted[1] ? value.end : parseRangeDateTime(to.replace(" ", "T"), timeZone) ?? NaN,
+  });
+  let clockSecond: number | undefined;
+  let clockText = "";
+  const latest = () => {
+    const second = Math.floor(Date.now() / 1000);
+    if (clockSecond !== second) {
+      clockSecond = second;
+      clockText = formatRangeDateTime(second * 1000, timeZone)!;
     }
-    const validationError = validate?.(range);
-    if (validationError) {
-      setError(validationError);
-      return;
-    }
-    close();
-    onChange(range);
+    return clockText;
   };
-
-  const inputRange = (field: keyof TimeRange) => {
-    const text = draft[field];
-    const original = field === "start" ? start : end;
-    if ((text.length === 16 ? text + ":00" : text) === original) return value[field];
-    return parseRangeDateTime(text, timeZone) ?? NaN;
+  const dateKey = (date: Date) => [date.getFullYear(), date.getMonth() + 1, date.getDate()]
+    .map((part, index) => String(part).padStart(index === 0 ? 4 : 2, "0")).join("-");
+  const after = (value: number, limit: number) =>
+    Array.from({ length: limit - value - 1 }, (_, index) => value + index + 1);
+  const disabledTime = (date?: Date) => {
+    const now = latest();
+    if (!date) return {};
+    const day = dateKey(date);
+    if (day > now.slice(0, 10)) return { disabledHours: after(-1, 24), disabledMinutes: after(-1, 60), disabledSeconds: after(-1, 60) };
+    if (day < now.slice(0, 10)) return {};
+    const [hour, minute, second] = now.slice(11).split(":").map(Number);
+    return {
+      disabledHours: after(hour, 24),
+      disabledMinutes: date.getHours() === hour ? after(minute, 60) : undefined,
+      disabledSeconds: date.getHours() === hour && date.getMinutes() === minute ? after(second, 60) : undefined,
+    };
   };
+  const validateValue = (range: TimeRange) =>
+    !Number.isFinite(range.start) || !Number.isFinite(range.end) || range.start >= range.end
+      ? invalidRange : disableFuture && range.end > Date.now() ? "结束时间不能晚于当前时间。" : validate?.(range);
 
-  const editField = (field: keyof TimeRange, text: string) => {
-    setDraft(current => ({ ...current, [field]: text }));
-    setError(undefined);
-  };
-
-  return <Popover position="bottomLeft" trigger="click" ariaLabel="选择时间范围" arrow={false}
-    popupVisible={visible && !disabled} onVisibleChange={onVisibleChange}
-    classNames={{ root: "qizhi-time-range-picker__popup" }}
-    content={<div ref={panel} className="qizhi-time-range-picker__panel">
-      {shortcuts.length ? <div className="qizhi-time-range-picker__shortcuts" role="group" aria-label="快捷时间范围">
-        {shortcuts.map(shortcut => <Button key={shortcut.key} size="small" onClick={() => commit(shortcut.resolve(Date.now()))}>{shortcut.label}</Button>)}
-      </div> : null}
-      <form onSubmit={event => {
-        event.preventDefault();
-        event.stopPropagation();
-        commit({ start: inputRange("start"), end: inputRange("end") });
-      }}>
-        <label>开始时间
-          <Input type="datetime-local" step={1} value={draft.start} onChange={event => editField("start", event.target.value)}
-            aria-invalid={Boolean(error)} aria-describedby={error ? errorId : undefined} />
-        </label>
-        <label>结束时间（不含）
-          <Input type="datetime-local" step={1} value={draft.end} onChange={event => editField("end", event.target.value)}
-            aria-invalid={Boolean(error)} aria-describedby={error ? errorId : undefined} />
-        </label>
-        {error && <p role="alert" id={errorId}>{error}</p>}
-        <div className="qizhi-time-range-picker__actions">
-          <Button onClick={close}>取消</Button>
-          <Button type="primary" htmlType="submit">应用</Button>
-        </div>
-      </form>
-    </div>}>
-    <Button ref={trigger} disabled={disabled} className={["qizhi-time-range-picker", className ?? ""]}>
-      时间范围 · {start.replace("T", " ")} – {end.replace("T", " ")}
-    </Button>
-  </Popover>;
+  return <DatePicker.RangePicker showTime editable closeOnValueChange allowClear={false}
+    onOpenChange={setOpen} separator="～" disabledDate={disableFuture ? date => dateKey(date) > latest().slice(0, 10) : undefined}
+    disabledTime={disableFuture ? disabledTime : undefined}
+    inputLabels={["开始时间", "结束时间（不含）"]} className={["qizhi-date-time-range-picker", className].filter(Boolean).join(" ")}
+    value={formatted} disabled={disabled}
+    validateRange={draft => validateValue(toRange(draft))}
+    onChange={draft => { if (draft.length) onChange(toRange(draft)); }}
+    shortcuts={shortcuts.map(shortcut => ({
+      key: shortcut.key,
+      label: shortcut.label,
+      onSelect: () => {
+        const range = shortcut.resolve(Date.now());
+        const error = validateValue(range);
+        if (!error) {
+          onChange(range);
+          onShortcutSelect?.(shortcut.key, range);
+        }
+        return error;
+      },
+    }))} />;
 }
