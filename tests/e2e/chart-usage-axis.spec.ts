@@ -117,7 +117,13 @@ test("十天按小时显示时，折线和柱状图横轴只显示时分", async
   }
 });
 
-test("九张时间图分别框选后同步全部图表，刷新保留固定范围", async ({ page }) => {
+const names = [
+    "零值与缺失请求量趋势图", "请求量趋势图", "不同服务请求量趋势图",
+    "每日请求量柱状图", "输入与输出用量分组柱状图", "输入与输出用量堆叠柱状图",
+    "费用趋势图", "服务请求量图例与提示信息示例", "可响应和键盘操作的输入输出用量堆叠柱状图",
+  ];
+
+for (const name of names) test(`框选${name}后同步九张图，刷新保留固定范围`, async ({ page }) => {
   test.setTimeout(90000);
   const now = Date.parse("2026-11-13T02:20:09Z");
   await page.clock.setFixedTime(now);
@@ -126,46 +132,39 @@ test("九张时间图分别框选后同步全部图表，刷新保留固定范�
   const controls = doc.getByRole("group", { name: "图表共同时间范围" });
   const start = controls.getByRole("combobox", { name: "开始时间", exact: true });
   const end = controls.getByRole("combobox", { name: "结束时间（不含）", exact: true });
-  const names = [
-    "零值与缺失请求量趋势图", "请求量趋势图", "不同服务请求量趋势图",
-    "每日请求量柱状图", "输入与输出用量分组柱状图", "输入与输出用量堆叠柱状图",
-    "费用趋势图", "服务请求量图例与提示信息示例", "可响应和键盘操作的输入输出用量堆叠柱状图",
-  ];
   const chart = (name: string) => doc.getByRole("region", { name, exact: true });
   const hour = 3_600_000;
-  for (const name of names) {
-    await page.clock.setFixedTime(now);
-    await start.click();
-    await page.getByRole("button", { name: "近 24 小时", exact: true }).click();
-    const plot = chart(name).locator(".qizhi-chart__plot");
-    await expect(plot).toHaveAttribute("data-ready", "true");
-    await plot.scrollIntoViewIfNeeded();
-    const box = (await plot.boundingBox())!;
-    await page.mouse.move(box.x + box.width * 0.32, box.y + 85);
-    await page.mouse.down();
-    await page.mouse.move(box.x + box.width * 0.58, box.y + 85, { steps: 8 });
-    const [from, to] = (await plot.locator(".qizhi-chart__range-selection-label").innerText()).split(" ～ ");
-    await page.mouse.up();
-    await expect(start).toHaveValue(from);
-    await expect(end).toHaveValue(to);
-    const parse = (value: string) => Date.parse(value.replace(" ", "T") + "+08:00");
-    const first = Math.floor(parse(from) / hour);
-    const expected = Array.from({ length: Math.ceil(parse(to) / hour) - first },
-      (_, index) => new Date((first + index) * hour).toISOString());
-    for (const other of names) {
-      await expect(chart(other).locator("tbody tr td:first-child")).toHaveText(expected);
-    }
-    if (name === names[0]) {
-      await expect(chart(name)).toHaveAttribute("data-state", "missing");
-      await expect(chart(name).getByText("暂无有效数据", { exact: true })).toBeVisible();
-    }
-    await page.clock.setFixedTime(now + 120_000);
-    await controls.getByRole("button", { name: "刷新", exact: true }).click();
-    await expect(start).toHaveValue(from);
-    await expect(end).toHaveValue(to);
-    for (const other of names) {
-      await expect(chart(other).locator("tbody tr td:first-child")).toHaveText(expected);
-    }
+  await page.clock.setFixedTime(now);
+  await start.click();
+  await page.getByRole("button", { name: "近 24 小时", exact: true }).click();
+  const plot = chart(name).locator(".qizhi-chart__plot");
+  await expect(plot).toHaveAttribute("data-ready", "true");
+  await plot.scrollIntoViewIfNeeded();
+  const box = (await plot.boundingBox())!;
+  await page.mouse.move(box.x + box.width * 0.32, box.y + 85);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width * 0.58, box.y + 85, { steps: 8 });
+  const [from, to] = (await plot.locator(".qizhi-chart__range-selection-label").innerText()).split(" ～ ");
+  await page.mouse.up();
+  await expect(start).toHaveValue(from);
+  await expect(end).toHaveValue(to);
+  const parse = (value: string) => Date.parse(value.replace(" ", "T") + "+08:00");
+  const first = Math.floor(parse(from) / hour);
+  const expected = Array.from({ length: Math.ceil(parse(to) / hour) - first },
+    (_, index) => new Date((first + index) * hour).toISOString());
+  for (const other of names) {
+    await expect(chart(other).locator("tbody tr td:first-child")).toHaveText(expected);
+  }
+  if (name === names[0]) {
+    await expect(chart(name)).toHaveAttribute("data-state", "missing");
+    await expect(chart(name).getByText("暂无有效数据", { exact: true })).toBeVisible();
+  }
+  await page.clock.setFixedTime(now + 120_000);
+  await controls.getByRole("button", { name: "刷新", exact: true }).click();
+  await expect(start).toHaveValue(from);
+  await expect(end).toHaveValue(to);
+  for (const other of names) {
+    await expect(chart(other).locator("tbody tr td:first-child")).toHaveText(expected);
   }
 });
 

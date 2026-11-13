@@ -122,6 +122,7 @@ async function auditInput(page) {
   const section = page.locator("#component-input");
   const target = section.locator(".qizhi-input").first();
   const sibling = section.locator(".qizhi-input").nth(1);
+  await target.waitFor({ state: "visible" });
   const heightBefore = await css(target, "height");
   await setVars(page.locator("html"), { "--primary-6": "80, 120, 255" });
   await target.locator("input").focus();

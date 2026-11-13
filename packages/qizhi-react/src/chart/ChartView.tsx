@@ -74,9 +74,10 @@ const timeRangeAt = (brush: ActiveBrush): ChartTimeRange => {
   const resolvedStep = brush.selection.resolveStep?.({ start: rawStart, end: rawEnd });
   const step = resolvedStep !== undefined && Number.isFinite(resolvedStep) && resolvedStep > 0
     ? resolvedStep : domain.step ?? TIME_SELECTION_STEPS[brush.selection.precision ?? "second"];
+  const origin = brush.selection.stepOrigin ?? 0;
   return {
-    start: clamp(Math.floor(rawStart / step) * step, domain.start, domain.end),
-    end: clamp(Math.ceil(rawEnd / step) * step, domain.start, domain.end),
+    start: clamp(origin + Math.floor((rawStart - origin) / step) * step, domain.start, domain.end),
+    end: clamp(origin + Math.ceil((rawEnd - origin) / step) * step, domain.start, domain.end),
   };
 };
 const timeRangeGeometry = (brush: ActiveBrush, range: ChartTimeRange) => {

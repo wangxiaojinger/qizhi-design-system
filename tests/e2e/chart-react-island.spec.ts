@@ -11,7 +11,9 @@ test("图表文档：三视口布局、提示、图例、状态、源码与键�
   await page.goto("/#component-chart");
   const doc = page.locator("#component-chart");
   const controls = doc.getByRole("group", { name: "图表共同时间范围" });
-  await controls.getByLabel("开始时间", { exact: true }).click();
+  await controls.getByRole("combobox", { name: "开始时间", exact: true }).click();
+  await controls.getByLabel("开始时间", { exact: true }).fill("2026-09-01 00:00:00");
+  await controls.getByLabel("结束时间（不含）").fill("2026-09-10 00:00:00");
   await page.getByRole("dialog").getByRole("button", { name: "确认", exact: true }).click();
   await expect(doc.locator(".codebox-wrapper")).toHaveCount(12);
   await expect(doc.locator('[data-ready="true"]')).toHaveCount(9, { timeout: 30000 });

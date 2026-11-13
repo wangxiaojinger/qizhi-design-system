@@ -44,6 +44,7 @@ export function queryDemoData(range: TimeRange, mode: DemoGranularity, onBrush: 
   }
   const rangeSelection = {
     timeDomain: range,
+    stepOrigin: -offset,
     formatTime: local ? (time: number) => displayTime.format(time) : undefined,
     resolveStep: (next: TimeRange) => mode === "day" || mode === "auto" && next.end - next.start > maxHourlyDays * day ? day : hour,
     onChange: onBrush,

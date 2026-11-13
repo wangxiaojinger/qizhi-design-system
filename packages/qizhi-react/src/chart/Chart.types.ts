@@ -41,6 +41,8 @@ export interface ChartTimeRangeSelection {
   /** 游标和选区的时间显示精度，默认 second。未显式配置 step 时也用作拖选步长。 */
   readonly precision?: "millisecond" | "second" | "minute";
   /** 根据未对齐的选区决定毫秒步长。无有效返回值时沿用 timeDomain.step 或 precision。 */
+  /** Origin for snapping time selections, in Unix milliseconds. */
+  readonly stepOrigin?: number;
   readonly resolveStep?: (range: ChartTimeRange) => number | undefined;
   /** 自定义游标与选区的时间文本，例如按用户时区格式化。默认按 UTC 取值，省略时区后缀。 */
   readonly formatTime?: (ms: number) => string;

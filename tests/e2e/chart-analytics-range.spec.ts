@@ -122,11 +122,15 @@ test("日图内拖选几小时，预览与实际查询范围一致", async ({ pa
       original.call(this, text, x, y, maxWidth);
     };
   });
-  await page.clock.setFixedTime(Date.UTC(2026, 8, 10, 16));
+  await page.clock.setFixedTime(Date.UTC(2026, 8, 10, 17));
   await page.goto("/#component-chart");
   const doc = page.locator("#component-chart");
   const controls = doc.getByRole("group", { name: "图表共同时间范围" });
   const trigger = controls.getByRole("combobox", { name: "开始时间", exact: true });
+  await trigger.click();
+  await controls.getByLabel("开始时间", { exact: true }).fill("2026-09-01 00:00:00");
+  await controls.getByLabel("结束时间（不含）").fill("2026-09-11 00:00:00");
+  await page.getByRole("dialog").getByRole("button", { name: "确认", exact: true }).click();
   const line = doc.getByRole("region", { name: "请求量趋势图", exact: true });
   const bar = doc.getByRole("region", { name: "每日请求量柱状图", exact: true });
   const plot = line.locator('.qizhi-chart__plot--range-selectable[data-ready="true"]');
@@ -171,7 +175,7 @@ test("日图内拖选几小时，预览与实际查询范围一致", async ({ pa
 
 test("自动模式长选区按日查询并提示边界调整", async ({ page }) => {
   test.skip(page.viewportSize()!.width !== 1440, "使用完整时间轴验证超过 10 天的选区");
-  await page.clock.setFixedTime(Date.UTC(2026, 8, 11));
+  await page.clock.setFixedTime(Date.UTC(2026, 8, 10, 16));
   await page.goto("/#component-chart");
   const doc = page.locator("#component-chart");
   const controls = doc.getByRole("group", { name: "图表共同时间范围" });
@@ -224,7 +228,7 @@ for (const name of ["请求量趋势图", "每日请求量柱状图"]) {
     await page.getByRole("dialog").getByRole("button", { name: "确认" }).click();
     const chart = page.getByRole("region", { name, exact: true });
     const rows = chart.locator("tbody tr");
-    await expect(rows.last()).toContainText("2026-09-10T00:00:00");
+    await expect(rows.last()).toContainText("2026-09-09T16:00:00");
     const plot = chart.locator('.qizhi-chart__plot[data-ready="true"]');
     await plot.scrollIntoViewIfNeeded();
     const box = (await plot.boundingBox())!;
@@ -234,7 +238,7 @@ for (const name of ["请求量趋势图", "每日请求量柱状图"]) {
     await expect(plot.locator(".qizhi-chart__range-selection-label")).toHaveText(/～ 2026-09-11 00:00:00$/);
     await page.mouse.up();
     await expect(page.getByLabel("结束时间（不含）")).toHaveValue("2026-09-11 00:00:00");
-    await expect(rows.last()).toContainText("2026-09-10T23:00:00");
+    await expect(rows.last()).toContainText("2026-09-10T15:00:00");
     const bar = page.getByRole("region", { name: "每日请求量柱状图", exact: true });
     await expect(bar.locator("tbody tr").last().locator("td").last()).toHaveText("0 次");
   });
