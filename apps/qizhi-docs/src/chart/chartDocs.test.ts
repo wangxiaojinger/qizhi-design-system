@@ -211,9 +211,21 @@ it("小时数据补零时保留显式未知值和查询的结束边界", () => {
   expect(query([]).data).toEqual([]);
 });
 
-it("日查询无匹配记录时仍返回可补齐的完整日期范围", () => {
+it("日查询无匹配记录时返回日桶及零值", () => {
   const query = queryDemoData({ start: Date.UTC(2026, 8, 3), end: Date.UTC(2026, 8, 5) }, "day", () => {});
   const result = query([{ x: "2026-09-01", series: "requests", value: 24 }]);
-  expect(result.data).toEqual([]);
-  expect(result.dateRange).toEqual({ start: "2026-09-03", end: "2026-09-04" });
+  expect(result.data.map(row => row.value)).toEqual([0, 0]);
+  expect(result.usageTimeAxis?.granularity).toBe("day");
+  expect(result.usageTimeAxis?.buckets.map(bucket => bucket.x)).toEqual(["2026-09-03T00:00:00.000Z", "2026-09-04T00:00:00.000Z"]);
+});
+
+it("首尾桶按实际查询边界计入模拟事件", () => {
+  const start = Date.parse("2026-09-01T07:50:01Z");
+  const boundary = Date.parse("2026-09-01T08:00:00Z");
+  const end = Date.parse("2026-09-01T08:10:00Z");
+  const result = queryDemoData({ start, end }, "hour", () => {})(
+    [{ x: "2026-09-01", series: "requests", value: 288 }],
+  );
+  expect(result.usageTimeAxis?.buckets.map(bucket => [bucket.start, bucket.end])).toEqual([[start, boundary], [boundary, end]]);
+  expect(result.data.map(row => row.value)).toEqual([1, 2]);
 });

@@ -30,7 +30,7 @@
 .qizhi-date-picker__clear svg { width: 16px; height: 16px; }
 .qizhi-date-picker.has-value:hover .qizhi-date-picker__clear { display: inline-flex; }
 .qizhi-date-picker.has-value:hover .qizhi-date-picker__clear[hidden] { display: none; }
-.qizhi-date-picker.has-value:hover .qizhi-date-picker__suffix { display: none; }
+.qizhi-date-picker.has-value:hover:has(.qizhi-date-picker__clear:not([hidden])) .qizhi-date-picker__suffix { display: none; }
 .qizhi-date-picker__popup { position: fixed; z-index: 60; width: 280px; border: 1px solid var(--color-border-2); border-radius: 2px; background: var(--color-bg-2); box-shadow: 0 6px 16px rgba(29,33,41,.12); }
 .qizhi-date-picker__popup--range { width: 560px; }
 .qizhi-date-picker__popup--time { width: 485px; }
@@ -86,4 +86,48 @@
   .qizhi-date-picker__popup--range:not(.qizhi-date-picker__popup--time) .qizhi-date-picker__panels, .qizhi-date-picker__popup--time .qizhi-date-picker__main { grid-template-columns:minmax(0,1fr); }
   .qizhi-date-picker__panel + .qizhi-date-picker__panel, .qizhi-date-picker__time { border-top:1px solid var(--color-border-1); border-left:0; }
   .qizhi-date-picker__time-columns { height:180px; }
+}
+
+.qizhi-date-picker__shortcuts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
+.qizhi-date-picker__shortcuts > .qizhi-btn {
+  padding-inline: 0;
+  border-inline-width: 0;
+}
+
+.qizhi-date-picker__range-error {
+  margin: 0;
+  padding: 0 12px 8px;
+  color: var(--color-danger);
+}
+
+.qizhi-date-time-range-picker.is-open .qizhi-date-picker__input { caret-color: transparent; }
+
+.qizhi-date-picker.qizhi-date-time-range-picker {
+  width: max-content;
+}
+
+.qizhi-date-time-range-picker .qizhi-date-picker__input-wrap { flex: 0 1 auto; }
+.qizhi-date-time-range-picker .qizhi-date-picker__input {
+  field-sizing: content;
+  border-right: 1px solid transparent;
+  width: auto;
+  padding-inline: 6px;
+}
+
+@media (max-width: 480px) {
+  .qizhi-date-picker.qizhi-date-time-range-picker {
+    display: inline-grid;
+    grid-template-columns: 16px minmax(0, 1fr) 16px;
+    grid-template-rows: repeat(2, 22px);
+    height: auto;
+  }
+  .qizhi-date-time-range-picker [data-date-picker-input-wrap="start"] { grid-area: 1 / 2; }
+  .qizhi-date-time-range-picker [data-date-picker-input-wrap="end"] { grid-area: 2 / 2; }
+  .qizhi-date-time-range-picker .qizhi-date-picker__separator { grid-area: 2 / 1; justify-content: center; }
+  .qizhi-date-time-range-picker .qizhi-date-picker__suffix { grid-area: 1 / 3 / 3; }
 }

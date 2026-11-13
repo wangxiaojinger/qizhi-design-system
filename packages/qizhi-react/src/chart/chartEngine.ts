@@ -1,7 +1,8 @@
-import type { ChartSeries, BarChartMode, FocusedItem } from "./Chart.types";
+import type { ChartSeries, ChartUsageTimeAxis, BarChartMode, FocusedItem } from "./Chart.types";
 import type { ChartModel } from "./chartModel";
-import { colorTokenCss, seriesColorToken } from "./chartModel";
+import { colorTokenCss, parseChartTime, seriesColorToken } from "./chartModel";
 import { focusOpacity } from "./chartFocus";
+import { usageTick } from "./chartUsageTime";
 import type { G2Spec } from "@antv/g2";
 
 export const PLOT_PADDING = { left: 44, right: 1, top: 24, bottom: 40 };
@@ -137,8 +138,9 @@ export interface EngineInput {
   onBackgroundClick?: () => void;
   useDefaultTimeLabels?: boolean;
   categoricalAxis?: boolean;
-  terminalCategory?: string;
-  singleBarCenter?: number;
+  usageAxis?: ChartUsageTimeAxis;
+  timeStart?: number;
+  timeEnd?: number;
   xFormatter: (value: string) => string; valueFormatter: (value: number) => string;
 }
 
@@ -175,7 +177,15 @@ export async function renderChart(host: HTMLElement, input: EngineInput) {
   const measureLabel = (label: string) => measurement?.measureText(label).width ?? label.length * fontSize;
   const yLabels = new Set<string>();
   const categories = input.model.categories;
-  const scaleCategories = input.terminalCategory ? [...categories, input.terminalCategory] : categories;
+  const { timeStart, timeEnd } = input;
+  const timeSpan = timeStart !== undefined && timeEnd !== undefined ? timeEnd - timeStart : 0;
+  const usageAxis = input.usageAxis;
+  const usageLabels = usageAxis?.buckets.map(bucket => usageTick(bucket.x, usageAxis, bucket.start));
+  const categoryIndexes = new Map(categories.map((key, index) => [key, index]));
+  let usagePositions: number[] | undefined;
+  const timeRatio = (category: string) => usagePositions?.[categoryIndexes.get(category)!]
+    ?? (parseChartTime(category) - (timeStart ?? 0)) / timeSpan;
+  const scaleCategories = categories;
   const timeAxis = input.useDefaultTimeLabels ? timeAxisLayout(categories) : undefined;
   const axisLabels = timeAxis?.labels ?? categories.map(input.xFormatter);
   const regularTime = Boolean(timeAxis?.calendarTicks) || isRegularTimeAxis(categories);
@@ -183,28 +193,25 @@ export async function renderChart(host: HTMLElement, input: EngineInput) {
     ? customTimeTickIndexes(axisLabels) : undefined;
   const calendarTicks = timeAxis?.calendarTicks ?? customTicks;
   const centeredDates = Boolean(calendarTicks) || (regularTime && categories.every(value => ISO_DATE.test(value)));
-  if (centeredDates && isLine) {
+  if (!timeSpan && centeredDates && isLine) {
     // Center date labels on their data points, including the ends of the plot.
     const endInset = Math.min(Math.ceil(Math.max(measureLabel(axisLabels[0]), measureLabel(axisLabels[axisLabels.length - 1])) / 2) + 1, input.width / 8);
     padding = { ...padding, left: Math.max(padding.left, endInset), right: Math.max(padding.right, endInset) };
   }
   const makeOptions = (): G2Spec => {
     const plotWidth = input.width - padding.left - padding.right;
+    if (usageLabels?.length) {
+      const last = usageLabels.length - 1;
+      // Align the outer text edges with the plot while keeping each label
+      // centered on its mark and all mark positions evenly spaced.
+      const firstPosition = Math.min(0.25, measureLabel(usageLabels[0]) / (2 * plotWidth));
+      const lastPosition = 1 - Math.min(0.25, measureLabel(usageLabels[last]) / (2 * plotWidth));
+      usagePositions = usageLabels.map((_, index) => last
+        ? firstPosition + (lastPosition - firstPosition) * index / last : 0.5);
+    }
     const visibleIndexes = selectXAxisLabels(axisLabels, plotWidth, isLine, measureLabel, regularTime, centeredDates ? padding : undefined, calendarTicks, scaleCategories.length);
     const visibleLabels = new Map([...visibleIndexes].map(index => [categories[index], axisLabels[index]]));
-    const singleBarAnchor = input.singleBarCenter === undefined ? undefined : input.singleBarCenter * plotWidth;
-    const alignSingleBarLabelLeft = singleBarAnchor !== undefined
-      && measureLabel(axisLabels[0]) / 2 > Math.min(singleBarAnchor, plotWidth - singleBarAnchor);
-    if (alignSingleBarLabelLeft) {
-      const limit = plotWidth - singleBarAnchor - X_LABEL_GAP;
-      let label = axisLabels[0];
-      if (measureLabel(label) > limit) {
-        const chars = Array.from(label);
-        while (chars.length && measureLabel(chars.join("") + "…") > limit) chars.pop();
-        label = chars.length ? chars.join("") + "…" : "";
-      }
-      visibleLabels.set(categories[0], label);
-    } else if (!visibleLabels.size && plotWidth > X_LABEL_GAP && categories.length) {
+    if (!visibleLabels.size && plotWidth > X_LABEL_GAP && categories.length) {
       const middle = Math.floor(categories.length / 2);
       // Very long custom text can be too wide even for a single centered label.
       const chars = Array.from(axisLabels[middle]);
@@ -212,13 +219,58 @@ export async function renderChart(host: HTMLElement, input: EngineInput) {
       while (chars.length && measureLabel(chars.join("") + "…") > limit) chars.pop();
       if (chars.length) visibleLabels.set(categories[middle], chars.join("") + "…");
     }
+    let timeLabels: string[] = [];
+    let timeTicks: number[] = [];
+    if (usageLabels?.length) {
+      const labels = usageLabels;
+      const last = labels.length - 1;
+      const slotWidth = last ? plotWidth * (usagePositions![last] - usagePositions![0]) / last : plotWidth;
+      const labelWidth = Math.max(...labels.map(measureLabel));
+      const selected = [0];
+      if (last > 0) {
+        const stride = Math.max(1, Math.ceil((labelWidth + X_LABEL_GAP) / slotWidth));
+        const intervals = Math.max(1, Math.floor(last / stride));
+        // Round to real data points while spreading the labels across the entire plot.
+        for (let index = 1; index < intervals; index++) {
+          selected.push(Math.round(index * last / intervals));
+        }
+        selected.push(last);
+      }
+      timeTicks = selected.map(index => timeRatio(categories[index]));
+      timeLabels = selected.map(index => labels[index]);
+    } else if (timeSpan && timeStart !== undefined) {
+      for (let intervals = 6; intervals >= 1; intervals--) {
+        const ticks = Array.from({ length: intervals + 1 }, (_, i) => i / intervals);
+        const times = ticks.map(ratio => new Date(Math.round(timeStart + ratio * timeSpan)).toISOString());
+        const sameDay = times[0].slice(0, 10) === times[intervals].slice(0, 10);
+        const sameYear = times[0].slice(0, 4) === times[intervals].slice(0, 4);
+        const dateOnly = !sameDay && times.every(iso => iso.slice(11, 23) === "00:00:00.000");
+        const timeEnd = timeSpan < 6_000 ? 23 : times.every(iso => iso.slice(17, 23) === "00.000") ? 16 : 19;
+        const fallback = times.map(iso => dateOnly ? iso.slice(sameYear ? 5 : 0, 10)
+          : iso.slice(sameDay ? 11 : sameYear ? 5 : 0, timeEnd).replace("T", " "));
+        const custom = input.useDefaultTimeLabels ? fallback : times.map(iso =>
+          input.xFormatter(dateOnly ? iso.slice(0, 10) : iso));
+        const spacing = plotWidth / intervals;
+        const fits = (labels: string[]) => {
+          const widths = labels.map(measureLabel);
+          return widths.every((width, i) => i === 0
+            || widths[i - 1] * (i === 1 ? 1 : 0.5) + width * (i === intervals ? 1 : 0.5) + X_LABEL_GAP <= spacing);
+        };
+        const distinct = new Set(custom).size === custom.length && custom.every(Boolean);
+        const labels = distinct && (intervals > 1 || fits(custom)) ? custom : fallback;
+        if (intervals > 1 && !fits(labels)) continue;
+        timeTicks = ticks;
+        timeLabels = labels;
+        break;
+      }
+    }
     const axis = {
       x: { title: false, grid: false, tick: false, line: true, lineStroke: axisColor,
         labelSpacing: parseFloat(css.getPropertyValue("--chart-axis-label-gap")),
-        labelTextAlign: (datum: { id: string }) => alignSingleBarLabelLeft ? "left" : centeredDates || !isLine || scaleCategories.length === 1 ? "center" : datum.id === "0" ? "left" : datum.id === String(scaleCategories.length - 1) ? "right" : "center",
+        labelTextAlign: (datum: { id: string }) => input.usageAxis ? "center" : timeSpan ? Number(datum.id) === 0 ? "left" : Number(datum.id) === timeTicks.length - 1 ? "right" : "center" : centeredDates || !isLine || scaleCategories.length === 1 ? "center" : datum.id === "0" ? "left" : datum.id === String(scaleCategories.length - 1) ? "right" : "center",
         labelFill: textColor, labelOpacity: 1, labelFontFamily: fontFamily, labelFontSize: fontSize,
         labelAutoHide: false, labelAutoRotate: false, labelAutoEllipsis: false, transform: [],
-        labelFormatter: (x: string) => visibleLabels.get(x) ?? "" },
+        labelFormatter: (x: string, index: number) => timeSpan ? timeLabels[index] ?? "" : visibleLabels.get(x) ?? "" },
       y: { title: false, line: false, tick: false, labelSpacing: 16, labelTextAlign: "right", grid: true, gridStroke: borderColor, gridStrokeOpacity: 1, gridLineDash: [],
         labelFill: textColor, labelOpacity: 1, labelFontFamily: fontFamily, labelFontSize: fontSize,
         transform: [], labelAutoHide: false, labelAutoEllipsis: false, labelFormatter: (value: number) => {
@@ -229,12 +281,32 @@ export async function renderChart(host: HTMLElement, input: EngineInput) {
     };
     const widthTier = window.innerWidth >= 1280 ? "large" : window.innerWidth >= 768 ? "medium" : "small";
     const maxBarWidth = parseFloat(css.getPropertyValue(`--chart-bar-width-${widthTier}`));
-    const common = { data, encode: { x: "x", y: "value", color: "series" }, animate: false as const, tooltip: false as const };
+    const common = { data, encode: { x: timeSpan ? (datum: { x: string }) => timeRatio(datum.x) : "x", y: "value", color: "series" }, animate: false as const, tooltip: false as const };
+    const ratios = timeSpan ? categories.map(timeRatio) : [];
+    const usageBarLimit = usagePositions && usagePositions.length > 1
+      ? 2 * Math.min(usagePositions[0], 1 - usagePositions[usagePositions.length - 1]) : 1;
+    const barWidth = Math.min(usageBarLimit, (maxBarWidth || plotWidth) / plotWidth, 0.7 * ratios.reduce(
+      (minimum, ratio, i) => i ? Math.min(minimum, ratio - ratios[i - 1]) : minimum, 1));
+    const groupSize = input.mode === "grouped" ? Math.max(1, input.visibleKeys.length) : 1;
+    const timeBars = {
+      ...common,
+      type: "rect" as const,
+      encode: {
+        ...common.encode,
+        x: (datum: { x: string; series: string }) => barEdge(datum, 0),
+        x1: (datum: { x: string; series: string }) => barEdge(datum, 1),
+      },
+      transform: input.mode === "stacked" ? [{ type: "stackY" as const, groupBy: "x" }] : [],
+    };
+    function barEdge(datum: { x: string; series: string }, edge: number) {
+      const groupIndex = input.mode === "grouped" ? input.visibleKeys.indexOf(datum.series) : 0;
+      const left = Math.max(0, Math.min(1 - barWidth, timeRatio(datum.x) - barWidth / 2));
+      return left + barWidth * (groupIndex + edge) / groupSize;
+    }
     return {
       type: "view", margin: 0, inset: 0, paddingLeft: padding.left, paddingRight: padding.right,
       paddingTop: padding.top, paddingBottom: padding.bottom,
-      scale: { x: { type: isLine ? "point" : "band", domain: scaleCategories, ...(isLine ? { padding: 0 } : { paddingInner: BAR_BAND_PADDING.inner, paddingOuter: BAR_BAND_PADDING.outer }),
-        range: input.singleBarCenter === undefined ? undefined : [0, input.singleBarCenter * 2] },
+      scale: { x: timeSpan ? { type: "linear", domain: [0, 1], nice: false, tickMethod: () => timeTicks } : { type: isLine ? "point" : "band", domain: scaleCategories, ...(isLine ? { padding: 0 } : { paddingInner: BAR_BAND_PADDING.inner, paddingOuter: BAR_BAND_PADDING.outer }) },
         y: { zero: true, nice: true, tickCount: 5 }, color: { type: "ordinal", domain: input.series.map(s => s.key), range: colors } },
       axis, legend: false, interaction: { tooltip: false }, animate: false,
       theme: { view: { viewFill: "transparent", plotFill: "transparent" } },
@@ -245,7 +317,7 @@ export async function renderChart(host: HTMLElement, input: EngineInput) {
             style: { lineWidth: parseFloat(css.getPropertyValue("--chart-line-width")) || 2, lineDash: [] } },
           ...(input.focusable ? [{ ...common, data: filtered, type: "point", encode: { ...common.encode, size: FOCUS_POINT_RADIUS, shape: "circle" }, style: { fillOpacity: 0, strokeOpacity: 0, lineWidth: 12, cursor: "pointer" } }] : []),
         ];
-      }) : [{ ...common, type: "interval", style: input.mode === "grouped" ? {} : { maxWidth: maxBarWidth }, transform: input.mode === "grouped" ? [{ type: "dodgeX" }] : input.mode === "stacked" ? [{ type: "stackY" }] : [] }],
+      }) : timeSpan ? [timeBars] : [{ ...common, type: "interval", style: input.mode === "grouped" ? {} : { maxWidth: maxBarWidth }, transform: input.mode === "grouped" ? [{ type: "dodgeX" }] : input.mode === "stacked" ? [{ type: "stackY" }] : [] }],
     };
   };
   const visibility = host.style.visibility;
@@ -302,7 +374,21 @@ export async function renderChart(host: HTMLElement, input: EngineInput) {
     };
     const destroy = chart.destroy.bind(chart);
     chart.destroy = () => { cancelAnimationFrame(frame); canvas.document.removeEventListener("click", click); destroy(); };
-    return Object.assign(chart, { updateFocus, plotPadding: padding });
+    const getBarBounds = (key: string) => {
+      const bars = records.filter(record => !record.line && record.datum.x === key);
+      if (!bars.length) return;
+      const bounds = bars.map(({ element }) => (element as unknown as { getBBox: () => { x: number; width: number } }).getBBox());
+      return {
+        left: Math.min(...bounds.map(box => box.x)),
+        right: Math.max(...bounds.map(box => box.x + box.width)),
+      };
+    };
+    const usageEdges = usagePositions && [
+      0,
+      ...usagePositions.slice(1).map((position, index) => (position + usagePositions![index]) / 2),
+      1,
+    ];
+    return Object.assign(chart, { updateFocus, getBarBounds, usagePositions, usageEdges, plotPadding: padding });
   }
   catch (error) { chart.destroy(); throw error; }
   finally { host.style.visibility = visibility; }

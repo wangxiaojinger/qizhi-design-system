@@ -114,7 +114,7 @@ export const chartDemos: readonly ChartDemoDefinition[] = [
   {
     id: "图表-响应式与键盘操作",
     title: "响应式与键盘操作",
-    description: "图表随容器宽度调整布局，并支持使用键盘查看数据和操作图例。以下为演示数据。此示例演示时间轴默认框选，松手后缩小当前图表范围。",
+    description: "图表随容器宽度调整布局，并支持使用键盘查看数据和操作图例。以下为演示数据。框选后更新图表页的共同时间范围。",
     component: ResponsiveKeyboardDemo,
     source: responsiveKeyboardSource,
   },

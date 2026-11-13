@@ -5,18 +5,24 @@ test("文档原有四个柱状图支持真实鼠标选择和再次取消", async
   test.setTimeout(60000);
   const errors: string[] = []; page.on("pageerror", e => errors.push(e.message));
   await page.goto("/#component-chart", { waitUntil: "domcontentloaded" });
-  const charts = page.locator('#component-chart .qizhi-chart[data-kind="bar"]');
+  const charts = page.locator('#component-chart .codebox-wrapper .qizhi-chart[data-kind="bar"]');
   await expect(charts).toHaveCount(4);
   mkdirSync("/tmp/qizhi-all-bars", { recursive: true });
   for (let i = 0; i < 4; i++) {
     const chart = charts.nth(i), plot = chart.locator(".qizhi-chart__plot");
     await expect(plot).toHaveAttribute("data-ready", "true", { timeout: 30000 });
     await expect(plot).toHaveAttribute("role", "listbox");
-    const count = await chart.locator("tbody tr").count();
-    const grouped = await chart.getAttribute("data-mode") === "grouped";
-    const width = await plot.evaluate(el => Math.floor(el.getBoundingClientRect().width));
-    // 与当前分类带宽一致，点击第一分类第一系列柱形的实体下部。
-    const x = 44.5 + (grouped ? 0.675 : 0.85) / (count + 0.7) * (width - 45);
+    const x = await plot.locator("canvas").evaluate((canvas: HTMLCanvasElement) => {
+      const context = canvas.getContext("2d")!;
+      const scale = canvas.width / canvas.getBoundingClientRect().width;
+      const pixels = context.getImageData(0, Math.floor(230 * scale), canvas.width, 1).data;
+      // Find the first colored bar at the click height on the rendered canvas.
+      for (let i = 0; i < pixels.length; i += 4) {
+        const [red, green, blue, alpha] = pixels.subarray(i, i + 4);
+        if (alpha > 200 && Math.max(red, green, blue) - Math.min(red, green, blue) > 70) return i / 4 / scale + 1;
+      }
+      throw new Error("未找到可点击的柱形");
+    });
     await plot.click({ position: { x, y: 230 } });
     await expect(chart.locator('[role="option"][aria-selected="true"]')).toHaveCount(1);
     await page.mouse.move(0, 0); await page.waitForTimeout(220);

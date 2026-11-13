@@ -1,7 +1,7 @@
 {
   "schemaVersion": 2,
   "status": "passed",
-  "sourceFingerprint": "sha256:f1a6711891a45bec9bba1c6835315ab16660a8f981a2b46502c1227933b4bb6d",
+  "sourceFingerprint": "sha256:8b13e3d6c3ef4bcd8fb65a03cd1fcde99df0ada496bea1721ede84f35daf7716",
   "root": ".",
   "exclusions": [
     ".git/**",
@@ -10,7 +10,7 @@
     "assets/remixicon/**"
   ],
   "summary": {
-    "files": 141,
+    "files": 140,
     "unreferencedFiles": 1,
     "findings": 3039,
     "byScope": {
@@ -27,8 +27,8 @@
       "shadow": 127
     },
     "byClassification": {
-      "review-required": 1045,
-      "theme-token-candidate": 1543,
+      "review-required": 1044,
+      "theme-token-candidate": 1544,
       "structural-constant": 451
     }
   },
@@ -165,7 +165,6 @@
     "packages/qizhi-react/src/task-overview/taskOverview.css",
     "packages/qizhi-react/src/time-picker/timePanel.css",
     "packages/qizhi-react/src/time-picker/timePicker.css",
-    "packages/qizhi-react/src/time-range-picker/timeRangePicker.css",
     "packages/qizhi-react/src/timeline/timeline.css",
     "packages/qizhi-react/src/tooltip/tooltip.css",
     "packages/qizhi-react/src/top-navigation/topNavigation.css",
@@ -10056,6 +10055,42 @@
       "reason": "positional or geometric offset"
     },
     {
+      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:94:3:gap",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/date-picker/datePicker.css",
+      "line": 94,
+      "column": 3,
+      "category": "spacing",
+      "property": "gap",
+      "value": "4px 8px",
+      "classification": "theme-token-candidate",
+      "reason": "gap participates in component density"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:104:3:padding",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/date-picker/datePicker.css",
+      "line": 104,
+      "column": 3,
+      "category": "spacing",
+      "property": "padding",
+      "value": "0 12px 8px",
+      "classification": "theme-token-candidate",
+      "reason": "padding participates in component density"
+    },
+    {
+      "id": "spacing:packages/qizhi-react/src/date-picker/datePicker.css:119:3:padding-inline",
+      "scope": "component-runtime",
+      "file": "packages/qizhi-react/src/date-picker/datePicker.css",
+      "line": 119,
+      "column": 3,
+      "category": "spacing",
+      "property": "padding-inline",
+      "value": "6px",
+      "classification": "theme-token-candidate",
+      "reason": "padding-inline participates in component density"
+    },
+    {
       "id": "spacing:packages/qizhi-react/src/descriptions/descriptions.css:9:3:margin-bottom",
       "scope": "component-runtime",
       "file": "packages/qizhi-react/src/descriptions/descriptions.css",
@@ -15886,42 +15921,6 @@
       "value": "6px 8px",
       "classification": "theme-token-candidate",
       "reason": "padding participates in component density"
-    },
-    {
-      "id": "spacing:packages/qizhi-react/src/time-range-picker/timeRangePicker.css:20:3:gap",
-      "scope": "component-runtime",
-      "file": "packages/qizhi-react/src/time-range-picker/timeRangePicker.css",
-      "line": 20,
-      "column": 3,
-      "category": "spacing",
-      "property": "gap",
-      "value": "8px",
-      "classification": "theme-token-candidate",
-      "reason": "gap participates in component density"
-    },
-    {
-      "id": "spacing:packages/qizhi-react/src/time-range-picker/timeRangePicker.css:35:3:gap",
-      "scope": "component-runtime",
-      "file": "packages/qizhi-react/src/time-range-picker/timeRangePicker.css",
-      "line": 35,
-      "column": 3,
-      "category": "spacing",
-      "property": "gap",
-      "value": "8px",
-      "classification": "theme-token-candidate",
-      "reason": "gap participates in component density"
-    },
-    {
-      "id": "spacing:packages/qizhi-react/src/time-range-picker/timeRangePicker.css:39:3:margin-block-end",
-      "scope": "component-runtime",
-      "file": "packages/qizhi-react/src/time-range-picker/timeRangePicker.css",
-      "line": 39,
-      "column": 3,
-      "category": "spacing",
-      "property": "margin-block-end",
-      "value": "12px",
-      "classification": "review-required",
-      "reason": "non-component surface or ambiguous design responsibility"
     },
     {
       "id": "spacing:packages/qizhi-react/src/timeline/timeline.css:12:3:column-gap",

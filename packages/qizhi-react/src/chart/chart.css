@@ -24,3 +24,8 @@
 .qizhi-chart-tooltip { position: fixed; z-index: 1200; pointer-events: none; box-sizing: border-box; max-width: min(360px, calc(100vw - 16px)); max-height: calc(100vh - 16px); overflow: auto; padding: var(--chart-padding); border: 1px solid var(--color-border-2); border-radius: var(--border-radius-medium); box-shadow: var(--shadow); background: var(--color-bg-popup); color: var(--color-text-1); font-family: var(--font-sans); font-size: var(--chart-body-font-size); line-height: var(--line-height-regular); overflow-wrap: anywhere; }
 .qizhi-chart-tooltip__row { display: flex; align-items: center; gap: var(--chart-gap); margin-top: var(--chart-gap); }
 .qizhi-chart-tooltip__value { margin-left: auto; font-variant-numeric: tabular-nums; }
+
+.qizhi-chart[data-kind="bar"] .qizhi-chart__swatch,
+.qizhi-chart-tooltip[data-kind="bar"] .qizhi-chart__swatch { height: 6px; }
+
+.qizhi-chart[data-usage-axis="true"] .qizhi-chart__content { min-width: 0; }

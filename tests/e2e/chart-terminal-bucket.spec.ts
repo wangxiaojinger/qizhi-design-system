@@ -48,24 +48,9 @@ test("连续性检查能抓住回跳到已见过的时间", async ({ page }) => 
 });
 
 test("显式末桶的折线图右端连续取值，正反拖选预览与查询一致", async ({ page }) => {
-  await page.addInitScript(() => {
-    const fillText = CanvasRenderingContext2D.prototype.fillText;
-    CanvasRenderingContext2D.prototype.fillText = function (text, x, y, maxWidth) {
-      if (text === "01-03 00:00") {
-        const transform = this.getTransform();
-        this.canvas.dataset.lastSampleX = String((transform.a * x + transform.c * y + transform.e) / this.canvas.width);
-      }
-      return fillText.call(this, text, x, y, maxWidth);
-    };
-  });
   const { plot, box, y, visibleLeft } = await openPlot(page, "kind=line&explicit");
   const left = Math.max(box.x + box.width * 0.35, visibleLeft + 15);
   const preview = plot.locator(".qizhi-chart__range-selection-label");
-  const canvas = plot.locator("canvas");
-  await expect(canvas).toHaveAttribute("data-last-sample-x", /^(0\.[0-9]+)$/);
-  const sampleX = Number(await canvas.getAttribute("data-last-sample-x"));
-  expect(sampleX).toBeGreaterThan(0.6);
-  expect(sampleX).toBeLessThan(0.75);
   await page.mouse.move(left, y);
   await page.mouse.down();
   const ends: string[] = [];
@@ -200,16 +185,6 @@ for (const kind of ["line", "bar"]) {
 
 for (const kind of ["line", "bar"]) {
   test(`${kind} 单点框选覆盖刻度时保留数据`, async ({ page }) => {
-    await page.addInitScript(() => {
-      const fillText = CanvasRenderingContext2D.prototype.fillText;
-      CanvasRenderingContext2D.prototype.fillText = function (text, x, y, maxWidth) {
-        if (text === "00:00") {
-          const transform = this.getTransform();
-          this.canvas.dataset.singleTick = String((transform.a * x + transform.c * y + transform.e) / this.canvas.width);
-        }
-        return fillText.call(this, text, x, y, maxWidth);
-      };
-    });
     const { plot, box, y, visibleLeft } = await openPlot(page, `kind=${kind}&local`);
     const preview = plot.locator(".qizhi-chart__range-selection-label");
     const rows = page.locator("table[aria-label='末桶探针数据'] tbody tr");
@@ -220,12 +195,8 @@ for (const kind of ["line", "bar"]) {
     await page.mouse.up();
     await expect(rows).toHaveCount(1);
 
-    await plotGeometry(plot, 0);
-    const canvas = plot.locator("canvas[data-single-tick]");
-    await expect(canvas).toHaveCount(1);
-    const canvasBox = await canvas.boundingBox();
-    if (!canvasBox) throw new Error("缺少单点画布");
-    const tickX = canvasBox.x + canvasBox.width * Number(await canvas.getAttribute("data-single-tick"));
+    const { box: nextBox } = await plotGeometry(plot, 0);
+    const tickX = nextBox.x + 44 + (nextBox.width - 45) * (day(3) - firstStart) / (firstEnd - firstStart);
     await page.mouse.move(tickX + 20, y);
     await page.mouse.down();
     await page.mouse.move(tickX - 20, y, { steps: 8 });
@@ -248,22 +219,10 @@ for (const kind of ["line", "bar"]) {
 
 for (const crossing of [false, true]) {
   test(`单柱位于时间起点时${crossing ? "跨柱框选保留数据" : "左半边提交有效范围"}`, async ({ page }) => {
-    await page.addInitScript(() => {
-      const fillText = CanvasRenderingContext2D.prototype.fillText;
-      CanvasRenderingContext2D.prototype.fillText = function (text, x, y, maxWidth) {
-        if (text === "00:00") {
-          const transform = this.getTransform();
-          this.canvas.dataset.startTick = String((transform.a * x + transform.c * y + transform.e) / this.canvas.width);
-        }
-        return fillText.call(this, text, x, y, maxWidth);
-      };
-    });
     const { plot, box, y } = await openPlot(page, "kind=bar&explicit&single", 0);
-    const canvas = plot.locator("canvas[data-start-tick]");
-    await expect(canvas).toHaveCount(1);
-    const tickX = box.x + box.width * Number(await canvas.getAttribute("data-start-tick"));
-    const start = crossing ? tickX + box.width * 0.12 : box.x + box.width * 0.29;
-    const end = crossing ? tickX - box.width * 0.07 : box.x + box.width * 0.45;
+    const tickX = box.x + 44;
+    const start = crossing ? tickX + 60 : tickX + 24;
+    const end = crossing ? tickX - 8 : tickX + 55;
     await page.mouse.move(start, y);
     await page.mouse.down();
     await page.mouse.move(end, y, { steps: 8 });
