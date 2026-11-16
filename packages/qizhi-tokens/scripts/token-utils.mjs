@@ -86,8 +86,9 @@ const renderDeclarations = (tokens, readValue) => Object.values(tokens)
   .join("\n");
 
 export const renderCss = (manifest) => {
-  const light = renderDeclarations(manifest.tokens, (token) => token.value);
-  const dark = renderDeclarations(manifest.tokens, (token) => token.themes?.dark);
+  const light = `  color-scheme: light;\n${renderDeclarations(manifest.tokens, (token) => token.value)}`;
+  const darkDeclarations = renderDeclarations(manifest.tokens, (token) => token.themes?.dark);
+  const dark = darkDeclarations ? `  color-scheme: dark;\n${darkDeclarations}` : null;
   return [`:root {\n${light}\n}`, dark ? `body[data-theme="dark"] {\n${dark}\n}` : null]
     .filter(Boolean)
     .join("\n\n") + "\n";

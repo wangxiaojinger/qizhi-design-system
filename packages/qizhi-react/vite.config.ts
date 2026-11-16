@@ -6,7 +6,10 @@ export default defineConfig({
   plugins: [react()],
   build: {
     lib: {
-      entry: resolve(import.meta.dirname, "src/index.ts"),
+      entry: {
+        index: resolve(import.meta.dirname, "src/index.ts"),
+        "theme/index": resolve(import.meta.dirname, "src/theme/index.ts"),
+      },
       formats: ["es"],
       cssFileName: "qizhi-react",
     },
