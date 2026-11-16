@@ -9,7 +9,7 @@ const manifest = async () => JSON.parse(await readFile(new URL("src/tokens.json"
 test("the v1 manifest validates without legacy compatibility entries", async () => {
   const value = await manifest();
   assert.deepEqual(validateManifest(value), []);
-  assert.equal(value.version, "1.0.0");
+  assert.equal(value.version, "1.1.0");
   assert.equal(value.tokens["admin.primary"].value, "#171717");
   assert.equal(value.tokens["admin.primary"].themes.dark, "#e5e5e5");
   assert.equal(value.tokens["component.drawer.body.background"].value, "var(--bg-bg-base-default)");
