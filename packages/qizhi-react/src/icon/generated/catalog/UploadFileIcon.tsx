@@ -1,9 +1,0 @@
-// 由 scripts/build-catalog-icons.mjs 生成，禁止手改。
-// Source: ../../../../assets/icons/figma-combination/qz-icon-239-1131.svg
-import { createQizhiMarkupIcon } from "../../createQizhiMarkupIcon";
-
-export const UploadFileIcon = createQizhiMarkupIcon(
-  "UploadFileIcon",
-  "0 0 16 16",
-  "<g id=\"__QIZHI_ICON_ID__-&#229;&#141;&#149;&#228;&#184;&#170;&#229;&#155;&#190;&#230;&#160;&#135;\">\n<g id=\"__QIZHI_ICON_ID__-&#228;&#184;&#138;&#228;&#188;&#160;&#230;&#150;&#135;&#228;&#187;&#182;\">\n<path id=\"__QIZHI_ICON_ID__-Vector\" d=\"M10 2.66667H3.33333V13.3333H12.6667V5.33334H10V2.66667ZM2 1.99454C2 1.62937 2.29833 1.33334 2.66567 1.33334H10.6667L13.9998 4.66667L14 13.995C14 14.3659 13.7034 14.6667 13.3377 14.6667H2.66227C2.29651 14.6667 2 14.3631 2 14.0055V1.99454ZM8.66667 8V10.6667H7.33333V8H5.33333L8 5.33334L10.6667 8H8.66667Z\" fill=\"currentColor\"/>\n</g>\n</g>",
-);

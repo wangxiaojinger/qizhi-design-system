@@ -1,9 +1,0 @@
-// 由 scripts/build-catalog-icons.mjs 生成，禁止手改。
-// Source: ../../../../assets/icons/figma-combination/qz-icon-67-206.svg
-import { createQizhiMarkupIcon } from "../../createQizhiMarkupIcon";
-
-export const ResourceGroupManagementIcon = createQizhiMarkupIcon(
-  "ResourceGroupManagementIcon",
-  "0 0 16 16",
-  "<g id=\"__QIZHI_ICON_ID__-&#229;&#141;&#149;&#228;&#184;&#170;&#229;&#155;&#190;&#230;&#160;&#135;\">\n<g id=\"__QIZHI_ICON_ID__-&#232;&#181;&#132;&#230;&#186;&#144;&#231;&#187;&#132;&#231;&#174;&#161;&#231;&#144;&#134;\">\n<path id=\"__QIZHI_ICON_ID__-Vector\" d=\"M1.33334 2.66667C1.33334 2.29848 1.63182 2 2 2H14C14.3682 2 14.6667 2.29848 14.6667 2.66667V13.3333C14.6667 13.7015 14.3682 14 14 14H2C1.63182 14 1.33334 13.7015 1.33334 13.3333V2.66667ZM2.66667 3.33333V12.6667H13.3333V3.33333H2.66667ZM4 4.66667H7.33334V7.33333H4V4.66667ZM7.33334 8.66667H4V11.3333H7.33334V8.66667ZM8.66667 4.66667H12V7.33333H8.66667V4.66667ZM12 8.66667H8.66667V11.3333H12V8.66667Z\" fill=\"currentColor\"/>\n</g>\n</g>",
-);
