@@ -31,13 +31,15 @@ export const validateManifest = (manifest) => {
     if (!new Set(["stable", "deprecated"]).has(token.status)) errors.push(`invalid status: ${name}`);
     if (token.status === "deprecated" && !token.replacedBy) errors.push(`deprecated token ${name} requires replacedBy`);
     if (token.replacedBy && !tokenNames.has(token.replacedBy)) errors.push(`${name} replacedBy target is missing: ${token.replacedBy}`);
+    if (token.themes && (typeof token.themes !== "object" || Array.isArray(token.themes))) errors.push(`invalid themes: ${name}`);
     if (cssVariables.has(token.cssVariable)) errors.push(`duplicate css variable: ${token.cssVariable}`);
     cssVariables.set(token.cssVariable, name);
   }
 
   const dependencies = new Map(entries.map(([name]) => [name, []]));
   for (const [name, token] of entries) {
-    for (const match of String(token.value).matchAll(/var\((--[a-zA-Z0-9-]+)\)/g)) {
+    const values = [token.value, ...Object.values(token.themes ?? {})];
+    for (const value of values) for (const match of String(value).matchAll(/var\((--[a-zA-Z0-9-]+)\)/g)) {
       const target = cssVariables.get(match[1]);
       if (!target) {
         errors.push(`${name} references missing ${match[1]}`);
@@ -75,11 +77,20 @@ export const validateManifest = (manifest) => {
   return errors;
 };
 
+const renderDeclarations = (tokens, readValue) => Object.values(tokens)
+  .map((token) => {
+    const value = readValue(token);
+    return value === undefined ? null : `  ${token.cssVariable}: ${value};`;
+  })
+  .filter(Boolean)
+  .join("\n");
+
 export const renderCss = (manifest) => {
-  const declarations = Object.values(manifest.tokens)
-    .map((token) => `  ${token.cssVariable}: ${token.value};`)
-    .join("\n");
-  return `:root {\n${declarations}\n}\n`;
+  const light = renderDeclarations(manifest.tokens, (token) => token.value);
+  const dark = renderDeclarations(manifest.tokens, (token) => token.themes?.dark);
+  return [`:root {\n${light}\n}`, dark ? `body[data-theme="dark"] {\n${dark}\n}` : null]
+    .filter(Boolean)
+    .join("\n\n") + "\n";
 };
 
 export const publicTokenValues = (manifest) => Object.fromEntries(
