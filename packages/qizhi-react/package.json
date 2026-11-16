@@ -46,6 +46,7 @@
     "**/*.css"
   ],
   "dependencies": {
+    "@ant-design/icons": "^6.3.4",
     "@antv/g2": "5.4.8",
     "@wangxiaojinger/qizhi-tokens": "workspace:*",
     "prism-react-renderer": "^2.4.1",
@@ -59,6 +60,7 @@
     "test:exports": "node scripts/exports-contract.mjs"
   },
   "peerDependencies": {
+    "antd": "^6.6.6",
     "react": ">=19",
     "react-dom": ">=19"
   },
