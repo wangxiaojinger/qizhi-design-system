@@ -1,9 +1,0 @@
-// 由 scripts/build-catalog-icons.mjs 生成，禁止手改。
-// Source: ../../../../assets/icons/figma-combination/qz-icon-67-177.svg
-import { createQizhiMarkupIcon } from "../../createQizhiMarkupIcon";
-
-export const SpaceManagementIcon = createQizhiMarkupIcon(
-  "SpaceManagementIcon",
-  "0 0 16 16",
-  "<g id=\"__QIZHI_ICON_ID__-&#229;&#141;&#149;&#228;&#184;&#170;&#229;&#155;&#190;&#230;&#160;&#135;\">\n<g id=\"__QIZHI_ICON_ID__-&#231;&#169;&#186;&#233;&#151;&#180;&#231;&#174;&#161;&#231;&#144;&#134;\" clip-path=\"url(#__QIZHI_ICON_ID__-clip0_18_3231)\">\n<path id=\"__QIZHI_ICON_ID__-Vector\" d=\"M8.44847 1.07442L13.8666 6H11.8845L8 2.46868L4 6.10505V12.6667H7.33333V14.0001H3.33333C2.96515 14.0001 2.66667 13.7016 2.66667 13.3334V7.3334H0.666668L7.55153 1.07442C7.8058 0.843257 8.1942 0.843257 8.44847 1.07442ZM9.33333 7.33334H15.3333V12H9.33333V7.33334ZM10.6667 8.66667V10.6667H14V8.66667H10.6667ZM16 14H8.66667V12.6667H16V14Z\" fill=\"currentColor\"/>\n</g>\n</g>\n<defs>\n<clipPath id=\"__QIZHI_ICON_ID__-clip0_18_3231\">\n<rect width=\"16\" height=\"16\" fill=\"white\"/>\n</clipPath>\n</defs>",
-);

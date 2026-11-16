@@ -1,9 +1,0 @@
-// 由 scripts/build-prompt-icons.mjs 生成，禁止手改。
-// Source: ../../../../assets/icons/figma-combination/qz-icon-361-581.svg
-import { createQizhiMarkupIcon } from "../../createQizhiMarkupIcon";
-
-export const FavoriteFilledIcon = createQizhiMarkupIcon(
-  "FavoriteFilledIcon",
-  "0 0 16 16",
-  "<g id=\"__QIZHI_ICON_ID__-fill=on\">\n<path id=\"__QIZHI_ICON_ID__-Vector\" d=\"M7.99973 0.333344L10.8171 4.45562L15.6082 5.86121L12.5583 9.81448L12.702 14.8055L7.99973 13.1265L3.29745 14.8055L3.44119 9.81448L0.391275 5.86121L5.1824 4.45562L7.99973 0.333344ZM6.66639 8.00001H5.33306C5.33306 9.47274 6.52697 10.6667 7.99973 10.6667C9.42787 10.6667 10.5938 9.54401 10.6631 8.13308L10.6664 8.00001H9.33307C9.33307 8.73641 8.73613 9.33334 7.99973 9.33334C7.2968 9.33334 6.72093 8.78941 6.67007 8.09954L6.66639 8.00001Z\" fill=\"currentColor\"/>\n</g>",
-);

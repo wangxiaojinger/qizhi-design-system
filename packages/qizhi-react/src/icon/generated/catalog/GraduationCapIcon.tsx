@@ -1,9 +1,0 @@
-// 由 scripts/build-catalog-icons.mjs 生成，禁止手改。
-// Source: ../../../../assets/icons/figma-combination/qz-icon-575-590.svg
-import { createQizhiMarkupIcon } from "../../createQizhiMarkupIcon";
-
-export const GraduationCapIcon = createQizhiMarkupIcon(
-  "GraduationCapIcon",
-  "0 0 16 16",
-  "<g id=\"__QIZHI_ICON_ID__-fill=off\">\n<path id=\"__QIZHI_ICON_ID__-Vector\" d=\"M3.33333 7.59998L1 6.2L8 2L15 6.2V11.3H13.8333V6.90002L12.6667 7.59998V11.6068L12.5368 11.7718C11.4683 13.1299 9.83272 14 8 14C6.16727 14 4.53167 13.1299 3.4632 11.7718L3.33333 11.6068V7.59998ZM4.5 8.3V11.175C5.35587 12.1724 6.60649 12.8 8 12.8C9.39353 12.8 10.6441 12.1724 11.5 11.175V8.3L8 10.4L4.5 8.3ZM3.31541 6.2L8 9.01076L12.6846 6.2L8 3.38925L3.31541 6.2Z\" fill=\"currentColor\"/>\n</g>",
-);

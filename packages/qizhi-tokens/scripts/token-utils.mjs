@@ -31,13 +31,15 @@ export const validateManifest = (manifest) => {
     if (!new Set(["stable", "deprecated"]).has(token.status)) errors.push(`invalid status: ${name}`);
     if (token.status === "deprecated" && !token.replacedBy) errors.push(`deprecated token ${name} requires replacedBy`);
     if (token.replacedBy && !tokenNames.has(token.replacedBy)) errors.push(`${name} replacedBy target is missing: ${token.replacedBy}`);
+    if (token.themes && (typeof token.themes !== "object" || Array.isArray(token.themes))) errors.push(`invalid themes: ${name}`);
     if (cssVariables.has(token.cssVariable)) errors.push(`duplicate css variable: ${token.cssVariable}`);
     cssVariables.set(token.cssVariable, name);
   }
 
   const dependencies = new Map(entries.map(([name]) => [name, []]));
   for (const [name, token] of entries) {
-    for (const match of String(token.value).matchAll(/var\((--[a-zA-Z0-9-]+)\)/g)) {
+    const values = [token.value, ...Object.values(token.themes ?? {})];
+    for (const value of values) for (const match of String(value).matchAll(/var\((--[a-zA-Z0-9-]+)\)/g)) {
       const target = cssVariables.get(match[1]);
       if (!target) {
         errors.push(`${name} references missing ${match[1]}`);
@@ -75,11 +77,20 @@ export const validateManifest = (manifest) => {
   return errors;
 };
 
+const renderDeclarations = (tokens, readValue) => Object.values(tokens)
+  .map((token) => {
+    const value = readValue(token);
+    return value === undefined ? null : `  ${token.cssVariable}: ${value};`;
+  })
+  .filter(Boolean)
+  .join("\n");
+
 export const renderCss = (manifest) => {
-  const declarations = Object.values(manifest.tokens)
-    .map((token) => `  ${token.cssVariable}: ${token.value};`)
-    .join("\n");
-  return `:root {\n${declarations}\n}\n`;
+  const light = renderDeclarations(manifest.tokens, (token) => token.value);
+  const dark = renderDeclarations(manifest.tokens, (token) => token.themes?.dark);
+  return [`:root {\n${light}\n}`, dark ? `body[data-theme="dark"] {\n${dark}\n}` : null]
+    .filter(Boolean)
+    .join("\n\n") + "\n";
 };
 
 export const publicTokenValues = (manifest) => Object.fromEntries(
@@ -94,38 +105,5 @@ export const publicTokenValues = (manifest) => Object.fromEntries(
     ...(token.replacedBy ? { replacedBy: token.replacedBy } : {}),
   }]),
 );
-
-const migrationEntries = (manifest, legacyContract) => {
-  const tokenByCssVariable = new Map(Object.entries(manifest.tokens).map(([name, token]) => [token.cssVariable, name]));
-  return Object.fromEntries(Object.entries(manifest.tokens).map(([name, token]) => {
-    const referencedCssVariable = String(token.value).match(/^var\((--[a-zA-Z0-9-]+)\)$/)?.[1];
-    const action = token.status === "deprecated"
-      ? "deprecated"
-      : !(name in legacyContract)
-        ? "add"
-        : referencedCssVariable
-          ? "compat-alias"
-          : "keep";
-    return [name, {
-    token: name,
-    cssVariable: token.cssVariable,
-    action,
-    recommendedToken: token.replacedBy ?? (referencedCssVariable ? tokenByCssVariable.get(referencedCssVariable) : name) ?? name,
-    valueType: classifyTokenValue(token.value),
-    replacement: token.replacedBy ?? null,
-    note: token.status === "deprecated" ? `Use ${token.replacedBy}` : token.description,
-    }];
-  }));
-};
-
-export const renderMigrationMap = (manifest, legacyContract) => `${JSON.stringify(migrationEntries(manifest, legacyContract), null, 2)}\n`;
-
-export const renderMigrationMarkdown = (manifest, legacyContract) => {
-  const entries = Object.values(migrationEntries(manifest, legacyContract));
-  const counts = Object.fromEntries(["keep", "compat-alias", "add", "deprecated"].map((action) => [action, entries.filter((entry) => entry.action === action).length]));
-  const actionLabels = { keep: "保留", "compat-alias": "兼容别名", add: "新增", deprecated: "弃用" };
-  const rows = entries.map((entry) => `| \`${entry.token}\` | \`${entry.cssVariable}\` | ${actionLabels[entry.action]} | \`${entry.recommendedToken}\` | ${entry.valueType} | ${entry.note.replaceAll("|", "\\|")} |`).join("\n");
-  return `# QIZHI 变量重构映射表\n\n> 本文件由 \`packages/qizhi-tokens/src/tokens.json\` 与 \`src/legacy-contract.json\` 生成，请勿手工编辑。\n\n保留：${counts.keep}；兼容别名：${counts["compat-alias"]}；新增：${counts.add}；弃用：${counts.deprecated}\n\n| 原 Token | CSS 变量 | 处理方式 | 推荐 Token | 值类型 | 迁移说明 |\n| --- | --- | --- | --- | --- | --- |\n${rows}\n`;
-};
 
 export const renderTypes = () => "export type QizhiTokenTier = \"seed\" | \"map\" | \"alias\" | \"component\";\nexport type QizhiTokenStatus = \"stable\" | \"deprecated\";\nexport interface QizhiToken { readonly name: string; readonly value: string; readonly cssVariable: `--${string}`; readonly category: string; readonly description: string; readonly tier: QizhiTokenTier; readonly status: QizhiTokenStatus; readonly replacedBy?: string; }\nexport declare const tokens: Readonly<Record<string, QizhiToken>>;\n";

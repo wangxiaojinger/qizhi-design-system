@@ -1,7 +1,7 @@
 {
   "name": "@wangxiaojinger/qizhi-react",
-  "version": "0.7.1",
-  "description": "QIZHI Design System React components.",
+  "version": "1.0.0",
+  "description": "QIZHI neutral enterprise-admin Ant Design components.",
   "type": "module",
   "main": "./dist/index.js",
   "module": "./dist/index.js",
@@ -10,22 +10,6 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
-    },
-    "./icon": {
-      "types": "./dist/icon/index.d.ts",
-      "import": "./dist/icon/index.js"
-    },
-    "./chart": {
-      "types": "./dist/chart/index.d.ts",
-      "import": "./dist/chart/index.js"
-    },
-    "./markdown": {
-      "types": "./dist/markdown-viewer/index.d.ts",
-      "import": "./dist/markdown-viewer/index.js"
-    },
-    "./code-preview": {
-      "types": "./dist/code-preview/index.d.ts",
-      "import": "./dist/code-preview/index.js"
     },
     "./style.css": "./dist/qizhi-react.css"
   },
@@ -46,19 +30,15 @@
     "**/*.css"
   ],
   "dependencies": {
-    "@antv/g2": "5.4.8",
-    "@wangxiaojinger/qizhi-tokens": "workspace:*",
-    "prism-react-renderer": "^2.4.1",
-    "react-markdown": "^10.1.0",
-    "remark-gfm": "^4.0.1"
+    "@ant-design/icons": "^6.3.4",
+    "@wangxiaojinger/qizhi-tokens": "workspace:*"
   },
   "scripts": {
-    "build": "pnpm icons:build && vite build && tsc -p tsconfig.build.json && node scripts/finalize-declarations.mjs",
-    "icons:build": "node --experimental-strip-types scripts/build-direction-icons.mjs && node --experimental-strip-types scripts/build-prompt-icons.mjs && node --experimental-strip-types scripts/build-catalog-icons.mjs",
-    "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test:exports": "node scripts/exports-contract.mjs"
+    "build": "vite build && tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "peerDependencies": {
+    "antd": "^6.6.6",
     "react": ">=19",
     "react-dom": ">=19"
   },

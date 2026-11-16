@@ -1,9 +1,0 @@
-// 由 scripts/build-catalog-icons.mjs 生成，禁止手改。
-// Source: ../../../../assets/icons/figma-combination/qz-icon-67-220.svg
-import { createQizhiMarkupIcon } from "../../createQizhiMarkupIcon";
-
-export const HpcTaskIcon = createQizhiMarkupIcon(
-  "HpcTaskIcon",
-  "0 0 16 16",
-  "<g id=\"__QIZHI_ICON_ID__-&#229;&#141;&#149;&#228;&#184;&#170;&#229;&#155;&#190;&#230;&#160;&#135;\">\n<g id=\"__QIZHI_ICON_ID__-HPC&#228;&#187;&#187;&#229;&#138;&#161;\">\n<path id=\"__QIZHI_ICON_ID__-Vector\" d=\"M10.624 1.664L9.488 2.296L13.888 4.816V3.536L10.624 1.664ZM12.344 6.816L13.896 7.704V5.84L12.344 4.952V6.816ZM12.344 11.856L9.184 13.616L10.544 14.392L13.888 12.52V8.72L12.336 7.832L12.344 11.856ZM5.608 1.664L2.344 3.536V4.824L6.744 2.304L5.608 1.664ZM2.336 5.84V7.704L3.888 6.816V4.952L2.336 5.84ZM2.336 8.72V12.528L5.68 14.392L7.04 13.616L3.88 11.856V7.832L2.336 8.72ZM8.16 5.688L10.992 4.176L8.2 2.576L5.376 4.152L8.16 5.688ZM8.56 9.872L11.464 8.256V4.92L8.568 6.48L8.56 9.872ZM4.84 8.312L7.736 9.872V6.544L4.832 4.92L4.84 8.312Z\" fill=\"currentColor\"/>\n<path id=\"__QIZHI_ICON_ID__-Vector_2\" d=\"M11.464 9.256L8.112 11.128L4.856 9.264V11.336L8.12 13.2L11.464 11.328V9.256Z\" fill=\"currentColor\"/>\n</g>\n</g>",
-);

@@ -1,150 +1,52 @@
-# QIZHI Design System
+# QIZHI Admin Design System
 
-QIZHI Design System 的规范站、设计变量与正式 React 组件工作区。
+QIZHI 是一套面向企业后台的中性设计系统。它以语义 Token 为唯一视觉来源，以 Ant Design 为基础组件，并提供少量后台页面组合件。
 
-## 本地开发
+## 包
 
-```bash
-corepack pnpm install
-corepack pnpm dev
-```
-
-文档站默认运行在 `http://127.0.0.1:5173/`。
-
-## 在线文档
-
-文档站的生产构建产物发布在独立的公开仓库 `qizhi-design-system-docs`：
-
-<https://wangxiaojinger.github.io/qizhi-design-system-docs/>
-
-组件源码继续保存在当前私有仓库，公开仓库只存放 `dist` 页面产物。
-
-## 工作区
-
-- `packages/qizhi-tokens`：设计变量包。
-- `packages/qizhi-react`：正式 React 组件包。
-- `apps/qizhi-docs`：组件文档与可运行示例。
+- `@wangxiaojinger/qizhi-tokens`：浅色、深色语义 Token 与 CSS 变量。
+- `@wangxiaojinger/qizhi-react`：Ant Design 的审阅导出、`QizhiProvider` 与后台组合组件。
 
 ## 在其他项目中使用
 
-组件包通过 GitHub Packages 发布。使用者需要拥有本仓库访问权限，并准备至少包含 `read:packages` 权限的 GitHub Personal Access Token（classic）。完整 React 组件要求项目使用 React 和 React DOM 19 或更高版本；非 React 项目可以单独使用设计变量和 CSS。
-
-### 1. 配置 GitHub Packages
-
-在使用方项目的 `.npmrc` 中配置包作用域。这份文件可以提交到项目仓库：
+先让项目能够读取 GitHub Packages：
 
 ```ini
+# .npmrc
 @wangxiaojinger:registry=https://npm.pkg.github.com
 always-auth=true
 ```
 
-GitHub Packages 凭证应写入使用者本机的用户级 `~/.npmrc`，不要将令牌提交到 Git：
+在开发者机器或 CI 的私有配置中提供拥有 `read:packages` 权限的 GitHub Token：
 
 ```ini
 //npm.pkg.github.com/:_authToken=你的令牌
 ```
 
-### 2. 安装并引用 React 组件
-
-安装当前最新版本：
+安装 React、Ant Design 与 QIZHI 包：
 
 ```bash
-pnpm add @wangxiaojinger/qizhi-react@latest
+pnpm add antd @ant-design/icons @wangxiaojinger/qizhi-tokens @wangxiaojinger/qizhi-react
 ```
 
-在应用入口文件（例如 `main.tsx`）全局引入一次组件样式：
+在应用入口引入样式，并用 Provider 包住应用：
 
 ```tsx
 import "@wangxiaojinger/qizhi-react/style.css";
-```
+import { Button, QizhiProvider } from "@wangxiaojinger/qizhi-react";
 
-按需引用组件：
-
-```tsx
-import { Button } from "@wangxiaojinger/qizhi-react";
-
-export function Example() {
-  return <Button type="primary">确认</Button>;
+export function App() {
+  return <QizhiProvider><Button type="primary">保存</Button></QizhiProvider>;
 }
 ```
 
-标准界面图标默认优先使用公开的 [Remix Icon](https://remixicon.com/)。先安装依赖：
+`QizhiProvider` 统一将 `--admin-*` 语义变量映射给 Ant Design。深色模式只需传入 `theme="dark"`。业务页面可直接使用审阅过的 Ant Design 导出，或组合 `PageHeader`、`ListPageCard`、`SectionCard`、`AdminSearchInput`、`AdminFilterSelect` 和 `TableActions`。
+
+## 开发与发布
 
 ```bash
-pnpm add remixicon
+corepack pnpm install
+corepack pnpm verify
 ```
 
-在应用入口全局引入一次样式，再使用官网提供的 `ri-*` 类名：
-
-```tsx
-import "remixicon/fonts/remixicon.css";
-
-export function SearchIconExample() {
-  return <i className="ri-search-line" aria-hidden="true" />;
-}
-```
-
-Remix Icon 中没有语义匹配的图标，或场景明确需要启智专属业务、多色、品牌图形时，再从组件包的独立入口导入启智图标资产：
-
-```tsx
-import { ArrowDownIcon } from "@wangxiaojinger/qizhi-react/icon";
-```
-
-仅图标交互控件必须提供中文 `aria-label`。业务代码不得使用字符、Unicode 符号、Emoji、CSS 绘制、硬编码 SVG path 或 data URL 临时创造图标；Remix Icon 和启智图标均无法满足时，应补充经过审核的 SVG 资产或 React 图标组件。
-
-### 3. 仅使用设计变量或 CSS
-
-Vue、原生 HTML 等非 React 项目不能直接使用 React 组件，但可以安装设计变量包：
-
-```bash
-pnpm add @wangxiaojinger/qizhi-tokens@latest
-```
-
-在全局样式文件中引入：
-
-```css
-@import "@wangxiaojinger/qizhi-tokens/style.css";
-```
-
-非 React 项目也可以引入 `@wangxiaojinger/qizhi-react/style.css`，但只能复用其中的 CSS，React 组件及交互逻辑不会自动生效。
-
-## 更新使用方项目
-
-组件库每次发布都必须使用新的版本号，已经发布的版本不能覆盖。使用方项目只有在升级依赖并重新构建后，才会应用新版组件与样式。
-
-例如组件库从 `0.1.1` 发布到 `0.1.2` 后，在使用方项目执行：
-
-```bash
-pnpm add @wangxiaojinger/qizhi-react@0.1.2
-pnpm build
-```
-
-如果使用方直接依赖设计变量包，也应同步升级：
-
-```bash
-pnpm add @wangxiaojinger/qizhi-tokens@0.1.2
-pnpm build
-```
-
-升级后提交使用方项目更新过的 `package.json` 和 `pnpm-lock.yaml`，再重新部署。仅执行 `pnpm build` 不会自动升级依赖，因为锁文件通常仍指向旧版本。
-
-更新流程如下：
-
-```text
-修改组件库 → 升级版本号 → 发布新版本 → 使用方升级依赖 → 重新构建和部署
-```
-
-## 发布
-
-### Table v0.5.0 默认配置
-
-业务升级到 `@wangxiaojinger/qizhi-react@0.5.0` 并重新构建后，未显式配置的 Table 会直接采用新默认：开启悬浮高亮、表头、两行省略、实际截断全文提示和640px容器固定列断点；边框、列调宽、列移动及显隐默认关闭，业务可按需开启或覆盖。
-
-这是组件本身的默认行为，不依赖文档Demo或业务额外封装。已有明确传入的属性继续优先。详见 [v0.5.0 业务升级说明](docs/releases/v0.5.0-table-upgrade.md)。
-
-1. 更新 `packages/qizhi-tokens` 与 `packages/qizhi-react` 的版本号。
-2. 运行 `corepack pnpm verify`。
-3. 在 GitHub 创建并发布 Release。
-4. `Publish GitHub Packages` 工作流会依次发布 Tokens 和 React 包。
-
-同一版本不能重复发布。发布前应确认两个包的版本尚未存在于 GitHub Packages。
+发布前同时提升两个正式包到相同的未发布版本，完成验证后在 GitHub 创建对应 Release。`Publish GitHub Packages` 工作流会发布 Tokens 与 React 包；使用方升级版本并重新构建后才会获得新的规范。

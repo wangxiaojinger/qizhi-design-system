@@ -5,31 +5,18 @@
   "type": "module",
   "packageManager": "pnpm@11.19.0",
   "scripts": {
-    "audit:theme": "node scripts/audit-theme-gaps.mjs --output docs/superpowers/specs/2026-10-09-qizhi-theme-gap-audit-data.json",
-    "audit:theme:runtime": "node scripts/audit-theme-runtime.mjs --output docs/superpowers/specs/2026-10-09-qizhi-theme-runtime-audit-data.json",
-    "audit:theme:test": "node --test tests/theme-gap-audit.node.mjs tests/theme-runtime-audit-matrix.node.mjs tests/theme-audit-provenance.node.mjs",
-    "audit:theme:check": "node scripts/check-theme-audit-artifacts.mjs",
-    "api:build": "node scripts/build-component-api.mjs",
-    "api:validate": "node scripts/build-component-api.mjs --check",
     "dev": "vite --host 127.0.0.1",
-    "build": "pnpm api:build && pnpm --filter @wangxiaojinger/qizhi-tokens build && vite build && pnpm --filter @wangxiaojinger/qizhi-react build && pnpm --filter @wangxiaojinger/qizhi-react-smoke build",
+    "build": "pnpm --filter @wangxiaojinger/qizhi-tokens build && vite build && pnpm --filter @wangxiaojinger/qizhi-react build && pnpm --filter @wangxiaojinger/qizhi-react-smoke build",
     "typecheck": "tsc -p tsconfig.json --noEmit && pnpm --filter @wangxiaojinger/qizhi-react typecheck",
     "test": "pnpm --filter @wangxiaojinger/qizhi-tokens test && vitest run",
-    "test:exports": "pnpm --filter @wangxiaojinger/qizhi-react test:exports",
-    "e2e": "playwright test",
-    "verify": "pnpm audit:theme:test && pnpm audit:theme:check && pnpm api:validate && pnpm --filter @wangxiaojinger/qizhi-tokens build && pnpm --filter @wangxiaojinger/qizhi-tokens validate && pnpm typecheck && pnpm test && pnpm build"
+    "verify": "pnpm typecheck && pnpm test && pnpm build"
   },
   "dependencies": {
-    "prismjs": "^1.30.0",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
   "devDependencies": {
-    "@playwright/test": "1.62.1",
-    "@testing-library/jest-dom": "7.0.1",
     "@testing-library/react": "16.3.2",
-    "@testing-library/user-event": "14.6.4",
-    "@types/prismjs": "^1.26.6",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.4",
     "@vitejs/plugin-react": "6.0.5",

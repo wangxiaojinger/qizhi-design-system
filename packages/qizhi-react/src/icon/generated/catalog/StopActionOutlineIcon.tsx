@@ -1,9 +1,0 @@
-// 由 scripts/build-catalog-icons.mjs 生成，禁止手改。
-// Source: ../../../../assets/icons/figma-combination/qz-icon-240-1147.svg
-import { createQizhiMarkupIcon } from "../../createQizhiMarkupIcon";
-
-export const StopActionOutlineIcon = createQizhiMarkupIcon(
-  "StopActionOutlineIcon",
-  "0 0 16 16",
-  "<g id=\"__QIZHI_ICON_ID__-&#229;&#188;&#128;&#229;&#167;&#139;=off, line=on\">\n<path id=\"__QIZHI_ICON_ID__-Vector\" d=\"M7.99998 14.6667C4.31808 14.6667 1.33331 11.6819 1.33331 8.00001C1.33331 4.31811 4.31808 1.33334 7.99998 1.33334C11.6818 1.33334 14.6666 4.31811 14.6666 8.00001C14.6666 11.6819 11.6818 14.6667 7.99998 14.6667ZM7.99998 13.3333C10.9455 13.3333 13.3333 10.9455 13.3333 8.00001C13.3333 5.05449 10.9455 2.66668 7.99998 2.66668C5.05446 2.66668 2.66665 5.05449 2.66665 8.00001C2.66665 10.9455 5.05446 13.3333 7.99998 13.3333ZM5.99998 6.00001H7.33331V10H5.99998V6.00001ZM8.66665 6.00001H9.99998V10H8.66665V6.00001Z\" fill=\"currentColor\"/>\n</g>",
-);

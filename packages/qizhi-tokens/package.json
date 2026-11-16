@@ -1,7 +1,7 @@
 {
   "name": "@wangxiaojinger/qizhi-tokens",
-  "version": "0.7.1",
-  "description": "QIZHI Design System design tokens.",
+  "version": "1.0.0",
+  "description": "QIZHI neutral enterprise-admin design tokens.",
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -11,8 +11,7 @@
       "import": "./dist/index.js"
     },
     "./style.css": "./dist/style.css",
-    "./tokens.json": "./dist/tokens.json",
-    "./migration-map.json": "./dist/migration-map.json"
+    "./tokens.json": "./dist/tokens.json"
   },
   "files": [
     "dist"
@@ -32,7 +31,7 @@
   ],
   "scripts": {
     "build": "node scripts/build.mjs",
-    "test": "node --test tests/tokens.node.mjs",
+    "test": "node --test tests/*.node.mjs",
     "validate": "node scripts/validate.mjs"
   }
 }
