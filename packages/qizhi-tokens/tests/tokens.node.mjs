@@ -18,7 +18,9 @@ test("the v1 manifest validates without legacy compatibility entries", async () 
 test("the stylesheet exports light defaults and explicit dark overrides", async () => {
   const css = renderCss(await manifest());
   assert.match(css, /:root \{/);
+  assert.match(css, /color-scheme: light;/);
   assert.match(css, /--admin-primary: #171717/);
   assert.match(css, /body\[data-theme="dark"\] \{/);
+  assert.match(css, /color-scheme: dark;/);
   assert.match(css, /--admin-primary: #e5e5e5/);
 });
