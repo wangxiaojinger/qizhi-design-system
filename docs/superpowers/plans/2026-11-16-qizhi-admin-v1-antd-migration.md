@@ -6,9 +6,16 @@
 
 **Architecture:** `@wangxiaojinger/qizhi-tokens` becomes the versioned source of CSS primitive and semantic backend variables. `@wangxiaojinger/qizhi-react` depends on those variables, exposes a `QizhiProvider` that owns the Ant Design `ConfigProvider`, then exports only reviewed Ant Design aliases and admin composition components. The old Token manifest, custom component implementation, static documentation surface and compatibility contract are removed atomically after the new package, smoke consumer and documentation build prove the v1 package works.
 
-**Tech Stack:** pnpm workspaces, Node 24, React 19, TypeScript 7, Ant Design 6, Vite 8, Vitest 4, Playwright, GitHub Packages.
+**Tech Stack:** pnpm workspaces, Node 24, React 19, TypeScript 7, Ant Design 6, Vite 8, Vitest 4, GitHub Packages.
 
 ---
+
+## Execution status
+
+- [x] Token contract, Ant Design provider bridge, reviewed primitive exports and portable backend compositions.
+- [x] Old component sources, old documentation islands, static interaction shell, custom icon surface and obsolete test suites removed.
+- [x] v1 documentation, package smoke consumer, release workflow and GitHub Packages instructions rebuilt.
+- [ ] Manual browser review of the generated documentation at desktop, narrow and mobile widths (not performed in this migration session).
 
 ## Locked file structure
 
@@ -24,7 +31,7 @@
 | `packages/qizhi-react/src/admin/*.tsx` | Contains provider-independent PageHeader, cards, search/filter controls and table actions. |
 | `packages/qizhi-react/src/index.ts` | Single public public API with CSS side-effect import. |
 | `apps/qizhi-react-smoke/src/*` | Consumer application used to build and render the packed v1 packages. |
-| `apps/qizhi-docs/src/*` | Vite React documentation entry and v1 examples; no parallel component implementation. |
+| `src/*` | Vite React documentation entry and v1 examples; no parallel component implementation. |
 | `README.md` and `.github/workflows/*.yml` | Installation, breaking-change guidance, CI and Release publishing. |
 
 ## Task 1: Replace the Token source with the backend Token contract
@@ -357,13 +364,13 @@ git commit -m "feat(react): add admin composition components"
 - Replace: `apps/qizhi-react-smoke/package.json`
 - Replace: `apps/qizhi-react-smoke/src/main.tsx`
 - Replace: `apps/qizhi-react-smoke/src/App.tsx`
-- Replace: `apps/qizhi-docs/src/**`
+- Delete: `apps/qizhi-docs/src/**`
+- Create: `src/{main.tsx,App.tsx,docs.css}`
 - Replace: `index.html`
 - Replace: `styles.css`
 - Replace: `script.js`
 - Modify: `vite.config.ts`
-- Modify: `apps/qizhi-docs/package.json`
-- Test: `apps/qizhi-react-smoke/src/App.test.tsx`
+- Delete: `apps/qizhi-docs/package.json`
 
 - [ ] **Step 1: Write a failing smoke consumer test.**
 
@@ -406,7 +413,7 @@ Expected: PASS; the docs and smoke consumer import v1 package exports only.
 - [ ] **Step 6: Commit the v1 consumer and documentation replacement.**
 
 ```bash
-git add apps/qizhi-react-smoke apps/qizhi-docs index.html styles.css script.js vite.config.ts
+git add apps/qizhi-react-smoke src index.html vite.config.ts
 git commit -m "docs: rebuild qizhi documentation for admin v1"
 ```
 

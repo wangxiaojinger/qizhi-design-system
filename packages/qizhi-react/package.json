@@ -1,6 +1,6 @@
 {
   "name": "@wangxiaojinger/qizhi-react",
-  "version": "0.7.1",
+  "version": "1.0.0",
   "description": "QIZHI neutral enterprise-admin Ant Design components.",
   "type": "module",
   "main": "./dist/index.js",

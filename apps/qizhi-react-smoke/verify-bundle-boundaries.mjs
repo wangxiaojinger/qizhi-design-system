@@ -7,13 +7,9 @@ const javascript = (await Promise.all(
   javascriptFiles.map((file) => readFile(resolve(assetsDirectory, file), "utf8")),
 )).join("\n");
 
-if (!javascript.includes("ArrowDownIcon")) {
-  throw new Error("单图标 smoke 产物缺少 ArrowDownIcon");
-}
-
-for (const excludedIcon of ["RobotType1Icon", "CustomDeploymentColorIcon", "HpcTaskIcon"]) {
-  if (javascript.includes(excludedIcon)) {
-    throw new Error(`单图标与无图标 smoke 产物意外包含 ${excludedIcon}`);
+for (const expectedCopy of ["搜索资源", "成员管理"]) {
+  if (!javascript.includes(expectedCopy)) {
+    throw new Error(`后台 smoke 产物缺少 ${expectedCopy} 示例`);
   }
 }
 

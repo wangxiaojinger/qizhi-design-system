@@ -1,7 +1,0 @@
-#component-input-number .input-number-size-demo { display: grid; justify-items: start; gap: 20px; }
-#component-input-number .input-number-strict-demo { width: min(100%, 480px); }
-
-@media (max-width: 600px) {
-  #component-input-number .input-number-demo-row { display: grid; grid-template-columns: minmax(0, 1fr); }
-  #component-input-number .input-number-demo-row .qizhi-input-number { max-width: 100%; }
-}

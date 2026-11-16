@@ -1,32 +1,18 @@
 # @wangxiaojinger/qizhi-react
 
-QIZHI Design System 的正式 React 组件包。
-
-## 安装
-
-```bash
-pnpm add @wangxiaojinger/qizhi-react
-```
-
-## 使用
+QIZHI 企业后台 React 包：提供受控的 Ant Design 导出、语义主题桥接和后台页面组合组件。
 
 ```tsx
-import { Button } from "@wangxiaojinger/qizhi-react";
 import "@wangxiaojinger/qizhi-react/style.css";
+import { Button, PageHeader, QizhiProvider } from "@wangxiaojinger/qizhi-react";
 
-export function Example() {
-  return <Button type="primary">确认</Button>;
+export function App() {
+  return (
+    <QizhiProvider>
+      <PageHeader title="成员管理" actions={<Button type="primary">新建成员</Button>} />
+    </QizhiProvider>
+  );
 }
 ```
 
-该包要求 React 和 React DOM 19 或更高版本。
-
-## 图标来源
-
-标准界面图标默认优先使用公开的 [Remix Icon](https://remixicon.com/) `ri-*` 资产。Remix Icon 中没有语义匹配的图标，或场景明确需要启智专属业务、多色、品牌图形时，再从独立入口导入启智图标资产：
-
-```tsx
-import { ArrowDownIcon } from "@wangxiaojinger/qizhi-react/icon";
-```
-
-业务代码不得使用字符、Unicode 符号、Emoji、CSS 绘制、硬编码 SVG path 或 data URL 临时创造图标；两个图标库均无法满足时，应补充经过审核的 SVG 资产或 React 图标组件。
+项目需安装 `react`、`react-dom`、`antd` 与 `@ant-design/icons`。`QizhiProvider` 支持 `theme="light" | "dark"`，并让 Ant Design 组件与 QIZHI Token 保持同步。

@@ -1,7 +1,0 @@
-interface:
-  display_name: "QIZHI React Page Builder"
-  short_description: "仅使用 QIZHI React 组件、Demo 与设计变量生成页面"
-  default_prompt: "使用 $qizhi-react-page-builder 根据需求生成 QIZHI React 页面。"
-policy:
-  allow_implicit_invocation: false
-

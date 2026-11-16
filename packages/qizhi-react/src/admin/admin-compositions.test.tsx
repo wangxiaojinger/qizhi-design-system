@@ -17,9 +17,9 @@ it("renders backend page compositions with the QIZHI admin contract", () => {
     </>,
   );
 
-  expect(screen.getByRole("heading", { name: "成员管理" })).toBeInTheDocument();
-  expect(screen.getByText("筛选内容")).toBeInTheDocument();
-  expect(screen.getByText("状态：")).toBeInTheDocument();
+  expect(screen.getByRole("heading", { name: "成员管理" })).toBeTruthy();
+  expect(screen.getByText("筛选内容")).toBeTruthy();
+  expect(screen.getByText("状态：")).toBeTruthy();
   const input = screen.getByPlaceholderText("搜索成员");
   fireEvent.change(input, { target: { value: "启智" } });
   fireEvent.keyDown(input, { key: "Enter" });

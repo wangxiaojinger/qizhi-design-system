@@ -1,4 +1,4 @@
-import "@wangxiaojinger/qizhi-tokens/style.css";
+import "./style.css";
 
 export { QizhiProvider } from "./provider/QizhiProvider";
 export type { QizhiProviderProps, QizhiTheme } from "./provider/QizhiProvider";
