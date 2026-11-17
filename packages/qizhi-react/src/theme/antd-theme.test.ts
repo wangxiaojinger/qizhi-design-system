@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { createQizhiTheme } from "./antd-theme";
+import { createQizhiTheme, cssToken } from "./antd-theme";
 import { createQizhiComponentConfig, qizhiComponentConfig } from "./component-config";
 
 afterEach(() => {
-  for (const name of ["--admin-primary", "--control-accent", "--admin-sidebar", "--admin-accent"]) document.body.style.removeProperty(name);
+  for (const name of ["--admin-primary", "--admin-brand-identity", "--control-accent", "--admin-sidebar", "--admin-accent"]) document.body.style.removeProperty(name);
 });
 
 describe("createQizhiTheme", () => {
@@ -12,6 +12,13 @@ describe("createQizhiTheme", () => {
     const theme = createQizhiTheme();
     expect(theme.inherit).toBe(false);
     expect(theme.token?.colorPrimary).toBe("#171717");
+  });
+
+  it("publishes the brand identity Token without replacing the neutral primary theme", () => {
+    document.body.style.setProperty("--admin-primary", "#171717");
+    document.body.style.setProperty("--admin-brand-identity", "#3366ff");
+    expect(cssToken("--admin-brand-identity")).toBe("#3366ff");
+    expect(createQizhiTheme().token?.colorPrimary).toBe("#171717");
   });
 
   it("keeps interactive controls and layout on the neutral admin contract", () => {

@@ -12,12 +12,13 @@ test("publishes the complete neutral enterprise-admin token contract", async () 
     "radius.full", "control.height.xl", "layout.sider.width", "transition.fast",
     "admin.card.foreground", "admin.sidebar.selected", "admin.shadow.drawer",
     "chart.cost.series.1", "bg.base.tertiary", "text.disabled",
-    "status.primary.surface.l1", "focus.ring.shadow", "control.accent",
+    "status.primary.surface.l1", "focus.ring.shadow", "control.accent", "admin.brand.identity",
   ];
 
   for (const name of required) assert.ok(tokens[name], `missing ${name}`);
   assert.equal(tokens["admin.primary"].value, "#171717");
   assert.equal(tokens["control.accent"].value, "var(--admin-primary)");
   assert.equal(tokens["control.accent.hover"].value, "var(--admin-primary-hover)");
-  assert.equal(tokens["admin.brand.identity"], undefined);
+  assert.equal(tokens["admin.brand.identity"].value, "#3366ff");
+  assert.equal(tokens["admin.brand.identity"].themes.dark, "#6690ff");
 });

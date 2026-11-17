@@ -16,6 +16,7 @@ test("publishes the neutral admin v1 semantic surface", async () => {
     "text.default",
     "border.neutral.l1",
     "admin.primary",
+    "admin.brand.identity",
     "admin.sidebar",
     "status.error.default",
     "component.table.header.background",
@@ -24,6 +25,7 @@ test("publishes the neutral admin v1 semantic surface", async () => {
 
   for (const name of required) assert.ok(tokens[name], `missing ${name}`);
   assert.equal(tokens["admin.primary"].value, "#171717");
+  assert.equal(tokens["admin.brand.identity"].value, "#3366ff");
   assert.equal(tokens["bg.base.default"].value, "var(--admin-card)");
   assert.equal(tokens["component.table.header.background"].value, "var(--bg-bg-base-secondary)");
 });

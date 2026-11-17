@@ -1,6 +1,6 @@
 {
   "name": "@wangxiaojinger/qizhi-tokens",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "QIZHI neutral enterprise-admin design tokens.",
   "type": "module",
   "main": "./dist/index.js",

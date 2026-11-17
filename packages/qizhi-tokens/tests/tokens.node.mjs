@@ -9,10 +9,12 @@ const manifest = async () => JSON.parse(await readFile(new URL("src/tokens.json"
 test("the current manifest validates without legacy compatibility entries", async () => {
   const value = await manifest();
   assert.deepEqual(validateManifest(value), []);
-  assert.equal(value.version, "1.2.0");
+  assert.equal(value.version, "1.2.1");
   assert.equal(value.tokens["admin.primary"].value, "#171717");
   assert.equal(value.tokens["admin.primary"].themes.dark, "#e5e5e5");
   assert.equal(value.tokens["component.drawer.body.background"].value, "var(--bg-bg-base-default)");
+  assert.equal(value.tokens["admin.brand.identity"].value, "#3366ff");
+  assert.equal(value.tokens["admin.brand.identity"].themes.dark, "#6690ff");
 });
 
 test("the stylesheet exports light defaults and explicit dark overrides", async () => {
