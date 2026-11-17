@@ -7,6 +7,7 @@ export default defineConfig(({ command }) => ({
   plugins: [react()],
   resolve: {
     alias: [
+      { find: "@wangxiaojinger/qizhi-tokens/style.css", replacement: fileURLToPath(new URL("./packages/qizhi-tokens/dist/style.css", import.meta.url)) },
       { find: "@wangxiaojinger/qizhi-react/style.css", replacement: fileURLToPath(new URL("./packages/qizhi-react/src/style.css", import.meta.url)) },
       { find: "@wangxiaojinger/qizhi-react", replacement: fileURLToPath(new URL("./packages/qizhi-react/src/index.ts", import.meta.url)) },
     ],

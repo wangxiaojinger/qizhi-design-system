@@ -5,6 +5,7 @@
   "type": "module",
   "packageManager": "pnpm@11.19.0",
   "scripts": {
+    "predev": "pnpm --filter @wangxiaojinger/qizhi-tokens build",
     "dev": "vite --host 127.0.0.1",
     "build": "pnpm --filter @wangxiaojinger/qizhi-tokens build && vite build && pnpm --filter @wangxiaojinger/qizhi-react build && pnpm --filter @wangxiaojinger/qizhi-react-smoke build",
     "typecheck": "tsc -p tsconfig.json --noEmit && pnpm --filter @wangxiaojinger/qizhi-react typecheck",

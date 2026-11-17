@@ -20,7 +20,9 @@ test("the stylesheet exports light defaults and explicit dark overrides", async 
   assert.match(css, /:root \{/);
   assert.match(css, /color-scheme: light;/);
   assert.match(css, /--admin-primary: #171717/);
-  assert.match(css, /body\[data-theme="dark"\] \{/);
+  assert.match(css, /:root\[data-theme="dark"\],\nbody\[data-theme="dark"\] \{/);
   assert.match(css, /color-scheme: dark;/);
   assert.match(css, /--admin-primary: #e5e5e5/);
+  assert.match(css, /--page-bg: var\(--admin-background\);/);
+  assert.match(css, /--text-text-default: var\(--admin-foreground\);/);
 });

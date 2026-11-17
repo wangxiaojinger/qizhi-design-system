@@ -9,12 +9,13 @@ export interface QizhiProviderProps extends PropsWithChildren { locale?: ConfigP
 export function QizhiProvider({ children, locale, theme = "light" }: QizhiProviderProps) {
   const [themeRevision, setThemeRevision] = useState(0);
   useLayoutEffect(() => {
-    if (theme === "dark") document.body.dataset.theme = "dark";
-    else delete document.body.dataset.theme;
+    const roots = [document.documentElement, document.body];
+    if (theme === "dark") roots.forEach((root) => { root.dataset.theme = "dark"; });
+    else roots.forEach((root) => { delete root.dataset.theme; });
     // CSS variables change with the body attribute. Rebuild AntD's ThemeConfig
     // in the same layout pass so its JS tokens and the stylesheet stay aligned.
     setThemeRevision((revision) => revision + 1);
-    return () => { delete document.body.dataset.theme; };
+    return () => { roots.forEach((root) => { delete root.dataset.theme; }); };
   }, [theme]);
   const antdTheme = useMemo(() => createQizhiTheme(), [theme, themeRevision]);
   return <ConfigProvider {...qizhiComponentConfig} locale={locale} theme={antdTheme}><AntApp>{children}</AntApp></ConfigProvider>;

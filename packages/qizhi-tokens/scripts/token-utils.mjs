@@ -87,9 +87,13 @@ const renderDeclarations = (tokens, readValue) => Object.values(tokens)
 
 export const renderCss = (manifest) => {
   const light = `  color-scheme: light;\n${renderDeclarations(manifest.tokens, (token) => token.value)}`;
-  const darkDeclarations = renderDeclarations(manifest.tokens, (token) => token.themes?.dark);
+  // Custom-property references are resolved at the scope where they are declared.
+  // Re-declare derived tokens in the dark scope so aliases such as --page-bg
+  // and --text-text-default resolve against the dark map tokens instead of
+  // retaining their light :root result.
+  const darkDeclarations = renderDeclarations(manifest.tokens, (token) => token.themes?.dark ?? (String(token.value).includes("var(") ? token.value : undefined));
   const dark = darkDeclarations ? `  color-scheme: dark;\n${darkDeclarations}` : null;
-  return [`:root {\n${light}\n}`, dark ? `body[data-theme="dark"] {\n${dark}\n}` : null]
+  return [`:root {\n${light}\n}`, dark ? `:root[data-theme="dark"],\nbody[data-theme="dark"] {\n${dark}\n}` : null]
     .filter(Boolean)
     .join("\n\n") + "\n";
 };
