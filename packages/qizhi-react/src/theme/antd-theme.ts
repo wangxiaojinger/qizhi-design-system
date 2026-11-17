@@ -91,6 +91,9 @@ export function createQizhiTheme(): ThemeConfig {
   const one = divideCssNumberToken("--spacing-2", 2);
   const controlHeight = cssNumberToken("--control-height-md");
   return {
+    // QIZHI is the single Ant Design theme owner. Do not merge an ancestor
+    // ConfigProvider's ThemeConfig into this semantic Token bridge.
+    inherit: false,
     cssVar: { prefix: "qizhi" },
     token: {
       colorPrimary: cssToken("--admin-primary"), colorPrimaryHover: cssToken("--admin-primary-hover"), colorPrimaryActive: cssToken("--admin-primary-active"),

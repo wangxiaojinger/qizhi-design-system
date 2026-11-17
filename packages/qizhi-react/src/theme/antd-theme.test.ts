@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { createQizhiTheme } from "./antd-theme";
-import { qizhiComponentConfig } from "./component-config";
+import { createQizhiComponentConfig, qizhiComponentConfig } from "./component-config";
 
 afterEach(() => {
   for (const name of ["--admin-primary", "--control-accent", "--admin-sidebar", "--admin-accent"]) document.body.style.removeProperty(name);
@@ -9,7 +9,9 @@ afterEach(() => {
 describe("createQizhiTheme", () => {
   it("maps the neutral primary Token into Ant Design", () => {
     document.body.style.setProperty("--admin-primary", "#171717");
-    expect(createQizhiTheme().token?.colorPrimary).toBe("#171717");
+    const theme = createQizhiTheme();
+    expect(theme.inherit).toBe(false);
+    expect(theme.token?.colorPrimary).toBe("#171717");
   });
 
   it("keeps interactive controls and layout on the neutral admin contract", () => {
@@ -25,5 +27,12 @@ describe("createQizhiTheme", () => {
 
   it("keeps drawer presentation in ConfigProvider public styles", () => {
     expect(typeof qizhiComponentConfig.drawer.styles).toBe("function");
+  });
+
+  it("allows Form behaviour without allowing a consumer to replace QIZHI Form styles", () => {
+    const config = createQizhiComponentConfig({ requiredMark: false, classNames: { root: "unsafe" } } as never);
+    expect(config.form?.requiredMark).toBe(false);
+    expect(config.form?.styles).toBe(qizhiComponentConfig.form.styles);
+    expect(config.form?.classNames).toBeUndefined();
   });
 });

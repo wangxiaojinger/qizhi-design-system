@@ -19,3 +19,24 @@ export const qizhiComponentConfig = {
     },
   },
 } satisfies Pick<ConfigProviderProps, "form" | "table" | "modal" | "drawer">;
+
+/**
+ * Behaviour-only Form configuration accepted from an application. QIZHI owns
+ * component class names and styles so a consumer cannot replace its Token
+ * contract through a nested ConfigProvider.
+ */
+export type QizhiFormConfig = Pick<NonNullable<ConfigProviderProps["form"]>, "colon" | "requiredMark" | "scrollToFirstError" | "validateMessages">;
+
+export function createQizhiComponentConfig(form?: QizhiFormConfig): Pick<ConfigProviderProps, "form" | "table" | "modal" | "drawer"> {
+  const { colon, requiredMark, scrollToFirstError, validateMessages } = form ?? {};
+  return {
+    ...qizhiComponentConfig,
+    form: {
+      colon,
+      requiredMark,
+      scrollToFirstError,
+      validateMessages,
+      ...qizhiComponentConfig.form,
+    },
+  } satisfies Pick<ConfigProviderProps, "form" | "table" | "modal" | "drawer">;
+}

@@ -10,11 +10,12 @@
     "build": "pnpm --filter @wangxiaojinger/qizhi-tokens build && vite build && pnpm --filter @wangxiaojinger/qizhi-react build && pnpm --filter @wangxiaojinger/qizhi-react-smoke build",
     "typecheck": "tsc -p tsconfig.json --noEmit && pnpm --filter @wangxiaojinger/qizhi-react typecheck",
     "test": "pnpm --filter @wangxiaojinger/qizhi-tokens test && vitest run",
-    "verify": "pnpm typecheck && pnpm test && pnpm build"
+    "verify:packed-consumer": "pnpm build && node scripts/verify-packed-consumer.mjs",
+    "verify": "pnpm typecheck && pnpm test && pnpm verify:packed-consumer"
   },
   "dependencies": {
-    "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
   },
   "devDependencies": {
     "@testing-library/react": "16.3.2",

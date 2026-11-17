@@ -40,7 +40,9 @@ export function App() {
 }
 ```
 
-`QizhiProvider` 统一将 `--admin-*` 语义变量映射给 Ant Design。深色模式只需传入 `theme="dark"`。业务页面可直接使用审阅过的 Ant Design 导出，或组合 `PageHeader`、`ListPageCard`、`SectionCard`、`AdminSearchInput`、`AdminFilterSelect` 和 `TableActions`。
+`QizhiProvider` 是应用 React 根节点中唯一的 Ant Design `ThemeConfig` 所有者：在应用入口只挂载一次，不要再以带有 `theme` 的 `ConfigProvider` 包裹或嵌套它。深色模式只需传入 `theme="dark"`。业务页面可直接使用审阅过的 Ant Design 导出，或组合 `PageHeader`、`ListPageCard`、`SectionCard`、`AdminSearchInput`、`AdminFilterSelect` 和 `TableActions`。
+
+项目可通过 `QizhiProvider` 传入 `locale`、`direction`、`componentSize`、`componentDisabled`、`prefixCls`、`iconPrefixCls`、容器回调、CSP 和 Form 的行为配置。QIZHI 保留 ThemeConfig 以及 Form、Table、Modal、Drawer 的视觉 styles 所有权；不要传入第二套主题或以局部 styles 覆盖这些规范。
 
 ## 开发与发布
 
@@ -50,3 +52,5 @@ corepack pnpm verify
 ```
 
 发布前同时提升两个正式包到相同的未发布版本，完成验证后在 GitHub 创建对应 Release。`Publish GitHub Packages` 工作流会发布 Tokens 与 React 包；使用方升级版本并重新构建后才会获得新的规范。
+
+`pnpm verify` 会以 React 19.3.0、React DOM 19.3.0 与 antd 6.6.6 构建正式包，并使用 `pnpm pack` 产物在独立临时消费者中安装、构建。该验证不发布任何包。这是当前已验证基线；包的 peer dependency 允许范围内的其他版本尚未由本次版本验证。
