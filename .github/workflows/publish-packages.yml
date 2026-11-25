@@ -1,4 +1,4 @@
-name: Publish GitHub Packages
+name: Publish to npm
 
 on:
   release:
@@ -7,7 +7,7 @@ on:
 
 permissions:
   contents: read
-  packages: write
+  id-token: write
 
 jobs:
   publish:
@@ -17,31 +17,29 @@ jobs:
       - uses: actions/setup-node@v7
         with:
           node-version: 24
-          registry-url: https://npm.pkg.github.com
-          scope: "@wangxiaojinger"
       - run: corepack enable
       - run: pnpm install --frozen-lockfile
       - run: pnpm verify
-      - name: Verify both package versions are unpublished
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Pack and publish
         run: |
           set -euo pipefail
           for package in qizhi-tokens qizhi-react; do
+            name="@wangxiaojinger/$package"
             version=$(node -p "require('./packages/$package/package.json').version")
-            versions=$(npm view "@wangxiaojinger/$package" versions --json)
-            node --input-type=module -e '
-              const [name, version, versions] = process.argv.slice(1);
-              if ([JSON.parse(versions)].flat().includes(version)) {
-                throw new Error(name + "@" + version + " is already published");
-              }
-            ' "$package" "$version" "$versions"
+            test "$GITHUB_REF_NAME" = "v$version"
+            pnpm --filter "$name" pack --pack-destination "$RUNNER_TEMP"
           done
-      - name: Publish design tokens
-        run: pnpm --filter @wangxiaojinger/qizhi-tokens publish --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Publish React components
-        run: pnpm --filter @wangxiaojinger/qizhi-react publish --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          for package in qizhi-tokens qizhi-react; do
+            archive="$RUNNER_TEMP/wangxiaojinger-$package-${GITHUB_REF_NAME#v}.tgz"
+            metadata="$RUNNER_TEMP/$package.json"
+            status=$(curl -sS -o "$metadata" -w '%{http_code}' "https://registry.npmjs.org/@wangxiaojinger%2f$package/${GITHUB_REF_NAME#v}")
+            case "$status" in
+              200)
+                expected=$(node -p "require(process.argv[1]).dist.integrity" "$metadata")
+                actual="sha512-$(openssl dgst -sha512 -binary "$archive" | openssl base64 -A)"
+                test "$expected" = "$actual"
+                ;;
+              404) npm publish "$archive" --registry=https://registry.npmjs.org --access public ;;
+              *) echo "npm returned HTTP $status for $package" >&2; exit 1 ;;
+            esac
+          done

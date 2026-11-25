@@ -9,21 +9,7 @@ QIZHI 是一套面向企业后台的中性设计系统。它以语义 Token 为�
 
 ## 在其他项目中使用
 
-先让项目能够读取 GitHub Packages：
-
-```ini
-# .npmrc
-@wangxiaojinger:registry=https://npm.pkg.github.com
-always-auth=true
-```
-
-在开发者机器或 CI 的私有配置中提供拥有 `read:packages` 权限的 GitHub Token：
-
-```ini
-//npm.pkg.github.com/:_authToken=你的令牌
-```
-
-安装 React、Ant Design 与 QIZHI 包：
+从 npm 公共仓库安装。已有项目若将 `@wangxiaojinger` 指向 GitHub Packages，请先更新对应的 `.npmrc` 配置，再安装 npm 上已发布的版本并提交更新后的锁文件。
 
 ```bash
 pnpm add antd @ant-design/icons @wangxiaojinger/qizhi-tokens @wangxiaojinger/qizhi-react
@@ -51,6 +37,6 @@ corepack pnpm install
 corepack pnpm verify
 ```
 
-发布前同时提升两个正式包到相同的未发布版本，完成验证后在 GitHub 创建对应 Release。`Publish GitHub Packages` 工作流会发布 Tokens 与 React 包；使用方升级版本并重新构建后才会获得新的规范。
+首次发布由拥有 npm 命名空间权限的维护者完成。后续自动发布使用 npm Trusted Publishing，在两个包的 npm 设置中分别授权本仓库的 GitHub Actions 工作流 `publish-packages.yml`。两个包使用同一版本，创建 GitHub Release 后，工作流先完成验证，再依次发布 Tokens 和 React 包。
 
 `pnpm verify` 会以 React 19.3.0、React DOM 19.3.0 与 antd 6.6.6 构建正式包，并使用 `pnpm pack` 产物在独立临时消费者中安装、构建。该验证不发布任何包。这是当前已验证基线；包的 peer dependency 允许范围内的其他版本尚未由本次版本验证。

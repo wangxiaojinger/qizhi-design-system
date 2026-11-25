@@ -27,8 +27,8 @@
   },
   "homepage": "https://github.com/wangxiaojinger/qizhi-design-system#readme",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com",
-    "access": "restricted"
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
   },
   "sideEffects": [
     "**/*.css"
